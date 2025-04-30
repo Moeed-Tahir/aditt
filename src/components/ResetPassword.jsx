@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { Mail, AlertCircle, Info } from "lucide-react";
+import { Mail, AlertCircle, Lock, Info } from "lucide-react";
 import Link from "next/link";
 
 function ResetPassword() {
@@ -17,6 +17,7 @@ function ResetPassword() {
   const [touched, setTouched] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
+  const [showCreatePassword, setCreatePassword] = useState(false);
   const [otp, setOtp] = useState(["", "", "", ""]);
 
   const validateEmailDomain = (email, website) => {
@@ -60,10 +61,15 @@ function ResetPassword() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
+
     if (!showOtp && validateForm()) {
       setShowOtp(true);
-    } else if (showOtp) {
+    } else if (showOtp && !showCreatePassword) {
       console.log("OTP submitted:", otp.join(""));
+      setCreatePassword(true); // Move to password screen
+    } else if (showCreatePassword) {
+      console.log("New password submitted:", formData.password);
+      // Handle final password submission logic here
     }
   };
 
@@ -151,12 +157,20 @@ function ResetPassword() {
       <div className="w-full md:w-[60%] h-auto min-h-screen bg-[var(--bg-color-off-white)] flex flex-col p-5 relative">
         {/* Top bar */}
         <div className="flex items-center justify-between mb-6 w-full">
-          {showOtp ? (
+          {!showOtp ? (
+            <button
+              type="button"
+              className="text-gray-800 py-3 px-6 font-medium hover:underline rounded-[58px] bg-white"
+              onClick={() => window.history.back()}
+            >
+              ← Back
+            </button>
+          ) : showCreatePassword ? (
             <button
               type="button"
               className="text-gray-800 py-3 px-6 font-medium hover:underline rounded-[58px] bg-white"
               onClick={() => {
-                setShowOtp(false);
+                setCreatePassword(false);
               }}
             >
               ← Back
@@ -165,7 +179,9 @@ function ResetPassword() {
             <button
               type="button"
               className="text-gray-800 py-3 px-6 font-medium hover:underline rounded-[58px] bg-white"
-              onClick={() => window.history.back()}
+              onClick={() => {
+                setShowOtp(false);
+              }}
             >
               ← Back
             </button>
@@ -178,17 +194,24 @@ function ResetPassword() {
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-md">
             <div className="flex justify-center mb-5">
-              {showOtp ? (
+              {!showOtp ? (
                 <Image
-                  src="/resetpassword-mail.jpg"
-                  alt="resetpassword-mail"
+                  src="/resetpassword-lock.jpg"
+                  alt="resetpassword-lock"
+                  width={200}
+                  height={200}
+                />
+              ) : showCreatePassword ? (
+                <Image
+                  src="/resetpassword-lock.jpg"
+                  alt="resetpassword-lock"
                   width={200}
                   height={200}
                 />
               ) : (
                 <Image
-                  src="/resetpassword-lock.jpg"
-                  alt="resetpassword-lock"
+                  src="/resetpassword-mail.jpg"
+                  alt="resetpassword-mail"
                   width={200}
                   height={200}
                 />
@@ -197,14 +220,20 @@ function ResetPassword() {
             <div>
               <div className="flex justify-center items-center">
                 <p className="text-[20px] font-bold text-black">
-                  {showOtp ? "Enter OTP" : "Reset Your Password"}
+                  {!showOtp
+                    ? "Reset Your Password"
+                    : showCreatePassword
+                    ? "Create New Password"
+                    : "Enter OTP"}
                 </p>
               </div>
               <div className="flex justify-center items-center">
                 <p className="text-[16px] text-center font-light text-gray-600">
-                  {showOtp
-                    ? "Please enter the 4 digit code that we’ve sent your"
-                    : "Enter your email address, and we’ll send you instructions to reset your password."}
+                  {!showOtp
+                    ? "Enter your email address, and we’ll send you instructions to reset your password."
+                    : showCreatePassword
+                    ? "Your new password must be secure and different from previous ones."
+                    : "Please enter the 4 digit code that we’ve sent to your email."}
                 </p>
               </div>
             </div>
@@ -218,7 +247,8 @@ function ResetPassword() {
                   Mail,
                   "email"
                 )
-              ) : (
+              ) : showOtp && !showCreatePassword ? (
+                // OTP input
                 <div className="flex flex-col gap-2">
                   <label className="text-[16px] font-semibold justify-center items-center flex text-[var(--text-dark-color)]">
                     Enter OTP
@@ -237,13 +267,35 @@ function ResetPassword() {
                     ))}
                   </div>
                 </div>
+              ) : (
+                // Password inputs
+                <>
+                  {renderField(
+                    "password",
+                    "New Password",
+                    "Create your password",
+                    Lock,
+                    "password"
+                  )}
+                  {renderField(
+                    "confirmPassword",
+                    "Confirm Password",
+                    "Confirm your password",
+                    Lock,
+                    "password"
+                  )}
+                </>
               )}
 
               <button
                 type="submit"
                 className="mt-4 w-full py-5 px-4 rounded-[58px] text-white font-semibold bg-blue-600 hover:bg-blue-700 cursor-pointer"
               >
-                {showOtp ? "Verify" : "Continue"}
+                {!showOtp
+                  ? "Continue"
+                  : showCreatePassword
+                  ? "Update"
+                  : "Verify"}
               </button>
             </form>
           </div>
