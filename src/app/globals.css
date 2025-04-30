@@ -3,6 +3,7 @@
 
 :root {
   --bg-color: rgba(248, 248, 248, 1);
+    --bg-color-off-white: rgba(248, 248, 248, 1);
   --text-light-color: rgba(113, 118, 128, 1);
   --text-dark-color: rgba(37, 43, 55, 1);
   --border-color: rgba(213, 215, 218, 1);

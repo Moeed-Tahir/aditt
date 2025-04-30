@@ -1,8 +1,7 @@
 import SignupUser from "@/components/SignupUser";
 
-export default function Home() {
+export default function Page() {
   return (
     <SignupUser />
-    
   );
 }

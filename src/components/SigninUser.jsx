@@ -4,29 +4,25 @@ import Image from "next/image";
 import { User, Globe, Mail, Lock, AlertCircle, Info } from "lucide-react";
 import Link from "next/link";
 
-function SignupUser() {
+function SigninUser() {
   const [formData, setFormData] = useState({
-    name: "",
-    website: "",
+
     email: "",
     password: "",
-    acceptTerms: false,
+
   });
 
   const [errors, setErrors] = useState({
-    name: "",
-    website: "",
+
     email: "",
     password: "",
-    acceptTerms: "",
   });
 
   const [touched, setTouched] = useState({
-    name: false,
-    website: false,
+
     email: false,
     password: false,
-    acceptTerms: false,
+
   });
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
@@ -39,8 +35,6 @@ function SignupUser() {
 
   const validateForm = () => {
     const newErrors = {
-      name: !formData.name ? "Name is required" : "",
-      website: !formData.website ? "Website is required" : "",
       email: !formData.email
         ? "Email is required"
         : !validateEmailDomain(formData.email, formData.website)
@@ -51,7 +45,6 @@ function SignupUser() {
         : formData.password.length < 8
         ? "Password must be at least 8 characters"
         : "",
-      acceptTerms: !formData.acceptTerms ? "You must accept the terms" : "",
     };
 
     setErrors(newErrors);
@@ -147,8 +140,8 @@ function SignupUser() {
     <div className="flex h-auto min-h-screen w-full">
       <div className="md:flex w-[40%] h-auto min-h-screen relative hidden items-start justify-center">
         <Image
-          src="/signup.jpg"
-          alt="signup"
+          src="/signin.jpg"
+          alt="signin"
           fill
           className="object-cover overflow-clip"
         />
@@ -164,21 +157,14 @@ function SignupUser() {
           />
           <div>
             <p className="text-4xl leading-[50px] font-bold">
-              Create your Advertiser account
+              Sign in to your Advertiser dashboard
             </p>
             <p className="text-[16px] text-[var(--text-light-color)] leading-6">
-              Launch, Manage, and Optimize Your Ad Campaigns with Ease
+              Launch, track, and optimize your ad campaigns with ease.
             </p>
           </div>
 
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            {renderField("name", "Name", "Enter your name", User)}
-            {renderField(
-              "website",
-              "Business Website",
-              "Enter your business website",
-              Globe
-            )}
             {renderField(
               "email",
               "Business Email",
@@ -195,60 +181,35 @@ function SignupUser() {
               "password"
             )}
 
-            <div className="flex items-start gap-3 mt-2">
-              <div className="flex items-center h-5">
-                <input
-                  id="acceptTerms"
-                  name="acceptTerms"
-                  type="checkbox"
-                  checked={formData.acceptTerms}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300"
-                />
-              </div>
+            <div className="flex justify-center gap-3 mt-2">
               <label
                 htmlFor="acceptTerms"
-                className="text-[16px] font-medium text-gray-700"
+                className="text-[16px] font-medium text-blue-500"
               >
-                I accept the{" "}
-                <a href="#" className="text-blue-600 hover:underline">
-                  Guidelines
-                </a>
-                ,{" "}
-                <a href="#" className="text-blue-600 hover:underline">
-                  Terms and Conditions
-                </a>
-                , and{" "}
-                <a href="#" className="text-blue-600 hover:underline">
-                  Privacy Policy
-                </a>
+                <Link
+                  href="/ResetPassword"
+                  className="text-blue-500 hover:underline font-medium"
+                >
+                  Forgot Password?
+                </Link>
               </label>
-              {shouldShowError("acceptTerms") && (
-                <AlertCircle className="text-red-500 ml-2" size={20} />
-              )}
             </div>
-            {shouldShowError("acceptTerms") && (
-              <p className="text-red-500 text-sm pl-7 -mt-2">
-                {errors.acceptTerms}
-              </p>
-            )}
 
             <button
               type="submit"
               className="mt-4 w-full py-4 px-6 rounded-[58px] text-white font-semibold bg-blue-600 hover:bg-blue-700 cursor-pointer"
             >
-              Sign Up
+              Sign In
             </button>
 
             <div className="text-center mt-4">
               <p className="text-gray-600">
-                Have an account already?{" "}
+                Don’t have account?{" "}
                 <Link
-                  href="/SigninUser"
+                  href="/SignupUser"
                   className="text-blue-600 hover:underline font-medium"
                 >
-                  Sign In
+                  Sign Up
                 </Link>
               </p>
             </div>
@@ -259,4 +220,4 @@ function SignupUser() {
   );
 }
 
-export default SignupUser;
+export default SigninUser;
