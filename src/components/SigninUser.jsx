@@ -6,50 +6,44 @@ import Link from "next/link";
 
 function SigninUser() {
   const [formData, setFormData] = useState({
-
     email: "",
     password: "",
-
   });
 
   const [errors, setErrors] = useState({
-
     email: "",
     password: "",
   });
 
   const [touched, setTouched] = useState({
-
     email: false,
     password: false,
-
   });
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
-  const validateEmailDomain = (email, website) => {
-    if (!website) return false;
-    const domain = website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0];
-    return email.endsWith(`@${domain}`);
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
-  const validateForm = () => {
-    const newErrors = {
-      email: !formData.email
-        ? "Email is required"
-        : !validateEmailDomain(formData.email, formData.website)
-        ? "Email must match your business domain"
-        : "",
-      password: !formData.password
-        ? "Password is required"
-        : formData.password.length < 8
-        ? "Password must be at least 8 characters"
-        : "",
-    };
+  //   const validateForm = () => {
+  //     const newErrors = {
+  //       email: !formData.email
+  //         ? "Email is required"
+  //         : !isValidEmail(formData.email)
+  //         ? "Email must match your business domain"
+  //         : "",
+  //       password: !formData.password
+  //         ? "Password is required"
+  //         : formData.password.length < 8
+  //         ? "Password must be at least 8 characters"
+  //         : "",
+  //     };
 
-    setErrors(newErrors);
-    return !Object.values(newErrors).some((error) => error);
-  };
+  //     setErrors(newErrors);
+  //     return !Object.values(newErrors).some((error) => error);
+  //   };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -73,10 +67,10 @@ function SigninUser() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
-    if (validateForm()) {
-      // Submit form logic here
-      console.log("Form submitted:", formData);
-    }
+    // if (validateForm()) {
+    //   // Submit form logic here
+    //   console.log("Form submitted:", formData);
+    // }
   };
 
   const shouldShowError = (name) => {
@@ -170,8 +164,7 @@ function SigninUser() {
               "Business Email",
               "Enter your business email",
               Mail,
-              "email",
-              "Email address must match your business domain."
+              "email"
             )}
             {renderField(
               "password",
@@ -199,15 +192,15 @@ function SigninUser() {
               type="submit"
               className="mt-4 w-full py-4 px-6 rounded-[58px] text-white font-semibold bg-blue-600 hover:bg-blue-700 cursor-pointer"
             >
-              Sign In
+              <Link href="/CampaignDashboard">Sign In</Link>
             </button>
 
-            <div className="text-center mt-4">
+            <div className="mt-4">
               <p className="text-gray-600">
                 Don’t have account?{" "}
                 <Link
                   href="/SignupUser"
-                  className="text-blue-600 hover:underline font-medium"
+                  className="text-blue-600 hover:underline font-bold"
                 >
                   Sign Up
                 </Link>
