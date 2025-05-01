@@ -10,6 +10,7 @@ function ResetPassword() {
     website: "",
     email: "",
     password: "",
+    confirmPassword: "",
     acceptTerms: false,
   });
 
@@ -19,28 +20,31 @@ function ResetPassword() {
   const [showOtp, setShowOtp] = useState(false);
   const [showCreatePassword, setCreatePassword] = useState(false);
   const [otp, setOtp] = useState(["", "", "", ""]);
+  const [otpError, setOtpError] = useState("");
 
-  const validateEmailDomain = (email, website) => {
-    if (!website) return false;
-    const domain = website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0];
-    return email.endsWith(`@${domain}`);
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
-  //   const validateForm = () => {
-  //     const newErrors = {
-  //       email: !formData.email
-  //         ? "Email is required"
-  //         : !validateEmailDomain(formData.email, formData.website)
-  //         ? "Email must match your business domain"
-  //         : "",
-  //     };
-  //     setErrors(newErrors);
-  //     return !Object.values(newErrors).some((error) => error);
-  //   };
-
   const validateForm = () => {
-    setErrors({});
-    return true;
+    const newErrors = {
+      email: !formData.email
+        ? "Email is required"
+        : !isValidEmail(formData.email)
+        ? "Invalid email format"
+        : "",
+      password:
+        showCreatePassword && !formData.password
+          ? "Password is required"
+          : "",
+      confirmPassword:
+        showCreatePassword && formData.password !== formData.confirmPassword
+          ? "Passwords do not match"
+          : "",
+    };
+    setErrors(newErrors);
+    return !Object.values(newErrors).some((error) => error);
   };
 
   const handleChange = (e) => {
@@ -65,11 +69,22 @@ function ResetPassword() {
     if (!showOtp && validateForm()) {
       setShowOtp(true);
     } else if (showOtp && !showCreatePassword) {
-      console.log("OTP submitted:", otp.join(""));
-      setCreatePassword(true); // Move to password screen
+      const fullOtp = otp.join("");
+      const isOtpValid = /^\d{4}$/.test(fullOtp);
+
+      if (!isOtpValid) {
+        setOtpError("Please enter a valid 4-digit OTP.");
+        return;
+      }
+
+      setOtpError("");
+      console.log("OTP submitted:", fullOtp);
+      setCreatePassword(true);
     } else if (showCreatePassword) {
-      console.log("New password submitted:", formData.password);
-      // Handle final password submission logic here
+      if (validateForm()) {
+        console.log("New password submitted:", formData.password);
+        // Handle final password submission logic here
+      }
     }
   };
 
@@ -160,7 +175,7 @@ function ResetPassword() {
           {!showOtp ? (
             <button
               type="button"
-              className="text-gray-800 py-3 px-6 font-medium hover:underline rounded-[58px] bg-white"
+              className="text-gray-800 py-3 px-6 font-bold hover:underline rounded-[58px] bg-white"
               onClick={() => window.history.back()}
             >
               ← Back
@@ -168,7 +183,7 @@ function ResetPassword() {
           ) : showCreatePassword ? (
             <button
               type="button"
-              className="text-gray-800 py-3 px-6 font-medium hover:underline rounded-[58px] bg-white"
+              className="text-gray-800 py-3 px-6 font-bold hover:underline rounded-[58px] bg-white"
               onClick={() => {
                 setCreatePassword(false);
               }}
@@ -178,7 +193,7 @@ function ResetPassword() {
           ) : (
             <button
               type="button"
-              className="text-gray-800 py-3 px-6 font-medium hover:underline rounded-[58px] bg-white"
+              className="text-gray-800 py-3 px-6 font-bold hover:underline rounded-[58px] bg-white"
               onClick={() => {
                 setShowOtp(false);
               }}
@@ -187,38 +202,28 @@ function ResetPassword() {
             </button>
           )}
           <p className="text-[20px] text-black">Reset Password</p>
-          <div className="w-[60px]" /> {/* Spacer */}
+          <div className="w-[60px]" />
         </div>
 
         {/* Form content */}
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-md">
             <div className="flex justify-center mb-5">
-              {!showOtp ? (
-                <Image
-                  src="/resetpassword-lock.jpg"
-                  alt="resetpassword-lock"
-                  width={200}
-                  height={200}
-                />
-              ) : showCreatePassword ? (
-                <Image
-                  src="/resetpassword-lock.jpg"
-                  alt="resetpassword-lock"
-                  width={200}
-                  height={200}
-                />
-              ) : (
-                <Image
-                  src="/resetpassword-mail.jpg"
-                  alt="resetpassword-mail"
-                  width={200}
-                  height={200}
-                />
-              )}
+              <Image
+                src={
+                  !showOtp
+                    ? "/resetpassword-lock.jpg"
+                    : showCreatePassword
+                    ? "/resetpassword-lock.jpg"
+                    : "/resetpassword-mail.jpg"
+                }
+                alt="reset"
+                width={200}
+                height={200}
+              />
             </div>
             <div>
-              <div className="flex justify-center items-center">
+              <div className="flex justify-center items-center py-4">
                 <p className="text-[20px] font-bold text-black">
                   {!showOtp
                     ? "Reset Your Password"
@@ -228,7 +233,7 @@ function ResetPassword() {
                 </p>
               </div>
               <div className="flex justify-center items-center">
-                <p className="text-[16px] text-center font-light text-gray-600">
+                <p className="text-[16px] text-center font-light text-gray-600 py-6">
                   {!showOtp
                     ? "Enter your email address, and we’ll send you instructions to reset your password."
                     : showCreatePassword
@@ -248,10 +253,9 @@ function ResetPassword() {
                   "email"
                 )
               ) : showOtp && !showCreatePassword ? (
-                // OTP input
                 <div className="flex flex-col gap-2">
-                  <label className="text-[16px] font-semibold justify-center items-center flex text-[var(--text-dark-color)]">
-                    Enter OTP
+                  <label className="text-[16px] font-semibold justify-center items-center flex text-[var(--text-dark-color)] py-6">
+                    {formData.email}
                   </label>
                   <div className="flex gap-4 justify-center">
                     {otp.map((digit, index) => (
@@ -266,9 +270,13 @@ function ResetPassword() {
                       />
                     ))}
                   </div>
+                  {otpError && (
+                    <p className="text-red-500 text-sm text-center mt-2">
+                      {otpError}
+                    </p>
+                  )}
                 </div>
               ) : (
-                // Password inputs
                 <>
                   {renderField(
                     "password",
