@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
+import ConfirmationDialogue from "@/components/ConfirmationDialogue";
 
 import Link from "next/link";
 import {
@@ -92,6 +93,7 @@ const campaignsData = [
 export function DataTable() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortBy, setSortBy] = useState("");
+  
 
   const filteredCampaigns = campaignsData
     .filter((c) => statusFilter === "All" || c.status === statusFilter)
@@ -102,6 +104,52 @@ export function DataTable() {
         return new Date(b.date).getTime() - new Date(a.date).getTime();
       return 0;
     });
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({
+    title: "",
+    smallText:"",
+    confirmLabel: "",
+    onConfirm: () => {},
+  });
+
+  const openDialog = (title, smallText, confirmLabel, onConfirm) => {
+    setDialogConfig({ title, smallText, confirmLabel, onConfirm });
+    setDialogOpen(true);
+  };
+
+  
+  const handleAction = (type, campaignId) => {
+    const titles = {
+      pause: "Are you sure you want to pause this campaign?",
+      complete: "Are you sure you want to mark this campaign as completed?",
+      cancel: "Are you sure you want to cancel this campaign?",
+    };
+
+    const smallTexts = {
+      pause: "Are you sure you want to pause this campaign?",
+      complete: "Are you sure you want to mark this campaign as completed?",
+      cancel: "Are you sure you want to cancel this campaign?",
+    };
+
+    const labels = {
+      pause: "Pause",
+      complete: "Complete",
+      cancel: "Yes, Cancel Campaign",
+    };
+
+    setDialogConfig({
+      title: titles[type],
+      smallText: smallTexts[type],
+      confirmLabel: labels[type],
+      onConfirm: () => {
+        console.log(`${type} campaign:`, campaignId);
+        setDialogOpen(false);
+      },
+    });
+
+    setDialogOpen(true);
+  };
 
   return (
     <>
@@ -267,23 +315,53 @@ export function DataTable() {
                             </Link>
 
                             <DropdownMenuItem
-                              onClick={() => console.log("Pause", c.id)}
-                            >
-                              <Pause className="h-4 w-4" />
-                              Pause
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
                               onClick={() =>
-                                console.log("Mark as Completed", c.id)
+                                openDialog(
+                                  "Are you sure you want to pause this campaign?",
+                                  "Your campaign won’t be visible to users, but you can resume it anytime.",
+                                  "Pause",
+                                  () => {
+                                    console.log("Paused", c.id);
+                                    setDialogOpen(false);
+                                  }
+                                )
                               }
                             >
-                              <CheckCheck className="h-4 w-4 text-green-600" />
+                              <Pause className="h-4 w-4 mr-2" />
+                              Pause
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onClick={() =>
+                                openDialog(
+                                  "Are you sure you want to mark this campaign as completed?",
+                                  "This action cannot be undone.",
+                                  "Completed",
+                                  () => {
+                                    console.log("Marked as completed", c.id);
+                                    setDialogOpen(false);
+                                  }
+                                )
+                              }
+                            >
+                              <CheckCheck className="h-4 w-4 mr-2 text-green-600" />
                               Mark as Completed
                             </DropdownMenuItem>
+
                             <DropdownMenuItem
-                              onClick={() => console.log("Cancel", c.id)}
+                              onClick={() =>
+                                openDialog(
+                                  "Are you sure you want to cancel this campaign?",
+                                  "This action cannot be undone.",
+                                  "Yes, Cancel",
+                                  () => {
+                                    console.log("Canceled", c.id);
+                                    setDialogOpen(false);
+                                  }
+                                )
+                              }
                             >
-                              <X className="h-4 w-4 text-red-600" />
+                              <X className="h-4 w-4 mr-2 text-red-600" />
                               Cancel
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -313,6 +391,14 @@ export function DataTable() {
           </div>
         </div>
       </main>
+      <ConfirmationDialogue
+        open={dialogOpen}
+        title={dialogConfig.title}
+        smallText={dialogConfig.smallText}
+        confirmLabel={dialogConfig.confirmLabel}
+        onConfirm={dialogConfig.onConfirm}
+        onCancel={() => setDialogOpen(false)}
+      />
     </>
   );
 }
