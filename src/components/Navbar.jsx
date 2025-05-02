@@ -28,7 +28,7 @@ export default function Navbar() {
         </button>
 
         {/* Profile Info with Image */}
-        <div className="flex items-center bg-[var(--bg-color-off-white)] text-gray-800 py-2 px-4 rounded-[58px] hover:bg-blue-700 transition">
+        <div className="flex items-center bg-[var(--bg-color-off-white)] text-gray-800 py-2 px-4 rounded-[58px] hover:bg-blue-700  hover:text-white transition">
           <Image
             src="/navbar-image.png"
             alt="logo"

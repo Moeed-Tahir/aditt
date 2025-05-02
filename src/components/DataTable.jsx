@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
+import ConfirmationDialogue from "@/components/ConfirmationDialogue";
 
 import Link from "next/link";
 import {
@@ -103,36 +104,94 @@ export function DataTable() {
       return 0;
     });
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({
+    title: "",
+    smallText: "",
+    confirmLabel: "",
+    onConfirm: () => {},
+  });
+
+  const openDialog = (title, smallText, confirmLabel, onConfirm) => {
+    setDialogConfig({ title, smallText, confirmLabel, onConfirm });
+    setDialogOpen(true);
+  };
+
+  const handleAction = (type, campaignId) => {
+    const titles = {
+      pause: "Are you sure you want to pause this campaign?",
+      complete: "Are you sure you want to mark this campaign as completed?",
+      cancel: "Are you sure you want to cancel this campaign?",
+    };
+
+    const smallTexts = {
+      pause: "Are you sure you want to pause this campaign?",
+      complete: "Are you sure you want to mark this campaign as completed?",
+      cancel: "Are you sure you want to cancel this campaign?",
+    };
+
+    const labels = {
+      pause: "Pause",
+      complete: "Complete",
+      cancel: "Yes, Cancel Campaign",
+    };
+
+    setDialogConfig({
+      title: titles[type],
+      smallText: smallTexts[type],
+      confirmLabel: labels[type],
+      onConfirm: () => {
+        console.log(`${type} campaign:`, campaignId);
+        setDialogOpen(false);
+      },
+    });
+
+    setDialogOpen(true);
+  };
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const totalPages = Math.ceil(filteredCampaigns.length / itemsPerPage);
+  const paginatedCampaigns = filteredCampaigns.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
   return (
     <>
       <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
         <Navbar />
 
         <div className="p-4">
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <p className="text-3xl">Campaigns</p>
             <button
               type="submit"
-              className="mt-4 py-4 px-6 rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              className="py-4 px-6 rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
             >
               <Link href="/CampaignDashboard">+ Create new campaign</Link>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3  p-4">
-            <div className="bg-white border-1 rounded-xl p-6">
+          <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">
+            <div className="flex-1 p-6">
               <h2 className="text-l text-gray-400 font-light mb-2">
                 📊 Campaigns Created
               </h2>
               <p>782</p>
             </div>
-            <div className="bg-white border-1  rounded-xl p-6">
+
+            <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
+
+            <div className="flex-1 bg-white rounded-xl p-6">
               <h2 className="text-l text-gray-400 font-light mb-2">
                 🚀 Active Campaigns
               </h2>
               <p>24</p>
             </div>
-            <div className="bg-white border-1 rounded-xl p-6">
+
+            <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
+
+            <div className="flex-1 bg-white rounded-xl p-6">
               <h2 className="text-l text-gray-400 font-light mb-2">
                 🎉 Total Engagements
               </h2>
@@ -209,7 +268,7 @@ export function DataTable() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredCampaigns.map((c) => (
+                  {paginatedCampaigns.map((c) => (
                     <TableRow
                       key={c.id}
                       className="hover:bg-gray-50 transition"
@@ -267,23 +326,53 @@ export function DataTable() {
                             </Link>
 
                             <DropdownMenuItem
-                              onClick={() => console.log("Pause", c.id)}
-                            >
-                              <Pause className="h-4 w-4" />
-                              Pause
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
                               onClick={() =>
-                                console.log("Mark as Completed", c.id)
+                                openDialog(
+                                  "Are you sure you want to pause this campaign?",
+                                  "Your campaign won’t be visible to users, but you can resume it anytime.",
+                                  "Pause",
+                                  () => {
+                                    console.log("Paused", c.id);
+                                    setDialogOpen(false);
+                                  }
+                                )
                               }
                             >
-                              <CheckCheck className="h-4 w-4 text-green-600" />
+                              <Pause className="h-4 w-4 mr-2" />
+                              Pause
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onClick={() =>
+                                openDialog(
+                                  "Are you sure you want to mark this campaign as completed?",
+                                  "This action cannot be undone.",
+                                  "Completed",
+                                  () => {
+                                    console.log("Marked as completed", c.id);
+                                    setDialogOpen(false);
+                                  }
+                                )
+                              }
+                            >
+                              <CheckCheck className="h-4 w-4 mr-2 text-green-600" />
                               Mark as Completed
                             </DropdownMenuItem>
+
                             <DropdownMenuItem
-                              onClick={() => console.log("Cancel", c.id)}
+                              onClick={() =>
+                                openDialog(
+                                  "Are you sure you want to cancel this campaign?",
+                                  "This action cannot be undone.",
+                                  "Yes, Cancel",
+                                  () => {
+                                    console.log("Canceled", c.id);
+                                    setDialogOpen(false);
+                                  }
+                                )
+                              }
                             >
-                              <X className="h-4 w-4 text-red-600" />
+                              <X className="h-4 w-4 mr-2 text-red-600" />
                               Cancel
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -302,17 +391,32 @@ export function DataTable() {
                 {filteredCampaigns.length !== 1 && "s"}
               </p>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <ChevronLeft className="h-4 w-4 mr-1" /> Prev
-                </Button>
-                <Button variant="outline" size="sm">
-                  Next <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <Button
+                      key={page}
+                      variant={page === currentPage ? "default" : "outline"}
+                      size="sm"
+                      className="rounded-full"
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </Button>
+                  )
+                )}
               </div>
             </div>
           </div>
         </div>
       </main>
+      <ConfirmationDialogue
+        open={dialogOpen}
+        title={dialogConfig.title}
+        smallText={dialogConfig.smallText}
+        confirmLabel={dialogConfig.confirmLabel}
+        onConfirm={dialogConfig.onConfirm}
+        onCancel={() => setDialogOpen(false)}
+      />
     </>
   );
 }

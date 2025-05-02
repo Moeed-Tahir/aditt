@@ -18,6 +18,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { usePathname } from "next/navigation";
+
 
 const items = [
   {
@@ -36,6 +38,7 @@ const items = [
     icon: CircleDollarSign,
   },
 ];
+
 
 export function AppSidebar() {
   return (
