@@ -93,7 +93,6 @@ const campaignsData = [
 export function DataTable() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortBy, setSortBy] = useState("");
-  
 
   const filteredCampaigns = campaignsData
     .filter((c) => statusFilter === "All" || c.status === statusFilter)
@@ -108,7 +107,7 @@ export function DataTable() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogConfig, setDialogConfig] = useState({
     title: "",
-    smallText:"",
+    smallText: "",
     confirmLabel: "",
     onConfirm: () => {},
   });
@@ -118,7 +117,6 @@ export function DataTable() {
     setDialogOpen(true);
   };
 
-  
   const handleAction = (type, campaignId) => {
     const titles = {
       pause: "Are you sure you want to pause this campaign?",
@@ -150,37 +148,50 @@ export function DataTable() {
 
     setDialogOpen(true);
   };
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
+  const totalPages = Math.ceil(filteredCampaigns.length / itemsPerPage);
+  const paginatedCampaigns = filteredCampaigns.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
   return (
     <>
       <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
         <Navbar />
 
         <div className="p-4">
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <p className="text-3xl">Campaigns</p>
             <button
               type="submit"
-              className="mt-4 py-4 px-6 rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              className="py-4 px-6 rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
             >
               <Link href="/CampaignDashboard">+ Create new campaign</Link>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3  p-4">
-            <div className="bg-white border-1 rounded-xl p-6">
+          <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">
+            <div className="flex-1 p-6">
               <h2 className="text-l text-gray-400 font-light mb-2">
                 📊 Campaigns Created
               </h2>
               <p>782</p>
             </div>
-            <div className="bg-white border-1  rounded-xl p-6">
+
+            <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
+
+            <div className="flex-1 bg-white rounded-xl p-6">
               <h2 className="text-l text-gray-400 font-light mb-2">
                 🚀 Active Campaigns
               </h2>
               <p>24</p>
             </div>
-            <div className="bg-white border-1 rounded-xl p-6">
+
+            <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
+
+            <div className="flex-1 bg-white rounded-xl p-6">
               <h2 className="text-l text-gray-400 font-light mb-2">
                 🎉 Total Engagements
               </h2>
@@ -257,7 +268,7 @@ export function DataTable() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredCampaigns.map((c) => (
+                  {paginatedCampaigns.map((c) => (
                     <TableRow
                       key={c.id}
                       className="hover:bg-gray-50 transition"
@@ -380,12 +391,19 @@ export function DataTable() {
                 {filteredCampaigns.length !== 1 && "s"}
               </p>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <ChevronLeft className="h-4 w-4 mr-1" /> Prev
-                </Button>
-                <Button variant="outline" size="sm">
-                  Next <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <Button
+                      key={page}
+                      variant={page === currentPage ? "default" : "outline"}
+                      size="sm"
+                      className="rounded-full"
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </Button>
+                  )
+                )}
               </div>
             </div>
           </div>

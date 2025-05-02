@@ -1,3 +1,5 @@
+"use client";
+
 import Navbar2 from "@/components/Navbar2";
 import Link from "next/link";
 import {
@@ -14,6 +16,7 @@ import {
   Globe,
   Upload,
   Trash,
+  Copy,
 } from "lucide-react";
 
 export default function EditCampaign() {
@@ -50,24 +53,24 @@ export default function EditCampaign() {
                 className="relative z-10 flex flex-col items-center w-1/4"
               >
                 <div
-                  className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-medium ${
+                  className={`w-30 h-10 flex items-center justify-center rounded-full text-xs font-medium ${
                     index === 0
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-300 text-white"
+                      ? "bg-white border-1 border-blue-600 text-gray-600"
+                      : "bg-white text-gray-500"
                   }`}
                 >
-                  {index + 1}
+                  {step}
                 </div>
-                <span
+                {/* <span
                   className={`text-sm mt-2 ${
                     index === 0 ? "text-blue-600 font-medium" : "text-gray-500"
                   }`}
                 >
                   {step}
-                </span>
+                </span> */}
               </div>
             ))}
-            <div className="absolute top-3 left-[7%] right-[7%] h-0.5 bg-gray-300 z-0" />
+            <div className="absolute top-5 left-[7%] right-[7%] h-0.5 bg-blue-600 z-0" />
           </div>
         </div>
 
@@ -86,6 +89,8 @@ export default function EditCampaign() {
               Next
             </button>
           </div>
+
+          <hr className="border-t mb-4 border-gray-300" />
 
           <div className="space-y-6">
             {/* Campaign Title */}
@@ -109,6 +114,8 @@ export default function EditCampaign() {
               </div>
             </div>
 
+            <hr className="border-t mb-4 border-gray-300" />
+
             {/* Website/Product Link */}
             <div className="flex items-start gap-6">
               <div className="w-1/3">
@@ -131,11 +138,26 @@ export default function EditCampaign() {
                   />
                 </div>
 
-                <p className="text-xs text-green-600 mt-1">
-                  https://www.example.com?utm_source=adit&utm_medium=video&utm_campaign=spring_sal
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-xs text-green-600 select-all">
+                    https://www.example.com?utm_source=adit&utm_medium=video&utm_campaign=spring_sal
+                  </p>
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(
+                        "https://www.example.com?utm_source=adit&utm_medium=video&utm_campaign=spring_sal"
+                      )
+                    }
+                    className="text-blue-600 hover:text-blue-800 transition"
+                    title="Copy URL"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
+
+            <hr className="border-t mb-4 border-gray-300" />
 
             {/* Campaign Video Upload */}
             <div className="flex items-start gap-6">
@@ -155,10 +177,14 @@ export default function EditCampaign() {
                 <div className="mt-4 flex justify-between items-center bg-blue-50 text-blue-700 px-4 py-2 rounded-md">
                   <span className="text-sm">ads video.mp4</span>
                   <span className="text-xs text-gray-500">34.6 MB</span>
-                  <button className="text-red-500 ml-4"><Trash/></button>
+                  <button className="text-red-500 ml-4">
+                    <Trash />
+                  </button>
                 </div>
               </div>
             </div>
+
+            <hr className="border-t mb-4 border-gray-300" />
 
             {/* Campaign Image Upload */}
             <div className="flex items-start gap-6">
@@ -177,7 +203,9 @@ export default function EditCampaign() {
                 <div className="mt-4 flex justify-between items-center bg-blue-50 text-blue-700 px-4 py-2 rounded-md">
                   <span className="text-sm">Campaign image.jpg</span>
                   <span className="text-xs text-gray-500">4.6 MB</span>
-                  <button className="text-red-500 ml-4"><Trash/></button>
+                  <button className="text-red-500 ml-4">
+                    <Trash />
+                  </button>
                 </div>
               </div>
             </div>
