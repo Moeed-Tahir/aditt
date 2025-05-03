@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 export default function QuestionBox() {
@@ -60,7 +61,9 @@ export default function QuestionBox() {
                 className="w-full text-gray-400 text-sm p-2 border rounded-full"
                 value={opt}
                 onChange={(e) =>
-                  setOptions(options.map((o, idx) => (idx === i ? e.target.value : o)))
+                  setOptions(
+                    options.map((o, idx) => (idx === i ? e.target.value : o))
+                  )
                 }
               />
             </div>
@@ -76,14 +79,18 @@ export default function QuestionBox() {
 
       {/* Show added questions */}
       {questions.map((q, idx) => (
-        <details key={idx} className="mb-2 bg-white p-4 rounded shadow">
-          <summary className="cursor-pointer font-medium text-gray-800">
-            {q.question}
+        <details key={idx} className="mb-2 bg-white p-4 rounded-xl border-1">
+          <summary className="cursor-pointer font-medium text-gray-800 flex justify-between items-center">
+            <span>{q.question}</span>
+            <ChevronDown className="w-5 h-5 text-gray-500" />
           </summary>
-          <ul className="mt-2 ml-4 list-disc">
+          <ul className="mt-2 ml-4 list-disc space-y-1">
             {q.options.map((opt, i) => (
-              <li key={i} className={q.selected === i ? "font-semibold text-blue-600" : ""}>
-                {opt}
+              <li key={i} className="flex justify-between items-center pr-2">
+                <span>{opt}</span>
+                {q.selected === i && (
+                  <Check className="w-5 h-5 text-black-500" />
+                )}
               </li>
             ))}
           </ul>
