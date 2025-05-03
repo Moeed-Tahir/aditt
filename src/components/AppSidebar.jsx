@@ -3,8 +3,6 @@ import {
   ChartColumn,
   Megaphone,
   CircleDollarSign,
-  Search,
-  Settings,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -19,7 +17,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
-
+import clsx from "clsx"; // Make sure to install clsx if not already: `npm install clsx`
 
 const items = [
   {
@@ -34,13 +32,14 @@ const items = [
   },
   {
     title: "Payment Management",
-    url: "/payment-management",
+    url: "/PaymentManagement",
     icon: CircleDollarSign,
   },
 ];
 
-
 export function AppSidebar() {
+  const pathname = usePathname();
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -56,16 +55,28 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title} className="text-gray-400">
-                  <SidebarMenuButton asChild className="hover:bg-blue-50 hover:text-blue-500 hover:font-bold px-5 py-6">
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                const isActive = pathname === item.url;
+
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      className={clsx(
+                        "px-5 py-6 flex gap-3 items-center",
+                        isActive
+                          ? "bg-blue-50 text-blue-600 font-bold"
+                          : "text-gray-400 hover:bg-blue-50 hover:text-blue-500 hover:font-bold"
+                      )}
+                    >
+                      <Link href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

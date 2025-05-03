@@ -10,6 +10,8 @@ import PieCharts from "@/components/PieCharts";
 import BarCharts from "@/components/BarCharts";
 import AreaCharts from "@/components/AreaCharts";
 import ProgressBar from "@/components/ProgressBar";
+import CampaignActionsDropdown from "@/components/CampaignActionsDropdown";
+import ConfirmationDialogue from "@/components/ConfirmationDialogue";
 
 const campaignsData = [
   {
@@ -72,6 +74,19 @@ export default function CampaignDetailPage() {
   const { id } = useParams();
   const [campaign, setCampaign] = useState(null);
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({
+    title: "",
+    smallText: "",
+    confirmLabel: "",
+    onConfirm: () => {},
+  });
+
+  const openDialog = (title, smallText, confirmLabel, onConfirm) => {
+    setDialogConfig({ title, smallText, confirmLabel, onConfirm });
+    setDialogOpen(true);
+  };
+
   useEffect(() => {
     const foundCampaign = campaignsData.find((c) => c.id === id);
     setCampaign(foundCampaign);
@@ -98,12 +113,18 @@ export default function CampaignDetailPage() {
 
           <div className=" text-center text-gray-800">Campaign Overview</div>
 
-          <button
-            type="button"
-            className="flex items-center gap-2 py-2 px-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition"
-          >
-            Actions <ChevronDown className="w-4 h-4" />
-          </button>
+          <CampaignActionsDropdown
+            campaignId={campaign.id}
+            openDialog={openDialog}
+            customTrigger={
+              <button
+                type="button"
+                className="flex items-center gap-2 py-2 px-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition"
+              >
+                Actions <ChevronDown className="w-4 h-4" />
+              </button>
+            }
+          />
         </div>
 
         {/* Campaign Overview */}
@@ -265,10 +286,18 @@ export default function CampaignDetailPage() {
 
                   {/* Options Below */}
                   <div className="grid grid-cols-2 gap-3 text-sm text-gray-600 w-full max-w-md">
-                    <div className="bg-white p-6 rounded-md">🟢 Option A: 32.8k (24%)</div>
-                    <div className="bg-white p-6 rounded-md">🔵 Option B: 45.9k (54%)</div>
-                    <div className="bg-white p-6 rounded-md">🟠 Option C: 15.5k (12%)</div>
-                    <div className="bg-white p-6 rounded-md">🔴 Option D: 13.7k (10%)</div>
+                    <div className="bg-white p-6 rounded-md">
+                      🟢 Option A: 32.8k (24%)
+                    </div>
+                    <div className="bg-white p-6 rounded-md">
+                      🔵 Option B: 45.9k (54%)
+                    </div>
+                    <div className="bg-white p-6 rounded-md">
+                      🟠 Option C: 15.5k (12%)
+                    </div>
+                    <div className="bg-white p-6 rounded-md">
+                      🔴 Option D: 13.7k (10%)
+                    </div>
                   </div>
                 </div>
               </div>
@@ -426,6 +455,17 @@ export default function CampaignDetailPage() {
           </div>
         </div>
       </div>
+      <ConfirmationDialogue
+        open={dialogOpen}
+        title={dialogConfig.title}
+        smallText={dialogConfig.smallText}
+        confirmLabel={dialogConfig.confirmLabel}
+        onConfirm={() => {
+          dialogConfig.onConfirm();
+          setDialogOpen(false);
+        }}
+        onCancel={() => setDialogOpen(false)}
+      />
     </main>
   );
 }
