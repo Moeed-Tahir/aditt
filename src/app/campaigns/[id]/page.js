@@ -10,6 +10,8 @@ import PieCharts from "@/components/PieCharts";
 import BarCharts from "@/components/BarCharts";
 import AreaCharts from "@/components/AreaCharts";
 import ProgressBar from "@/components/ProgressBar";
+import CampaignActionsDropdown from "@/components/CampaignActionsDropdown";
+import ConfirmationDialogue from "@/components/ConfirmationDialogue";
 
 const campaignsData = [
   {
@@ -72,6 +74,19 @@ export default function CampaignDetailPage() {
   const { id } = useParams();
   const [campaign, setCampaign] = useState(null);
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({
+    title: "",
+    smallText: "",
+    confirmLabel: "",
+    onConfirm: () => {},
+  });
+
+  const openDialog = (title, smallText, confirmLabel, onConfirm) => {
+    setDialogConfig({ title, smallText, confirmLabel, onConfirm });
+    setDialogOpen(true);
+  };
+
   useEffect(() => {
     const foundCampaign = campaignsData.find((c) => c.id === id);
     setCampaign(foundCampaign);
@@ -98,12 +113,18 @@ export default function CampaignDetailPage() {
 
           <div className=" text-center text-gray-800">Campaign Overview</div>
 
-          <button
-            type="button"
-            className="flex items-center gap-2 py-2 px-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition"
-          >
-            Actions <ChevronDown className="w-4 h-4" />
-          </button>
+          <CampaignActionsDropdown
+            campaignId={campaign.id}
+            openDialog={openDialog}
+            customTrigger={
+              <button
+                type="button"
+                className="flex items-center gap-2 py-2 px-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition"
+              >
+                Actions <ChevronDown className="w-4 h-4" />
+              </button>
+            }
+          />
         </div>
 
         {/* Campaign Overview */}
@@ -127,54 +148,40 @@ export default function CampaignDetailPage() {
                 {campaign.status}
               </span>
 
-              <div className="text-[16px] text-gray-700 space-y-2 leading-relaxed">
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    UTM Link:
-                  </strong>
+              <div className="space-y-2 text-gray-700 text-[16px]">
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">UTM Link:</span>
                   <a
                     href="https://www.example.com"
                     className="text-blue-600 underline break-words"
                   >
                     https://www.example.com?utm_source=...
                   </a>
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Date:
-                  </strong>{" "}
-                  {campaign.date}
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Views:
-                  </strong>{" "}
-                  {campaign.views.toLocaleString()}
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Category:
-                  </strong>{" "}
-                  {campaign.category}
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Target Audience Age:
-                  </strong>{" "}
-                  18–35
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Gender:
-                  </strong>{" "}
-                  Female Only
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Locations:
-                  </strong>{" "}
-                  AL, GA, FL
-                </p>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Date:</span>
+                  <span>{campaign.date}</span>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Views:</span>
+                  <span>{campaign.views.toLocaleString()}</span>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Category:</span>
+                  <span>{campaign.category}</span>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Target Age:</span>
+                  <span>18–35</span>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Gender:</span>
+                  <span>Female Only</span>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Locations:</span>
+                  <span>AL, GA, FL</span>
+                </div>
               </div>
             </div>
           </div>
@@ -230,6 +237,8 @@ export default function CampaignDetailPage() {
                   What is the primary purpose of blockchain technology in
                   cryptocurrency?
                 </p>
+                <hr className="border-t mb-4 border-gray-300" />
+
                 <ul className="mt-4 text-sm text-gray-600 space-y-1">
                   <li>
                     A. To store user data{" "}
@@ -265,10 +274,18 @@ export default function CampaignDetailPage() {
 
                   {/* Options Below */}
                   <div className="grid grid-cols-2 gap-3 text-sm text-gray-600 w-full max-w-md">
-                    <div className="bg-white p-6 rounded-md">🟢 Option A: 32.8k (24%)</div>
-                    <div className="bg-white p-6 rounded-md">🔵 Option B: 45.9k (54%)</div>
-                    <div className="bg-white p-6 rounded-md">🟠 Option C: 15.5k (12%)</div>
-                    <div className="bg-white p-6 rounded-md">🔴 Option D: 13.7k (10%)</div>
+                    <div className="bg-white p-6 rounded-md">
+                      🟢 Option A: 32.8k (24%)
+                    </div>
+                    <div className="bg-white p-6 rounded-md">
+                      🔵 Option B: 45.9k (54%)
+                    </div>
+                    <div className="bg-white p-6 rounded-md">
+                      🟠 Option C: 15.5k (12%)
+                    </div>
+                    <div className="bg-white p-6 rounded-md">
+                      🔴 Option D: 13.7k (10%)
+                    </div>
                   </div>
                 </div>
               </div>
@@ -289,7 +306,7 @@ export default function CampaignDetailPage() {
                   25,400 Responses
                 </span>
               </div>
-              <div className="p-5 bg-[var(--bg-color-off-white)]">
+              <div className="p-5 rounded-xl bg-[var(--bg-color-off-white)]">
                 <div className="p-5 relative">
                   <ProgressBar value={25} fill="bg-white" />
                   <span className="absolute inset-0 flex items-center justify-center text-black ">
@@ -331,7 +348,7 @@ export default function CampaignDetailPage() {
                   23,240 Responses
                 </span>
               </div>
-              <div className="p-5 bg-[var(--bg-color-off-white)]">
+              <div className="p-5 rounded-xl bg-[var(--bg-color-off-white)]">
                 <div className="p-5 relative">
                   <ProgressBar value={25} fill="bg-white" />
                   <span className="absolute inset-0 flex items-center justify-center text-black ">
@@ -426,6 +443,17 @@ export default function CampaignDetailPage() {
           </div>
         </div>
       </div>
+      <ConfirmationDialogue
+        open={dialogOpen}
+        title={dialogConfig.title}
+        smallText={dialogConfig.smallText}
+        confirmLabel={dialogConfig.confirmLabel}
+        onConfirm={() => {
+          dialogConfig.onConfirm();
+          setDialogOpen(false);
+        }}
+        onCancel={() => setDialogOpen(false)}
+      />
     </main>
   );
 }

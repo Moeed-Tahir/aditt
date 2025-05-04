@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import ConfirmationDialogue from "@/components/ConfirmationDialogue";
+import CampaignActionsDropdown from "@/components/CampaignActionsDropdown";
 
 import Link from "next/link";
 import {
@@ -168,7 +169,7 @@ export function DataTable() {
               type="submit"
               className="py-4 px-6 rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
             >
-              <Link href="/CampaignDashboard">+ Create new campaign</Link>
+              <Link href="/CreateCampaign">+ Create new campaign</Link>
             </button>
           </div>
 
@@ -308,75 +309,10 @@ export function DataTable() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <EllipsisVertical className="h-4 w-4 " />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <Link
-                              href={`/EditCampaign/${c.id}`}
-                              className="w-full"
-                            >
-                              <DropdownMenuItem>
-                                <Pencil className="h-4 w-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                            </Link>
-
-                            <DropdownMenuItem
-                              onClick={() =>
-                                openDialog(
-                                  "Are you sure you want to pause this campaign?",
-                                  "Your campaign won’t be visible to users, but you can resume it anytime.",
-                                  "Pause",
-                                  () => {
-                                    console.log("Paused", c.id);
-                                    setDialogOpen(false);
-                                  }
-                                )
-                              }
-                            >
-                              <Pause className="h-4 w-4 mr-2" />
-                              Pause
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                              onClick={() =>
-                                openDialog(
-                                  "Are you sure you want to mark this campaign as completed?",
-                                  "This action cannot be undone.",
-                                  "Completed",
-                                  () => {
-                                    console.log("Marked as completed", c.id);
-                                    setDialogOpen(false);
-                                  }
-                                )
-                              }
-                            >
-                              <CheckCheck className="h-4 w-4 mr-2 text-green-600" />
-                              Mark as Completed
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                              onClick={() =>
-                                openDialog(
-                                  "Are you sure you want to cancel this campaign?",
-                                  "This action cannot be undone.",
-                                  "Yes, Cancel",
-                                  () => {
-                                    console.log("Canceled", c.id);
-                                    setDialogOpen(false);
-                                  }
-                                )
-                              }
-                            >
-                              <X className="h-4 w-4 mr-2 text-red-600" />
-                              Cancel
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <CampaignActionsDropdown
+                          campaignId={c.id}
+                          openDialog={openDialog}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}
