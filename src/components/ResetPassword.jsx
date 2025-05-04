@@ -235,10 +235,10 @@ function ResetPassword() {
               <div className="flex justify-center items-center">
                 <p className="text-[16px] text-center font-light text-gray-600 py-6">
                   {!showOtp
-                    ? "Enter your email address, and we’ll send you instructions to reset your password."
+                    ? "Enter your email address, and we'll send you instructions to reset your password."
                     : showCreatePassword
                     ? "Your new password must be secure and different from previous ones."
-                    : "Please enter the 4 digit code that we’ve sent to your email."}
+                    : "Please enter the 4 digit code that we've sent to your email."}
                 </p>
               </div>
             </div>

@@ -121,7 +121,9 @@ function SignupUser() {
           } rounded-[58px] p-4 pl-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
         />
         <Icon
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600"
+          className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${
+            shouldShowError(name) ? "text-red-500" : "text-gray-600"
+          }`}
           size={20}
         />
         {shouldShowError(name) && (
@@ -211,18 +213,18 @@ function SignupUser() {
                 htmlFor="acceptTerms"
                 className="text-[16px] font-medium text-gray-700"
               >
-                I accept the{" "}
-                <a href="#" className="text-blue-600 hover:underline">
+                Accept {""}
+                <Link href="#" className="text-blue-500 underline">
                   Guidelines
-                </a>
+                </Link>
                 ,{" "}
-                <a href="#" className="text-blue-600 hover:underline">
+                <Link href="#" className="text-blue-500 underline">
                   Terms and Conditions
-                </a>
+                </Link>
                 , and{" "}
-                <a href="#" className="text-blue-600 hover:underline">
+                <Link href="#" className="text-blue-500 underline">
                   Privacy Policy
-                </a>
+                </Link>
               </label>
               {shouldShowError("acceptTerms") && (
                 <AlertCircle className="text-red-500 ml-2" size={20} />
