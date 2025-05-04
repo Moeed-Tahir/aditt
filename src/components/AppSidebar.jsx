@@ -3,6 +3,7 @@ import {
   ChartColumn,
   Megaphone,
   CircleDollarSign,
+  Headset,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,8 +42,8 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <Sidebar>
-      <SidebarContent>
+    <Sidebar className="min-h-screen">
+      <SidebarContent className="flex flex-col h-full">
         <SidebarGroup>
           <SidebarGroupLabel className="py-10">
             <Image
@@ -53,6 +54,7 @@ export function AppSidebar() {
               className="mb-5 py-6"
             />
           </SidebarGroupLabel>
+
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
@@ -80,6 +82,21 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Sticky Help Box */}
+        <div className="mt-auto p-4">
+          <div className="bg-blue-100 text-sm p-4 rounded-xl shadow-md">
+            <Headset className="text-blue-500 mb-4 w-10 h-10"/>
+            <p className="font-semibold text-xl mb-2">Need help?</p>
+            <p className="text-xs text-gray-600 mb-2">Get answers, resolve issues, or reach out to our support team.</p>
+            <Link
+              href="/Support"
+              className="block w-full text-center bg-white text-blue-600 rounded-full py-2 text-xl hover:bg-blue-700 hover:text-white transition"
+            >
+              Contact us
+            </Link>
+          </div>
+        </div>
       </SidebarContent>
     </Sidebar>
   );

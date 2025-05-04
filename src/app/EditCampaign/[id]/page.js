@@ -170,7 +170,7 @@ export default function EditCampaign() {
                   using vertical videos.
                 </span>
               </div>
-              <div className="flex-1 border border-dashed border-gray-300 rounded-lg p-6 text-center shadow-sm">
+              <div className="flex-1 bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
                 <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
                 <p className="text-sm text-gray-700 mb-1">Upload video</p>
                 <p className="text-xs text-gray-500">Format: mp4</p>
@@ -196,7 +196,7 @@ export default function EditCampaign() {
                   This image will be used as a thumbnail for your campaign.
                 </span>
               </div>
-              <div className="flex-1 border border-dashed border-gray-300 rounded-lg p-6 text-center shadow-sm">
+              <div className="flex-1 bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
                 <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
                 <p className="text-sm text-gray-700 mb-1">Upload image</p>
                 <p className="text-xs text-gray-500">Format: jpeg, jpg, png</p>

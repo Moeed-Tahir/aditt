@@ -34,8 +34,8 @@ export default function PaymentManagementDashboard() {
                 {/* Campaign Video Upload */}
                 <div className="flex items-start gap-6">
                   <div className="w-1/3">
-                    <label className="block text-xl font-bold">
-                      Payment Info
+                    <label className="block text-xl">
+                      Payment Methods
                     </label>
                   </div>
 
@@ -51,7 +51,7 @@ export default function PaymentManagementDashboard() {
                 {/* Campaign Video Upload */}
                 <div className="flex items-start gap-6">
                   <div className="w-1/3">
-                    <label className="block text-xl font-bold">
+                    <label className="block text-xl">
                       Transactions
                     </label>
                   </div>

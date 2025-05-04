@@ -148,54 +148,40 @@ export default function CampaignDetailPage() {
                 {campaign.status}
               </span>
 
-              <div className="text-[16px] text-gray-700 space-y-2 leading-relaxed">
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    UTM Link:
-                  </strong>
+              <div className="space-y-2 text-gray-700 text-[16px]">
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">UTM Link:</span>
                   <a
                     href="https://www.example.com"
                     className="text-blue-600 underline break-words"
                   >
                     https://www.example.com?utm_source=...
                   </a>
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Date:
-                  </strong>{" "}
-                  {campaign.date}
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Views:
-                  </strong>{" "}
-                  {campaign.views.toLocaleString()}
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Category:
-                  </strong>{" "}
-                  {campaign.category}
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Target Audience Age:
-                  </strong>{" "}
-                  18–35
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Gender:
-                  </strong>{" "}
-                  Female Only
-                </p>
-                <p>
-                  <strong className="text-[16px] text-gray-400 space-y-2 leading-relaxed">
-                    Locations:
-                  </strong>{" "}
-                  AL, GA, FL
-                </p>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Date:</span>
+                  <span>{campaign.date}</span>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Views:</span>
+                  <span>{campaign.views.toLocaleString()}</span>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Category:</span>
+                  <span>{campaign.category}</span>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Target Age:</span>
+                  <span>18–35</span>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Gender:</span>
+                  <span>Female Only</span>
+                </div>
+                <div className="grid grid-cols-[130px_1fr]">
+                  <span className="text-gray-400">Locations:</span>
+                  <span>AL, GA, FL</span>
+                </div>
               </div>
             </div>
           </div>
@@ -251,6 +237,8 @@ export default function CampaignDetailPage() {
                   What is the primary purpose of blockchain technology in
                   cryptocurrency?
                 </p>
+                <hr className="border-t mb-4 border-gray-300" />
+
                 <ul className="mt-4 text-sm text-gray-600 space-y-1">
                   <li>
                     A. To store user data{" "}
@@ -318,7 +306,7 @@ export default function CampaignDetailPage() {
                   25,400 Responses
                 </span>
               </div>
-              <div className="p-5 bg-[var(--bg-color-off-white)]">
+              <div className="p-5 rounded-xl bg-[var(--bg-color-off-white)]">
                 <div className="p-5 relative">
                   <ProgressBar value={25} fill="bg-white" />
                   <span className="absolute inset-0 flex items-center justify-center text-black ">
@@ -360,7 +348,7 @@ export default function CampaignDetailPage() {
                   23,240 Responses
                 </span>
               </div>
-              <div className="p-5 bg-[var(--bg-color-off-white)]">
+              <div className="p-5 rounded-xl bg-[var(--bg-color-off-white)]">
                 <div className="p-5 relative">
                   <ProgressBar value={25} fill="bg-white" />
                   <span className="absolute inset-0 flex items-center justify-center text-black ">
