@@ -23,17 +23,17 @@ import clsx from "clsx"; // Make sure to install clsx if not already: `npm insta
 const items = [
   {
     title: "Campaign",
-    url: "/CampaignDashboard",
+    url: "/campaign-dashboard",
     icon: Megaphone,
   },
   {
     title: "Analytics",
-    url: "/Analytics",
+    url: "/analytics",
     icon: ChartColumn,
   },
   {
     title: "Payment Management",
-    url: "/PaymentManagement",
+    url: "/payment-management",
     icon: CircleDollarSign,
   },
 ];
@@ -67,7 +67,7 @@ export function AppSidebar() {
                       className={clsx(
                         "px-5 py-6 flex gap-3 items-center",
                         isActive
-                          ? "bg-blue-50 text-blue-600 font-bold"
+                          ? "bg-blue-50 text-blue-600 font-bold rounded-full"
                           : "text-gray-400 hover:bg-blue-50 hover:text-blue-500 hover:font-bold"
                       )}
                     >
@@ -90,7 +90,7 @@ export function AppSidebar() {
             <p className="font-semibold text-xl mb-2">Need help?</p>
             <p className="text-xs text-gray-600 mb-2">Get answers, resolve issues, or reach out to our support team.</p>
             <Link
-              href="/Support"
+              href="/support"
               className="block w-full text-center bg-white text-blue-600 rounded-full py-2 text-xl hover:bg-blue-700 hover:text-white transition"
             >
               Contact us

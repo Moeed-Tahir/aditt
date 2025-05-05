@@ -6,6 +6,7 @@ import Charts from "@/components/Charts";
 import { LineBarsChart } from "@/components/LineBarsChart";
 import Link from "next/link";
 import {
+  ArrowLeft,
   ChevronDown,
   Copy,
   Globe,
@@ -41,10 +42,11 @@ export function Support() {
         <div className="p-10">
           <div className="relative flex items-center mb-10 justify-between">
             <Link
-              href="/CampaignDashboard"
-              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition"
+              href="/campaign-dashboard"
+              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
             >
-              ← Back
+              <ArrowLeft />
+              Back
             </Link>
             <div className="absolute left-1/2 transform -translate-x-1/2 text-center text-gray-800 text-lg">
               Help Center
@@ -79,7 +81,7 @@ export function Support() {
               </div>
 
               <button className="bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700">
-                <Link href="/ChatSupport">Chat with Support</Link>
+                <Link href="/chat-support">Chat with Support</Link>
               </button>
             </div>
           </div>

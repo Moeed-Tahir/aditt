@@ -87,7 +87,7 @@ export default function NotificationDropdown() {
           <hr className="border-t mb-2 border-gray-300" />
 
           <div className="flex justify-center p-2">
-            <Link href="/Notifications" className="w-full p-2 text-center rounded-full text-white bg-blue-600 text-sm hover:bg-blue-700 cursor-pointer">
+            <Link href="/notifications" className="w-full p-2 text-center rounded-full text-white bg-blue-600 text-sm hover:bg-blue-700 cursor-pointer">
               View all notifications
             </Link>
           </div>

@@ -26,6 +26,10 @@ import {
   Pause,
   CheckCheck,
   X,
+  ChevronUp,
+  ListFilter,
+  ChevronsUpDown,
+  Plus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -165,12 +169,15 @@ export function DataTable() {
         <div className="p-4">
           <div className="flex justify-between items-center">
             <p className="text-3xl">Campaigns</p>
-            <button
-              type="submit"
-              className="py-4 px-6 rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
-            >
-              <Link href="/CreateCampaign">+ Create new campaign</Link>
-            </button>
+            <Link href="/create-campaign">
+              <button
+                type="button"
+                className="flex items-center gap-2 py-4 px-6 rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Create new campaign</span>
+              </button>
+            </Link>
           </div>
 
           <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">
@@ -205,37 +212,17 @@ export function DataTable() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
               <h2 className="text-xl text-gray-400">ALL CAMPAIGNS</h2>
               <div className="flex gap-2">
-                {/* Filter Dropdown */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="flex items-center gap-1"
-                    >
-                      Status: {statusFilter} <ChevronDown className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    {["All", "Active", "Pending", "Completed"].map((status) => (
-                      <DropdownMenuItem
-                        key={status}
-                        onSelect={() => setStatusFilter(status)}
-                      >
-                        {status}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
                 {/* Sort Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="flex items-center gap-1"
+                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-semibold items-center gap-1"
                     >
-                      Sort: {sortBy || "None"}{" "}
-                      <ChevronDown className="w-4 h-4" />
+                      Sort by
+                      <div>
+                        <ChevronsUpDown className="w-4 h-4" />
+                      </div>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -245,6 +232,27 @@ export function DataTable() {
                         onSelect={() => setSortBy(field)}
                       >
                         {field[0].toUpperCase() + field.slice(1)}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {/* Filter Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-semibold items-center gap-1"
+                    >
+                      <ListFilter className="w-4 h-4" /> Filter
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {["All", "Active", "Pending", "Completed"].map((status) => (
+                      <DropdownMenuItem
+                        key={status}
+                        onSelect={() => setStatusFilter(status)}
+                      >
+                        {status}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>

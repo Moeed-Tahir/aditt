@@ -1,7 +1,14 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { Mail, AlertCircle, Lock, Info } from "lucide-react";
+import {
+  Mail,
+  AlertCircle,
+  Lock,
+  Info,
+  MoveLeft,
+  ArrowLeft,
+} from "lucide-react";
 import Link from "next/link";
 
 function ResetPassword() {
@@ -35,9 +42,7 @@ function ResetPassword() {
         ? "Invalid email format"
         : "",
       password:
-        showCreatePassword && !formData.password
-          ? "Password is required"
-          : "",
+        showCreatePassword && !formData.password ? "Password is required" : "",
       confirmPassword:
         showCreatePassword && formData.password !== formData.confirmPassword
           ? "Passwords do not match"
@@ -175,30 +180,33 @@ function ResetPassword() {
           {!showOtp ? (
             <button
               type="button"
-              className="text-gray-800 py-3 px-6 font-bold hover:underline rounded-[58px] bg-white"
+              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
               onClick={() => window.history.back()}
             >
-              ← Back
+              <ArrowLeft />
+              Back
             </button>
           ) : showCreatePassword ? (
             <button
               type="button"
-              className="text-gray-800 py-3 px-6 font-bold hover:underline rounded-[58px] bg-white"
+              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
               onClick={() => {
                 setCreatePassword(false);
               }}
             >
-              ← Back
+              <ArrowLeft />
+              Back
             </button>
           ) : (
             <button
               type="button"
-              className="text-gray-800 py-3 px-6 font-bold hover:underline rounded-[58px] bg-white"
+              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
               onClick={() => {
                 setShowOtp(false);
               }}
             >
-              ← Back
+              <ArrowLeft />
+              Back
             </button>
           )}
           <p className="text-[20px] text-black">Reset Password</p>
@@ -265,8 +273,9 @@ function ResetPassword() {
                         type="text"
                         maxLength={1}
                         value={digit}
+                        placeholder="0"
                         onChange={(e) => handleOtpChange(index, e.target.value)}
-                        className="w-12 h-12 text-center border border-[var(--border-color)] rounded-lg text-xl focus:outline-none focus:border-[var(--primary-color)]"
+                        className="w-18 h-18 text-center bg-white border border-[var(--border-color)] rounded-2xl text-4xl placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary-color)]"
                       />
                     ))}
                   </div>

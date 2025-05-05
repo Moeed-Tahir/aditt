@@ -22,7 +22,7 @@ export default function Navbar2() {
             className="rounded-full mr-3"
           />
           <div>
-            <Link href="/Settings">
+            <Link href="/settings">
               <div className="font-bold">Bongo digital</div>
               <p className="text-sm font-light">john@aditt.com</p>
             </Link>

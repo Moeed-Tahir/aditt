@@ -8,6 +8,7 @@ import Sliders from "@/components/Sliders";
 import Calendars from "@/components/Calendars";
 
 import {
+  ArrowLeft,
   Calendar,
   ChevronDown,
   CircleDollarSign,
@@ -40,10 +41,11 @@ export function CreateCampaigns() {
         {/* Top Header with Back Button */}
         <div className="relative flex items-center mb-10 justify-between">
           <Link
-            href="/CampaignDashboard"
-            className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition"
+            href="/campaign-dashboard"
+            className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
           >
-            ← Back
+            <ArrowLeft />
+            Back
           </Link>
           <div className="absolute left-1/2 transform -translate-x-1/2 text-center text-gray-800 text-lg">
             Create Campaign
@@ -441,7 +443,7 @@ export function CreateCampaigns() {
                 </div>
 
                 <Link
-                  href="/CampaignDashboard"
+                  href="/campaign-dashboard"
                   className="bg-blue-600 text-white px-16 py-2 rounded-full hover:bg-blue-700"
                 >
                   Next
@@ -492,7 +494,7 @@ export function CreateCampaigns() {
                 <div className="flex items-start gap-6">
                   <div className="w-1/3">
                     <label className="block text-sm font-medium">
-                    Calculate campaign budget
+                      Calculate campaign budget
                     </label>
                     <span className="block text-xs text-gray-500 mt-1">
                       Define the total budget for your campaign.
@@ -508,7 +510,6 @@ export function CreateCampaigns() {
                       className="w-120 h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
                     />
                   </div>
-                  
                 </div>
 
                 <hr className="border-t mb-4 border-gray-300" />
@@ -517,10 +518,10 @@ export function CreateCampaigns() {
                 <div className="flex items-start gap-6">
                   <div className="w-1/3">
                     <label className="block text-sm font-medium">
-                    Payment Info
+                      Payment Info
                     </label>
                     <span className="block text-xs text-gray-500 mt-1">
-                    Choose a payment method to fund your campaign.
+                      Choose a payment method to fund your campaign.
                     </span>
                   </div>
 

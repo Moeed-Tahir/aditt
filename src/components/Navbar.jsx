@@ -27,7 +27,7 @@ export default function Navbar() {
           />
           <div>
 
-          <Link href="/Settings">
+          <Link href="/settings">
               <div className="font-bold">Bongo digital</div>
               <p className="text-sm font-light">john@aditt.com</p>
             </Link>

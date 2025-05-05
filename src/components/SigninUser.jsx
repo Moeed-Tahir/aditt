@@ -21,6 +21,7 @@ function SigninUser() {
   });
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -61,12 +62,17 @@ function SigninUser() {
   const handleBlur = (e) => {
     const { name } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
-    validateForm();
+    // validateForm();
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      window.location.href = "/campaign-dashboard";
+    }, 2000)
     // if (validateForm()) {
     //   // Submit form logic here
     //   console.log("Form submitted:", formData);
@@ -180,7 +186,7 @@ function SigninUser() {
                 className="text-[16px] font-medium text-blue-500"
               >
                 <Link
-                  href="/ResetPassword"
+                  href="/reset-password"
                   className="text-blue-500 hover:underline font-medium"
                 >
                   Forgot Password?
@@ -190,16 +196,44 @@ function SigninUser() {
 
             <button
               type="submit"
-              className="mt-4 w-full py-4 px-6 rounded-[58px] text-white font-semibold bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              disabled={loading}
+              className={`mt-4 w-full py-4 px-6 rounded-[58px] text-white font-semibold flex items-center justify-center gap-2 ${
+                loading
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
             >
-              <Link href="/CampaignDashboard">Sign In</Link>
+              {loading ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  ></path>
+                </svg>
+              ) : (
+                <span>Sign In</span>
+              )}
             </button>
 
             <div className="mt-4">
               <p className="text-gray-600">
                 Don’t have account?{" "}
                 <Link
-                  href="/SignupUser"
+                  href="/signup-user"
                   className="text-blue-600 hover:underline font-bold"
                 >
                   Sign Up

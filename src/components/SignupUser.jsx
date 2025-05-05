@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { User, Globe, Mail, Lock, AlertCircle, Info } from "lucide-react";
+import { User, Globe, Mail, Lock, AlertCircle, Info, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
 function SignupUser() {
@@ -30,6 +30,10 @@ function SignupUser() {
   });
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+
 
   const validateEmailDomain = (email, website) => {
     if (!website) return false;
@@ -80,6 +84,10 @@ function SignupUser() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
+    setTimeout(() => {
+      setLoading(false);
+      window.location.href = "/sign-in";
+    }, 2000)
     if (validateForm()) {
       // Submit form logic here
       console.log("Form submitted:", formData);
@@ -97,53 +105,68 @@ function SignupUser() {
     Icon,
     type = "text",
     note = null
-  ) => (
-    <div className="flex flex-col gap-2">
-      <label
-        htmlFor={name}
-        className="text-[16px] font-semibold text-[var(--text-dark-color)]"
-      >
-        {label}
-      </label>
-      <div className="relative">
-        <input
-          type={type}
-          id={name}
-          name={name}
-          value={formData[name]}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder={placeholder}
-          className={`w-full border ${
-            shouldShowError(name)
-              ? "border-red-500"
-              : "border-[var(--border-color)]"
-          } rounded-[58px] p-4 pl-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
-        />
-        <Icon
-          className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${
-            shouldShowError(name) ? "text-red-500" : "text-gray-600"
-          }`}
-          size={20}
-        />
-        {shouldShowError(name) && (
-          <AlertCircle
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500"
+  ) => {
+    const isPassword = name === "password";
+    const inputType = isPassword ? (showPassword ? "text" : "password") : type;
+  
+    return (
+      <div className="flex flex-col gap-2">
+        <label
+          htmlFor={name}
+          className="text-[16px] font-semibold text-[var(--text-dark-color)]"
+        >
+          {label}
+        </label>
+        <div className="relative">
+          <input
+            type={inputType}
+            id={name}
+            name={name}
+            value={formData[name]}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder={placeholder}
+            className={`w-full border ${
+              shouldShowError(name)
+                ? "border-red-500"
+                : "border-[var(--border-color)]"
+            } rounded-[58px] p-4 pl-12 pr-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
+          />
+          <Icon
+            className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${
+              shouldShowError(name) ? "text-red-500" : "text-gray-600"
+            }`}
             size={20}
           />
+          {isPassword && (
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          )}
+          {shouldShowError(name) && !isPassword && (
+            <AlertCircle
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500"
+              size={20}
+            />
+          )}
+        </div>
+        {note && (
+          <div className="flex items-center gap-1 text-gray-500 text-sm pl-4">
+            <Info size={14} />
+            <p>{note}</p>
+          </div>
+        )}
+        {shouldShowError(name) && (
+          <p className="text-red-500 text-sm pl-4">{errors[name]}</p>
         )}
       </div>
-      {note && (
-        <div className="flex items-center gap-1 text-gray-500 text-sm pl-4">
-          <Info size={14} />
-          <p>{note}</p>
-        </div>
-      )}
-      {shouldShowError(name) && (
-        <p className="text-red-500 text-sm pl-4">{errors[name]}</p>
-      )}
-    </div>
-  );
+    );
+  };
+  
 
   return (
     <div className="flex h-auto min-h-screen w-full">
@@ -218,7 +241,7 @@ function SignupUser() {
                   Guidelines
                 </Link>
                 ,{" "}
-                <Link href="#" className="text-blue-500 underline">
+                <Link href="/terms-conditions" className="text-blue-500 underline">
                   Terms and Conditions
                 </Link>
                 , and{" "}
@@ -236,18 +259,46 @@ function SignupUser() {
               </p>
             )}
 
-            <button
+<button
               type="submit"
-              className="mt-4 w-full py-4 px-6 rounded-[58px] text-white font-semibold bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              disabled={loading}
+              className={`mt-4 w-full py-4 px-6 rounded-[58px] text-white font-semibold flex items-center justify-center gap-2 ${
+                loading
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
             >
-              Sign Up
+              {loading ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  ></path>
+                </svg>
+              ) : (
+                <span>Sign Up</span>
+              )}
             </button>
 
             <div className="mt-4">
               <p className="text-gray-600">
                 Have an account already?{" "}
                 <Link
-                  href="/SigninUser"
+                  href="/signin-user"
                   className="text-blue-600 hover:underline font-bold"
                 >
                   Sign In

@@ -6,6 +6,7 @@ import Charts from "@/components/Charts";
 import { LineBarsChart } from "@/components/LineBarsChart";
 import Link from "next/link";
 import {
+  ArrowLeft,
   ChevronDown,
   Copy,
   Globe,
@@ -26,10 +27,11 @@ export function ChatSupport() {
         <div className="p-10">
           <div className="relative flex items-center mb-10 justify-between">
             <Link
-              href="/Support"
-              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition"
+              href="/support"
+              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
             >
-              ← Back
+              <ArrowLeft />
+              Back
             </Link>
             <div className="absolute left-1/2 transform -translate-x-1/2 text-center text-gray-800 text-lg">
               Help Center
