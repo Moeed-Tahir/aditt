@@ -1,7 +1,16 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { User, Globe, Mail, Lock, AlertCircle, Info, Eye, EyeOff } from "lucide-react";
+import {
+  User,
+  Globe,
+  Mail,
+  Lock,
+  AlertCircle,
+  Info,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import Link from "next/link";
 
 function SignupUser() {
@@ -32,8 +41,6 @@ function SignupUser() {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
-
 
   const validateEmailDomain = (email, website) => {
     if (!website) return false;
@@ -87,7 +94,7 @@ function SignupUser() {
     setTimeout(() => {
       setLoading(false);
       window.location.href = "/sign-in";
-    }, 2000)
+    }, 2000);
     if (validateForm()) {
       // Submit form logic here
       console.log("Form submitted:", formData);
@@ -108,7 +115,7 @@ function SignupUser() {
   ) => {
     const isPassword = name === "password";
     const inputType = isPassword ? (showPassword ? "text" : "password") : type;
-  
+
     return (
       <div className="flex flex-col gap-2">
         <label
@@ -166,7 +173,6 @@ function SignupUser() {
       </div>
     );
   };
-  
 
   return (
     <div className="flex h-auto min-h-screen w-full">
@@ -237,15 +243,24 @@ function SignupUser() {
                 className="text-[16px] font-medium text-gray-700"
               >
                 Accept {""}
-                <Link href="#" className="text-blue-500 underline">
+                <Link
+                  href="/terms-conditions?section=guidelines"
+                  className="text-blue-500 underline"
+                >
                   Guidelines
                 </Link>
-                ,{" "}
-                <Link href="/terms-conditions" className="text-blue-500 underline">
+                ,
+                <Link
+                  href="/terms-conditions?section=terms"
+                  className="text-blue-500 underline"
+                >
                   Terms and Conditions
                 </Link>
-                , and{" "}
-                <Link href="#" className="text-blue-500 underline">
+                , and
+                <Link
+                  href="/terms-conditions?section=privacy"
+                  className="text-blue-500 underline"
+                >
                   Privacy Policy
                 </Link>
               </label>
@@ -259,7 +274,7 @@ function SignupUser() {
               </p>
             )}
 
-<button
+            <button
               type="submit"
               disabled={loading}
               className={`mt-4 w-full py-4 px-6 rounded-[58px] text-white font-semibold flex items-center justify-center gap-2 ${
