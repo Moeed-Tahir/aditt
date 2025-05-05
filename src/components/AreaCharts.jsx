@@ -42,7 +42,8 @@ export default function AreaCharts() {
     return (
     <Card>
       <CardHeader>
-        <CardDescription className="text-xl text-gray-600">Campaign Performance</CardDescription>
+        
+        <CardDescription className="text-xl font-bold text-gray-600">Campaign Performance</CardDescription>
         <CardDescription>
         The total number of views and clicks for your campaign over time.
         </CardDescription>
@@ -69,6 +70,7 @@ export default function AreaCharts() {
               cursor={false}
               content={<ChartTooltipContent indicator="dot" hideLabel />}
             />
+            
             <Area
               dataKey="desktop"
               type="linear"

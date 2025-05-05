@@ -231,7 +231,7 @@ function ResetPassword() {
               />
             </div>
             <div>
-              <div className="flex justify-center items-center py-4">
+              <div className="flex justify-center items-center">
                 <p className="text-[20px] font-bold text-black">
                   {!showOtp
                     ? "Reset Your Password"
@@ -262,7 +262,7 @@ function ResetPassword() {
                 )
               ) : showOtp && !showCreatePassword ? (
                 <div className="flex flex-col gap-2">
-                  <label className="text-[16px] font-semibold justify-center items-center flex text-[var(--text-dark-color)] py-6">
+                  <label className="text-[16px] font-semibold justify-center items-center flex text-[var(--text-dark-color)]">
                     {formData.email}
                   </label>
                   <div className="flex gap-4 justify-center">

@@ -12,6 +12,7 @@ import AreaCharts from "@/components/AreaCharts";
 import ProgressBar from "@/components/ProgressBar";
 import CampaignActionsDropdown from "@/components/CampaignActionsDropdown";
 import ConfirmationDialogue from "@/components/ConfirmationDialogue";
+import QuizResponseChart from "@/components/QuizResponseChart";
 
 const campaignsData = [
   {
@@ -294,7 +295,7 @@ export default function CampaignDetailPage() {
                 </h3>
                 <div className="bg-[var(--bg-color-off-white)] p-10 rounded-xl">
                   <div>
-                    <PieCharts />
+                    <QuizResponseChart />
                   </div>
                   <div className="flex flex-col items-center gap-6">
                     {/* Chart on Top */}
@@ -334,36 +335,36 @@ export default function CampaignDetailPage() {
                   </span>
                 </div>
                 <div className="p-5 rounded-xl bg-[var(--bg-color-off-white)]">
-                <span className="text-sm text-gray-800">How satisfied are you with the earning opportunities provided by Aditt?</span>
-                  <div className="p-5 relative">
+                <span className="text-md text-gray-800">How satisfied are you with the earning opportunities provided by Aditt?</span>
+                  <div className="p-1 relative">
                     <ProgressBar
                       value={25}
                       fill="bg-white rounded-xl"
                       text={{ left: "Very Satisfied", right: "25%" }}
                     />
                   </div>
-                  <div className="p-5 relative">
+                  <div className="p-1 relative">
                     <ProgressBar
                       value={60}
                       fill="bg-white rounded-xl"
                       text={{ left: "Satisfied", right: "60%" }}
                     />
                   </div>
-                  <div className="p-5 relative">
+                  <div className="p-1 relative">
                     <ProgressBar
                       value={45}
                       fill="bg-white rounded-xl"
                       text={{ left: "Neutral", right: "45%" }}
                     />
                   </div>
-                  <div className="p-5 relative">
+                  <div className="p-1 relative">
                     <ProgressBar
                       value={30}
                       fill="bg-white rounded-xl"
                       text={{ left: "Dissatisfied", right: "30%" }}
                     />
                   </div>
-                  <div className="p-5 relative">
+                  <div className="p-1 relative">
                     <ProgressBar
                       value={30}
                       fill="bg-white rounded-xl"
@@ -382,37 +383,37 @@ export default function CampaignDetailPage() {
                   </span>
                 </div>
                 <div className="p-5 rounded-xl bg-[var(--bg-color-off-white)]">
-                <span className="text-sm text-gray-800">How satisfied are you with the earning opportunities provided by Aditt?</span>
+                <span className="text-md text-gray-800">How satisfied are you with the earning opportunities provided by Aditt?</span>
 
-                  <div className="p-5 relative">
+                  <div className="p-1 relative">
                     <ProgressBar
                       value={25}
                       fill="bg-white rounded-xl"
                       text={{ left: "Very Satisfied", right: "25%" }}
                     />
                   </div>
-                  <div className="p-5 relative">
+                  <div className="p-1 relative">
                     <ProgressBar
                       value={60}
                       fill="bg-white rounded-xl"
                       text={{ left: "Satisfied", right: "60%" }}
                     />
                   </div>
-                  <div className="p-5 relative">
+                  <div className="p-1 relative">
                     <ProgressBar
                       value={45}
                       fill="bg-white rounded-xl"
                       text={{ left: "Neutral", right: "45%" }}
                     />
                   </div>
-                  <div className="p-5 relative">
+                  <div className="p-1 relative">
                     <ProgressBar
                       value={30}
                       fill="bg-white rounded-xl"
                       text={{ left: "Dissatisfied", right: "30%" }}
                     />
                   </div>
-                  <div className="p-5 relative">
+                  <div className="p-1 relative">
                     <ProgressBar
                       value={30}
                       fill="bg-white rounded-xl"
@@ -465,12 +466,12 @@ export default function CampaignDetailPage() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3">
-            <div className="col-span-1  md:col-span-2 bg-white p-6 rounded-xl border">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="col-span-1  md:col-span-2 bg-white p-6 rounded-xl border">
               <BarCharts />
             </div>
             <div className="col-span-1  bg-white p-6 rounded-xl border">
-              <h3 className="text-gray-600 text-xl font-medium mb-3">
+              <h3 className="text-gray-600 text-xl font-bold mb-3">
                 Gender breakdown
               </h3>
               <h3 className="text-gray-500 text-sm font-medium mb-3">
@@ -478,9 +479,9 @@ export default function CampaignDetailPage() {
               </h3>
               <PieCharts />
               <div className="grid grid-cols-3 text-sm text-gray-600 w-full max-w-md">
-                <div>🟢 Male</div>
-                <div>🔵 Female</div>
-                <div>🟠 Prefer Not to Say</div>
+                <div>🔵 Male</div>
+                <div>🟣 Female</div>
+                <div>🟢 Prefer Not to Say</div>
               </div>
             </div>
           </div>

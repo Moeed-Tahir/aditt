@@ -19,9 +19,11 @@ import {
 } from "@/components/ui/chart"
 
 const chartData = [
-  { browser: "Male", visitors: 500, fill: "#3653F7" }, 
-  { browser: "Female", visitors: 200, fill: "#F670C7" }, 
-  { browser: "Prefer not to say", visitors: 107, fill: "#15B79E" },
+  { browser: "chrome", visitors: 275, fill: "#6366f1" }, // Indigo
+  { browser: "safari", visitors: 200, fill: "#10b981" }, // Emerald
+  { browser: "firefox", visitors: 287, fill: "#f59e0b" }, // Amber
+  { browser: "edge", visitors: 173, fill: "#ef4444" }, // Red
+  { browser: "other", visitors: 190, fill: "#a855f7" }, // Purple (optional 5th)
 ]
 
 
@@ -51,7 +53,7 @@ const chartConfig = {
   },
 }
 
-export default function PieCharts() {
+export default function QuizResponseChart() {
 
   const totalVisitors = useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
@@ -77,7 +79,7 @@ export default function PieCharts() {
               data={chartData}
               dataKey="visitors"
               nameKey="browser"
-              innerRadius={80}
+              innerRadius={120}
               strokeWidth={5}
             >
               <Label
@@ -93,9 +95,16 @@ export default function PieCharts() {
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-xl text-gray-300"
+                          className="fill-foreground text-3xl font-bold"
                         >
-                          Gender
+                          {totalVisitors.toLocaleString()}
+                        </tspan>
+                        <tspan
+                          x={viewBox.cx}
+                          y={viewBox.cy + 24}
+                          className="fill-muted-foreground"
+                        >
+                          Visitors
                         </tspan>
                       </text>
                     )

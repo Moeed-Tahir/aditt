@@ -20,14 +20,14 @@ export default function ConfirmationDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onCancel}>
-      <DialogContent className="h-[300px] flex flex-col justify-between">
+      <DialogContent className="h-[340px] flex flex-col justify-between">
         <DialogHeader className="items-center">
           <div className="w-full flex justify-center mt-2">
-            <ShieldAlert className="h-10 w-10 text-blue-300" />
+            <ShieldAlert className="h-20 w-20 text-blue-300" />
           </div>
-          <DialogTitle className="text-center text-xl font-normal mt-4">{title}</DialogTitle>
+          <DialogTitle className="text-center text-2xl font-normal mt-2">{title}</DialogTitle>
 
-          <DialogTitle className="text-center font-light text-gray-600 text-sm mt-4">{smallText}</DialogTitle>
+          <DialogTitle className="text-center font-light text-gray-600 text-sm mt-2">{smallText}</DialogTitle>
         </DialogHeader>
 
         <DialogFooter className="flex justify-center gap-4 mt-auto">
