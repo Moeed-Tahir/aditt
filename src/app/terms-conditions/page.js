@@ -221,7 +221,7 @@ export default function TermsConditions() {
             Back
           </Link>
 
-          <div className="flex-1 text-center text-lg font-medium">
+          <div className="flex-1 text-center text-[24px] font-medium ">
             {section === "guidelines"
               ? "Guidelines"
               : section === "privacy"
