@@ -50,7 +50,7 @@ const chartConfig = {
 
 export default function BarCharts() {
   return (
-    <Card>
+    <Card className="border-none shadow-none">
       <CardHeader>
         <CardTitle className="text-xl text-gray-600">
           Demographic Insights
@@ -59,15 +59,15 @@ export default function BarCharts() {
           Audience demographics by Age and Gender.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent >
         <ChartContainer config={chartConfig}>
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ top: 10, right: 16, bottom: 10, left: 30 }}
+            margin={{ top: 20, right: 16, bottom: 10, left: 30 }}
             width={400}
             height={300} // Increased chart height
-            barCategoryGap={20} // Smaller value = thinner bars
+            barCategoryGap={10} // Smaller value = thinner bars
           >
             <CartesianGrid horizontal={false} />
             <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
