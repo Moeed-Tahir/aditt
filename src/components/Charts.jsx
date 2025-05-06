@@ -42,7 +42,9 @@ export default function BarChartComponent() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-xl font-light">Most efficient campaigns</CardTitle>
+        <CardTitle className="text-xl font-light">
+          Most efficient campaigns
+        </CardTitle>
         <CardDescription className="font-light">
           Rank based on Click through rate
         </CardDescription>
@@ -51,7 +53,7 @@ export default function BarChartComponent() {
         <div className="w-full h-[500px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <CartesianGrid strokeDasharray="0 0" />
               <XAxis
                 dataKey="month"
                 tickFormatter={(value) => value.slice(0, 3)}
@@ -66,6 +68,7 @@ export default function BarChartComponent() {
                 tickMargin={10}
               />
               <Tooltip
+              
                 formatter={(value) => `${(value / 1000).toFixed(1)}K`}
                 labelFormatter={(label) => `Campaign: ${label}`}
               />

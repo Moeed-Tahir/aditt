@@ -24,9 +24,10 @@ import LinkBankAccount from "./LinkBankAccount";
 
 export function CreateCampaigns() {
   const steps = [
-    { label: "Set Questions" },
+
     { label: "Campaign Info" },
     { label: "Targeting Details" },
+    { label: "Set Questions" },
     { label: "Campaign Budget" },
   ];
 
@@ -79,7 +80,7 @@ export function CreateCampaigns() {
         </div>
 
         {/* Page Content (only for step 0 here) */}
-        {currentStep === 0 && (
+        {currentStep === 2 && (
           <div className="min-h-screen px-4 py-8">
             <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
               <div className="flex items-center justify-between mb-8">
@@ -148,7 +149,7 @@ export function CreateCampaigns() {
           </div>
         )}
 
-        {currentStep === 1 && (
+        {currentStep === 0 && (
           <div className="min-h-screen px-4 py-8">
             {/* Form Section */}
             <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
@@ -297,7 +298,7 @@ export function CreateCampaigns() {
           </div>
         )}
 
-        {currentStep === 2 && (
+        {currentStep === 1 && (
           <div className="min-h-screen px-4 py-8">
             {/* Form Section */}
             <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">

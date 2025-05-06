@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-function ResetPassword() {
+function SignUpVerifyEmail() {
   const [formData, setFormData] = useState({
     name: "",
     website: "",
@@ -163,54 +163,18 @@ function ResetPassword() {
 
   return (
     <div className="flex h-auto min-h-screen w-full">
-      {/* Left side image */}
-      <div className="md:flex w-[40%] h-auto min-h-screen relative hidden items-start justify-center">
-        <Image
-          src="/resetpassword.jpg"
-          alt="signin"
-          fill
-          className="object-cover overflow-clip"
-        />
-      </div>
-
       {/* Right side content */}
-      <div className="w-full md:w-[60%] h-auto min-h-screen bg-[var(--bg-color-off-white)] flex flex-col p-5 relative">
+      <div className="w-full h-auto min-h-screen bg-[var(--bg-color-off-white)] flex flex-col p-5 relative">
         {/* Top bar */}
         <div className="flex items-center justify-between mb-6 w-full">
-          {!showOtp ? (
-            <button
-              type="button"
-              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
-              onClick={() => window.history.back()}
-            >
-              <ArrowLeft />
-              Back
-            </button>
-          ) : showCreatePassword ? (
-            <button
-              type="button"
-              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
-              onClick={() => {
-                setCreatePassword(false);
-              }}
-            >
-              <ArrowLeft />
-              Back
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
-              onClick={() => {
-                setShowOtp(false);
-              }}
-            >
-              <ArrowLeft />
-              Back
-            </button>
-          )}
-          <p className="text-[20px] text-black">Reset Password</p>
-          <div className="w-[60px]" />
+          <button
+            type="button"
+            className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
+            onClick={() => window.history.back()}
+          >
+            <ArrowLeft />
+            Back
+          </button>
         </div>
 
         {/* Form content */}
@@ -218,13 +182,7 @@ function ResetPassword() {
           <div className="w-full max-w-md">
             <div className="flex justify-center mb-5">
               <Image
-                src={
-                  !showOtp
-                    ? "/resetpassword-lock.jpg"
-                    : showCreatePassword
-                    ? "/resetpassword-lock.jpg"
-                    : "/resetpassword-mail.jpg"
-                }
+                src="/resetpassword-mail.jpg"
                 alt="reset"
                 width={200}
                 height={200}
@@ -233,34 +191,17 @@ function ResetPassword() {
             <div>
               <div className="flex justify-center items-center">
                 <p className="text-[20px] font-bold text-black">
-                  {!showOtp
-                    ? "Reset Your Password"
-                    : showCreatePassword
-                    ? "Create New Password"
-                    : "Enter OTP"}
+                  Verify your email
                 </p>
               </div>
               <div className="flex justify-center items-center">
                 <p className="text-[16px] text-center font-light text-gray-600 py-6">
-                  {!showOtp
-                    ? "Enter your email address, and we'll send you instructions to reset your password."
-                    : showCreatePassword
-                    ? "Your new password must be secure and different from previous ones."
-                    : "Please enter the 4 digit code that we've sent to your email."}
-                </p>
+                Please enter the 4 digit code that we’ve sent to your email: <span className="font-bold"> jhondoe@gmail.com    </span>            </p>
               </div>
             </div>
 
             <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-              {!showOtp ? (
-                renderField(
-                  "email",
-                  "Email",
-                  "Enter your business email",
-                  Mail,
-                  "email"
-                )
-              ) : showOtp && !showCreatePassword ? (
+
                 <div className="flex flex-col gap-2">
                   <label className="text-[16px] font-semibold justify-center items-center flex text-[var(--text-dark-color)]">
                     {formData.email}
@@ -285,34 +226,11 @@ function ResetPassword() {
                     </p>
                   )}
                 </div>
-              ) : (
-                <>
-                  {renderField(
-                    "password",
-                    "New Password",
-                    "Create your password",
-                    Lock,
-                    "password"
-                  )}
-                  {renderField(
-                    "confirmPassword",
-                    "Confirm Password",
-                    "Confirm your password",
-                    Lock,
-                    "password"
-                  )}
-                </>
-              )}
 
               <button
                 type="submit"
                 className="mt-4 w-full py-5 px-4 rounded-[58px] text-white font-semibold bg-blue-600 hover:bg-blue-700 cursor-pointer"
-              >
-                {!showOtp
-                  ? "Continue"
-                  : showCreatePassword
-                  ? "Update"
-                  : "Verify"}
+              > Verify
               </button>
             </form>
           </div>
@@ -322,4 +240,4 @@ function ResetPassword() {
   );
 }
 
-export default ResetPassword;
+export default SignUpVerifyEmail;

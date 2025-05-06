@@ -93,7 +93,7 @@ function SignupUser() {
     setSubmitAttempted(true);
     setTimeout(() => {
       setLoading(false);
-      window.location.href = "/sign-in";
+      window.location.href = "/verify-email";
     }, 2000);
     if (validateForm()) {
       // Submit form logic here
@@ -244,21 +244,21 @@ function SignupUser() {
               >
                 Accept {""}
                 <Link
-                  href="/terms-conditions?section=guidelines"
+                  href="/guidelines"
                   className="text-blue-500 underline"
                 >
                   Guidelines
                 </Link>
                 ,
                 <Link
-                  href="/terms-conditions?section=terms"
+                  href="/terms-conditions"
                   className="text-blue-500 underline"
                 >
                   Terms and Conditions
                 </Link>
                 , and
                 <Link
-                  href="/terms-conditions?section=privacy"
+                  href="/privacy-policy"
                   className="text-blue-500 underline"
                 >
                   Privacy Policy

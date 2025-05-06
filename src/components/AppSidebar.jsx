@@ -26,16 +26,16 @@ const items = [
     url: "/campaign-dashboard",
     icon: Megaphone,
   },
-  {
-    title: "Analytics",
-    url: "/analytics",
-    icon: ChartColumn,
-  },
-  {
-    title: "Payment Management",
-    url: "/payment-management",
-    icon: CircleDollarSign,
-  },
+  // {
+  //   title: "Analytics",
+  //   url: "/analytics",
+  //   icon: ChartColumn,
+  // },
+  // {
+  //   title: "Payment Management",
+  //   url: "/payment-management",
+  //   icon: CircleDollarSign,
+  // },
 ];
 
 export function AppSidebar() {

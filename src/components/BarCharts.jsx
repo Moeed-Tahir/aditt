@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
+import { TrendingUp } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
   Cell,
-} from "recharts"
+} from "recharts";
 
 import {
   Card,
@@ -18,91 +18,118 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 
 // Custom color added to each data object
 const chartData = [
-  { month: "January", desktop: 186, fill: "#E670C7" }, // Indigo
-  { month: "February", desktop: 305, fill: "#3653F7" }, // Emerald
-  { month: "March", desktop: 237, fill: "#E670C7" }, // Amber
-  { month: "April", desktop: 73, fill: "#3653F7" }, // Red
-  { month: "May", desktop: 209, fill: "#E670C7" }, // Purple
-  { month: "June", desktop: 214, fill: "#3653F7" }, // Sky Blue
-]
+  { month: "45+", male: 120, female: 66 },
+  { month: "35-44", male: 200, female: 105 },
+  { month: "25-33", male: 140, female: 97, preferNotToSay: 30 },
+  { month: "18-24", male: 50, female: 23, preferNotToSay: 50 },
+];
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
+  male: {
+    label: "Male",
+    color: "#3653F7", // Blue
   },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
+  female: {
+    label: "Female",
+    color: "#E670C7", // Pink
   },
-  label: {
-    color: "hsl(var(--background))",
+  preferNotToSay: {
+    label: "Prefer Not To Say",
+    color: "#15B79E",
   },
-}
+};
 
 export default function BarCharts() {
   return (
-    <Card>
+    <Card className="border-none shadow-none">
       <CardHeader>
-        <CardTitle className="text-xl text-gray-600">Demographic Insights</CardTitle>
-        <CardDescription>Audience demographics by Age and Gender.</CardDescription>
+        <CardTitle className="text-xl text-gray-600">
+          Demographic Insights
+        </CardTitle>
+        <CardDescription>
+          Audience demographics by Age and Gender.
+        </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent >
         <ChartContainer config={chartConfig}>
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ top: 10, right: 16, bottom: 10, left: 30 }} // Adjusted margin
-            width={400} // Decreased width
-            height={250} // Decreased height
+            margin={{ top: 20, right: 16, bottom: 10, left: 30 }}
+            width={400}
+            height={300} // Increased chart height
+            barCategoryGap={10} // Smaller value = thinner bars
           >
             <CartesianGrid horizontal={false} />
+            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
+
             <YAxis
               dataKey="month"
               type="category"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-              hide
             />
-            <XAxis dataKey="desktop" type="number" hide />
+            <XAxis type="number" hide />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
             />
-            <Bar dataKey="desktop" layout="vertical" radius={4}>
-              {/* Custom color for each bar */}
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
-              ))}
+
+            <Bar
+              dataKey="male"
+              stackId="a"
+              fill={chartConfig.male.color}
+              radius={[4, 0, 0, 4]}
+            >
               <LabelList
-                dataKey="month"
-                position="insideLeft"
-                offset={8}
-                className="fill-[--color-label]"
-                fontSize={12}
-              />
-              <LabelList
-                dataKey="desktop"
+                dataKey="male"
                 position="right"
                 offset={8}
-                className="fill-foreground"
                 fontSize={12}
+                className="fill-foreground"
+              />
+            </Bar>
+            <Bar
+              dataKey="preferNotToSay"
+              stackId="a"
+              fill={chartConfig.preferNotToSay.color}
+              radius={[0, 0, 0, 0]}
+            >
+              <LabelList
+                dataKey="preferNotToSay"
+                position="right"
+                offset={8}
+                fontSize={12}
+                className="fill-foreground"
+              />
+            </Bar>
+            <Bar
+              dataKey="female"
+              stackId="a"
+              fill={chartConfig.female.color}
+              radius={[0, 4, 4, 0]}
+            >
+              <LabelList
+                dataKey="female"
+                position="right"
+                offset={8}
+                fontSize={12}
+                className="fill-foreground"
               />
             </Bar>
           </BarChart>
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

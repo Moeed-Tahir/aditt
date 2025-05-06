@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import ConfirmationDialogue from "@/components/ConfirmationDialogue";
 import CampaignActionsDropdown from "@/components/CampaignActionsDropdown";
+import Charts from "@/components/Charts";
 
 import Link from "next/link";
 import {
@@ -207,7 +208,7 @@ export function DataTable() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-4 border border-gray-200">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
               <h2 className="text-xl text-gray-400">ALL CAMPAIGNS</h2>
@@ -351,7 +352,9 @@ export function DataTable() {
               </div>
             </div>
           </div>
+          <Charts/>
         </div>
+        
       </main>
       <ConfirmationDialogue
         open={dialogOpen}
