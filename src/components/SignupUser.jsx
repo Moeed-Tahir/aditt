@@ -12,6 +12,8 @@ import {
   EyeOff,
 } from "lucide-react";
 import Link from "next/link";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 function SignupUser() {
   const [formData, setFormData] = useState({
@@ -41,6 +43,7 @@ function SignupUser() {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const validateEmailDomain = (email, website) => {
     if (!website) return false;
@@ -55,13 +58,13 @@ function SignupUser() {
       email: !formData.email
         ? "Email is required"
         : !validateEmailDomain(formData.email, formData.website)
-        ? "Email must match your business domain"
-        : "",
+          ? "Email must match your business domain"
+          : "",
       password: !formData.password
         ? "Password is required"
         : formData.password.length < 8
-        ? "Password must be at least 8 characters"
-        : "",
+          ? "Password must be at least 8 characters"
+          : "",
       acceptTerms: !formData.acceptTerms ? "You must accept the terms" : "",
     };
 
@@ -88,16 +91,37 @@ function SignupUser() {
     validateForm();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
-    setTimeout(() => {
-      setLoading(false);
-      window.location.href = "/verify-email";
-    }, 2000);
-    if (validateForm()) {
-      // Submit form logic here
-      console.log("Form submitted:", formData);
+
+    if (!formData.name || !formData.website || !formData.email || !formData.password) {
+      setMessage({ text: 'Please fill all fields', type: 'error' });
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/routes/v1/authRoutes?action=signup', {
+        name: formData.name,
+        businessWebsite: formData.website,
+        businessEmail: formData.email,
+        password: formData.password
+      })
+      console.log("response",response.data.userId)
+      if (response.status === 200 || response.status === 201) {
+        localStorage.setItem("userId",response.data.userId);
+        alert("User created successfully");
+        router.push("verify-email");
+      } else if (response.status === 200) {
+        alert("User created successfully")
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.response && error.response.status === 400) {
+        alert("'User with entered email already exists")
+      } else {
+        alert("Server error. Please try again")
+      }
     }
   };
 
@@ -133,16 +157,14 @@ function SignupUser() {
             onChange={handleChange}
             onBlur={handleBlur}
             placeholder={placeholder}
-            className={`w-full border ${
-              shouldShowError(name)
+            className={`w-full border ${shouldShowError(name)
                 ? "border-red-500"
                 : "border-[var(--border-color)]"
-            } rounded-[58px] p-4 pl-12 pr-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
+              } rounded-[58px] p-4 pl-12 pr-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
           />
           <Icon
-            className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${
-              shouldShowError(name) ? "text-red-500" : "text-gray-600"
-            }`}
+            className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${shouldShowError(name) ? "text-red-500" : "text-gray-600"
+              }`}
             size={20}
           />
           {isPassword && (
@@ -277,11 +299,10 @@ function SignupUser() {
             <button
               type="submit"
               disabled={loading}
-              className={`mt-4 w-full py-4 px-6 rounded-[58px] text-white font-semibold flex items-center justify-center gap-2 ${
-                loading
+              className={`mt-4 w-full py-4 px-6 rounded-[58px] text-white font-semibold flex items-center justify-center gap-2 ${loading
                   ? "bg-blue-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"
-              }`}
+                }`}
             >
               {loading ? (
                 <svg

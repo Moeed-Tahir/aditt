@@ -10,6 +10,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
+import axios from "axios";
 
 function SignUpVerifyEmail() {
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ function SignUpVerifyEmail() {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
   const [showCreatePassword, setCreatePassword] = useState(false);
-  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
 
   const isValidEmail = (email) => {
@@ -39,8 +40,8 @@ function SignUpVerifyEmail() {
       email: !formData.email
         ? "Email is required"
         : !isValidEmail(formData.email)
-        ? "Invalid email format"
-        : "",
+          ? "Invalid email format"
+          : "",
       password:
         showCreatePassword && !formData.password ? "Password is required" : "",
       confirmPassword:
@@ -67,29 +68,20 @@ function SignUpVerifyEmail() {
     validateForm();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
-
-    if (!showOtp && validateForm()) {
-      setShowOtp(true);
-    } else if (showOtp && !showCreatePassword) {
-      const fullOtp = otp.join("");
-      const isOtpValid = /^\d{4}$/.test(fullOtp);
-
-      if (!isOtpValid) {
-        setOtpError("Please enter a valid 4-digit OTP.");
-        return;
-      }
-
-      setOtpError("");
-      console.log("OTP submitted:", fullOtp);
-      setCreatePassword(true);
-    } else if (showCreatePassword) {
-      if (validateForm()) {
-        console.log("New password submitted:", formData.password);
-        // Handle final password submission logic here
-      }
+    const userId = localStorage.getItem("userId");
+    try {
+      const response = await axios.post('/api/routes/v1/authRoutes?action=verify-otp', {
+        otp: otp,
+        userId: userId
+      })
+      alert("User is created")
+    } catch (error) {
+      alert("Error is occured", error);
+    }finally{
+      setSubmitAttempted(false);
     }
   };
 
@@ -97,15 +89,13 @@ function SignUpVerifyEmail() {
     return (touched[name] || submitAttempted) && errors[name];
   };
 
-  const handleOtpChange = (index, value) => {
-    if (!/^\d?$/.test(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    if (value && index < 3) {
-      const nextInput = document.getElementById(`otp-${index + 1}`);
-      if (nextInput) nextInput.focus();
+  const handleOtpChange = (e) => {
+    const value = e.target.value;
+    // Only allow numbers and limit to 4 digits
+    if (/^\d{0,4}$/.test(value)) {
+      setOtp(value);
     }
+    if (otpError) setOtpError("");
   };
 
   const renderField = (
@@ -132,11 +122,10 @@ function SignUpVerifyEmail() {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={placeholder}
-          className={`w-full border ${
-            shouldShowError(name)
+          className={`w-full border ${shouldShowError(name)
               ? "border-red-500"
               : "border-[var(--border-color)]"
-          } rounded-[58px] p-4 pl-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
+            } rounded-[58px] p-4 pl-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
         />
         <Icon
           className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600"
@@ -196,39 +185,37 @@ function SignUpVerifyEmail() {
               </div>
               <div className="flex justify-center items-center">
                 <p className="text-[16px] text-center font-light text-gray-600 py-6">
-                Please enter the 4 digit code that we’ve sent to your email: <span className="font-bold"> jhondoe@gmail.com    </span>            </p>
+                  Please enter the 4 digit code that we’ve sent to your email: <span className="font-bold"> jhondoe@gmail.com    </span>            </p>
               </div>
             </div>
 
-            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <form className="flex flex-col gap-4" >
 
-                <div className="flex flex-col gap-2">
-                  <label className="text-[16px] font-semibold justify-center items-center flex text-[var(--text-dark-color)]">
-                    {formData.email}
-                  </label>
-                  <div className="flex gap-4 justify-center">
-                    {otp.map((digit, index) => (
-                      <input
-                        key={index}
-                        id={`otp-${index}`}
-                        type="text"
-                        maxLength={1}
-                        value={digit}
-                        placeholder="0"
-                        onChange={(e) => handleOtpChange(index, e.target.value)}
-                        className="w-18 h-18 text-center bg-white border border-[var(--border-color)] rounded-2xl text-4xl placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary-color)]"
-                      />
-                    ))}
-                  </div>
-                  {otpError && (
-                    <p className="text-red-500 text-sm text-center mt-2">
-                      {otpError}
-                    </p>
-                  )}
+              <div className="flex flex-col gap-2">
+                <label className="text-[16px] font-semibold justify-center items-center flex text-[var(--text-dark-color)]">
+                  {formData.email}
+                </label>
+                <div className="flex gap-4 justify-center">
+                <input
+                    type="text"
+                    id="otp"
+                    name="otp"
+                    value={otp}
+                    onChange={handleOtpChange}
+                    maxLength={4}
+                    placeholder="1234"
+                    className="w-full text-center bg-white border border-[var(--border-color)] rounded-2xl p-4 placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary-color)]"
+                  />
                 </div>
+                {otpError && (
+                  <p className="text-red-500 text-sm text-center mt-2">
+                    {otpError}
+                  </p>
+                )}
+              </div>
 
               <button
-                type="submit"
+              onClick={handleSubmit}
                 className="mt-4 w-full py-5 px-4 rounded-[58px] text-white font-semibold bg-blue-600 hover:bg-blue-700 cursor-pointer"
               > Verify
               </button>
