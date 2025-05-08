@@ -10,15 +10,14 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 function ResetPassword() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    name: "",
-    website: "",
     email: "",
     password: "",
     confirmPassword: "",
-    acceptTerms: false,
   });
 
   const [errors, setErrors] = useState({});
@@ -28,6 +27,11 @@ function ResetPassword() {
   const [showCreatePassword, setCreatePassword] = useState(false);
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [otpError, setOtpError] = useState("");
+  const [userId, setUserId] = useState(null);
+  const [apiError, setApiError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,6 +63,7 @@ function ResetPassword() {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
     setTouched((prev) => ({ ...prev, [name]: true }));
+    setApiError("");
   };
 
   const handleBlur = (e) => {
@@ -67,12 +72,40 @@ function ResetPassword() {
     validateForm();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
+    setApiError("");
 
-    if (!showOtp && validateForm()) {
-      setShowOtp(true);
+    if (!showOtp) {
+      if (!validateForm()) return;
+
+      setLoading(true);
+      try {
+        const response = await fetch("/api/routes/v1/authRoutes?action=forgot-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to send OTP");
+        }
+
+        setUserId(data.userId);
+        setShowOtp(true);
+      } catch (error) {
+        console.error("Forgot password error:", error);
+        setApiError(error.message);
+      } finally {
+        setLoading(false);
+      }
     } else if (showOtp && !showCreatePassword) {
       const fullOtp = otp.join("");
       const isOtpValid = /^\d{4}$/.test(fullOtp);
@@ -83,12 +116,41 @@ function ResetPassword() {
       }
 
       setOtpError("");
-      console.log("OTP submitted:", fullOtp);
       setCreatePassword(true);
     } else if (showCreatePassword) {
-      if (validateForm()) {
-        console.log("New password submitted:", formData.password);
-        // Handle final password submission logic here
+      if (!validateForm()) return;
+
+      setLoading(true);
+      try {
+        const response = await fetch("/api/routes/v1/authRoutes?action=reset-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+            otp: otp.join(""),
+            newPassword: formData.password,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Password reset failed");
+        }
+
+        setSuccessMessage(
+          "Password reset successfully! Redirecting to login..."
+        );
+        setTimeout(() => {
+          router.push("/signin-user");
+        }, 2000);
+      } catch (error) {
+        console.error("Reset password error:", error);
+        setApiError(error.message);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -302,6 +364,17 @@ function ResetPassword() {
                     "password"
                   )}
                 </>
+              )}
+              {apiError && (
+                <div className="text-red-500 text-sm text-center">
+                  {apiError}
+                </div>
+              )}
+
+              {successMessage && (
+                <div className="text-green-500 text-sm text-center">
+                  {successMessage}
+                </div>
               )}
 
               <button

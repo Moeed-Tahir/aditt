@@ -27,7 +27,7 @@ function SignUpVerifyEmail() {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
   const [showCreatePassword, setCreatePassword] = useState(false);
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(["", "", "", ""]);
   const [otpError, setOtpError] = useState("");
 
   const isValidEmail = (email) => {
@@ -71,16 +71,24 @@ function SignUpVerifyEmail() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
+  
+    // Validate OTP before proceeding
+    if (otp.some((digit) => !digit)) {
+      setOtpError("Please enter a valid 4-digit OTP.");
+      setSubmitAttempted(false);
+      return;
+    }
+  
     const userId = localStorage.getItem("userId");
     try {
       const response = await axios.post('/api/routes/v1/authRoutes?action=verify-otp', {
-        otp: otp,
+        otp: otp.join(""), // Send OTP as a string
         userId: userId
-      })
-      alert("User is created")
+      });
+      alert("User is created");
     } catch (error) {
-      alert("Error is occured", error);
-    }finally{
+      alert("An error occurred: " + error.message); // Show specific error message
+    } finally {
       setSubmitAttempted(false);
     }
   };
@@ -89,13 +97,15 @@ function SignUpVerifyEmail() {
     return (touched[name] || submitAttempted) && errors[name];
   };
 
-  const handleOtpChange = (e) => {
-    const value = e.target.value;
-    // Only allow numbers and limit to 4 digits
-    if (/^\d{0,4}$/.test(value)) {
-      setOtp(value);
+  const handleOtpChange = (index, value) => {
+    if (!/^\d?$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+    if (value && index < 3) {
+      const nextInput = document.getElementById(`otp-${index + 1}`);
+      if (nextInput) nextInput.focus();
     }
-    if (otpError) setOtpError("");
   };
 
   const renderField = (
@@ -196,16 +206,18 @@ function SignUpVerifyEmail() {
                   {formData.email}
                 </label>
                 <div className="flex gap-4 justify-center">
-                <input
-                    type="text"
-                    id="otp"
-                    name="otp"
-                    value={otp}
-                    onChange={handleOtpChange}
-                    maxLength={4}
-                    placeholder="1234"
-                    className="w-full text-center bg-white border border-[var(--border-color)] rounded-2xl p-4 placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary-color)]"
-                  />
+                {otp.map((digit, index) => (
+                      <input
+                        key={index}
+                        id={`otp-${index}`}
+                        type="text"
+                        maxLength={1}
+                        value={digit}
+                        placeholder="0"
+                        onChange={(e) => handleOtpChange(index, e.target.value)}
+                        className="w-18 h-18 text-center bg-white border border-[var(--border-color)] rounded-2xl text-4xl placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary-color)]"
+                      />
+                    ))}
                 </div>
                 {otpError && (
                   <p className="text-red-500 text-sm text-center mt-2">

@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { User, Globe, Mail, Lock, AlertCircle, Info } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 function SigninUser() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -22,29 +24,28 @@ function SigninUser() {
 
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  //   const validateForm = () => {
-  //     const newErrors = {
-  //       email: !formData.email
-  //         ? "Email is required"
-  //         : !isValidEmail(formData.email)
-  //         ? "Email must match your business domain"
-  //         : "",
-  //       password: !formData.password
-  //         ? "Password is required"
-  //         : formData.password.length < 8
-  //         ? "Password must be at least 8 characters"
-  //         : "",
-  //     };
+  const validateForm = () => {
+    const newErrors = {
+      email: !formData.email
+        ? "Email is required"
+        : !isValidEmail(formData.email)
+        ? "Invalid email format"
+        : "",
+      password: !formData.password
+        ? "Password is required"
+        : "",
+    };
 
-  //     setErrors(newErrors);
-  //     return !Object.values(newErrors).some((error) => error);
-  //   };
+    setErrors(newErrors);
+    return !Object.values(newErrors).some((error) => error);
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -57,26 +58,55 @@ function SigninUser() {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
     setTouched((prev) => ({ ...prev, [name]: true }));
+    setApiError("");
   };
 
   const handleBlur = (e) => {
     const { name } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
-    // validateForm();
+    validateForm();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
+    setApiError("");
+
+    try {
+      const response = await fetch('/api/routes/v1/authRoutes?action=signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Sign in failed");
+      }
+
+      // Store token and user data as needed
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      // Redirect to dashboard
+      router.push("/campaign-dashboard");
+    } catch (error) {
+      console.error('Sign in error:', error);
+      setApiError(error.message);
       setLoading(false);
-      window.location.href = "/campaign-dashboard";
-    }, 2000)
-    // if (validateForm()) {
-    //   // Submit form logic here
-    //   console.log("Form submitted:", formData);
-    // }
+    }
   };
 
   const shouldShowError = (name) => {
@@ -178,6 +208,11 @@ function SigninUser() {
               "Create your password",
               Lock,
               "password"
+            )}
+            {apiError && (
+              <div className="text-red-500 text-sm text-center">
+                {apiError}
+              </div>
             )}
 
             <div className="flex justify-center gap-3 mt-2">
