@@ -3,28 +3,15 @@
 import { Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
-export default function QuestionBox() {
-  const [questions, setQuestions] = useState([]);
+export default function QuestionBox({ question, onChange, isQuiz,name }) {
   const [showForm, setShowForm] = useState(false);
-  const [questionText, setQuestionText] = useState("");
-  const [options, setOptions] = useState(["", "", "", ""]);
-  const [selectedOption, setSelectedOption] = useState(null);
 
   const handleAddQuestion = () => {
-    if (!questionText.trim() || selectedOption === null) return;
-
-    setQuestions([
-      ...questions,
-      {
-        question: questionText,
-        options,
-        selected: selectedOption,
-      },
-    ]);
-    // Reset form
-    setQuestionText("");
-    setOptions(["", "", "", ""]);
-    setSelectedOption(null);
+    if (!question.text.trim() ||
+      ((isQuiz ? question.correctAnswer === i : question.selectedAnswer === i || question[`selectedAnswer${questionIndex}`] === i)
+      )) {
+      return;
+    }
     setShowForm(false);
   };
 
@@ -41,30 +28,33 @@ export default function QuestionBox() {
         <div className="bg-white p-4 rounded shadow mb-4">
           <input
             type="text"
+            
             placeholder="Question Title"
             className="w-full mb-4 p-3 border text-gray-400 text-sm rounded-full"
-            value={questionText}
-            onChange={(e) => setQuestionText(e.target.value)}
+            value={question.text}
+            onChange={(e) => onChange('text', e.target.value)}
           />
-          {options.map((opt, i) => (
+          {question.options.map((opt, i) => (
             <div key={i} className="flex items-center mb-2">
               <input
                 type="radio"
-                name="selected"
+                
+                name={name}
                 className="mr-2"
-                checked={selectedOption === i}
-                onChange={() => setSelectedOption(i)}
+                checked={isQuiz ?
+                  question.correctAnswer === i :
+                  question.selectedAnswer === i}
+                onChange={() => onChange(
+                  isQuiz ? 'correctAnswer' : 'selectedAnswer',
+                  i
+                )}
               />
               <input
                 type="text"
                 placeholder={`Enter an answer choice`}
                 className="w-full text-gray-400 text-sm p-2 border rounded-full"
                 value={opt}
-                onChange={(e) =>
-                  setOptions(
-                    options.map((o, idx) => (idx === i ? e.target.value : o))
-                  )
-                }
+                onChange={(e) => onChange('options', e.target.value, i)}
               />
             </div>
           ))}
@@ -77,25 +67,25 @@ export default function QuestionBox() {
         </div>
       )}
 
-      {/* Show added questions */}
-      {questions.map((q, idx) => (
-        <details key={idx} className="mb-2 bg-white p-4 rounded-xl border-1">
+      {/* Show added question */}
+      {question.text && (
+        <details className="mb-2 bg-white p-4 rounded-xl border-1">
           <summary className="cursor-pointer font-medium text-gray-800 flex justify-between items-center">
-            <span>{q.question}</span>
+            <span>{question.text}</span>
             <ChevronDown className="w-5 h-5 text-gray-500" />
           </summary>
           <ul className="mt-2 ml-4 list-disc space-y-1">
-            {q.options.map((opt, i) => (
+            {question.options.map((opt, i) => (
               <li key={i} className="flex justify-between items-center pr-2">
                 <span>{opt}</span>
-                {q.selected === i && (
+                {(isQuiz ? question.correctAnswer === i : question.selectedAnswer === i || question[`selectedAnswer${questionIndex}`] === i) && (
                   <Check className="w-5 h-5 text-black-500" />
                 )}
               </li>
             ))}
           </ul>
         </details>
-      ))}
+      )}
     </div>
   );
 }

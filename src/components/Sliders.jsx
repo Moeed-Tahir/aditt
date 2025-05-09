@@ -1,72 +1,74 @@
-import React, { useState } from "react";
+"use client"
+
+import React, { useState, useEffect } from 'react';
 
 const Sliders = ({
-  min = 0,
-  max = 100,
-  defaultValue = 50,
-  showLabel = true,
-  showRadio = false,
+  min,
+  max,
+  defaultValue,
+  onChange,
+  showLabel,
+  showRadio,
+  labelUnit,
   radioOptions = [],
-  labelUnit = "%",
 }) => {
   const [value, setValue] = useState(defaultValue);
-  const [selectedRadio, setSelectedRadio] = useState(
-    radioOptions[0]?.value || ""
-  );
+  const [selectedRadio, setSelectedRadio] = useState("");
+
+  // Update parent whenever value changes
+  useEffect(() => {
+    if (onChange) {
+      onChange(value);
+    }
+  }, [value]);
 
   const handleSliderChange = (e) => {
-    setValue(Number(e.target.value));
+    const newValue = parseInt(e.target.value);
+    setValue(newValue);
   };
 
   const handleRadioChange = (e) => {
     setSelectedRadio(e.target.value);
+    // Optional: call a separate callback like onRadioChange
+    onChange && onChange(value, e.target.value); // Pass both value and selected gender
   };
 
-  return (
-    <div className="space-y-4">
-      {/* Slider with moving label */}
-      <div className="relative mt-4">
-        <input
-          type="range"
-          min={min}
-          max={max}
-          value={value}
-          onChange={handleSliderChange}
-          className="w-full"
-        />
-        {showLabel && (
-          <div
-            className="absolute top-[-1.5rem] text-sm font-medium text-blue-700"
-            style={{
-              left: `calc(${((value - min) / (max - min)) * 100}% - 20px)`,
-              transition: "left 0.2s",
-            }}
-          >
-            {value}
-            {labelUnit} {selectedRadio}
-          </div>
-        )}
-        {/* Min and Max labels below slider */}
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>{min}</span>
-          <span>{max}</span>
-        </div>
-      </div>
+  useEffect(() => {
+    setValue(defaultValue);
+  }, []);
 
-      {/* Optional radio buttons */}
-      {showRadio && radioOptions.length > 0 && (
-        <div className="flex gap-6">
+
+
+  return (
+    <div className="space-y-2">
+      {showLabel && (
+        <div className="text-sm">
+          {value}
+          {labelUnit}
+        </div>
+      )}
+
+      <input
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={handleSliderChange}
+        className="w-full"
+      />
+
+      {showRadio && (
+        <div className="flex gap-4 mt-2">
           {radioOptions.map((option) => (
-            <label key={option.value} className="inline-flex items-center">
+            <label key={option.value} className="flex items-center gap-1">
               <input
                 type="radio"
-                name="slider-radio"
+                name="gender"
                 value={option.value}
                 checked={selectedRadio === option.value}
                 onChange={handleRadioChange}
-                className="form-radio"
               />
-              <span className="ml-2">{option.label}</span>
+              {option.label}
             </label>
           ))}
         </div>

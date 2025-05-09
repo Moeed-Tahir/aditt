@@ -2,11 +2,11 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useState, useCallback } from "react";
 import Navbar2 from "@/components/Navbar2";
 import QuestionBox from "./QuestionBox";
 import Sliders from "@/components/Sliders";
 import Calendars from "@/components/Calendars";
-
 import {
   ArrowLeft,
   Calendar,
@@ -21,10 +21,15 @@ import {
 } from "lucide-react";
 import PaymentMethod from "./PaymentMethod";
 import LinkBankAccount from "./LinkBankAccount";
+import { createClient } from "@supabase/supabase-js";
+import axios from "axios";
 
-export function CreateCampaigns() {
+const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGRyYm9rZWJudmlkd3l6dnpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI2MjMzMzIsImV4cCI6MjA0ODE5OTMzMn0.Zhnz5rLRoIhtHyF52pFjzYijNdxgZBvEr9LtOxR2Lhw";
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+export function CreateCampaigns({ userId }) {
   const steps = [
-
     { label: "Campaign Info" },
     { label: "Targeting Details" },
     { label: "Set Questions" },
@@ -33,6 +38,281 @@ export function CreateCampaigns() {
 
   const searchParams = useSearchParams();
   const currentStep = parseInt(searchParams.get("step") || "0");
+
+  const [formData, setFormData] = useState({
+    campaignTitle: "",
+    websiteLink: "",
+    videoFile: null,
+    videoUrl: "",
+    imageFile: null,
+    imageUrl: "",
+    videoDuration: "",
+
+    genderRatio: 50,
+    genderType: "",
+    ageRange: [18, 65],
+    genderAge: "12",
+    categories: [],
+
+    quizQuestion: {
+      text: "",
+      options: ["", "", "", ""],
+      correctAnswer: null
+    },
+    surveyQuestion1: {
+      text: "",
+      options: ["", "", "", ""],
+      selectedAnswer: null
+    },
+    surveyQuestion2: {
+      text: "",
+      options: ["", "", "", ""],
+      selectedAnswer: null
+    },
+
+    startDate: new Date(),
+    endDate: null,
+    budget: "",
+
+    cardNumber: "",
+    monthOnCard: "",
+    cvc: "",
+    nameOnCard: "",
+    country: "",
+    zipCode: "",
+
+    bankAccountNumber: "",
+    routingNumber: "",
+    accountType: "",
+    couponCode: "",
+    age: ""
+  });
+
+  console.log("formData", formData);
+
+  const [uploadProgress, setUploadProgress] = useState({
+    video: 0,
+    image: 0,
+  });
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileUpload = useCallback(async (file, type) => {
+    if (!file || !type) return;
+
+    setIsUploading(true);
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `addit-assets/${type}s/${fileName}`;
+
+    try {
+      // First upload the file
+      const { data, error } = await supabase.storage
+        .from('new-project')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: type === 'video' ? 'video/mp4' : 'image/jpeg',
+        });
+
+      if (error) throw error;
+
+      // Get the public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('new-project')
+        .getPublicUrl(filePath);
+      console.log("publicUrl", publicUrl);
+
+      let duration = "";
+      if (type === 'video') {
+        duration = await getVideoDuration(file);
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        [`${type}Url`]: publicUrl,
+        ...(type === 'video' && { videoDuration: duration })
+      }));
+
+      return publicUrl;
+    } catch (error) {
+      console.error(`Error uploading ${type}:`, error);
+      return null;
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(prev => ({ ...prev, [type]: 0 }));
+    }
+  }, []);
+
+  const getVideoDuration = (file) => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+
+      video.onloadedmetadata = function () {
+        window.URL.revokeObjectURL(video.src);
+        const duration = video.duration;
+        resolve(formatDuration(duration));
+      };
+
+      video.src = URL.createObjectURL(file);
+    });
+  };
+
+  const formatDuration = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  };
+
+
+  const handleFileChange = (e, type) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setFormData(prev => ({
+        ...prev,
+        [`${type}File`]: file
+      }));
+      handleFileUpload(file, type);
+    }
+  };
+
+  const handleCategoryChange = (category, isChecked) => {
+    setFormData(prev => {
+      const categories = isChecked
+        ? [...prev.categories, category]
+        : prev.categories.filter(c => c !== category);
+      return { ...prev, categories };
+    });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const campaignData = {
+        campaignTitle: formData.campaignTitle,
+        websiteLink: formData.websiteLink,
+        campaignVideoUrl: formData.videoUrl,
+        companyLogo: formData.imageUrl,
+        userId: userId,
+        couponCode: formData.couponCode,
+        quizQuestion: {
+          questionText: formData.quizQuestion.text,
+          option1: formData.quizQuestion.options[0],
+          option2: formData.quizQuestion.options[1],
+          option3: formData.quizQuestion.options[2],
+          option4: formData.quizQuestion.options[3],
+          answer: formData.quizQuestion.options[formData.quizQuestion.correctAnswer]
+        },
+        surveyQuestion1: {
+          questionText: formData.surveyQuestion1.text,
+          option1: formData.surveyQuestion1.options[0],
+          option2: formData.surveyQuestion1.options[1],
+          option3: formData.surveyQuestion1.options[2],
+          option4: formData.surveyQuestion1.options[3],
+          answer: formData.surveyQuestion1.correctAnswer !== null
+            ? formData.surveyQuestion1.options[formData.surveyQuestion1.correctAnswer]
+            : ""
+        },
+        surveyQuestion2: {
+          questionText: formData.surveyQuestion2.text,
+          option1: formData.surveyQuestion2.options[0],
+          option2: formData.surveyQuestion2.options[1],
+          option3: formData.surveyQuestion2.options[2],
+          option4: formData.surveyQuestion2.options[3],
+          answer: formData.surveyQuestion2.correctAnswer !== null
+            ? formData.surveyQuestion2.options[formData.surveyQuestion2.correctAnswer]
+            : ""
+        },
+        genderType: formData.genderType,
+        genderRatio: formData.genderRatio.toString(),
+        age: formData.age,
+        categories: formData.categories.join(","),
+        campaignStartDate: formData.startDate.toISOString(),
+        campaignEndDate: formData.endDate?.toISOString() || formData.startDate.toISOString(),
+        cardDetail: {
+          cardNumber: formData.cardNumber,
+          cvc: formData.cvc,
+          nameOnCard: formData.nameOnCard,
+          dateOnCard: formData.monthOnCard,
+          country: formData.country,
+          zip: formData.zipCode
+        },
+        bankDetail: {
+          accountNumber: formData.bankAccountNumber,
+          routingNumber: formData.routingNumber,
+          accountType: formData.accountType
+        }
+      };
+
+      const response = await axios.post("/api/routes/v1/campaignRoutes?action=createCampaign", campaignData, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      alert("Success");
+      console.log('Campaign created successfully:', response.data);
+    } catch (error) {
+      console.error('Error creating campaign:', error);
+      alert("Failed to create campaign. Please check your form data.");
+    }
+  };
+
+
+  const handleQuestionChange = (questionType, field, value, optionIndex = null) => {
+    setFormData(prev => {
+      if (optionIndex !== null) {
+        // Updating an option
+        const newOptions = [...prev[questionType].options];
+        newOptions[optionIndex] = value;
+        return {
+          ...prev,
+          [questionType]: {
+            ...prev[questionType],
+            options: newOptions
+          }
+        };
+      } else if (field === 'correctAnswer' || field === 'selectedAnswer') {
+        // Updating the selected/correct answer
+        return {
+          ...prev,
+          [questionType]: {
+            ...prev[questionType],
+            [field]: value
+          }
+        };
+      } else {
+        // Updating the question text
+        return {
+          ...prev,
+          [questionType]: {
+            ...prev[questionType],
+            text: value
+          }
+        };
+      }
+    });
+  };
+
+  const calculateEstimatedReach = () => {
+    if (!formData.budget || !formData.videoDuration) return null;
+
+    const budget = parseFloat(formData.budget);
+
+    const [minutes, seconds] = formData.videoDuration.split(':').map(Number);
+    const duration = minutes * 60 + seconds;
+
+    if (isNaN(budget)) return null;
+    if (isNaN(duration) || duration <= 0) return null;
+
+    const estimatedReach = (budget / duration) * 2;
+
+    return estimatedReach.toFixed(2);
+  };
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
@@ -64,11 +344,10 @@ export function CreateCampaigns() {
               >
                 <Link
                   href={`?step=${index}`}
-                  className={`w-40 gap-2 h-10 flex items-center justify-center rounded-full text-xs font-medium ${
-                    index === currentStep
-                      ? "bg-blue-600 text-white"
-                      : "bg-white text-gray-500 border border-gray-300"
-                  } hover:cursor-pointer transition`}
+                  className={`w-40 gap-2 h-10 flex items-center justify-center rounded-full text-xs font-medium ${index === currentStep
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-500 border border-gray-300"
+                    } hover:cursor-pointer transition`}
                 >
                   <CircleDot className="w-4 h-4" />
                   {step.label}
@@ -79,81 +358,10 @@ export function CreateCampaigns() {
           </div>
         </div>
 
-        {/* Page Content (only for step 0 here) */}
-        {currentStep === 2 && (
-          <div className="min-h-screen px-4 py-8">
-            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-              <div className="flex items-center justify-between mb-8">
-                <div className="w-1/3">
-                  <label className="block text-lg font-medium">
-                    Set Questions
-                  </label>
-                  <span className="block text-xs text-gray-500 mt-1">
-                    Add a quiz or survey for campaign insights.
-                  </span>
-                </div>
-                {/* Next button goes to next step */}
-                <Link
-                  href="?step=1"
-                  className="bg-blue-600 text-white px-16 py-2 rounded-full hover:bg-blue-700"
-                >
-                  Next
-                </Link>
-              </div>
-
-              <hr className="border-t mb-4 border-gray-300" />
-              <div className="space-y-6">
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-sm font-medium">
-                      Quiz Question (optional)
-                    </label>
-                    <span className="block text-xs text-gray-500 mt-1">
-                      Adit will create if you don't
-                    </span>
-                  </div>
-                  <div className="relative flex-1">
-                    <QuestionBox />
-                  </div>
-                </div>
-                <hr className="border-t mb-4 border-gray-300" />
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-sm font-medium">
-                      Survey Question 1 (optional)
-                    </label>
-                    <span className="block text-xs text-gray-500 mt-1">
-                      Adit will NOT create if you don't
-                    </span>
-                  </div>
-                  <div className="relative flex-1">
-                    <QuestionBox />
-                  </div>
-                </div>
-                <hr className="border-t mb-4 border-gray-300" />
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-sm font-medium">
-                      Survey Question 2 (optional)
-                    </label>
-                    <span className="block text-xs text-gray-500 mt-1">
-                      Adit will NOT create if you don't
-                    </span>
-                  </div>
-                  <div className="relative flex-1">
-                    <QuestionBox />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
+        {/* Step 0: Campaign Info */}
         {currentStep === 0 && (
           <div className="min-h-screen px-4 py-8">
-            {/* Form Section */}
             <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-              {/* Top-right Next button */}
               <div className="flex items-center justify-between mb-8">
                 <div className="w-1/3">
                   <label className="block text-lg font-medium">
@@ -165,7 +373,7 @@ export function CreateCampaigns() {
                 </div>
 
                 <Link
-                  href="?step=2"
+                  href="?step=1"
                   className="bg-blue-600 text-white px-16 py-2 rounded-full hover:bg-blue-700"
                 >
                   Next
@@ -190,6 +398,9 @@ export function CreateCampaigns() {
                     <House className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
+                      name="campaignTitle"
+                      value={formData.campaignTitle}
+                      onChange={handleInputChange}
                       placeholder="Reebok promotion"
                       className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
                     />
@@ -215,6 +426,9 @@ export function CreateCampaigns() {
                       <Globe className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
                       <input
                         type="url"
+                        name="websiteLink"
+                        value={formData.websiteLink}
+                        onChange={handleInputChange}
                         placeholder="https://shop.app/"
                         className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
                       />
@@ -222,12 +436,12 @@ export function CreateCampaigns() {
 
                     <div className="flex items-center gap-2 mt-1">
                       <p className="text-xs text-green-600 select-all">
-                        https://www.example.com?utm_source=adit&utm_medium=video&utm_campaign=spring_sal
+                        {formData.websiteLink || "https://www.example.com"}?utm_source=adit&utm_medium=video&utm_campaign=spring_sal
                       </p>
                       <button
                         onClick={() =>
                           navigator.clipboard.writeText(
-                            "https://www.example.com?utm_source=adit&utm_medium=video&utm_campaign=spring_sal"
+                            `${formData.websiteLink || "https://www.example.com"}?utm_source=adit&utm_medium=video&utm_campaign=spring_sal`
                           )
                         }
                         className="text-blue-600 hover:text-blue-800 transition"
@@ -253,16 +467,39 @@ export function CreateCampaigns() {
                     </span>
                   </div>
                   <div className="flex-1 border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
-                    <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
-                    <p className="text-sm text-gray-700 mb-1">Upload video</p>
-                    <p className="text-xs text-gray-500">Format: mp4</p>
-                    <div className="mt-4 flex justify-between items-center bg-blue-50 text-blue-700 px-4 py-2 rounded-md">
-                      <span className="text-sm">ads video.mp4</span>
-                      <span className="text-xs text-gray-500">34.6 MB</span>
-                      <button className="text-red-500 ml-4">
-                        <Trash />
-                      </button>
-                    </div>
+                    <label className="cursor-pointer">
+                      <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
+                      <p className="text-sm text-gray-700 mb-1">Upload video</p>
+                      <p className="text-xs text-gray-500">Format: mp4</p>
+                      <input
+                        type="file"
+                        accept="video/mp4"
+                        onChange={(e) => handleFileChange(e, 'video')}
+                        className="hidden"
+                      />
+                    </label>
+                    {formData.videoFile && (
+                      <div className="mt-4 flex justify-between items-center bg-blue-50 text-blue-700 px-4 py-2 rounded-md">
+                        <span className="text-sm">{formData.videoFile.name}</span>
+                        <span className="text-xs text-gray-500">
+                          {(formData.videoFile.size / (1024 * 1024)).toFixed(1)} MB
+                        </span>
+                        <button
+                          onClick={() => setFormData(prev => ({ ...prev, videoFile: null, videoUrl: '' }))}
+                          className="text-red-500 ml-4"
+                        >
+                          <Trash />
+                        </button>
+                      </div>
+                    )}
+                    {isUploading && uploadProgress.video > 0 && (
+                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                        <div
+                          className="bg-blue-600 h-2.5 rounded-full"
+                          style={{ width: `${uploadProgress.video}%` }}
+                        ></div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -279,18 +516,41 @@ export function CreateCampaigns() {
                     </span>
                   </div>
                   <div className="flex-1 border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
-                    <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
-                    <p className="text-sm text-gray-700 mb-1">Upload image</p>
-                    <p className="text-xs text-gray-500">
-                      Format: jpeg, jpg, png
-                    </p>
-                    <div className="mt-4 flex justify-between items-center bg-blue-50 text-blue-700 px-4 py-2 rounded-md">
-                      <span className="text-sm">Campaign image.jpg</span>
-                      <span className="text-xs text-gray-500">4.6 MB</span>
-                      <button className="text-red-500 ml-4">
-                        <Trash />
-                      </button>
-                    </div>
+                    <label className="cursor-pointer">
+                      <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
+                      <p className="text-sm text-gray-700 mb-1">Upload image</p>
+                      <p className="text-xs text-gray-500">
+                        Format: jpeg, jpg, png
+                      </p>
+                      <input
+                        type="file"
+                        accept="image/jpeg, image/jpg, image/png"
+                        onChange={(e) => handleFileChange(e, 'image')}
+                        className="hidden"
+                      />
+                    </label>
+                    {formData.imageFile && (
+                      <div className="mt-4 flex justify-between items-center bg-blue-50 text-blue-700 px-4 py-2 rounded-md">
+                        <span className="text-sm">{formData.imageFile.name}</span>
+                        <span className="text-xs text-gray-500">
+                          {(formData.imageFile.size / (1024 * 1024)).toFixed(1)} MB
+                        </span>
+                        <button
+                          onClick={() => setFormData(prev => ({ ...prev, imageFile: null, imageUrl: '' }))}
+                          className="text-red-500 ml-4"
+                        >
+                          <Trash />
+                        </button>
+                      </div>
+                    )}
+                    {isUploading && uploadProgress.image > 0 && (
+                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                        <div
+                          className="bg-blue-600 h-2.5 rounded-full"
+                          style={{ width: `${uploadProgress.image}%` }}
+                        ></div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -298,11 +558,10 @@ export function CreateCampaigns() {
           </div>
         )}
 
+        {/* Step 1: Targeting Details */}
         {currentStep === 1 && (
           <div className="min-h-screen px-4 py-8">
-            {/* Form Section */}
             <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-              {/* Top-right Next button */}
               <div className="flex items-center justify-between mb-8">
                 <div className="w-1/3">
                   <label className="block text-lg font-medium">
@@ -315,7 +574,7 @@ export function CreateCampaigns() {
                 </div>
 
                 <Link
-                  href="?step=3"
+                  href="?step=2"
                   className="bg-blue-600 text-white px-16 py-2 rounded-full hover:bg-blue-700"
                 >
                   Next
@@ -325,7 +584,7 @@ export function CreateCampaigns() {
               <hr className="border-t mb-4 border-gray-300" />
 
               <div className="space-y-6">
-                {/* Campaign Title */}
+                {/* Gender Ratio */}
                 <div className="flex items-start gap-6">
                   <div className="w-1/3">
                     <label className="block text-sm font-medium">
@@ -340,7 +599,14 @@ export function CreateCampaigns() {
                     <Sliders
                       min={0}
                       max={100}
-                      defaultValue={50}
+                      defaultValue={formData.genderRatio}
+                      onChange={(value, selectedGender) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          genderRatio: value,
+                          genderType: selectedGender || prev.genderType,
+                        }))
+                      }
                       showLabel={true}
                       showRadio={true}
                       labelUnit="%"
@@ -349,12 +615,13 @@ export function CreateCampaigns() {
                         { value: "female", label: "Female" },
                       ]}
                     />
+
                   </div>
                 </div>
 
                 <hr className="border-t mb-4 border-gray-300" />
 
-                {/* Website/Product Link */}
+                {/* Age Range */}
                 <div className="flex items-start gap-6">
                   <div className="w-1/3">
                     <label className="block text-sm font-medium">Age</label>
@@ -368,59 +635,106 @@ export function CreateCampaigns() {
                       <Sliders
                         min={18}
                         max={65}
-                        defaultValue={30}
+                        defaultValue={formData.age || 25}
+                        onChange={(value) =>
+                          setFormData(prev => ({
+                            ...prev,
+                            age: value
+                          }))
+                        }
                         showLabel={true}
                         showRadio={false}
-                        labelUnit=" yrs"
+                        labelUnit={`yrs`}
                       />
                     </div>
                   </div>
                 </div>
 
                 <hr className="border-t mb-4 border-gray-300" />
+              </div>
+            </div>
+          </div>
+        )}
 
-                {/* Campaign Video Upload */}
+        {/* Step 2: Set Questions */}
+        {currentStep === 2 && (
+          <div className="min-h-screen px-4 py-8">
+            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
+              <div className="flex items-center justify-between mb-8">
+                <div className="w-1/3">
+                  <label className="block text-lg font-medium">
+                    Set Questions
+                  </label>
+                  <span className="block text-xs text-gray-500 mt-1">
+                    Add a quiz or survey for campaign insights.
+                  </span>
+                </div>
+                <Link
+                  href="?step=3"
+                  className="bg-blue-600 text-white px-16 py-2 rounded-full hover:bg-blue-700"
+                >
+                  Next
+                </Link>
+              </div>
+
+              <hr className="border-t mb-4 border-gray-300" />
+              <div className="space-y-6">
                 <div className="flex items-start gap-6">
                   <div className="w-1/3">
                     <label className="block text-sm font-medium">
-                      Categories
+                      Quiz Question (optional)
                     </label>
                     <span className="block text-xs text-gray-500 mt-1">
-                      Select the categories that align with your campaign to
-                      reach the right audience.
+                      Adit will create if you don't
                     </span>
                   </div>
-                  <div className="flex-1 rounded-lg p-3">
-                    <div className="flex items-center mb-2">
-                      <input type="checkbox" name="selected" className="mr-2" />
-                      <span className="w-120 h-12 text-black text-m p-2 border rounded-full">
-                        🎮 Gaming
-                      </span>
-                    </div>
-                    <div className="flex items-center mb-2">
-                      <input type="checkbox" name="selected" className="mr-2" />
-                      <span className="w-120 h-12 text-black text-m p-2 border rounded-full">
-                        🍹 Food and Drink
-                      </span>
-                    </div>
-                    <div className="flex items-center mb-2">
-                      <input type="checkbox" name="selected" className="mr-2" />
-                      <span className="w-120 h-12 text-black text-m p-2 border rounded-full">
-                        📺 Entertainment & Technology
-                      </span>
-                    </div>
-                    <div className="flex items-center mb-2">
-                      <input type="checkbox" name="selected" className="mr-2" />
-                      <span className="w-120 h-12 text-black text-m p-2 border rounded-full">
-                        👩🏻‍⚕️ Health & wellness
-                      </span>
-                    </div>
-                    <div className="flex items-center mb-2">
-                      <input type="checkbox" name="selected" className="mr-2" />
-                      <span className="w-120 h-12 text-black text-m p-2 border rounded-full">
-                        🛍️ Shopping
-                      </span>
-                    </div>
+                  <div className="relative flex-1">
+                    <QuestionBox
+                      question={formData.quizQuestion}
+                      onChange={(field, value, optionIndex) => handleQuestionChange('quizQuestion', field, value, optionIndex)}
+                      isQuiz={true}
+                      name="quizQuestion"
+                    />
+                  </div>
+                </div>
+                <hr className="border-t mb-4 border-gray-300" />
+                <div className="flex items-start gap-6">
+                  <div className="w-1/3">
+                    <label className="block text-sm font-medium">
+                      Survey Question 1 (optional)
+                    </label>
+                    <span className="block text-xs text-gray-500 mt-1">
+                      Adit will NOT create if you don't
+                    </span>
+                  </div>
+                  <div className="relative flex-1">
+                    <QuestionBox
+                      question={formData.surveyQuestion1}
+                      onChange={(field, value, optionIndex) => handleQuestionChange('surveyQuestion1', field, value, optionIndex)}
+                      isQuiz={true}
+                      name="surveyQuestion1"
+
+                    />
+                  </div>
+                </div>
+                <hr className="border-t mb-4 border-gray-300" />
+                <div className="flex items-start gap-6">
+                  <div className="w-1/3">
+                    <label className="block text-sm font-medium">
+                      Survey Question 2 (optional)
+                    </label>
+                    <span className="block text-xs text-gray-500 mt-1">
+                      Adit will NOT create if you don't
+                    </span>
+                  </div>
+                  <div className="relative flex-1">
+                    <QuestionBox
+                      question={formData.surveyQuestion2}
+                      onChange={(field, value, optionIndex) => handleQuestionChange('surveyQuestion2', field, value, optionIndex)}
+                      isQuiz={true}
+                      name="surveyQuestion2"
+
+                    />
                   </div>
                 </div>
               </div>
@@ -428,11 +742,10 @@ export function CreateCampaigns() {
           </div>
         )}
 
+        {/* Step 3: Campaign Budget */}
         {currentStep === 3 && (
           <div className="min-h-screen px-4 py-8">
-            {/* Form Section */}
             <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-              {/* Top-right Next button */}
               <div className="flex items-center justify-between mb-8">
                 <div className="w-1/3">
                   <label className="block text-lg font-medium">
@@ -443,18 +756,18 @@ export function CreateCampaigns() {
                   </span>
                 </div>
 
-                <Link
-                  href="/campaign-dashboard"
+                <button
+                  onClick={handleSubmit}
                   className="bg-blue-600 text-white px-16 py-2 rounded-full hover:bg-blue-700"
                 >
-                  Next
-                </Link>
+                  Submit
+                </button>
               </div>
 
               <hr className="border-t mb-4 border-gray-300" />
 
               <div className="space-y-6">
-                {/* Campaign Title */}
+                {/* Campaign Start Date */}
                 <div className="flex items-start gap-6">
                   <div className="w-1/3">
                     <label className="block text-sm font-medium">
@@ -466,13 +779,16 @@ export function CreateCampaigns() {
                     </span>
                   </div>
                   <div className="relative flex-1">
-                    <Calendars />
+                    <Calendars
+                      selected={formData.startDate}
+                      onSelect={(date) => setFormData(prev => ({ ...prev, startDate: date }))}
+                    />
                   </div>
                 </div>
 
                 <hr className="border-t mb-4 border-gray-300" />
 
-                {/* Website/Product Link */}
+                {/* Campaign End Date */}
                 <div className="flex items-start gap-6">
                   <div className="w-1/3">
                     <label className="block text-sm font-medium">
@@ -485,13 +801,16 @@ export function CreateCampaigns() {
                   </div>
 
                   <div className="relative flex-1">
-                    <Calendars />
+                    <Calendars
+                      selected={formData.endDate}
+                      onSelect={(date) => setFormData(prev => ({ ...prev, endDate: date }))}
+                    />
                   </div>
                 </div>
 
                 <hr className="border-t mb-4 border-gray-300" />
 
-                {/* Campaign Video Upload */}
+                {/* Campaign Budget */}
                 <div className="flex items-start gap-6">
                   <div className="w-1/3">
                     <label className="block text-sm font-medium">
@@ -506,16 +825,49 @@ export function CreateCampaigns() {
                     <CircleDollarSign className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
 
                     <input
-                      type="text"
+                      type="number"
+                      name="budget"
+                      value={formData.budget}
+                      onChange={handleInputChange}
                       placeholder="Enter campaign budget"
                       className="w-120 h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
                     />
+                    {formData.budget && formData.videoDuration && (
+                      <div className="mt-2 text-sm text-gray-500">
+                        With a ${formData.budget} budget for your {formData.videoDuration}-second video,
+                        you will reach approximately {calculateEstimatedReach()} unique users.
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <hr className="border-t mb-4 border-gray-300" />
+
+                <div className="flex items-start gap-6">
+                  <div className="w-1/3">
+                    <label className="block text-sm font-medium">
+                      Coupon Code
+                    </label>
+                    <span className="block text-xs text-gray-500 mt-1">
+                      Add Coupon code If you have.
+                    </span>
+                  </div>
+
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      name="couponCode"
+                      value={formData.couponCode}
+                      onChange={handleInputChange}
+                      placeholder="Enter Coupon Code"
+                      className="w-120 h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
+                    />
+
                   </div>
                 </div>
 
                 <hr className="border-t mb-4 border-gray-300" />
 
-                {/* Campaign Video Upload */}
+                {/* Payment Info */}
                 <div className="flex items-start gap-6">
                   <div className="w-1/3">
                     <label className="block text-sm font-medium">
@@ -527,8 +879,30 @@ export function CreateCampaigns() {
                   </div>
 
                   <div className="relative flex-1">
-                    <PaymentMethod />
-                    <LinkBankAccount />
+                    <PaymentMethod
+                      value={{
+                        cardNumber: formData.cardNumber,
+                        monthOnCard: formData.monthOnCard,
+                        cvc: formData.cvc,
+                        nameOnCard: formData.nameOnCard,
+                        country: formData.country,
+                        zipCode: formData.zipCode,
+                        cardType: formData.cardType,
+                        cardAdded: formData.cardAdded,
+                        isFormOpen: formData.isFormOpen
+                      }}
+                      onChange={(paymentData) => setFormData(prev => ({ ...prev, ...paymentData }))}
+                    />
+                    <LinkBankAccount
+                      value={{
+                        bankAccountNumber: formData.bankAccountNumber,
+                        routingNumber: formData.routingNumber,
+                        accountType: formData.accountType,
+                        bankAdded: formData.bankAdded,
+                        isBankFormOpen: formData.isBankFormOpen
+                      }}
+                      onChange={(bankData) => setFormData(prev => ({ ...prev, ...bankData }))}
+                    />
                   </div>
                 </div>
               </div>
