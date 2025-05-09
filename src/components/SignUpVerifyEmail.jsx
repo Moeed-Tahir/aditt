@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
+import { Router } from "next/router";
 
 function SignUpVerifyEmail() {
   const [formData, setFormData] = useState({
@@ -90,6 +91,7 @@ function SignUpVerifyEmail() {
       alert("An error occurred: " + error.message); // Show specific error message
     } finally {
       setSubmitAttempted(false);
+      Router.push("/campaign-dashboard");
     }
   };
 
