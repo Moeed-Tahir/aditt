@@ -80,6 +80,10 @@ const BankDetailSchema = new mongoose.Schema({
 });
 
 const CompaignSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+        required: true,
+    },
     campaignTitle: {
         type: String,
         required: true,
@@ -123,10 +127,6 @@ const CompaignSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    categories: {
-        type: [String],
-        required: true,
-    },
     campaignStartDate: {
         type: String,
         required: true,
@@ -140,6 +140,10 @@ const CompaignSchema = new mongoose.Schema({
     },
     bankDetail: {
         type: BankDetailSchema,
+    },
+    couponCode: {
+        type: String,
+        required: false,
     },
 }, { timestamps: true });
 

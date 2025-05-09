@@ -28,7 +28,7 @@ const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGRyYm9rZWJudmlkd3l6dnpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI2MjMzMzIsImV4cCI6MjA0ODE5OTMzMn0.Zhnz5rLRoIhtHyF52pFjzYijNdxgZBvEr9LtOxR2Lhw";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-export function CreateCampaigns() {
+export function CreateCampaigns({ userId }) {
   const steps = [
     { label: "Campaign Info" },
     { label: "Targeting Details" },
@@ -51,7 +51,7 @@ export function CreateCampaigns() {
     genderRatio: 50,
     genderType: "",
     ageRange: [18, 65],
-    genderAge: "",
+    genderAge: "12",
     categories: [],
 
     quizQuestion: {
@@ -84,6 +84,8 @@ export function CreateCampaigns() {
     bankAccountNumber: "",
     routingNumber: "",
     accountType: "",
+    couponCode: "",
+    age: ""
   });
 
   console.log("formData", formData);
@@ -125,13 +127,11 @@ export function CreateCampaigns() {
         .getPublicUrl(filePath);
       console.log("publicUrl", publicUrl);
 
-      // If it's a video, calculate duration
       let duration = "";
       if (type === 'video') {
         duration = await getVideoDuration(file);
       }
 
-      // Update form data with both URL and duration (if video)
       setFormData(prev => ({
         ...prev,
         [`${type}Url`]: publicUrl,
@@ -197,6 +197,8 @@ export function CreateCampaigns() {
         websiteLink: formData.websiteLink,
         campaignVideoUrl: formData.videoUrl,
         companyLogo: formData.imageUrl,
+        userId: userId,
+        couponCode: formData.couponCode,
         quizQuestion: {
           questionText: formData.quizQuestion.text,
           option1: formData.quizQuestion.options[0],
@@ -633,7 +635,7 @@ export function CreateCampaigns() {
                       <Sliders
                         min={18}
                         max={65}
-                        defaultValue={formData.age}
+                        defaultValue={formData.age || 25}
                         onChange={(value) =>
                           setFormData(prev => ({
                             ...prev,
@@ -642,47 +644,13 @@ export function CreateCampaigns() {
                         }
                         showLabel={true}
                         showRadio={false}
-                        labelUnit=" yrs"
+                        labelUnit={`yrs`}
                       />
                     </div>
                   </div>
                 </div>
 
                 <hr className="border-t mb-4 border-gray-300" />
-
-                {/* Categories */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-sm font-medium">
-                      Categories
-                    </label>
-                    <span className="block text-xs text-gray-500 mt-1">
-                      Select the categories that align with your campaign to
-                      reach the right audience.
-                    </span>
-                  </div>
-                  <div className="flex-1 rounded-lg p-3">
-                    {[
-                      { emoji: "🎮", name: "Gaming" },
-                      { emoji: "🍹", name: "Food and Drink" },
-                      { emoji: "📺", name: "Entertainment & Technology" },
-                      { emoji: "👩🏻‍⚕️", name: "Health & wellness" },
-                      { emoji: "🛍️", name: "Shopping" },
-                    ].map((category) => (
-                      <div key={category.name} className="flex items-center mb-2">
-                        <input
-                          type="checkbox"
-                          checked={formData.categories.includes(category.name)}
-                          onChange={(e) => handleCategoryChange(category.name, e.target.checked)}
-                          className="mr-2"
-                        />
-                        <span className="w-120 h-12 text-black text-m p-2 border rounded-full">
-                          {category.emoji} {category.name}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -870,6 +838,30 @@ export function CreateCampaigns() {
                         you will reach approximately {calculateEstimatedReach()} unique users.
                       </div>
                     )}
+                  </div>
+                </div>
+                <hr className="border-t mb-4 border-gray-300" />
+
+                <div className="flex items-start gap-6">
+                  <div className="w-1/3">
+                    <label className="block text-sm font-medium">
+                      Coupon Code
+                    </label>
+                    <span className="block text-xs text-gray-500 mt-1">
+                      Add Coupon code If you have.
+                    </span>
+                  </div>
+
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      name="couponCode"
+                      value={formData.couponCode}
+                      onChange={handleInputChange}
+                      placeholder="Enter Coupon Code"
+                      className="w-120 h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
+                    />
+
                   </div>
                 </div>
 
