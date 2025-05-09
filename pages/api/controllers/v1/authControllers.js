@@ -4,9 +4,6 @@ const { generateOTP, sendOTP } = require("../../services/otpServices");
 const jwt = require("jsonwebtoken");
 const connectToDatabase = require("../../config/dbConnect");
 
-
-
-
 exports.signUp = async (req, res) => {
 
     try {
