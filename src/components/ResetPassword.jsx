@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState ,useEffect } from "react";
 import Image from "next/image";
 import {
   Mail,
@@ -31,6 +31,8 @@ function ResetPassword() {
   const [apiError, setApiError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+
 
 
   const isValidEmail = (email) => {
@@ -169,6 +171,43 @@ function ResetPassword() {
       if (nextInput) nextInput.focus();
     }
   };
+
+  const handleResendOtp = async () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+        alert("User ID not found.");
+        return;
+    }
+
+    try {
+        const response = await axios.post(
+            "/api/routes/v1/authRoutes?action=resend-otp",
+            { userId }
+        );
+        
+        if (response.data.message === "OTP resent successfully") {
+            alert("New OTP has been sent to your email.");
+            setResendTimer(30); // Set timer for 30 seconds
+        } else {
+            alert("Failed to resend OTP. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error resending OTP:", error);
+        alert(
+            error.response?.data?.message ||
+            "Failed to resend OTP. Please try again."
+        );
+    }
+};
+
+  useEffect(() => {
+    let timer;
+    if (resendTimer > 0) {
+      timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendTimer]);
+
 
   const renderField = (
     name,
@@ -341,6 +380,22 @@ function ResetPassword() {
                       />
                     ))}
                   </div>
+                  <div className="text-center mt-4">
+                {resendTimer > 0 ? (
+                  <p className="text-gray-500 text-sm">
+                    You can resend OTP in {resendTimer}s
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    className="text-blue-600 font-medium hover:underline"
+                  >
+                    Resend OTP
+                  </button>
+                )}
+              </div>
+
                   {otpError && (
                     <p className="text-red-500 text-sm text-center mt-2">
                       {otpError}
