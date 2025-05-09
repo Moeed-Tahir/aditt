@@ -99,7 +99,7 @@ const CompaignSchema = new mongoose.Schema({
     },
     companyLogo: {
         type: String,
-        required: true,
+        required: false,
     },
     quizQuestion: {
         type: QuestionSchema,
