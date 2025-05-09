@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   Mail,
@@ -29,6 +29,7 @@ function SignUpVerifyEmail() {
   const [showCreatePassword, setCreatePassword] = useState(false);
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [otpError, setOtpError] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,8 +41,8 @@ function SignUpVerifyEmail() {
       email: !formData.email
         ? "Email is required"
         : !isValidEmail(formData.email)
-          ? "Invalid email format"
-          : "",
+        ? "Invalid email format"
+        : "",
       password:
         showCreatePassword && !formData.password ? "Password is required" : "",
       confirmPassword:
@@ -71,20 +72,23 @@ function SignUpVerifyEmail() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
-  
+
     // Validate OTP before proceeding
     if (otp.some((digit) => !digit)) {
       setOtpError("Please enter a valid 4-digit OTP.");
       setSubmitAttempted(false);
       return;
     }
-  
+
     const userId = localStorage.getItem("userId");
     try {
-      const response = await axios.post('/api/routes/v1/authRoutes?action=verify-otp', {
-        otp: otp.join(""), // Send OTP as a string
-        userId: userId
-      });
+      const response = await axios.post(
+        "/api/routes/v1/authRoutes?action=verify-otp",
+        {
+          otp: otp.join(""), // Send OTP as a string
+          userId: userId,
+        }
+      );
       alert("User is created");
     } catch (error) {
       alert("An error occurred: " + error.message); // Show specific error message
@@ -107,6 +111,42 @@ function SignUpVerifyEmail() {
       if (nextInput) nextInput.focus();
     }
   };
+
+  const handleResendOtp = async () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+        alert("User ID not found.");
+        return;
+    }
+
+    try {
+        const response = await axios.post(
+            "/api/routes/v1/authRoutes?action=resend-otp",
+            { userId }
+        );
+        
+        if (response.data.message === "OTP resent successfully") {
+            alert("New OTP has been sent to your email.");
+            setResendTimer(30); // Set timer for 30 seconds
+        } else {
+            alert("Failed to resend OTP. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error resending OTP:", error);
+        alert(
+            error.response?.data?.message ||
+            "Failed to resend OTP. Please try again."
+        );
+    }
+};
+
+  useEffect(() => {
+    let timer;
+    if (resendTimer > 0) {
+      timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendTimer]);
 
   const renderField = (
     name,
@@ -132,10 +172,11 @@ function SignUpVerifyEmail() {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={placeholder}
-          className={`w-full border ${shouldShowError(name)
+          className={`w-full border ${
+            shouldShowError(name)
               ? "border-red-500"
               : "border-[var(--border-color)]"
-            } rounded-[58px] p-4 pl-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
+          } rounded-[58px] p-4 pl-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
         />
         <Icon
           className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600"
@@ -195,29 +236,30 @@ function SignUpVerifyEmail() {
               </div>
               <div className="flex justify-center items-center">
                 <p className="text-[16px] text-center font-light text-gray-600 py-6">
-                  Please enter the 4 digit code that we’ve sent to your email: <span className="font-bold"> jhondoe@gmail.com    </span>            </p>
+                  Please enter the 4 digit code that we’ve sent to your email:{" "}
+                  <span className="font-bold"> {formData.email} </span>{" "}
+                </p>
               </div>
             </div>
 
-            <form className="flex flex-col gap-4" >
-
+            <form className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-[16px] font-semibold justify-center items-center flex text-[var(--text-dark-color)]">
                   {formData.email}
                 </label>
                 <div className="flex gap-4 justify-center">
-                {otp.map((digit, index) => (
-                      <input
-                        key={index}
-                        id={`otp-${index}`}
-                        type="text"
-                        maxLength={1}
-                        value={digit}
-                        placeholder="0"
-                        onChange={(e) => handleOtpChange(index, e.target.value)}
-                        className="w-18 h-18 text-center bg-white border border-[var(--border-color)] rounded-2xl text-4xl placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary-color)]"
-                      />
-                    ))}
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      id={`otp-${index}`}
+                      type="text"
+                      maxLength={1}
+                      value={digit}
+                      placeholder="0"
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      className="w-18 h-18 text-center bg-white border border-[var(--border-color)] rounded-2xl text-4xl placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary-color)]"
+                    />
+                  ))}
                 </div>
                 {otpError && (
                   <p className="text-red-500 text-sm text-center mt-2">
@@ -225,11 +267,28 @@ function SignUpVerifyEmail() {
                   </p>
                 )}
               </div>
+              <div className="text-center mt-4">
+                {resendTimer > 0 ? (
+                  <p className="text-gray-500 text-sm">
+                    You can resend OTP in {resendTimer}s
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    className="text-blue-600 font-medium hover:underline"
+                  >
+                    Resend OTP
+                  </button>
+                )}
+              </div>
 
               <button
-              onClick={handleSubmit}
+                onClick={handleSubmit}
                 className="mt-4 w-full py-5 px-4 rounded-[58px] text-white font-semibold bg-blue-600 hover:bg-blue-700 cursor-pointer"
-              > Verify
+              >
+                {" "}
+                Verify
               </button>
             </form>
           </div>

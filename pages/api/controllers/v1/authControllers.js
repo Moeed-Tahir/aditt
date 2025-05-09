@@ -121,6 +121,7 @@ exports.verifyOTP = async (req, res) => {
                 _id: user._id,
                 name: user.name,
                 email: user.businessEmail,
+                website: user.businessWebsite, 
                 role: user.role
             },
             token,
@@ -194,6 +195,7 @@ exports.signIn = async (req, res) => {
                 _id: user._id,
                 name: user.name,
                 email: user.businessEmail,
+                website: user.businessWebsite,
                 role: user.role
             },
             token
@@ -307,6 +309,157 @@ exports.resetPassword = async (req, res) => {
         console.error('[ERROR] Password reset failed:', error);
         res.status(500).json({ 
             message: "Server error during password reset",
+            error: error.message
+        });
+    }
+};
+
+exports.updateProfile = async (req, res) => {
+    try {
+      await connectToDatabase();
+  
+      const { userId, name, website } = req.body;
+  
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+  
+      const user = await User.findById(userId);
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Update fields
+      user.name = name;
+      user.businessWebsite = website;
+      await user.save();
+  
+      res.status(200).json({
+        message: "Profile updated successfully",
+        user: {
+          name: user.name,
+          email: user.businessEmail,
+          website: user.businessWebsite,
+        },
+      });
+  
+    } catch (error) {
+      console.error("[ERROR] Update failed:", error);
+      res.status(500).json({ message: "Server error during update" });
+    }
+  };
+  
+
+  // Update Password for logged-in user
+exports.updatePassword = async (req, res) => {
+    try {
+        await connectToDatabase();
+
+        const { userId, currentPassword, newPassword } = req.body;
+
+        if (!userId || !currentPassword || !newPassword) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Current password is incorrect" });
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+
+        return res.status(200).json({ message: "Password updated successfully" });
+
+    } catch (error) {
+        console.error("[ERROR] Password update failed:", error);
+        res.status(500).json({ message: "Server error during password update" });
+    }
+};
+
+
+
+// Add this to your authControllers.js
+exports.deleteAccount = async (req, res) => {
+    try {
+        await connectToDatabase();
+
+        const { userId } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({ 
+                message: "User ID is required",
+                code: "USER_ID_REQUIRED"
+            });
+        }
+
+        const user = await User.findByIdAndDelete(userId);
+
+        if (!user) {
+            return res.status(404).json({ 
+                message: "User not found",
+                code: "USER_NOT_FOUND"
+            });
+        }
+
+        res.status(200).json({
+            message: "Account deleted successfully"
+        });
+
+    } catch (error) {
+        console.error('[ERROR] Account deletion failed:', error);
+        res.status(500).json({ 
+            message: "Server error during account deletion",
+            error: error.message
+        });
+    }
+};
+
+exports.resendOTP = async (req, res) => {
+    try {
+        await connectToDatabase();
+
+        const { userId } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({ 
+                message: "User ID is required",
+                code: "USER_ID_REQUIRED"
+            });
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ 
+                message: "User not found",
+                code: "USER_NOT_FOUND"
+            });
+        }
+
+        // Generate new OTP
+        user.otp = generateOTP();
+        user.otpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
+        await user.save();
+
+        // Send OTP to email
+        await sendOTP(user.businessEmail, user.otp);
+
+        res.status(200).json({
+            message: "OTP resent successfully",
+            userId: user._id
+        });
+
+    } catch (error) {
+        console.error('[ERROR] Resend OTP failed:', error);
+        res.status(500).json({ 
+            message: "Server error during OTP resend",
             error: error.message
         });
     }
