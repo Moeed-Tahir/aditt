@@ -70,9 +70,9 @@ exports.getCampaign = async (req, res) => {
     try {
         await connectToDatabase();
         
-        const { id } = req.body;
+        const { userId } = req.body;
         
-        const campaign = await Compaign.findById(id);
+        const campaign = await Compaign.findOne({ userId: userId });
         
         if (!campaign) {
             return res.status(404).json({

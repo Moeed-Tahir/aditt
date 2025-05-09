@@ -94,6 +94,7 @@ export function CreateCampaigns({ userId }) {
     video: 0,
     image: 0,
   });
+  
   const [isUploading, setIsUploading] = useState(false);
 
   const handleInputChange = (e) => {

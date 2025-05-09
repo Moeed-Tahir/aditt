@@ -39,7 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const campaignsData = [
+const defaultCampaignsData = [
   {
     id: "nike",
     title: "Nike Campaign",
@@ -96,11 +96,24 @@ const campaignsData = [
   },
 ];
 
-export function DataTable() {
+export function DataTable({ campaignData }) {
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortBy, setSortBy] = useState("");
+  
+  // Transform the campaignData to match the expected format or use default data
+  const transformedCampaigns = campaignData 
+    ? [{
+        id: campaignData._id,
+        title: campaignData.campaignTitle,
+        category: campaignData.categories.join(", ") || "No Category",
+        views: 0, // You might want to add views to your data model
+        date: campaignData.campaignStartDate,
+        amount: 0, // You might want to add amount to your data model
+        status: "Pending", // Default status or add to your data model
+      }]
+    : defaultCampaignsData;
 
-  const filteredCampaigns = campaignsData
+  const filteredCampaigns = transformedCampaigns
     .filter((c) => statusFilter === "All" || c.status === statusFilter)
     .sort((a, b) => {
       if (sortBy === "views") return b.views - a.views;
@@ -154,6 +167,7 @@ export function DataTable() {
 
     setDialogOpen(true);
   };
+  
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -162,6 +176,7 @@ export function DataTable() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
   return (
     <>
       <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
@@ -186,7 +201,7 @@ export function DataTable() {
               <h2 className="text-l text-gray-400 font-light mb-2">
                 📊 Campaigns Created
               </h2>
-              <p>782</p>
+              <p>{transformedCampaigns.length}</p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
@@ -195,7 +210,7 @@ export function DataTable() {
               <h2 className="text-l text-gray-400 font-light mb-2">
                 🚀 Active Campaigns
               </h2>
-              <p>24</p>
+              <p>{transformedCampaigns.filter(c => c.status === "Active").length}</p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
@@ -204,7 +219,7 @@ export function DataTable() {
               <h2 className="text-l text-gray-400 font-light mb-2">
                 🎉 Total Engagements
               </h2>
-              <p>4.7M</p>
+              <p>{transformedCampaigns.reduce((sum, c) => sum + c.views, 0).toLocaleString()}</p>
             </div>
           </div>
 
@@ -354,7 +369,6 @@ export function DataTable() {
           </div>
           <Charts/>
         </div>
-        
       </main>
       <ConfirmationDialogue
         open={dialogOpen}
