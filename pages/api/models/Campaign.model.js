@@ -9,22 +9,26 @@ const QuestionSchema = new mongoose.Schema({
     option1: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
+        // clickCount: 0
     },
     option2: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
+        // clickCount: 0
     },
     option3: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
+        // clickCount: 0
     },
     option4: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
+        // clickCount: 0
     },
     answer: {
         type: String,
