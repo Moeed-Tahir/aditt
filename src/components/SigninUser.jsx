@@ -101,7 +101,7 @@ function SigninUser() {
       localStorage.setItem('user', JSON.stringify(data.user));
 
       // Redirect to dashboard
-      router.push("/campaign-dashboard");
+      router.push("userid/campaign-dashboard");
     } catch (error) {
       console.error('Sign in error:', error);
       setApiError(error.message);

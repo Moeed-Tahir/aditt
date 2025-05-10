@@ -170,7 +170,7 @@ export function DataTable() {
         <div className="p-4">
           <div className="flex justify-between items-center">
             <p className="text-3xl">Campaigns</p>
-            <Link href="/create-campaign/userid">
+            <Link href="/create-campaign/id">
               <button
                 type="button"
                 className="flex items-center gap-2 py-4 px-6 rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"

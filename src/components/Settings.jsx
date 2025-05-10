@@ -73,6 +73,7 @@ export function Settings() {
         setMessage({ text: "Profile updated successfully!", type: "success" });
         setBusinessEditMode(false);
         setPersonalEditMode(false);
+        updatePassword();
       }
     } catch (error) {
       console.error("Update failed:", error);
@@ -386,7 +387,7 @@ export function Settings() {
               />
             </div>
           </div>
-          {personalEditMode && (
+          {/* {personalEditMode && (
               <div className="flex justify-end mt-4">
                 <button
                   onClick={updatePassword}
@@ -396,7 +397,7 @@ export function Settings() {
                   {loading ? "Updating..." : "Update Password"}
                 </button>
               </div>
-            )}
+            )} */}
         </div>
       </div>
 
