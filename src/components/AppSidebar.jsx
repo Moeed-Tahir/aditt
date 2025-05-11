@@ -23,7 +23,7 @@ import clsx from "clsx"; // Make sure to install clsx if not already: `npm insta
 const items = [
   {
     title: "Campaign",
-    url: "/campaign-dashboard",
+    url: "/userid/campaign-dashboard",
     icon: Megaphone,
   },
   // {

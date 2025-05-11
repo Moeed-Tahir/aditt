@@ -1,10 +1,10 @@
 "use client";
-import Navbar from "@/components/Navbar";
 import { CreateCampaigns } from "@/components/CreateCampaigns";
+import Cookies from "js-cookie";
 
 export default function CreateCampaign() {
-  const userId = localStorage.getItem("userId") || "abcdef";
-
+  const userId = Cookies.get("userId");
+  
   return (
     <>
       <CreateCampaigns userId={userId} />

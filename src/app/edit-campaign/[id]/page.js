@@ -31,8 +31,8 @@ export default function EditCampaign() {
         <div className="max-w-4xl mx-auto mb-6">
           <div className="flex items-center mb-6">
             <Link
-              href="/campaign-dashboard"
-              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
+          href="/userid/campaign-dashboard"
+          className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
             >
               <ArrowLeft />
               Back

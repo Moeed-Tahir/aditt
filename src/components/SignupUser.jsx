@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 function SignupUser() {
   const [formData, setFormData] = useState({
@@ -107,11 +108,13 @@ function SignupUser() {
         businessEmail: formData.email,
         password: formData.password
       })
-      console.log("response",response.data.userId)
+      
       if (response.status === 200 || response.status === 201) {
-        localStorage.setItem("userId",response.data.userId);
+        Cookies.set('userId', response.data.userId, { expires: 1 });
+        const userId = Cookies.get("userId");
+
         alert("User created successfully");
-        router.push("verify-email");
+        router.push(`${userId}/verify-email`);
       } else if (response.status === 200) {
         alert("User created successfully")
       }

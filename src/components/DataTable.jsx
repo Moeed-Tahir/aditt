@@ -18,16 +18,6 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  Ellipsis,
-  EllipsisVertical,
-  Pencil,
-  Pause,
-  CheckCheck,
-  X,
-  ChevronUp,
   ListFilter,
   ChevronsUpDown,
   Plus,
@@ -38,82 +28,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const defaultCampaignsData = [
-  {
-    id: "nike",
-    title: "Nike Campaign",
-    category: "📺 Entertainment & Technology",
-    views: 89000,
-    date: "2025-06-23",
-    amount: 678.5,
-    status: "Pending",
-  },
-  {
-    id: "adidas",
-    title: "Adidas Campaign",
-    category: "🍹 Food & Drink",
-    views: 90000,
-    date: "2025-06-24",
-    amount: 699.99,
-    status: "Active",
-  },
-  {
-    id: "puma",
-    title: "Puma Promotion",
-    category: "🛍 Shopping",
-    views: 91000,
-    date: "2025-06-25",
-    amount: 720.0,
-    status: "Completed",
-  },
-  {
-    id: "newBalance",
-    title: "New Balance ad",
-    category: "🍹 Food & Drink",
-    views: 91000,
-    date: "2025-06-25",
-    amount: 720.0,
-    status: "Completed",
-  },
-  {
-    id: "newBalance2",
-    title: "New Balance ad",
-    category: "🥎 Sports & Fitness",
-    views: 91000,
-    date: "2025-06-25",
-    amount: 720.0,
-    status: "Pending",
-  },
-  {
-    id: "puma2",
-    title: "Puma Promotion",
-    category: "🛍 Shopping",
-    views: 91000,
-    date: "2025-06-25",
-    amount: 720.0,
-    status: "Completed",
-  },
-];
+import Cookies from "js-cookie";
 
 export function DataTable({ campaignData }) {
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortBy, setSortBy] = useState("");
-  
-  // Transform the campaignData to match the expected format or use default data
-  const transformedCampaigns = campaignData 
-    ? [{
-        id: campaignData._id,
-        title: campaignData.campaignTitle,
-        category: campaignData.categories.join(", ") || "No Category",
-        views: 0, // You might want to add views to your data model
-        date: campaignData.campaignStartDate,
-        amount: 0, // You might want to add amount to your data model
-        status: "Pending", // Default status or add to your data model
-      }]
-    : defaultCampaignsData;
+  const userId = Cookies.get("userId");
 
-  const filteredCampaigns = transformedCampaigns
+  // Transform the API data to match our table structure
+  const transformedCampaigns = campaignData?.map(campaign => ({
+    id: campaign._id,
+    title: campaign.campaignTitle,
+    category: "No Category", // Default category since not in API
+    views: campaign.totalViews || 0,
+    date: campaign.campaignStartDate,
+    amount: parseFloat(campaign.campaignBudget) || 0,
+    status: campaign.status || "Pending",
+  }));
+
+  const filteredCampaigns = (transformedCampaigns || [])
     .filter((c) => statusFilter === "All" || c.status === statusFilter)
     .sort((a, b) => {
       if (sortBy === "views") return b.views - a.views;
@@ -128,7 +61,7 @@ export function DataTable({ campaignData }) {
     title: "",
     smallText: "",
     confirmLabel: "",
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const openDialog = (title, smallText, confirmLabel, onConfirm) => {
@@ -160,14 +93,13 @@ export function DataTable({ campaignData }) {
       smallText: smallTexts[type],
       confirmLabel: labels[type],
       onConfirm: () => {
-        console.log(`${type} campaign:`, campaignId);
         setDialogOpen(false);
       },
     });
 
     setDialogOpen(true);
   };
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -185,10 +117,10 @@ export function DataTable({ campaignData }) {
         <div className="p-4">
           <div className="flex justify-between items-center">
             <p className="text-3xl">Campaigns</p>
-            <Link href="/create-campaign">
+            <Link href={`/${userId}/create-campaign`}>
               <button
                 type="button"
-                className="flex items-center gap-2 py-4 px-6 rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                className="flex items-center justify-center w-[241px] h-[56px] rounded-[80px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
               >
                 <Plus className="w-5 h-5" />
                 <span>Create new campaign</span>
@@ -198,42 +130,42 @@ export function DataTable({ campaignData }) {
 
           <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">
             <div className="flex-1 p-6">
-              <h2 className="text-l text-gray-400 font-light mb-2">
+              <h2 className="text-[16px] text-gray-400 mb-2">
                 📊 Campaigns Created
               </h2>
-              <p>{transformedCampaigns.length}</p>
+              <p>{transformedCampaigns?.length}</p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
 
             <div className="flex-1 bg-white rounded-xl p-6">
-              <h2 className="text-l text-gray-400 font-light mb-2">
+              <h2 className="text-[16px] text-gray-400 mb-2">
                 🚀 Active Campaigns
               </h2>
-              <p>{transformedCampaigns.filter(c => c.status === "Active").length}</p>
+              <p>{transformedCampaigns?.filter(c => c.status === "Active").length}</p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
 
             <div className="flex-1 bg-white rounded-xl p-6">
-              <h2 className="text-l text-gray-400 font-light mb-2">
-                🎉 Total Engagements
+              <h2 className="text-[16px] text-gray-400 mb-2">
+                🎉 Total Attentive Engagements
               </h2>
-              <p>{transformedCampaigns.reduce((sum, c) => sum + c.views, 0).toLocaleString()}</p>
+              <p>{transformedCampaigns?.reduce((sum, c) => sum + c.views, 0).toLocaleString()}</p>
             </div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-4 border border-gray-200">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-              <h2 className="text-xl text-gray-400">ALL CAMPAIGNS</h2>
+              <h2 className="text-[18px] font-md text-gray-400">ALL CAMPAIGNS</h2>
               <div className="flex gap-2">
                 {/* Sort Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-semibold items-center gap-1"
+                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-md text-[16px] items-center gap-1"
                     >
                       Sort by
                       <div>
@@ -257,7 +189,7 @@ export function DataTable({ campaignData }) {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-semibold items-center gap-1"
+                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-md text-[16px] items-center gap-1"
                     >
                       <ListFilter className="w-4 h-4" /> Filter
                     </Button>
@@ -282,7 +214,6 @@ export function DataTable({ campaignData }) {
                 <TableHeader>
                   <TableRow className="bg-[var(--bg-color-off-white)]">
                     <TableHead className=" text-gray-500 ">Title</TableHead>
-                    <TableHead className=" text-gray-500 ">Category</TableHead>
                     <TableHead className=" text-gray-500 ">
                       Total Views
                     </TableHead>
@@ -298,36 +229,31 @@ export function DataTable({ campaignData }) {
                       key={c.id}
                       className="hover:bg-gray-50 transition"
                     >
-                      <TableCell className="text-gray-800 py-6">
+                      <TableCell className="text-gray-800 text-[14px] py-6">
                         <Link
-                          href={`/campaigns/${c.id}`}
+                          href={`campaigns?id=${c.id}`}
                           className="text-gray-800 hover:underline"
                         >
                           {c.title}
                         </Link>
                       </TableCell>
-
-                      <TableCell className="text-gray-800 py-6">
-                        {c.category}
+                      <TableCell className="text-gray-80 text-[14px] py-6">
+                        {c.views.toLocaleString()} k
                       </TableCell>
-                      <TableCell className="text-gray-800 py-6">
-                        {c.views.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-gray-800 py-6">
+                      <TableCell className="text-gray-800 text-[14px] py-6">
                         {new Date(c.date).toLocaleDateString()}
                       </TableCell>
-                      <TableCell className="text-gray-800 py-6">
+                      <TableCell className="text-gray-800 text-[14px] py-6">
                         ${c.amount.toFixed(2)}
                       </TableCell>
                       <TableCell>
                         <span
-                          className={`text-xs font-medium px-3 py-1 rounded-full ${
-                            c.status === "Active"
+                          className={`text-xs font-medium px-3 py-1 rounded-full ${c.status === "Active"
                               ? "bg-green-100 text-green-700"
                               : c.status === "Pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-blue-100 text-blue-700"
-                          }`}
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-blue-100 text-blue-700"
+                            }`}
                         >
                           {c.status}
                         </span>
@@ -367,7 +293,7 @@ export function DataTable({ campaignData }) {
               </div>
             </div>
           </div>
-          <Charts/>
+          <Charts />
         </div>
       </main>
       <ConfirmationDialogue

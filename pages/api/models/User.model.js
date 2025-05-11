@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
+const generateRandomId = () => Math.random().toString(36).substr(2, 9);
 
 const UserSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+        default: generateRandomId,
+        unique: true,
+    },
     name: {
         type: String,
         required: true,

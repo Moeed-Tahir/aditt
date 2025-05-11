@@ -4,11 +4,12 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { DataTable } from "@/components/DataTable";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function CampaignDashboard() {
   const [campaignData, setCampaignData] = useState()
-  const userId = localStorage.getItem("userId") || "abcdef";
-
+  const userId = Cookies.get("userId");
+  
   const fetchCampaign = async () => {
     try {
 

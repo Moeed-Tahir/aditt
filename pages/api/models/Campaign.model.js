@@ -9,22 +9,42 @@ const QuestionSchema = new mongoose.Schema({
     option1: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
+        totalCount: {
+            type: Number,
+            required: false,
+            default: 0
+        },
     },
     option2: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
+        totalCount: {
+            type: Number,
+            required: false,
+            default: 0
+        },
     },
     option3: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
+        totalCount: {
+            type: Number,
+            required: false,
+            default: 0
+        },
     },
     option4: {
         type: String,
         required: false,
-        trim: true
+        trim: true,
+        totalCount: {
+            type: Number,
+            required: false,
+            default: 0
+        },
     },
     answer: {
         type: String,
@@ -88,6 +108,11 @@ const CompaignSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    status: {
+        type: String,
+        required: false,
+        default: "Pending"
+    },
     websiteLink: {
         type: String,
         required: true,
@@ -144,6 +169,46 @@ const CompaignSchema = new mongoose.Schema({
     couponCode: {
         type: String,
         required: false,
+    },
+    campaignBudget: {
+        type: String,
+        required: false,
+    },
+    totalViews: {
+        type: Number,
+        required: false,
+        default: 0
+    },
+    impressions: {
+        type: Number,
+        required: false,
+        default: 0
+    },
+    engagements: {
+        totalCount: {
+            type: Number,
+            required: false,
+            default: 0
+        },
+        countData: {
+            type: String,
+            required: false
+        }
+    },
+    clickCount: {
+        totalCount: {
+            type: Number,
+            required: false,
+            default: 0
+        },
+        countData: {
+            type: String,
+            required: false
+        },
+        gender: {
+            type: String,
+            required: false
+        }
     },
 }, { timestamps: true });
 

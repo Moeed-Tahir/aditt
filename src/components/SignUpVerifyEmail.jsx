@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
+import { Router } from "next/router";
+import Cookies from "js-cookie";
 
 function SignUpVerifyEmail() {
   const [formData, setFormData] = useState({
@@ -80,20 +82,22 @@ function SignUpVerifyEmail() {
       return;
     }
 
-    const userId = localStorage.getItem("userId");
+    const userId = Cookies.get("userId");
     try {
+      
       const response = await axios.post(
         "/api/routes/v1/authRoutes?action=verify-otp",
         {
-          otp: otp.join(""), // Send OTP as a string
+          otp: otp.join(""),
           userId: userId,
         }
       );
       alert("User is created");
     } catch (error) {
-      alert("An error occurred: " + error.message); // Show specific error message
+      alert("An error occurred: " + error.message);
     } finally {
       setSubmitAttempted(false);
+      Router.push("/campaign-dashboard");
     }
   };
 

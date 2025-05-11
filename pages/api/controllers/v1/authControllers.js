@@ -56,7 +56,7 @@ exports.signUp = async (req, res) => {
 
         res.status(201).json({
             message: "User created successfully. OTP sent to your email.",
-            userId: newUser._id,
+            userId: newUser.userId,
             email: businessEmail
         });
 
@@ -78,7 +78,7 @@ exports.verifyOTP = async (req, res) => {
     try {
         const { userId, otp } = req.body;
 
-        const user = await User.findOne({ _id: userId });
+        const user = await User.findOne({ userId: userId });
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -107,7 +107,7 @@ exports.verifyOTP = async (req, res) => {
         console.log('After verification:', user.isOtpVerified);
 
         const token = jwt.sign(
-            { userId: user._id },
+            { userId: user.userId },
             process.env.SECRET_KEY,
             { expiresIn: '1h' }
         );
@@ -115,10 +115,11 @@ exports.verifyOTP = async (req, res) => {
         res.status(200).json({
             message: "OTP verified successfully",
             user: {
-                _id: user._id,
+                userId: user.userId,
                 name: user.name,
                 email: user.businessEmail,
                 website: user.businessWebsite, 
+                userId:user.userId,
                 role: user.role
             },
             token,
@@ -181,7 +182,7 @@ exports.signIn = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { userId: user._id },
+            { userId: user.userId },
             process.env.SECRET_KEY,
             { expiresIn: '1h' }
         );
@@ -189,7 +190,7 @@ exports.signIn = async (req, res) => {
         res.status(200).json({
             message: "Sign in successful",
             user: {
-                _id: user._id,
+                userId: user.userId,
                 name: user.name,
                 email: user.businessEmail,
                 website: user.businessWebsite,
@@ -239,7 +240,7 @@ exports.forgotPassword = async (req, res) => {
 
         res.status(200).json({
             message: "OTP sent to your email for password reset",
-            userId: user._id
+            userId: user.userId
         });
 
     } catch (error) {
@@ -450,7 +451,7 @@ exports.resendOTP = async (req, res) => {
 
         res.status(200).json({
             message: "OTP resent successfully",
-            userId: user._id
+            userId: user.userId
         });
 
     } catch (error) {

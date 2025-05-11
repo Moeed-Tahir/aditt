@@ -1,6 +1,7 @@
 import {
     createCampaign,
-    getCampaign
+    getCampaign,
+    getCampaignAgainstId
 } from "../../controllers/v1/compaignController";
 
 export default async function handler(req, res) {
@@ -17,6 +18,8 @@ export default async function handler(req, res) {
                     return await createCampaign(req, res);
                 case "getCampaign":
                     return await getCampaign(req, res);
+                case "getCampaignAgainstId":
+                    return await getCampaignAgainstId(req, res);
                 default:
                     return res.status(400).json({ message: "Invalid action parameter" });
             }

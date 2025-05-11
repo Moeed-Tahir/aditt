@@ -4,6 +4,7 @@ import Image from "next/image";
 import { User, Globe, Mail, Lock, AlertCircle, Info } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 function SigninUser() {
   const router = useRouter();
@@ -92,16 +93,12 @@ function SigninUser() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || "Sign in failed");
-      }
+      Cookies.set('token',  data.token, { expires: 1 });
+      Cookies.set('userId',  data.user.userId, { expires: 1 });
+      Cookies.set('user', JSON.stringify(data.user), { expires: 1 });
 
-      // Store token and user data as needed
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-
-      // Redirect to dashboard
-      router.push("/campaign-dashboard");
+      const userId = Cookies.get("userId");
+      router.push(`${userId}/campaign-dashboard`);
     } catch (error) {
       console.error('Sign in error:', error);
       setApiError(error.message);
