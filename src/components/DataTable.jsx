@@ -44,7 +44,7 @@ const campaignsData = [
     id: "nike",
     title: "Nike Campaign",
     category: "📺 Entertainment & Technology",
-    views: 89000,
+    views: 89,
     date: "2025-06-23",
     amount: 678.5,
     status: "Pending",
@@ -53,7 +53,7 @@ const campaignsData = [
     id: "adidas",
     title: "Adidas Campaign",
     category: "🍹 Food & Drink",
-    views: 90000,
+    views: 9,
     date: "2025-06-24",
     amount: 699.99,
     status: "Active",
@@ -62,7 +62,7 @@ const campaignsData = [
     id: "puma",
     title: "Puma Promotion",
     category: "🛍 Shopping",
-    views: 91000,
+    views: 91,
     date: "2025-06-25",
     amount: 720.0,
     status: "Completed",
@@ -71,7 +71,7 @@ const campaignsData = [
     id: "newBalance",
     title: "New Balance ad",
     category: "🍹 Food & Drink",
-    views: 91000,
+    views: 91,
     date: "2025-06-25",
     amount: 720.0,
     status: "Completed",
@@ -80,7 +80,7 @@ const campaignsData = [
     id: "newBalance2",
     title: "New Balance ad",
     category: "🥎 Sports & Fitness",
-    views: 91000,
+    views: 91,
     date: "2025-06-25",
     amount: 720.0,
     status: "Pending",
@@ -89,7 +89,7 @@ const campaignsData = [
     id: "puma2",
     title: "Puma Promotion",
     category: "🛍 Shopping",
-    views: 91000,
+    views: 91,
     date: "2025-06-25",
     amount: 720.0,
     status: "Completed",
@@ -173,7 +173,7 @@ export function DataTable() {
             <Link href="/create-campaign/id">
               <button
                 type="button"
-                className="flex items-center gap-2 py-4 px-6 rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                className="flex items-center justify-center w-[241px] h-[56px] rounded-[80px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
               >
                 <Plus className="w-5 h-5" />
                 <span>Create new campaign</span>
@@ -183,42 +183,42 @@ export function DataTable() {
 
           <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">
             <div className="flex-1 p-6">
-              <h2 className="text-l text-gray-400 font-light mb-2">
+              <h2 className="text-[16px] text-gray-400 mb-2">
                 📊 Campaigns Created
               </h2>
-              <p>782</p>
+              <p className="font-md text-[30px]">782</p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
 
             <div className="flex-1 bg-white rounded-xl p-6">
-              <h2 className="text-l text-gray-400 font-light mb-2">
+              <h2 className="text-[16px] text-gray-400 mb-2">
                 🚀 Active Campaigns
               </h2>
-              <p>24</p>
+              <p className="font-md text-[30px]">24</p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
 
             <div className="flex-1 bg-white rounded-xl p-6">
-              <h2 className="text-l text-gray-400 font-light mb-2">
-                🎉 Total Engagements
+              <h2 className="text-[16px] text-gray-400 mb-2">
+                🎉 Total Attentive Engagements
               </h2>
-              <p>4.7M</p>
+              <p className="font-md text-[30px]">4.7M</p>
             </div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-4 border border-gray-200">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-              <h2 className="text-xl text-gray-400">ALL CAMPAIGNS</h2>
+              <h2 className="text-[18px] font-md text-gray-400">ALL CAMPAIGNS</h2>
               <div className="flex gap-2">
                 {/* Sort Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-semibold items-center gap-1"
+                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-md text-[16px] items-center gap-1"
                     >
                       Sort by
                       <div>
@@ -242,7 +242,7 @@ export function DataTable() {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-semibold items-center gap-1"
+                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-md text-[16px] items-center gap-1"
                     >
                       <ListFilter className="w-4 h-4" /> Filter
                     </Button>
@@ -267,7 +267,6 @@ export function DataTable() {
                 <TableHeader>
                   <TableRow className="bg-[var(--bg-color-off-white)]">
                     <TableHead className=" text-gray-500 ">Title</TableHead>
-                    <TableHead className=" text-gray-500 ">Category</TableHead>
                     <TableHead className=" text-gray-500 ">
                       Total Views
                     </TableHead>
@@ -283,7 +282,7 @@ export function DataTable() {
                       key={c.id}
                       className="hover:bg-gray-50 transition"
                     >
-                      <TableCell className="text-gray-800 py-6">
+                      <TableCell className="text-gray-800 text-[14px] py-6">
                         <Link
                           href={`/campaigns/${c.id}`}
                           className="text-gray-800 hover:underline"
@@ -291,17 +290,13 @@ export function DataTable() {
                           {c.title}
                         </Link>
                       </TableCell>
-
-                      <TableCell className="text-gray-800 py-6">
-                        {c.category}
+                      <TableCell className="text-gray-80 text-[14px] py-6">
+                        {c.views.toLocaleString()} k
                       </TableCell>
-                      <TableCell className="text-gray-800 py-6">
-                        {c.views.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-gray-800 py-6">
+                      <TableCell className="text-gray-800 text-[14px] py-6">
                         {new Date(c.date).toLocaleDateString()}
                       </TableCell>
-                      <TableCell className="text-gray-800 py-6">
+                      <TableCell className="text-gray-800 text-[14px] py-6">
                         ${c.amount.toFixed(2)}
                       </TableCell>
                       <TableCell>

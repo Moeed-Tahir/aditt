@@ -1,17 +1,22 @@
 "use client";
 
+import { allCountries } from "country-telephone-data";
 import Navbar from "@/components/Navbar";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   ChevronDown,
+  Eye,
+  EyeOff,
   Globe,
   House,
   LandmarkIcon,
   Lock,
   Mail,
+  Trash,
   User,
 } from "lucide-react";
+import Link from "next/link";
 
 export function Settings() {
   const [businessEditMode, setBusinessEditMode] = useState(false);
@@ -19,8 +24,8 @@ export function Settings() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [formData, setFormData] = useState({
     userId: "",
     name: "",
@@ -73,7 +78,9 @@ export function Settings() {
         setMessage({ text: "Profile updated successfully!", type: "success" });
         setBusinessEditMode(false);
         setPersonalEditMode(false);
-        updatePassword();
+        if (formData.currentPassword && formData.newPassword) {
+          await updatePassword();
+        }
       }
     } catch (error) {
       console.error("Update failed:", error);
@@ -84,11 +91,6 @@ export function Settings() {
   };
 
   const updatePassword = async () => {
-    if (!formData.currentPassword || !formData.newPassword) {
-      setMessage({ text: "Please fill both password fields.", type: "error" });
-      return;
-    }
-
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -171,15 +173,15 @@ export function Settings() {
       <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow p-8 relative">
         <div className="flex items-center justify-between mb-8">
           <div className="w-1/3">
-            <label className="block text-lg font-medium">
+            <label className="block text-[24px] font-medium">
               Business information
             </label>
-            <span className="block text-xs text-gray-500 mt-1">
+            <span className="block text-[16px] text-gray-500 mt-1">
               Edit your business details to keep them up to date.
             </span>
           </div>
           <button
-            className={`px-16 py-2 rounded-full hover:bg-blue-700 ${
+            className={`w-[218px] h-[56px] text-[16px] rounded-full hover:bg-blue-700 ${
               businessEditMode
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700 hover:text-white"
@@ -199,7 +201,9 @@ export function Settings() {
         <div className="space-y-6">
           <div className="flex items-start gap-6">
             <div className="w-1/3">
-              <label className="block text-sm font-medium">Profile Type</label>
+              <label className="block text-[18px] font-medium">
+                Profile Type
+              </label>
             </div>
             <div className="relative flex-1">
               <LandmarkIcon className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
@@ -218,7 +222,9 @@ export function Settings() {
 
           <div className="flex items-start gap-6">
             <div className="w-1/3">
-              <label className="block text-sm font-medium">Company Name</label>
+              <label className="block text-[18px] font-medium">
+                Company Name
+              </label>
             </div>
             <div className="relative flex-1">
               <House className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
@@ -235,7 +241,7 @@ export function Settings() {
 
           <div className="flex items-start gap-6">
             <div className="w-1/3">
-              <label className="block text-sm font-medium">
+              <label className="block text-[18px] font-medium">
                 Business Website (optional)
               </label>
             </div>
@@ -258,15 +264,15 @@ export function Settings() {
       <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow p-8 relative">
         <div className="flex items-center justify-between mb-8">
           <div className="w-1/3">
-            <label className="block text-lg font-medium">
+            <label className="block text-[24px] font-medium">
               Personal information
             </label>
-            <span className="block text-xs text-gray-500 mt-1">
+            <span className="block text-[16px] text-gray-500 mt-1">
               Update your personal details to keep your profile accurate.
             </span>
           </div>
           <button
-            className={`px-16 py-2 rounded-full hover:bg-blue-700 ${
+            className={`w-[218px] h-[56px] text-[16px] rounded-full hover:bg-blue-700 ${
               personalEditMode
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700 hover:text-white"
@@ -286,7 +292,7 @@ export function Settings() {
         <div className="space-y-6">
           <div className="flex items-start gap-6">
             <div className="w-1/3">
-              <label className="block text-sm font-medium">Name</label>
+              <label className="block text-[18px] font-medium">Name</label>
             </div>
             <div className="relative flex-1">
               <User className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
@@ -303,27 +309,39 @@ export function Settings() {
 
           <div className="flex items-start gap-6">
             <div className="w-1/3">
-              <label className="block text-sm font-medium pt-2">
+              <label className="block text-[18px] font-medium pt-2">
                 Phone Number
               </label>
             </div>
             <div className="flex-1">
-              <div className="flex items-center border border-gray-300 rounded-full overflow-hidden w-full">
-                <select
-                  className="bg-transparent text-sm px-4 py-2 outline-none appearance-none"
-                  disabled={!personalEditMode}
-                >
-                  <option value="+1">🇺🇸+1</option>
-                  <option value="+44">🇬🇧+44</option>
-                  <option value="+92">🇵🇰+92</option>
-                  <option value="+971">🇦🇪+971</option>
-                  <option value="+974">🇶🇦+974</option>
-                </select>
-                <span className="h-6 w-px bg-gray-300"></span>
+              <div className="flex items-center border border-gray-300 rounded-full w-full overflow-visible">
+                <div className="relative flex-shrink-0">
+                  <select
+                    defaultValue="+1"
+                    className="bg-transparent text-sm pl-4 pr-8 py-2 outline-none appearance-none"
+                    disabled={!personalEditMode}
+                  >
+                    {allCountries.map((country) => {
+                      // Convert ISO2 code to regional indicator symbols
+                      const flag = country.iso2
+                        .toUpperCase()
+                        .replace(/./g, (char) =>
+                          String.fromCodePoint(127397 + char.charCodeAt(0))
+                        );
+                      return (
+                        <option key={country.iso2} value={country.dialCode}>
+                          {flag} +{country.dialCode}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <ChevronDown className="w-4 h-4 text-gray-500 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                </div>
+                <span className="h-6 w-px bg-gray-300 mx-2"></span>
                 <input
                   type="tel"
                   placeholder="Enter your phone number"
-                  className="w-full pl-2 pr-4 py-2 text-sm bg-transparent outline-none"
+                  className="flex-1 pl-2 pr-4 py-2 text-sm bg-transparent outline-none"
                   disabled={!personalEditMode}
                 />
               </div>
@@ -332,7 +350,7 @@ export function Settings() {
 
           <div className="flex items-start gap-6">
             <div className="w-1/3">
-              <label className="block text-sm font-medium">Email</label>
+              <label className="block text-[18px] font-medium">Email</label>
             </div>
             <div className="relative flex-1">
               <Mail className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
@@ -351,42 +369,78 @@ export function Settings() {
           {/* Password fields – currently not hooked up */}
           <div className="flex items-start gap-6">
             <div className="w-1/3">
-              <label className="block text-sm font-medium">
+              <label className="block text-[18px] font-medium">
                 Current Password
+              </label>
+            </div>
+            <div className="flex-1">
+              <div className="relative">
+                <Lock className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                <input
+                  type={showCurrentPassword ? "text" : "password"}
+                  name="currentPassword"
+                  value={formData.currentPassword}
+                  onChange={handleChange}
+                  placeholder="Enter your current password"
+                  className="w-full border border-gray-300 rounded-full pl-10 pr-10 py-2"
+                  disabled={!personalEditMode}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  disabled={!personalEditMode}
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+              <div className="text-right mt-1">
+                <Link
+                  href="/reset-password"
+                  className="text-blue-500 hover:underline font-medium text-sm"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-6">
+            <div className="w-1/3">
+              <label className="block text-[18px] font-medium">
+                New Password
               </label>
             </div>
             <div className="relative flex-1">
               <Lock className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
               <input
-                type="password"
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleChange}
-                placeholder="Enter your current password"
-                className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
-                disabled={!personalEditMode}
-              />
-            </div>
-          </div>
-          
-
-          <div className="flex items-start gap-6">
-            <div className="w-1/3">
-              <label className="block text-sm font-medium">New Password</label>
-            </div>
-            <div className="relative flex-1">
-              <Lock className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
-              <input
-                type="password"
+                type={showNewPassword ? "text" : "password"}
                 name="newPassword"
                 value={formData.newPassword}
                 onChange={handleChange}
                 placeholder="Enter your new password"
-                className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
+                className="w-full border border-gray-300 rounded-full pl-10 pr-10 py-2"
                 disabled={!personalEditMode}
               />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                disabled={!personalEditMode}
+              >
+                {showNewPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
             </div>
           </div>
+
           {/* {personalEditMode && (
               <div className="flex justify-end mt-4">
                 <button
@@ -401,21 +455,21 @@ export function Settings() {
         </div>
       </div>
 
-     {/* Account Deletion Section */}
-     <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow p-8 relative">
+      {/* Account Deletion Section */}
+      <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow p-8 relative">
         <div className="flex items-center justify-between mb-8">
           <div className="w-1/3">
-            <label className="block text-lg font-medium">
+            <label className="block text-[24px] font-medium">
               Account Deletion
             </label>
-            <span className="block text-xs text-gray-500 mt-1">
+            <span className="block text-[16px] text-gray-500 mt-1">
               Easily delete your account and remove all associated data from our
               platform.
             </span>
           </div>
           <button
             onClick={() => setIsModalOpen(true)} // Show the modal when clicked
-            className="bg-white text-red-500 px-10 py-2 rounded-full border-2 border-red-500 hover:bg-red-700 hover:text-white"
+            className="bg-white text-[16px] font-md text-[#FF4319] w-[230px] h-[56px] rounded-full border-2 border-[#FF4319] hover:bg-[#FF4319] hover:text-white"
             disabled={loading}
           >
             {loading ? "Processing..." : "Request Account Deletion"}
@@ -425,24 +479,26 @@ export function Settings() {
 
       {/* Modal for Account Deletion */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-xl w-96">
-            <h3 className="text-lg font-bold mb-4">
-              Are you sure you want to delete your account?
+        <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white border text-center p-6 rounded-[20px] max-w-[456px]">
+          <Trash className="w-16 h-16 text-red-500 mx-auto mb-4" />
+
+            <h3 className="text-[24px] font-md mb-4">
+              Request account deletion
             </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              This action cannot be undone.
+            <p className="text-[16px] text-gray-500 mb-6">
+              We're sorry to see you go! Deleting your account will permanently remove all your data.Are you sure you want to proceed?
             </p>
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-4">
               <button
                 onClick={() => setIsModalOpen(false)} // Close the modal
-                className="bg-gray-200 text-gray-800 px-6 py-2 rounded-full hover:bg-gray-300"
+                className="border w-[204px] h-[44px] rounded-[58px] text-blue-600 bg-white hover:bg-blue-600 hover:text-white cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={deleteAccount} // Proceed with account deletion
-                className="bg-red-500 text-white px-6 py-2 rounded-full hover:bg-red-600"
+                className="border w-[204px] h-[44px] rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
                 disabled={loading}
               >
                 {loading ? "Processing..." : "Proceed"}
