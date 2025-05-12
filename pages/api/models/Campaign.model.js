@@ -201,15 +201,18 @@ const CompaignSchema = new mongoose.Schema({
             required: false,
             default: 0
         },
-        countData: {
-            type: String,
-            required: false
-        },
-        gender: {
-            type: String,
-            required: false
-        }
-    },
+        dailyCounts: [{
+            date: {
+                type: Date,
+                required: false
+            },
+            count: {
+                type: Number,
+                required: false,
+                default: 0
+            }
+        }]
+    }
 }, { timestamps: true });
 
 const Compaign = mongoose.models.Compaign || mongoose.model('Compaign', CompaignSchema);

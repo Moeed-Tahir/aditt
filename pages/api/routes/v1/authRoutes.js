@@ -8,6 +8,7 @@ import {
   updatePassword,
   deleteAccount,
   resendOTP,
+  sendPaymentOnClick
 } from "../../controllers/v1/authControllers";
 
 export default async function handler(req, res) {
