@@ -56,30 +56,30 @@ const QuestionSchema = new mongoose.Schema({
 const CardDetailSchema = new mongoose.Schema({
     cardNumber: {
         type: String,
-        required: true,
+        required: false,
     },
     cvc: {
         type: String,
-        required: true,
+        required: false,
     },
     nameOnCard: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     dateOnCard: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     country: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     },
     zip: {
         type: String,
-        required: true,
+        required: false,
         trim: true
     }
 });
@@ -87,15 +87,15 @@ const CardDetailSchema = new mongoose.Schema({
 const BankDetailSchema = new mongoose.Schema({
     accountNumber: {
         type: String,
-        required: true,
+        required: false,
     },
     routingNumber: {
         type: String,
-        required: true,
+        required: false,
     },
     accountType: {
         type: String,
-        required: true,
+        required: false,
     },
 });
 
