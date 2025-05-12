@@ -117,7 +117,8 @@ function SignUpVerifyEmail() {
   };
 
   const handleResendOtp = async () => {
-    const userId = localStorage.getItem("userId");
+    const userId = Cookies.get("userId");
+
     if (!userId) {
         alert("User ID not found.");
         return;

@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 function ResetPassword() {
   const router = useRouter();
@@ -173,7 +175,8 @@ function ResetPassword() {
   };
 
   const handleResendOtp = async () => {
-    const userId = localStorage.getItem("userId");
+    const userId = Cookies.get("userId");
+
     if (!userId) {
         alert("User ID not found.");
         return;
@@ -187,7 +190,7 @@ function ResetPassword() {
         
         if (response.data.message === "OTP resent successfully") {
             alert("New OTP has been sent to your email.");
-            setResendTimer(30); // Set timer for 30 seconds
+            setResendTimer(30);
         } else {
             alert("Failed to resend OTP. Please try again.");
         }

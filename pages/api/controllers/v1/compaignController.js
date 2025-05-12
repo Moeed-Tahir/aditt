@@ -25,7 +25,7 @@ exports.createCampaign = async (req, res) => {
             campaignBudget
         } = req.body;
 
-        if (!campaignTitle || !websiteLink || !campaignVideoUrl || !companyLogo ||
+        if (!campaignTitle || !websiteLink || !campaignVideoUrl ||
             !genderType || !genderRatio || !age ||
             !campaignStartDate || !campaignEndDate || !userId) {
             return res.status(400).json({ message: 'Missing required fields' });
@@ -125,3 +125,7 @@ exports.getCampaignAgainstId = async (req, res) => {
         });
     }
 };
+
+exports.sendPaymentOnClick = async (req,res) => {
+
+}

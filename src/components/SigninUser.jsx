@@ -92,7 +92,7 @@ function SigninUser() {
       });
 
       const data = await response.json();
-
+      
       Cookies.set('token',  data.token, { expires: 1 });
       Cookies.set('userId',  data.user.userId, { expires: 1 });
       Cookies.set('user', JSON.stringify(data.user), { expires: 1 });

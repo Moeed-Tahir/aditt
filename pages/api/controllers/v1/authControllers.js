@@ -16,10 +16,10 @@ exports.signUp = async (req, res) => {
         }
 
         const existingUser = await User.findOne({ businessEmail });
-        
+
         if (existingUser) {
             if (existingUser.isOtpVerified === true) {
-                return res.status(400).json({ 
+                return res.status(400).json({
                     message: "User with this email already exists",
                     code: "EMAIL_EXISTS"
                 });
@@ -27,10 +27,10 @@ exports.signUp = async (req, res) => {
                 existingUser.otp = generateOTP();
                 existingUser.otpExpires = Date.now() + 5 * 60 * 1000;
                 await existingUser.save();
-                
+
                 await sendOTP(businessEmail, existingUser.otp);
-                
-                return res.status(200).json({ 
+
+                return res.status(200).json({
                     message: "OTP resent successfully",
                     userId: existingUser._id
                 });
@@ -66,7 +66,7 @@ exports.signUp = async (req, res) => {
             stack: error.stack,
             fullError: error
         });
-        res.status(500).json({ 
+        res.status(500).json({
             message: "Server error during registration",
             error: error.message
         });
@@ -118,8 +118,8 @@ exports.verifyOTP = async (req, res) => {
                 userId: user.userId,
                 name: user.name,
                 email: user.businessEmail,
-                website: user.businessWebsite, 
-                userId:user.userId,
+                website: user.businessWebsite,
+                userId: user.userId,
                 role: user.role
             },
             token,
@@ -141,7 +141,7 @@ exports.signIn = async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 message: "Email and password are required",
                 code: "MISSING_FIELDS"
             });
@@ -150,7 +150,7 @@ exports.signIn = async (req, res) => {
         const user = await User.findOne({ businessEmail: email });
 
         if (!user) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 message: "User not found",
                 code: "USER_NOT_FOUND"
             });
@@ -161,10 +161,10 @@ exports.signIn = async (req, res) => {
             user.otp = generateOTP();
             user.otpExpires = Date.now() + 5 * 60 * 1000;
             await user.save();
-            
+
             await sendOTP(email, user.otp);
-            
-            return res.status(403).json({ 
+
+            return res.status(403).json({
                 message: "Account not verified. OTP resent to your email.",
                 code: "ACCOUNT_NOT_VERIFIED",
                 userId: user._id,
@@ -175,7 +175,7 @@ exports.signIn = async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return res.status(401).json({ 
+            return res.status(401).json({
                 message: "Invalid password",
                 code: "INVALID_PASSWORD"
             });
@@ -201,7 +201,7 @@ exports.signIn = async (req, res) => {
 
     } catch (error) {
         console.error('[ERROR] Sign in failed:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: "Server error during sign in",
             error: error.message
         });
@@ -216,7 +216,7 @@ exports.forgotPassword = async (req, res) => {
         const { email } = req.body;
 
         if (!email) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 message: "Email is required",
                 code: "EMAIL_REQUIRED"
             });
@@ -225,7 +225,7 @@ exports.forgotPassword = async (req, res) => {
         const user = await User.findOne({ businessEmail: email });
 
         if (!user) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 message: "User with this email not found",
                 code: "USER_NOT_FOUND"
             });
@@ -245,7 +245,7 @@ exports.forgotPassword = async (req, res) => {
 
     } catch (error) {
         console.error('[ERROR] Forgot password failed:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: "Server error during password reset",
             error: error.message
         });
@@ -260,7 +260,7 @@ exports.resetPassword = async (req, res) => {
         const { userId, otp, newPassword } = req.body;
 
         if (!userId || !otp || !newPassword) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 message: "All fields are required",
                 code: "MISSING_FIELDS"
             });
@@ -269,7 +269,7 @@ exports.resetPassword = async (req, res) => {
         const user = await User.findById(userId);
 
         if (!user) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 message: "User not found",
                 code: "USER_NOT_FOUND"
             });
@@ -277,7 +277,7 @@ exports.resetPassword = async (req, res) => {
 
         // Verify OTP
         if (user.otp !== otp) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 message: "Invalid OTP",
                 code: "INVALID_OTP",
                 requiresResend: true
@@ -285,7 +285,7 @@ exports.resetPassword = async (req, res) => {
         }
 
         if (user.otpExpires < Date.now()) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 message: "OTP has expired",
                 code: "OTP_EXPIRED",
                 requiresResend: true
@@ -305,7 +305,7 @@ exports.resetPassword = async (req, res) => {
 
     } catch (error) {
         console.error('[ERROR] Password reset failed:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: "Server error during password reset",
             error: error.message
         });
@@ -314,42 +314,42 @@ exports.resetPassword = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-      await connectToDatabase();
-  
-      const { userId, name, website } = req.body;
-  
-      if (!userId) {
-        return res.status(400).json({ message: "User ID is required" });
-      }
-  
-      const user = await User.findById(userId);
-  
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      // Update fields
-      user.name = name;
-      user.businessWebsite = website;
-      await user.save();
-  
-      res.status(200).json({
-        message: "Profile updated successfully",
-        user: {
-          name: user.name,
-          email: user.businessEmail,
-          website: user.businessWebsite,
-        },
-      });
-  
-    } catch (error) {
-      console.error("[ERROR] Update failed:", error);
-      res.status(500).json({ message: "Server error during update" });
-    }
-  };
-  
+        await connectToDatabase();
 
-  // Update Password for logged-in user
+        const { userId, name, website } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Update fields
+        user.name = name;
+        user.businessWebsite = website;
+        await user.save();
+
+        res.status(200).json({
+            message: "Profile updated successfully",
+            user: {
+                name: user.name,
+                email: user.businessEmail,
+                website: user.businessWebsite,
+            },
+        });
+
+    } catch (error) {
+        console.error("[ERROR] Update failed:", error);
+        res.status(500).json({ message: "Server error during update" });
+    }
+};
+
+
+// Update Password for logged-in user
 exports.updatePassword = async (req, res) => {
     try {
         await connectToDatabase();
@@ -391,7 +391,7 @@ exports.deleteAccount = async (req, res) => {
         const { userId } = req.body;
 
         if (!userId) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 message: "User ID is required",
                 code: "USER_ID_REQUIRED"
             });
@@ -400,7 +400,7 @@ exports.deleteAccount = async (req, res) => {
         const user = await User.findByIdAndDelete(userId);
 
         if (!user) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 message: "User not found",
                 code: "USER_NOT_FOUND"
             });
@@ -412,7 +412,7 @@ exports.deleteAccount = async (req, res) => {
 
     } catch (error) {
         console.error('[ERROR] Account deletion failed:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: "Server error during account deletion",
             error: error.message
         });
@@ -426,16 +426,16 @@ exports.resendOTP = async (req, res) => {
         const { userId } = req.body;
 
         if (!userId) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 message: "User ID is required",
                 code: "USER_ID_REQUIRED"
             });
         }
 
-        const user = await User.findById(userId);
+        const user = await User.findOne({ userId });
 
         if (!user) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 message: "User not found",
                 code: "USER_NOT_FOUND"
             });
@@ -456,7 +456,7 @@ exports.resendOTP = async (req, res) => {
 
     } catch (error) {
         console.error('[ERROR] Resend OTP failed:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: "Server error during OTP resend",
             error: error.message
         });
