@@ -32,7 +32,7 @@ export default function ConfirmationDialog({
 
         <DialogFooter className="flex justify-center gap-4 mt-auto">
           <div className="flex gap-4">
-            <Button className="mt-4 py-7 px-20 rounded-[58px] text-blue-600 bg-white hover:bg-white-700 cursor-pointer" variant="outline" onClick={onCancel}>
+            <Button className="mt-4 py-7 px-20 rounded-[58px] text-blue-600 bg-white hover:bg-blue-600 hover:text-white cursor-pointer" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
             <Button className="mt-4 py-7 px-20 rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer" onClick={onConfirm}>{confirmLabel}</Button>

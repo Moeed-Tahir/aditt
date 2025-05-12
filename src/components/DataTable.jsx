@@ -17,11 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import {
-  ListFilter,
-  ChevronsUpDown,
-  Plus,
-} from "lucide-react";
+import { ListFilter, ChevronsUpDown, Plus, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,10 +29,15 @@ import Cookies from "js-cookie";
 export function DataTable({ campaignData }) {
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortBy, setSortBy] = useState("");
+  const [dateFilter, setDateFilter] = useState({
+    from: "",
+    to: "",
+  });
+  const [showFilters, setShowFilters] = useState(false);
   const userId = Cookies.get("userId");
 
   // Transform the API data to match our table structure
-  const transformedCampaigns = campaignData?.map(campaign => ({
+  const transformedCampaigns = campaignData?.map((campaign) => ({
     id: campaign._id,
     title: campaign.campaignTitle,
     category: "No Category", // Default category since not in API
@@ -47,12 +48,34 @@ export function DataTable({ campaignData }) {
   }));
 
   const filteredCampaigns = (transformedCampaigns || [])
-    .filter((c) => statusFilter === "All" || c.status === statusFilter)
+    .filter((c) => {
+      // Status filter
+      const statusMatch = statusFilter === "All" || c.status === statusFilter;
+
+      // Date filter
+      let dateMatch = true;
+      if (dateFilter.from || dateFilter.to) {
+        const campaignDate = new Date(c.date);
+        const fromDate = dateFilter.from ? new Date(dateFilter.from) : null;
+        const toDate = dateFilter.to ? new Date(dateFilter.to) : null;
+
+        if (fromDate && campaignDate < fromDate) dateMatch = false;
+        if (toDate && campaignDate > toDate) dateMatch = false;
+      }
+
+      return statusMatch && dateMatch;
+    })
     .sort((a, b) => {
-      if (sortBy === "views") return b.views - a.views;
-      if (sortBy === "amount") return b.amount - a.amount;
-      if (sortBy === "date")
+      if (sortBy === "views_high_low") return b.views - a.views;
+      if (sortBy === "views_low_high") return a.views - b.views;
+      if (sortBy === "amount_high_low") return b.amount - a.amount;
+      if (sortBy === "amount_low_high") return a.amount - b.amount;
+      if (sortBy === "date_new_old")
         return new Date(b.date).getTime() - new Date(a.date).getTime();
+      if (sortBy === "date_old_new")
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      if (sortBy === "a_z") return a.title.localeCompare(b.title);
+      if (sortBy === "z_a") return b.title.localeCompare(a.title);
       return 0;
     });
 
@@ -61,7 +84,7 @@ export function DataTable({ campaignData }) {
     title: "",
     smallText: "",
     confirmLabel: "",
-    onConfirm: () => { },
+    onConfirm: () => {},
   });
 
   const openDialog = (title, smallText, confirmLabel, onConfirm) => {
@@ -109,6 +132,18 @@ export function DataTable({ campaignData }) {
     currentPage * itemsPerPage
   );
 
+  const applyFilters = () => {
+    setCurrentPage(1); // Reset to first page when filters change
+    setShowFilters(false);
+  };
+
+  const resetFilters = () => {
+    setStatusFilter("All");
+    setDateFilter({ from: "", to: "" });
+    setCurrentPage(1);
+    setShowFilters(false);
+  };
+
   return (
     <>
       <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
@@ -116,7 +151,7 @@ export function DataTable({ campaignData }) {
 
         <div className="p-4">
           <div className="flex justify-between items-center">
-            <p className="text-3xl">Campaigns</p>
+            <p className="text-[30px] font-md">Campaigns</p>
             <Link href={`/${userId}/create-campaign`}>
               <button
                 type="button"
@@ -142,7 +177,12 @@ export function DataTable({ campaignData }) {
               <h2 className="text-[16px] text-gray-400 mb-2">
                 🚀 Active Campaigns
               </h2>
-              <p>{transformedCampaigns?.filter(c => c.status === "Active").length}</p>
+              <p>
+                {
+                  transformedCampaigns?.filter((c) => c.status === "Active")
+                    .length
+                }
+              </p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
@@ -151,14 +191,20 @@ export function DataTable({ campaignData }) {
               <h2 className="text-[16px] text-gray-400 mb-2">
                 🎉 Total Attentive Engagements
               </h2>
-              <p>{transformedCampaigns?.reduce((sum, c) => sum + c.views, 0).toLocaleString()}</p>
+              <p>
+                {transformedCampaigns
+                  ?.reduce((sum, c) => sum + c.views, 0)
+                  .toLocaleString()}
+              </p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-4 border border-gray-200">
+          <div className="bg-white rounded-2xl p-6 mb-4 border-none border-gray-200">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-              <h2 className="text-[18px] font-md text-gray-400">ALL CAMPAIGNS</h2>
+              <h2 className="text-[18px] font-md text-gray-400">
+                ALL CAMPAIGNS
+              </h2>
               <div className="flex gap-2">
                 {/* Sort Dropdown */}
                 <DropdownMenu>
@@ -173,17 +219,46 @@ export function DataTable({ campaignData }) {
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    {["views", "amount", "date"].map((field) => (
-                      <DropdownMenuItem
-                        key={field}
-                        onSelect={() => setSortBy(field)}
-                      >
-                        {field[0].toUpperCase() + field.slice(1)}
-                      </DropdownMenuItem>
-                    ))}
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuItem onSelect={() => setSortBy("a_z")}>
+                      A to Z
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setSortBy("z_a")}>
+                      Z to A
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => setSortBy("views_high_low")}
+                    >
+                      Views (Highest to Lowest)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => setSortBy("views_low_high")}
+                    >
+                      Views (Lowest to Highest)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => setSortBy("amount_high_low")}
+                    >
+                      Amount (Highest to Lowest)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => setSortBy("amount_low_high")}
+                    >
+                      Amount (Lowest to Highest)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => setSortBy("date_new_old")}
+                    >
+                      Date (Newest to Oldest)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => setSortBy("date_old_new")}
+                    >
+                      Date (Oldest to Newest)
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+
                 {/* Filter Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -191,18 +266,90 @@ export function DataTable({ campaignData }) {
                       variant="outline"
                       className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-md text-[16px] items-center gap-1"
                     >
-                      <ListFilter className="w-4 h-4" /> Filter
+                      <ListFilter className="w-4 h-4 " /> Filter
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    {["All", "Active", "Pending", "Completed"].map((status) => (
-                      <DropdownMenuItem
-                        key={status}
-                        onSelect={() => setStatusFilter(status)}
-                      >
-                        {status}
-                      </DropdownMenuItem>
-                    ))}
+                  <DropdownMenuContent className="rounded-[16px] w-[343px] h-[296] p-[20px] gap-[24px] mr-10 mt-10">
+                    <div className="space-y-3">
+                      {/* Date Filters */}
+                      <div>
+                        <label className="block text-[16px] gap-[16px] font-medium text-black mb-1">
+                          Date
+                        </label>
+                        <div className="flex gap-2">
+                          <Input
+                            type="date"
+                            value={dateFilter.from}
+                            onChange={(e) =>
+                              setDateFilter({
+                                ...dateFilter,
+                                from: e.target.value,
+                              })
+                            }
+                            className="w-[146px] h-[44px] rounded-full gap-[8px] text-xs"
+                          />
+                          <Input
+                            type="date"
+                            value={dateFilter.to}
+                            onChange={(e) =>
+                              setDateFilter({
+                                ...dateFilter,
+                                to: e.target.value,
+                              })
+                            }
+                            className="w-[146px] h-[44px] rounded-full gap-[8px] text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Status Filters */}
+                      <div>
+                      <label className="block text-[16px] gap-[16px] font-medium text-black mb-1">
+                      Status
+                        </label>
+                        <div className="flex w-[303px] h-[44px] flex-wrap gap-[11px]">
+                          {["Active", "Pending", "Paused"].map((status) => (
+                            <Button
+                              key={status}
+                              variant={
+                                statusFilter === status ? "default" : "outline"
+                              }
+                              className="rounded-full text-[16px] font-md gap-[8px] p-[16px]"
+                              onClick={() =>
+                                setStatusFilter(
+                                  statusFilter === status ? "All" : status
+                                )
+                              }
+                            >
+                              {status}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="w-[317px] h-[48px] gap-[10px]">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={resetFilters}
+                          className="w-[154px] h-[48px] rounded-full border text-blue-600 bg-white hover:bg-blue-600 hover:text-white cursor-pointer"
+                        >
+                          Clear All
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            document.dispatchEvent(
+                              new KeyboardEvent("keydown", { key: "Escape" })
+                            )
+                          }
+                          className="w-[154px] h-[48px] rounded-full border text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                        >
+                          Apply
+                        </Button>
+                      </div>
+                    </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -248,12 +395,13 @@ export function DataTable({ campaignData }) {
                       </TableCell>
                       <TableCell>
                         <span
-                          className={`text-xs font-medium px-3 py-1 rounded-full ${c.status === "Active"
+                          className={`text-xs font-medium px-3 py-1 rounded-full ${
+                            c.status === "Active"
                               ? "bg-green-100 text-green-700"
                               : c.status === "Pending"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : "bg-blue-100 text-blue-700"
-                            }`}
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-blue-100 text-blue-700"
+                          }`}
                         >
                           {c.status}
                         </span>
