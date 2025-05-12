@@ -40,7 +40,7 @@ const formatYAxis = (value) => `${value / 1000}K`;
 
 export default function BarChartComponent() {
   return (
-    <Card className="w-full">
+    <Card className="w-full shadow-none border-none">
       <CardHeader>
         <CardTitle className="text-xl font-light">
           Most efficient campaigns
@@ -68,7 +68,7 @@ export default function BarChartComponent() {
                 tickMargin={10}
               />
               <Tooltip
-              
+                cursor={{ fill: "rgba(0, 0, 0, 0)" }}
                 formatter={(value) => `${(value / 1000).toFixed(1)}K`}
                 labelFormatter={(label) => `Campaign: ${label}`}
               />

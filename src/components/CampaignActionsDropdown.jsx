@@ -13,7 +13,6 @@ import {
   Pencil,
   Pause,
   CheckCheck,
-  X,
 } from "lucide-react";
 
 export default function CampaignActionsDropdown({ campaignId, openDialog , customTrigger }) {
@@ -69,21 +68,6 @@ export default function CampaignActionsDropdown({ campaignId, openDialog , custo
           Mark as Completed
         </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() =>
-            openDialog(
-              "Are you sure you want to cancel this campaign?",
-              "This action cannot be undone.",
-              "Yes, Cancel",
-              () => {
-                console.log("Canceled", campaignId);
-              }
-            )
-          }
-        >
-          <X className="h-4 w-4 mr-2 text-red-600" />
-          Cancel
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
