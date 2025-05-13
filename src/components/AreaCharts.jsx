@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { TrendingUp } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -10,13 +10,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 120 },
@@ -25,7 +25,7 @@ const chartData = [
   { month: "April", desktop: 73, mobile: 90 },
   { month: "May", desktop: 209, mobile: 160 },
   { month: "June", desktop: 214, mobile: 180 },
-]
+];
 
 const chartConfig = {
   desktop: {
@@ -36,16 +36,17 @@ const chartConfig = {
     label: "Mobile",
     color: "#6297FF",
   },
-}
+};
 
 export default function AreaCharts() {
-    return (
-    <Card>
+  return (
+    <Card className="shadow-none border-none">
       <CardHeader>
-        
-        <CardDescription className="text-xl font-bold text-gray-600">Campaign Performance</CardDescription>
-        <CardDescription>
-        The total number of views and clicks for your campaign over time.
+        <CardDescription className="text-[20px] font-md text-gray-600">
+          Retention Chart
+        </CardDescription>
+        <CardDescription className="text-[16px]">
+          The total number of views and clicks for your campaign over time.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -54,11 +55,23 @@ export default function AreaCharts() {
             accessibilityLayer
             data={chartData}
             margin={{
+              top: 10,
               left: 12,
               right: 12,
+              bottom: 0,
             }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={true} horizontal={false} />
+
+            {/* ✅ Add vertical line (Y-axis) */}
+            <YAxis
+              axisLine={true}
+              tickLine={false}
+              tick={{ fontSize: 12, fill: "#94a3b8" }} // style ticks
+              width={35}
+            />
+
+            {/* ✅ Horizontal months at the bottom */}
             <XAxis
               dataKey="month"
               tickLine={false}
@@ -66,11 +79,12 @@ export default function AreaCharts() {
               tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3)}
             />
+
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dot" hideLabel />}
             />
-            
+
             <Area
               dataKey="desktop"
               type="linear"
@@ -81,13 +95,13 @@ export default function AreaCharts() {
             <Area
               dataKey="mobile"
               type="linear"
-              fill="var(--color-mobile)"
-              fillOpacity={0.4}
+              fill="#6297FF"
+              fillOpacity={1}
               stroke="var(--color-mobile)"
             />
           </AreaChart>
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

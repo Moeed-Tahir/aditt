@@ -156,7 +156,7 @@ export function Settings() {
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
       <Navbar />
 
-      <h1 className="text-2xl p-4 font-bold">Settings</h1>
+      <h1 className="text-[30px] p-4 text-center font-md">Settings</h1>
 
       {message.text && (
         <div
@@ -171,7 +171,7 @@ export function Settings() {
       )}
 
       {/* Business Information */}
-      <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow p-8 relative">
+      <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl p-8 relative">
         <div className="flex items-center justify-between mb-8">
           <div className="w-1/3">
             <label className="block text-[24px] font-medium">
@@ -262,7 +262,7 @@ export function Settings() {
       </div>
 
       {/* Personal Information */}
-      <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow p-8 relative">
+      <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl  p-8 relative">
         <div className="flex items-center justify-between mb-8">
           <div className="w-1/3">
             <label className="block text-[24px] font-medium">
@@ -456,8 +456,28 @@ export function Settings() {
         </div>
       </div>
 
+      <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl  p-8 relative">
+        <div className="flex items-center justify-between mb-8">
+          <div className="w-1/3">
+            <label className="block text-[24px] font-medium">
+               Logout
+            </label>
+            <span className="block text-[16px] text-gray-500 mt-1">
+              Logout from your account
+            </span>
+          </div>
+          <Link
+            href="/signup-user"
+            className="bg-white text-[16px] flex justify-center items-center font-md text-[#FF4319] w-[230px] h-[56px] rounded-full border-2 border-[#FF4319] hover:bg-[#FF4319] hover:text-white"
+            disabled={loading}
+          >
+            {loading ? "Processing..." : "Logout Account"}
+          </Link>
+        </div>
+      </div>
+
       {/* Account Deletion Section */}
-      <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow p-8 relative">
+      <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl  p-8 mb-5 relative">
         <div className="flex items-center justify-between mb-8">
           <div className="w-1/3">
             <label className="block text-[24px] font-medium">

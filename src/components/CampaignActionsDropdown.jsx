@@ -29,7 +29,7 @@ export default function CampaignActionsDropdown({ campaignId, openDialog , custo
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <Link href={`/create-campaign`} className="w-full">
+        <Link href={`/edit-campaign/id`} className="w-full">
           <DropdownMenuItem>
             <Pencil className="h-4 w-4 mr-2" />
             Edit

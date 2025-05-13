@@ -93,7 +93,7 @@ export function CreateCampaigns({ userId }) {
     accountType: "",
     couponCode: "",
     age: "",
-    campignBudget: ""
+    campignBudget: "",
   });
 
   const [uploadProgress, setUploadProgress] = useState({
@@ -225,8 +225,8 @@ export function CreateCampaigns({ userId }) {
           answer:
             formData.surveyQuestion1.correctAnswer !== null
               ? formData.surveyQuestion1.options[
-              formData.surveyQuestion1.correctAnswer
-              ]
+                  formData.surveyQuestion1.correctAnswer
+                ]
               : "",
         },
         surveyQuestion2: {
@@ -238,8 +238,8 @@ export function CreateCampaigns({ userId }) {
           answer:
             formData.surveyQuestion2.correctAnswer !== null
               ? formData.surveyQuestion2.options[
-              formData.surveyQuestion2.correctAnswer
-              ]
+                  formData.surveyQuestion2.correctAnswer
+                ]
               : "",
         },
         genderType: formData.genderType,
@@ -335,7 +335,6 @@ export function CreateCampaigns({ userId }) {
     return (budget / duration) * 2;
   }, [formData.budget, formData.videoDuration]);
 
-
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
       <Navbar2 />
@@ -362,23 +361,25 @@ export function CreateCampaigns({ userId }) {
             {steps.map((step, index) => (
               <div
                 key={index}
-                className="relative z-10 flex flex-col items-center w-1/4"
+                className="relative z-10 flex flex-col items-center"
               >
                 <Link
                   href={`?step=${index}`}
-                  className={`w-40 gap-2 h-10 flex items-center justify-center rounded-full text-xs font-medium ${index === currentStep
-                    ? "border-blue-600 border bg-white text-gray-600"
-                    : "bg-white text-gray-600"
-                    } hover:cursor-pointer transition`}
+                  className={` gap-2 h-10 flex items-center justify-start rounded-full text-xs font-medium px-4 ${
+                    index === currentStep
+                      ? "border-blue-600 border bg-white text-gray-600"
+                      : "bg-white text-gray-600"
+                  } hover:cursor-pointer transition`}
                 >
                   {index < currentStep ? (
-                    <CircleCheck className="w-7 h-7 text-blue-600" /> // Tick icon for completed steps
+                    <CircleCheck className="w-7 h-7 text-blue-600 shrink-0" /> // Tick icon for completed steps
                   ) : (
                     <CircleDot
-                      className={`w-7 h-7 ${index === currentStep
-                        ? "text-blue-600"
-                        : "text-gray-300"
-                        }`}
+                      className={`w-7 h-7 shrink-0 ${
+                        index === currentStep
+                          ? "text-blue-600"
+                          : "text-gray-300"
+                      }`}
                     />
                   )}
                   {step.label}
@@ -412,12 +413,13 @@ export function CreateCampaigns({ userId }) {
 
                 <Link
                   href="?step=1"
-                  className={`bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${!formData.campaignTitle ||
+                  className={`bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
+                    !formData.campaignTitle ||
                     !formData.websiteLink ||
                     !formData.videoFile
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                    }`}
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
                   onClick={(e) => {
                     if (
                       !formData.campaignTitle ||
@@ -487,7 +489,7 @@ export function CreateCampaigns({ userId }) {
                     </div>
 
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-xs text-green-600 select-all">
+                      <p className="text-[16px] text-green-600 select-all">
                         {formData.websiteLink || "https://www.example.com"}
                       </p>
                       {formData.websiteLink && (
@@ -1031,7 +1033,7 @@ export function CreateCampaigns({ userId }) {
                   </div>
 
                   <div className="relative flex-1">
-                    <PaymentMethod
+                    <PaymentMethod 
                       value={{
                         cardNumber: formData.cardNumber,
                         monthOnCard: formData.monthOnCard,
@@ -1046,6 +1048,8 @@ export function CreateCampaigns({ userId }) {
                       onChange={(paymentData) =>
                         setFormData((prev) => ({ ...prev, ...paymentData }))
                       }
+                      
+                      
                     />
                     <LinkBankAccount
                       value={{
@@ -1064,7 +1068,6 @@ export function CreateCampaigns({ userId }) {
               </div>
             </div>
           </div>
-
         )}
       </div>
 
@@ -1073,9 +1076,12 @@ export function CreateCampaigns({ userId }) {
           <div className="bg-white rounded-xl border border-md p-8 max-w-md w-full mx-4">
             <div className="text-center">
               <Check className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-              <h3 className="text-[24px] font-md text-gray-800 mb-2">Congratulations</h3>
+              <h3 className="text-[24px] font-md text-gray-800 mb-2">
+                Congratulations
+              </h3>
               <p className="text-gray-600 text-[16px] mb-6">
-                Your campaign is pending approval.We'll notify you once its active.
+                Your campaign is pending approval.We'll notify you once its
+                active.
               </p>
               <Link
                 href="/userid/campaign-dashboard"
@@ -1087,7 +1093,6 @@ export function CreateCampaigns({ userId }) {
           </div>
         </div>
       )}
-
     </main>
   );
 }

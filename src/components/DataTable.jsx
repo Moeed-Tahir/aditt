@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { ListFilter, ChevronsUpDown, Plus, X } from "lucide-react";
+import { ListFilter, ChevronsUpDown, Plus, X, Coffee } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +35,9 @@ export function DataTable({ campaignData }) {
   });
   const [showFilters, setShowFilters] = useState(false);
   const userId = Cookies.get("userId");
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [sliderValue, setSliderValue] = useState(5); // Default value is 5
 
   // Transform the API data to match our table structure
   const transformedCampaigns = campaignData?.map((campaign) => ({
@@ -95,32 +98,148 @@ export function DataTable({ campaignData }) {
   const handleAction = (type, campaignId) => {
     const titles = {
       pause: "Are you sure you want to pause this campaign?",
-      complete: "Are you sure you want to mark this campaign as completed?",
+      complete: "Provide feedback for this completed campaign",
       cancel: "Are you sure you want to cancel this campaign?",
     };
 
     const smallTexts = {
       pause: "Are you sure you want to pause this campaign?",
-      complete: "Are you sure you want to mark this campaign as completed?",
+      complete: "Please share your experience with this campaign",
       cancel: "Are you sure you want to cancel this campaign?",
     };
 
     const labels = {
       pause: "Pause",
-      complete: "Complete",
+      complete: "Submit Feedback",
       cancel: "Yes, Cancel Campaign",
     };
 
-    setDialogConfig({
-      title: titles[type],
-      smallText: smallTexts[type],
-      confirmLabel: labels[type],
-      onConfirm: () => {
-        setDialogOpen(false);
-      },
-    });
+    if (type === "complete") {
+      setDialogConfig({
+        title: titles[type],
+        smallText: smallTexts[type],
+        confirmLabel: labels[type],
+        onConfirm: () => {
+          setDialogOpen(false);
+          setFeedbackDialogOpen(true); // Show feedback dialog after confirmation
+        },
+      });
+      setDialogOpen(true);
+    } else {
+      setDialogConfig({
+        title: titles[type],
+        smallText: smallTexts[type],
+        confirmLabel: labels[type],
+        onConfirm: () => {
+          setDialogOpen(false);
+          // Handle other actions here
+        },
+      });
+      setDialogOpen(true);
+    }
+  };
 
-    setDialogOpen(true);
+  const FeedbackDialog = ({
+    open,
+    onClose,
+    feedback,
+    setFeedback,
+    onSubmit,
+  }) => {
+    return (
+      <div
+        className={` fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 ${
+          open ? "" : "hidden"
+        }`}
+      >
+        <div className="bg-white w-[679px] h-auto border rounded-[20px] p-[18px] flex flex-col">
+          <div className="flex items-center p-[12px] justify-center">
+            <Coffee className="w-[54px] h-[54px] text-blue-300 text-center flex items-center justify-center" />
+          </div>
+
+          <div className="text-center mb-4">
+            <h3 className="text-lg font-medium">Campaign Feedback</h3>
+          </div>
+
+          <p className="text-sm text-gray-500 mb-4 text-center">
+            We’d love to hear about your campaign’s performance. Your feedback
+            helps us improve!
+          </p>
+
+          {/* Scrollable content section */}
+          <div className="flex-1 overflow-auto space-y-4">
+            <div className="relative">
+              <p className="text-[14px] mb-2 font-md">
+                How many Conversions did your campaign have?
+              </p>
+              <input
+                type="text"
+                name="campaignFeedback"
+                placeholder="Enter details..."
+                className="w-full h-full p-[16px] border border-gray-300 rounded-full"
+              />
+            </div>
+
+            <div className="relative">
+              <p className="text-[14px] mb-2 font-md">
+                How do you define conversions in this campaign (e.g. purchases,
+                installs, followers, etc.)
+              </p>
+              <input
+                type="text"
+                name="campaignFeedback"
+                placeholder="Enter details..."
+                className="w-full h-full p-[16px] border border-gray-300 rounded-full"
+              />
+            </div>
+
+            <div className="relative">
+              <p className="text-[14px] font-md mb-2">
+                How satisfied are you with your campaign?{" "}
+              </p>
+
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={sliderValue}
+                  onChange={(e) => setSliderValue(e.target.value)}
+                  className="w-full"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  {sliderValue}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom fixed textarea and button */}
+          <div className="mt-4">
+            <p className="text-[14px] font-md mb-2">Feedback</p>
+            <textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-[20px] mb-4 resize-none"
+              rows={4}
+              placeholder="Enter details..."
+            />
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => {
+                  onSubmit(feedback);
+                  onClose();
+                }}
+                className="w-full h-[52px] text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700"
+              >
+                Submit Feedback
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -304,8 +423,8 @@ export function DataTable({ campaignData }) {
 
                       {/* Status Filters */}
                       <div>
-                      <label className="block text-[16px] gap-[16px] font-medium text-black mb-1">
-                      Status
+                        <label className="block text-[16px] gap-[16px] font-medium text-black mb-1">
+                          Status
                         </label>
                         <div className="flex w-[303px] h-[44px] flex-wrap gap-[11px]">
                           {["Active", "Pending", "Paused"].map((status) => (
@@ -449,8 +568,23 @@ export function DataTable({ campaignData }) {
         title={dialogConfig.title}
         smallText={dialogConfig.smallText}
         confirmLabel={dialogConfig.confirmLabel}
-        onConfirm={dialogConfig.onConfirm}
+        onConfirm={() => {
+          dialogConfig.onConfirm(); // Perform your confirm action
+          setDialogOpen(false); // Close confirmation dialog
+          setFeedbackDialogOpen(true); // Open feedback dialog
+        }}
         onCancel={() => setDialogOpen(false)}
+      />
+      <FeedbackDialog
+        open={feedbackDialogOpen}
+        onClose={() => setFeedbackDialogOpen(false)}
+        feedback={feedback}
+        setFeedback={setFeedback}
+        onSubmit={(feedback) => {
+          // Handle feedback submission here
+          console.log("Feedback submitted:", feedback);
+          // You might want to make an API call here
+        }}
       />
     </>
   );
