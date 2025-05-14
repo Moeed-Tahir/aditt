@@ -42,7 +42,7 @@ export default function Guidelines() {
           copyrights, and other proprietary rights related to the service
           or product. Privacy and Data Collection: How user data is
           collected, stored, used, and protected. It may include details
-          about cookies, tracking technologies, and the company's approach
+          about cookies, tracking technologies, and the company&apos;s approach
           to handling personal information.
         </p>
         <p className="block text-sm mb-3">
@@ -71,7 +71,7 @@ export default function Guidelines() {
           copyrights, and other proprietary rights related to the service
           or product. Privacy and Data Collection: How user data is
           collected, stored, used, and protected. It may include details
-          about cookies, tracking technologies, and the company's approach
+          about cookies, tracking technologies, and the companys approach
           to handling personal information.
         </p>
         <p className="block text-sm mb-3">

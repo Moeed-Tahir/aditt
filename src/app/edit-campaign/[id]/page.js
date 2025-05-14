@@ -800,7 +800,7 @@ export default function EditCampaign() {
                       Quiz Question (optional)
                     </label>
                     <span className="block text-[16px] text-gray-400 mt-1">
-                      Adit will create if you don't
+                      Adit will create if you dont
                     </span>
                   </div>
                   <div className="relative flex-1">
@@ -826,7 +826,7 @@ export default function EditCampaign() {
                       Survey Question 1 (optional)
                     </label>
                     <span className="block text-[16px] text-gray-400 mt-1">
-                      Adit will NOT create if you don't
+                      Adit will NOT create if you dont
                     </span>
                   </div>
                   <div className="relative flex-1">
@@ -852,7 +852,7 @@ export default function EditCampaign() {
                       Survey Question 2 (optional)
                     </label>
                     <span className="block text-[16px] text-gray-400 mt-1">
-                      Adit will NOT create if you don't
+                      Adit will NOT create if you dont
                     </span>
                   </div>
                   <div className="relative flex-1">
@@ -1080,7 +1080,7 @@ export default function EditCampaign() {
                 Congratulations
               </h3>
               <p className="text-gray-600 text-[16px] mb-6">
-                Your campaign is pending approval.We'll notify you once its
+                Your campaign is pending approval.Well notify you once its
                 active.
               </p>
               <Link
