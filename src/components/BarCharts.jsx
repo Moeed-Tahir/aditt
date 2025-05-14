@@ -58,6 +58,9 @@ export default function BarCharts() {
         <CardDescription>
           Audience demographics by Age and Gender.
         </CardDescription>
+
+        <hr className="border-t border-gray-300" />
+
       </CardHeader>
       <CardContent >
         <ChartContainer config={chartConfig}>

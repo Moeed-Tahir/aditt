@@ -41,7 +41,7 @@ exports.createCampaign = async (req, res) => {
         } = req.body;
 
         if (!campaignTitle || !websiteLink || !campaignVideoUrl ||
-            !genderType || !genderRatio || !age ||
+            !genderType ||
             !campaignStartDate || !campaignEndDate || !userId) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
