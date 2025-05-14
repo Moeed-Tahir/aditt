@@ -3,7 +3,7 @@
 import Navbar2 from "@/components/Navbar2";
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronDown, CircleAlert, Copy } from "lucide-react";
+import { ArrowLeft, ChevronDown, CircleAlert, Coffee, Copy } from "lucide-react";
 import Image from "next/image";
 import BarCharts from "@/components/BarCharts";
 import AreaCharts from "@/components/AreaCharts";
@@ -50,6 +50,114 @@ export default function CampaignDetailPage({ campaignData }) {
     }
   };
 
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [sliderValue, setSliderValue] = useState(5); // Default value is 5
+
+
+  const FeedbackDialog = ({
+    open,
+    onClose,
+    feedback,
+    setFeedback,
+    onSubmit,
+  }) => {
+    return (
+      <div
+        className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${
+          open ? "" : "hidden"
+        }`}
+      >
+        <div className="bg-white w-[679px] h-[763px] border rounded-[20px] p-[18px] flex flex-col">
+          <div className="flex items-center p-[12px] justify-center">
+            <Coffee className="w-[54px] h-[54px] text-blue-300 text-center flex items-center justify-center" />
+          </div>
+
+          <div className="text-center mb-4">
+            <h3 className="text-lg font-medium">Campaign Feedback</h3>
+          </div>
+
+          <p className="text-sm text-gray-500 mb-4 text-center">
+            We’d love to hear about your campaign’s performance. Your feedback
+            helps us improve!
+          </p>
+
+          {/* Scrollable content section */}
+          <div className="flex-1 overflow-auto space-y-4">
+            <div className="relative">
+              <p className="text-[14px] mb-2 font-md">
+                How many Conversions did your campaign have?
+              </p>
+              <input
+                type="text"
+                name="campaignFeedback"
+                placeholder="Enter details..."
+                className="w-full h-full p-[16px] border border-gray-300 rounded-full"
+              />
+            </div>
+
+            <div className="relative">
+              <p className="text-[14px] mb-2 font-md">
+                How do you define conversions in this campaign (e.g. purchases,
+                installs, followers, etc.)
+              </p>
+              <input
+                type="text"
+                name="campaignFeedback"
+                placeholder="Enter details..."
+                className="w-full h-full p-[16px] border border-gray-300 rounded-full"
+              />
+            </div>
+
+            <div className="relative">
+              <p className="text-[14px] font-md mb-2">
+                How satisfied are you with your campaign?{" "}
+              </p>
+
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={sliderValue}
+                  onChange={(e) => setSliderValue(e.target.value)}
+                  className="w-full"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  {sliderValue}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom fixed textarea and button */}
+          <div className="mt-4">
+            <p className="text-[14px] font-md mb-2">Feedback</p>
+            <textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-[20px] mb-4 resize-none"
+              rows={4}
+              placeholder="Enter details..."
+            />
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => {
+                  onSubmit(feedback);
+                  onClose();
+                }}
+                className="w-full h-[52px] text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700"
+              >
+                Submit Feedback
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <Navbar2 />
@@ -66,7 +174,9 @@ export default function CampaignDetailPage({ campaignData }) {
               Back
             </Link>
 
-            <div className=" text-center text-gray-800">Campaign Overview</div>
+            <div className="text-[24px] font-md text-center text-gray-800">
+              Campaign Overview
+            </div>
 
             <CampaignActionsDropdown
               campaignId={campaignData.id}
@@ -82,7 +192,7 @@ export default function CampaignDetailPage({ campaignData }) {
             />
           </div>
 
-          <div className="bg-white p-4 sm:p-6 rounded-xl">
+          <div className="bg-white p-4 sm:p-6 rounded-[24px]">
             <div className="flex flex-col md:flex-row gap-6">
               {/* Video Section */}
               <div className="flex-shrink-0">
@@ -99,7 +209,7 @@ export default function CampaignDetailPage({ campaignData }) {
               <div className="flex-1 flex flex-col gap-4">
                 {/* Title and Status */}
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">
+                  <h2 className="text-[24px] sm:text-2xl font-md text-gray-900">
                     {campaignData.campaignTitle}
                   </h2>
                   <span className="text-xs font-medium bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
@@ -109,8 +219,8 @@ export default function CampaignDetailPage({ campaignData }) {
 
                 {/* UTM Link */}
                 <div className="flex flex-wrap items-center gap-2 rounded-lg overflow-hidden">
-                  <div className="text-sm text-gray-500">UTM Link:</div>
-                  <a className="flex-1 text-black text-sm break-words px-3 py-2">
+                  <div className="text-[18px] text-gray-400">UTM Link:</div>
+                  <a className="flex-1 text-black text-[18px] break-words px-3 py-2">
                     {campaignData.websiteLink}
                   </a>
                   <Copy className="text-blue-600 hover:text-blue-800 cursor-pointer" />
@@ -119,9 +229,9 @@ export default function CampaignDetailPage({ campaignData }) {
                 {/* Campaign Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
                   {/* Left Column */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 text-[18px]">
                     <div className="flex flex-wrap">
-                      <span className="min-w-[80px] text-gray-500">
+                      <span className="min-w-[80px] text-gray-400">
                         Duration:
                       </span>
                       <span>
@@ -129,7 +239,7 @@ export default function CampaignDetailPage({ campaignData }) {
                       </span>
                     </div>
                     <div className="flex flex-wrap">
-                      <span className="min-w-[130px] text-gray-500">
+                      <span className="min-w-[130px] text-gray-400">
                         Campaign Length:
                       </span>
                       <span>
@@ -143,21 +253,21 @@ export default function CampaignDetailPage({ campaignData }) {
                   </div>
 
                   {/* Right Column */}
-                  <div className="space-y-2">
+                  <div className="space-y-2  text-[18px]">
                     <div className="flex flex-wrap">
-                      <span className="min-w-[160px] text-gray-500">
+                      <span className="min-w-[160px] px-10 text-gray-400">
                         Target Audience Age:
                       </span>
                       <span>{`${campaignData.genderRatio} years`}</span>
                     </div>
                     <div className="flex flex-wrap">
-                      <span className="min-w-[160px] text-gray-500">
+                      <span className="min-w-[160px] px-10 text-gray-400">
                         Target Audience Gender:
                       </span>
                       <span>{campaignData.genderType}</span>
                     </div>
                     <div className="flex flex-wrap">
-                      <span className="min-w-[160px] text-gray-500">
+                      <span className="min-w-[160px] px-10 text-gray-400">
                         Target Audience Locations:
                       </span>
                       <span>AL, GA, FL</span>
@@ -208,11 +318,12 @@ export default function CampaignDetailPage({ campaignData }) {
           )}
 
           {/* Budget Summary */}
+          <div><h1 className="font-md text-[18px]">Budget & Spending</h1></div>
 
           <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">
             <div className="flex-1 p-6">
               <h2 className="text-[16px] text-gray-400 mb-2">
-                Allocated Budget
+                ALLOCATED BUDGET
               </h2>
               <p className="text-[30px] font-md text-gray-800">$30,000</p>
             </div>
@@ -220,7 +331,7 @@ export default function CampaignDetailPage({ campaignData }) {
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
 
             <div className="flex-1 bg-white rounded-xl p-6">
-              <h2 className=" text-gray-400 text-[16px] mb-2">Total Spent</h2>
+              <h2 className=" text-gray-400 text-[16px] mb-2">TOTAL SPENT</h2>
               <p className="text-[30px] font-md text-gray-800">
                 {campaignData?.campaignBudget}
               </p>{" "}
@@ -230,7 +341,7 @@ export default function CampaignDetailPage({ campaignData }) {
 
             <div className="flex-1 bg-white rounded-xl p-6">
               <h2 className="text-[16px] text-gray-400 mb-2">
-                Remaining Budget
+                REMAINING BUDGET
               </h2>
               <p className="text-[30px] font-md text-gray-800">
                 {(30000 - campaignData.campaignBudget).toFixed(2)}
@@ -248,25 +359,25 @@ export default function CampaignDetailPage({ campaignData }) {
               <div className="mb-20">
                 <h3 className="text-gray-500 text-[16px] mb-2">QUIZ INFO</h3>
                 <div className="bg-[var(--bg-color-off-white)] p-10 rounded-xl">
-                  <p className="text-gray-700 text-[16px]">
+                  <p className="text-gray-700 mb-4 text-[16px]">
                     {campaignData?.quizQuestion?.questionText}
                   </p>
-                  <hr className="border-t mb-4 border-gray-300" />
+                  <hr className="border-t border-gray-300" />
 
-                  <ul className="mt-4 text-[16px] text-gray-600 space-y-1">
-                    <li>
+                  <ul className=" py-2 text-[16px] text-gray-600 space-y-1">
+                    <li className="py-[12px]">
                       A. {campaignData?.quizQuestion?.option1}
                       <span className="float-right">0%</span>
                     </li>
-                    <li>
+                    <li className="py-[12px]">
                       B. {campaignData?.quizQuestion?.option2}
                       <span className="float-right">0%</span>
                     </li>
-                    <li>
+                    <li className="py-[12px]">
                       C. {campaignData?.quizQuestion?.option3}
                       <span className="float-right">0%</span>
                     </li>
-                    <li>
+                    <li className="py-[12px]">
                       D. {campaignData?.quizQuestion?.option4}
                       <span className="float-right">0%</span>
                     </li>
@@ -276,10 +387,11 @@ export default function CampaignDetailPage({ campaignData }) {
 
               {/* Quiz Responses (Mock Donut Chart) */}
               <BarCharts />
+              
               <div className="grid grid-cols-3 ml-20 text-sm text-gray-600 w-full max-w-md">
-                <div>🔵 Male ({campaignData?.genderRatio}%)</div>
-                <div>🟣 Female (0%)</div>
-                <div>🟢 Prefer Not to Say (0%)</div>
+                <div><span className="w-3 h-3 rounded-full bg-[#3653F7] inline-block mr-2"/> Male ({campaignData?.genderRatio}%)</div>
+                <div><span className="w-3 h-3 rounded-full bg-[#E670C7] inline-block mr-2"/>Female (0%)</div>
+                <div><span className="w-3 h-3 rounded-full bg-[#15B79E] inline-block mr-2"/> Prefer Not to Say (0%)</div>
               </div>
             </div>
 
@@ -401,9 +513,11 @@ export default function CampaignDetailPage({ campaignData }) {
               </div>
             </div>
           </div>
+          <div><h1 className="font-md text-[18px]">Performance Summary</h1></div>
+
           <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">
             <div className="flex-1 p-6">
-              <h2 className="text-[16px] text-gray-400 mb-2">Impressions</h2>
+              <h2 className="text-[16px] text-gray-400 mb-2">IMPRESSIONS</h2>
               <p className="text-[30px] font-md text-gray-800">
                 {campaignData.impressions}
               </p>
@@ -413,7 +527,7 @@ export default function CampaignDetailPage({ campaignData }) {
 
             <div className="flex-1 bg-white rounded-xl p-6">
               <h2 className="text-[16px] text-gray-400 mb-2">
-                Completed Engagements
+                COMPLETED ENGAGEMENTS
               </h2>
               <p className="text-[30px] font-md text-gray-800">
                 {campaignData.engagements?.totalCount}
@@ -423,14 +537,14 @@ export default function CampaignDetailPage({ campaignData }) {
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
 
             <div className="flex-1 bg-white rounded-xl p-6">
-              <h2 className="text-[16px] text-gray-400 mb-2">Ad Clicks</h2>
+              <h2 className="text-[16px] text-gray-400 mb-2">AD CLICKS</h2>
               <p className="text-[30px] font-md text-gray-800">30,000</p>
             </div>
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
 
             <div className="flex-1 bg-white rounded-xl p-6">
               <h2 className="text-[16px] text-gray-400  mb-2">
-                Click-through rate
+                CLICK-THROUGH RATE
               </h2>
               <p className="text-[30px] font-md text-gray-800">40%</p>
             </div>
@@ -463,17 +577,30 @@ export default function CampaignDetailPage({ campaignData }) {
             </div>
           </div> */}
         </div>
-        <ConfirmationDialogue
-          open={dialogOpen}
-          title={dialogConfig.title}
-          smallText={dialogConfig.smallText}
-          confirmLabel={dialogConfig.confirmLabel}
-          onConfirm={() => {
-            dialogConfig.onConfirm();
-            setDialogOpen(false);
-          }}
-          onCancel={() => setDialogOpen(false)}
-        />
+
+         <ConfirmationDialogue
+        open={dialogOpen}
+        title={dialogConfig.title}
+        smallText={dialogConfig.smallText}
+        confirmLabel={dialogConfig.confirmLabel}
+        onConfirm={() => {
+          dialogConfig.onConfirm(); // Perform your confirm action
+          setDialogOpen(false); // Close confirmation dialog
+          setFeedbackDialogOpen(true); // Open feedback dialog
+        }}
+        onCancel={() => setDialogOpen(false)}
+      />
+      <FeedbackDialog
+        open={feedbackDialogOpen}
+        onClose={() => setFeedbackDialogOpen(false)}
+        feedback={feedback}
+        setFeedback={setFeedback}
+        onSubmit={(feedback) => {
+          // Handle feedback submission here
+          console.log("Feedback submitted:", feedback);
+          // You might want to make an API call here
+        }}
+      />
       </main>
     </>
   );

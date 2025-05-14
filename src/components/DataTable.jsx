@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { ListFilter, ChevronsUpDown, Plus, X, Coffee } from "lucide-react";
+import { ListFilter, ChevronsUpDown, Plus, X, Coffee, ChevronLeftCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -148,11 +148,11 @@ export function DataTable({ campaignData }) {
   }) => {
     return (
       <div
-        className={` fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 ${
+        className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${
           open ? "" : "hidden"
         }`}
       >
-        <div className="bg-white w-[679px] h-auto border rounded-[20px] p-[18px] flex flex-col">
+        <div className="bg-white w-[679px] h-[763px] border rounded-[20px] p-[18px] flex flex-col">
           <div className="flex items-center p-[12px] justify-center">
             <Coffee className="w-[54px] h-[54px] text-blue-300 text-center flex items-center justify-center" />
           </div>
@@ -287,7 +287,9 @@ export function DataTable({ campaignData }) {
               <h2 className="text-[16px] text-gray-400 mb-2">
                 📊 CAMPAIGNS CREATED
               </h2>
-              <p className="font-md text-[30px]">{transformedCampaigns?.length}</p>
+              <p className="font-md text-[30px]">
+                {transformedCampaigns?.length}
+              </p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
@@ -550,7 +552,7 @@ export function DataTable({ campaignData }) {
                       key={page}
                       variant={page === currentPage ? "default" : "outline"}
                       size="sm"
-                      className="rounded-full"
+                      className="bg-blue-500 rounded-full"
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}

@@ -46,7 +46,7 @@ export function CreateCampaigns({ userId }) {
   const searchParams = useSearchParams();
   const currentStep = parseInt(searchParams.get("step") || "0");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [values, setValues] = useState([10,60]);
+  const [values, setValues] = useState([10, 60]);
 
   const [formData, setFormData] = useState({
     campaignTitle: "",
@@ -976,17 +976,19 @@ export function CreateCampaigns({ userId }) {
                     </span>
                   </div>
 
-                  <div className="relative flex-1">
-                    <CircleDollarSign className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                  <div className="flex-1">
+                    <div className="relative w-full h-12">
+                      <CircleDollarSign className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                      <input
+                        type="number"
+                        name="budget"
+                        value={formData.budget}
+                        onChange={handleInputChange}
+                        placeholder="Enter campaign budget"
+                        className="w-full h-full border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
+                      />
+                    </div>
 
-                    <input
-                      type="number"
-                      name="budget"
-                      value={formData.budget}
-                      onChange={handleInputChange}
-                      placeholder="Enter campaign budget"
-                      className="w-full h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
-                    />
                     {formData.budget && formData.videoDuration && (
                       <div className="mt-2 text-sm text-gray-500">
                         With a ${formData.budget} budget for your{" "}
@@ -996,6 +998,7 @@ export function CreateCampaigns({ userId }) {
                     )}
                   </div>
                 </div>
+
                 <hr className="border-t mb-4 border-gray-300" />
 
                 <div className="flex items-start gap-6">
@@ -1073,7 +1076,7 @@ export function CreateCampaigns({ userId }) {
       </div>
 
       {showSuccessModal && (
-        <div className="fixed inset-0 bg-opacity-30 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl border border-md p-8 max-w-md w-full mx-4">
             <div className="text-center">
               <Check className="w-16 h-16 text-blue-500 mx-auto mb-4" />
