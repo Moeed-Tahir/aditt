@@ -3,6 +3,17 @@ import Compaign from '../../models/Campaign.model';
 import Stripe from 'stripe';
 const dotenv = require("dotenv");
 dotenv.config();
+const ffmpeg = require('fluent-ffmpeg');
+
+const getVideoDurationFromUrl = (videoUrl) => {
+    return new Promise((resolve, reject) => {
+        ffmpeg.ffprobe(videoUrl, (err, metadata) => {
+            if (err) return reject(err);
+            const duration = metadata.format.duration; // duration in seconds
+            resolve(duration);
+        });
+    });
+};
 
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 exports.createCampaign = async (req, res) => {
@@ -147,7 +158,7 @@ exports.sendPaymentOnClick = async (req, res) => {
 
         const today = new Date();
         today.setUTCHours(0, 0, 0, 0);
-        
+
         const clickDate = new Date(req.body.clickDate || new Date());
         clickDate.setUTCHours(0, 0, 0, 0);
 
@@ -167,12 +178,15 @@ exports.sendPaymentOnClick = async (req, res) => {
             return res.status(200).json({ message: 'No clicks today, no payment processed' });
         }
 
-        const amount = todayClicks * 100;
+        const duration = await getVideoDurationFromUrl(campaign.campaignVideoUrl);
+        const paymentRate = 0.01 * duration + 0.05;
+        const amount = Math.round(todayClicks * paymentRate * 100);
+
 
         const paymentIntent = await stripeInstance.paymentIntents.create({
             amount,
             currency: 'usd',
-            payment_method_types: ['card'], 
+            payment_method_types: ['card'],
             description: `Payment for ${todayClicks} clicks on ${campaign.campaignTitle}`,
             metadata: {
                 campaignId: campaign._id.toString(),
@@ -219,35 +233,35 @@ exports.addCountInCampaign = async (req, res) => {
         await connectToDatabase();
         const { campaignId } = req.body;
         const today = new Date();
-        today.setHours(0, 0, 0, 0); 
-        
+        today.setHours(0, 0, 0, 0);
+
         const updatedCampaign = await Compaign.findOneAndUpdate(
-            { 
+            {
                 _id: campaignId,
-                "clickCount.dailyCounts.date": today 
+                "clickCount.dailyCounts.date": today
             },
-            { 
-                $inc: { 
+            {
+                $inc: {
                     "clickCount.totalCount": 1,
                     "totalViews": 1,
-                    "clickCount.dailyCounts.$.count": 1 
+                    "clickCount.dailyCounts.$.count": 1
                 }
             },
             { new: true }
         );
-        
+
         if (updatedCampaign) {
-            return res.status(200).json({ 
-                success: true, 
+            return res.status(200).json({
+                success: true,
                 message: "Click count updated successfully",
                 data: updatedCampaign
             });
         }
-        
+
         const campaignWithNewDate = await Compaign.findOneAndUpdate(
             { _id: campaignId },
-            { 
-                $inc: { 
+            {
+                $inc: {
                     "clickCount.totalCount": 1,
                     "totalViews": 1
                 },
@@ -257,7 +271,7 @@ exports.addCountInCampaign = async (req, res) => {
             },
             { new: true }
         );
-        
+
         if (!campaignWithNewDate) {
             const newCampaign = await Compaign.create({
                 _id: campaignId,
@@ -267,26 +281,26 @@ exports.addCountInCampaign = async (req, res) => {
                 },
                 totalViews: 1
             });
-            
-            return res.status(200).json({ 
-                success: true, 
+
+            return res.status(200).json({
+                success: true,
                 message: "New campaign created with click count",
                 data: newCampaign
             });
         }
-        
-        return res.status(200).json({ 
-            success: true, 
+
+        return res.status(200).json({
+            success: true,
             message: "Click count updated successfully with new date",
             data: campaignWithNewDate
         });
-        
+
     } catch (error) {
         console.error("Error updating click count:", error);
-        return res.status(500).json({ 
-            success: false, 
+        return res.status(500).json({
+            success: false,
             message: "Internal server error",
-            error: error.message 
+            error: error.message
         });
     }
 }
