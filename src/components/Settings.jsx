@@ -17,6 +17,8 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export function Settings() {
   const [businessEditMode, setBusinessEditMode] = useState(false);
@@ -34,6 +36,7 @@ export function Settings() {
     currentPassword: "",
     newPassword: "",
   });
+  const router = useRouter();
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("user"));
@@ -151,6 +154,12 @@ export function Settings() {
       setLoading(false);
     }
   };
+
+  const handleLogout = async () => {
+    Cookies.remove("userId");
+    Cookies.remove("token");
+    router.push("/signin-user")
+  }
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
@@ -470,6 +479,7 @@ export function Settings() {
             href="/signup-user"
             className="bg-white text-[16px] flex justify-center items-center font-md text-[#FF4319] w-[230px] h-[56px] rounded-full border-2 border-[#FF4319] hover:bg-[#FF4319] hover:text-white"
             disabled={loading}
+            onClick={handleLogout}
           >
             {loading ? "Processing..." : "Logout Account"}
           </Link>

@@ -9,7 +9,7 @@ const getVideoDurationFromUrl = (videoUrl) => {
     return new Promise((resolve, reject) => {
         ffmpeg.ffprobe(videoUrl, (err, metadata) => {
             if (err) return reject(err);
-            const duration = metadata.format.duration; // duration in seconds
+            const duration = metadata.format.duration;
             resolve(duration);
         });
     });
@@ -41,7 +41,7 @@ exports.createCampaign = async (req, res) => {
         } = req.body;
 
         if (!campaignTitle || !websiteLink || !campaignVideoUrl ||
-            !genderType || !genderRatio || !age ||
+            !genderType ||
             !campaignStartDate || !campaignEndDate || !userId) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
