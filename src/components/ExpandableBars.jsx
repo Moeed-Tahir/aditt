@@ -10,7 +10,7 @@ import {
 export default function ExpandableBars() {
   return (
     <Accordion type="single" collapsible className="w-full">
-      <AccordionItem className="border-1 rounded-md mb-2 p-1" value="item-1">
+      <AccordionItem className="border-1 rounded-md mb-2 p-3" value="item-1">
         <AccordionTrigger className="text-gray-800">
           How do I create an ad campaign on Aditt?
         </AccordionTrigger>

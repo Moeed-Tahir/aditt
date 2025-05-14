@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { ListFilter, ChevronsUpDown, Plus, X, Coffee } from "lucide-react";
+import { ListFilter, ChevronsUpDown, Plus, X, Coffee, ChevronLeftCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -148,11 +148,11 @@ export function DataTable({ campaignData }) {
   }) => {
     return (
       <div
-        className={` fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 ${
+        className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${
           open ? "" : "hidden"
         }`}
       >
-        <div className="bg-white w-[679px] h-auto border rounded-[20px] p-[18px] flex flex-col">
+        <div className="bg-white w-[679px] h-[763px] border rounded-[20px] p-[18px] flex flex-col">
           <div className="flex items-center p-[12px] justify-center">
             <Coffee className="w-[54px] h-[54px] text-blue-300 text-center flex items-center justify-center" />
           </div>
@@ -274,7 +274,7 @@ export function DataTable({ campaignData }) {
             <Link href={`/${userId}/create-campaign`}>
               <button
                 type="button"
-                className="flex items-center justify-center w-[241px] h-[56px] rounded-[80px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                className="flex items-center justify-center gap-[12px] px-[28px] py-[16px] rounded-[80px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
               >
                 <Plus className="w-5 h-5" />
                 <span>Create new campaign</span>
@@ -285,18 +285,20 @@ export function DataTable({ campaignData }) {
           <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">
             <div className="flex-1 p-6">
               <h2 className="text-[16px] text-gray-400 mb-2">
-                📊 Campaigns Created
+                📊 CAMPAIGNS CREATED
               </h2>
-              <p>{transformedCampaigns?.length}</p>
+              <p className="font-md text-[30px]">
+                {transformedCampaigns?.length}
+              </p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
 
             <div className="flex-1 bg-white rounded-xl p-6">
               <h2 className="text-[16px] text-gray-400 mb-2">
-                🚀 Active Campaigns
+                🚀 ACTIVE CAMPAIGNS
               </h2>
-              <p>
+              <p className="font-md text-[30px]">
                 {
                   transformedCampaigns?.filter((c) => c.status === "Active")
                     .length
@@ -308,9 +310,9 @@ export function DataTable({ campaignData }) {
 
             <div className="flex-1 bg-white rounded-xl p-6">
               <h2 className="text-[16px] text-gray-400 mb-2">
-                🎉 Total Attentive Engagements
+                🎉 TOTAL ATTENTIVE ENGAGEMENTS
               </h2>
-              <p>
+              <p className="font-md text-[30px]">
                 {transformedCampaigns
                   ?.reduce((sum, c) => sum + c.views, 0)
                   .toLocaleString()}
@@ -550,7 +552,7 @@ export function DataTable({ campaignData }) {
                       key={page}
                       variant={page === currentPage ? "default" : "outline"}
                       size="sm"
-                      className="rounded-full"
+                      className="bg-blue-500 rounded-full"
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}

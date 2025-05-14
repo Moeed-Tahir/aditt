@@ -24,7 +24,7 @@ export default function CampaignActionsDropdown({ campaignId, openDialog , custo
           customTrigger
         ) : (
           <Button variant="ghost" size="icon">
-            <EllipsisVertical className="h-4 w-4" />
+            <EllipsisVertical className="h-4 text-gray-400 w-4" />
           </Button>
         )}
       </DropdownMenuTrigger>
