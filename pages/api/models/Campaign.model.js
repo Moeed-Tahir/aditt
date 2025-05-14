@@ -150,7 +150,7 @@ const CompaignSchema = new mongoose.Schema({
     },
     age: {
         type: String,
-        required: true,
+        required: false,
     },
     campaignStartDate: {
         type: String,

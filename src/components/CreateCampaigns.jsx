@@ -28,6 +28,7 @@ import PaymentMethod from "./PaymentMethod";
 import LinkBankAccount from "./LinkBankAccount";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
+import { DualRangeSlider } from "./DualSlider";
 
 const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
 const supabaseKey =
@@ -45,6 +46,7 @@ export function CreateCampaigns({ userId }) {
   const searchParams = useSearchParams();
   const currentStep = parseInt(searchParams.get("step") || "0");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [values, setValues] = useState([10,60]);
 
   const [formData, setFormData] = useState({
     campaignTitle: "",
@@ -456,7 +458,7 @@ export function CreateCampaigns({ userId }) {
                       value={formData.campaignTitle}
                       onChange={handleInputChange}
                       placeholder="Reebok promotion"
-                      className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
+                      className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-3"
                     />
                   </div>
                 </div>
@@ -484,7 +486,7 @@ export function CreateCampaigns({ userId }) {
                         value={formData.websiteLink}
                         onChange={handleInputChange}
                         placeholder="https://shop.app/"
-                        className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
+                        className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-3"
                       />
                     </div>
 
@@ -525,7 +527,7 @@ export function CreateCampaigns({ userId }) {
                     {/* Upload box */}
                     <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
                       <label className="cursor-pointer">
-                        <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
+                        <Upload className="mx-auto mb-2 text-blue-500 w-6 h-6" />
                         <p className="text-sm text-gray-700 mb-1">
                           Upload video
                         </p>
@@ -604,7 +606,7 @@ export function CreateCampaigns({ userId }) {
                     {/* Upload box */}
                     <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
                       <label className="cursor-pointer">
-                        <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
+                        <Upload className="mx-auto mb-2 text-blue-500 w-6 h-6" />
                         <p className="text-sm text-gray-700 mb-1">
                           Upload image
                         </p>
@@ -747,20 +749,21 @@ export function CreateCampaigns({ userId }) {
 
                   <div className="flex-1">
                     <div className="relative flex-1">
-                      <Sliders
-                        min={18}
-                        max={65}
-                        defaultValue={formData.age || 25}
-                        onChange={(value) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            age: value,
-                          }))
-                        }
-                        showLabel={true}
-                        showRadio={false}
-                        labelUnit={`yrs`}
+                      {/* Slider */}
+                      <DualRangeSlider
+                        label={(value) => value}
+                        labelPosition="bottom"
+                        value={values}
+                        onValueChange={setValues}
+                        min={0}
+                        max={100}
+                        step={1}
                       />
+                      {/* Label row for min and max */}
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Min 14</span>
+                        <span>Any</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1033,7 +1036,7 @@ export function CreateCampaigns({ userId }) {
                   </div>
 
                   <div className="relative flex-1">
-                    <PaymentMethod 
+                    <PaymentMethod
                       value={{
                         cardNumber: formData.cardNumber,
                         monthOnCard: formData.monthOnCard,
@@ -1048,8 +1051,6 @@ export function CreateCampaigns({ userId }) {
                       onChange={(paymentData) =>
                         setFormData((prev) => ({ ...prev, ...paymentData }))
                       }
-                      
-                      
                     />
                     <LinkBankAccount
                       value={{

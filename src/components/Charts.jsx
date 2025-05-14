@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useState } from "react";
 
 import {
   Card,
@@ -19,6 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Calendars from "./Calendars";
 
 // Sample data
 const chartData = [
@@ -39,16 +41,36 @@ const chartData = [
 const formatYAxis = (value) => `${value / 1000}K`;
 
 export default function BarChartComponent() {
+  const [formData, setFormData] = useState({
+    startDate: new Date(),
+  });
+
   return (
     <Card className="w-full shadow-none border-none">
-      <CardHeader>
-        <CardTitle className="text-xl font-light">
-          Most efficient campaigns
-        </CardTitle>
-        <CardDescription className="font-light">
-          Rank based on Click through rate
-        </CardDescription>
+      <CardHeader className="flex flex-row items-start justify-between">
+        <div>
+          <CardTitle className="text-xl font-light">
+            Most efficient campaigns
+          </CardTitle>
+          <CardDescription className="font-light">
+            Rank based on Click through rate
+          </CardDescription>
+        </div>
+        <div className="relative">
+          <Calendars
+            selected={formData.endDate}
+            onSelect={(date) =>
+              setFormData((prev) => ({ ...prev, endDate: date }))
+            }
+            fromDate={
+              formData.startDate
+                ? formData.startDate // allow same-day or future end date
+                : new Date() // allow today if no start date selected
+            }
+          />{" "}
+        </div>
       </CardHeader>
+
       <CardContent>
         <div className="w-full h-[500px]">
           <ResponsiveContainer width="100%" height="100%">

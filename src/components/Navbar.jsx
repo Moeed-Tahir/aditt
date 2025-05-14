@@ -7,7 +7,7 @@ export default function Navbar() {
   return (
     <nav className="flex items-center justify-between bg-white shadow px-6 py-3">
 
-      <div className="text-[20px] font">Welcome, John 👋
+      <div className="text-[20px] font-md">Welcome, John 👋
         <p className="text-[14px] text-gray-400">Good Morning</p>
       </div>
       
