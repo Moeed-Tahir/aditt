@@ -1,11 +1,13 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Cookies from "js-cookie";
 
 export default function NotificationDropdown() {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
-
+  const userId = Cookies.get("userId");
+  
   // Close on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -88,7 +90,7 @@ export default function NotificationDropdown() {
 
           <div className="flex justify-center p-2">
             <Link
-              href="/userid/campaign-dashboard"
+              href={`/${userId}/campaign-dashboard`}
               className="w-full p-2 text-center rounded-full text-white bg-blue-600 text-sm hover:bg-blue-700 cursor-pointer"
             >
               View all notifications

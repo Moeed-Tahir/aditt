@@ -19,11 +19,13 @@ import {
   User,
 } from "lucide-react";
 import ExpandableBars from "./ExpandableBars";
+import Cookies from "js-cookie";
 
 export function Support() {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState("");
-
+  const userId = Cookies.get("userId");
+  
   const options = [
     { value: "", label: "Select Profile" },
     { value: "agency", label: "Marketing Agency" },
@@ -43,7 +45,7 @@ export function Support() {
           <div className="max-w-6xl mx-auto">
             <div className="relative flex items-center mb-4 md:mb-10 justify-between">
               <Link
-                href="/userid/campaign-dashboard"
+                href={`/${userId}/campaign-dashboard`}
                 className="py-2 px-4 md:px-5 md:ml-5 rounded-full bg-white text-gray-700 hover:bg-blue-600 hover:text-white transition flex items-center gap-2 text-sm md:text-base"
               >
                 <ArrowLeft className="w-4 h-4" />

@@ -30,6 +30,7 @@ import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
 import { DualRangeSlider } from "./DualSlider";
 import AlertBox from "./AlertBox";
+import Cookies from "js-cookie";
 
 const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
 const supabaseKey =
@@ -48,6 +49,7 @@ export function CreateCampaigns({ userId }) {
   const currentStep = parseInt(searchParams.get("step") || "0");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [values, setValues] = useState([10, 60]);
+  const userId = Cookies.get("userId");
 
   const [formData, setFormData] = useState({
     campaignTitle: "",
@@ -364,7 +366,7 @@ export function CreateCampaigns({ userId }) {
         <div className="max-w-6xl mx-auto">
           <div className="relative flex items-center mb-6 md:mb-10 justify-between">
             <Link
-              href="/userid/campaign-dashboard"
+              href={`/${userId}/campaign-dashboard`}
               className="py-2 px-4 md:px-5 md:ml-5 rounded-full bg-white text-gray-700 hover:bg-blue-600 hover:text-white transition flex items-center gap-2 text-sm md:text-base"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -1107,7 +1109,7 @@ export function CreateCampaigns({ userId }) {
                   active.
                 </p>
                 <Link
-                  href="/userid/campaign-dashboard"
+                  href={`/${userId}/campaign-dashboard`}
                   className="bg-blue-600 w-full h-10 md:h-[45px] px-4 py-2 md:px-25 md:py-3 text-white rounded-full hover:bg-blue-700 transition text-sm md:text-base"
                 >
                   Back to campaigns
