@@ -29,6 +29,7 @@ import LinkBankAccount from "./LinkBankAccount";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
 import { DualRangeSlider } from "./DualSlider";
+import AlertBox from "./AlertBox";
 
 const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
 const supabaseKey =
@@ -280,7 +281,16 @@ export function CreateCampaigns({ userId }) {
       console.log("Campaign created successfully:", response.data);
     } catch (error) {
       console.error("Error creating campaign:", error);
-      alert("Failed to create campaign. Please check your form data.");
+      setAlert({
+        message: "Failed to create campaign. Please check your form data.",
+        type: "error",
+        visible: true,
+      });
+      
+      setTimeout(() => {
+        setAlert(prev => ({ ...prev, visible: false }));
+      }, 4000);
+      
     }
   };
 
@@ -323,6 +333,13 @@ export function CreateCampaigns({ userId }) {
       }
     });
   };
+
+  const [alert, setAlert] = useState({
+    message: '',
+    type: '', // 'success' | 'error' | 'info' | 'warning'
+    visible: false
+  });
+  
 
   const calculateEstimatedReach = useCallback(() => {
     if (!formData.budget || !formData.videoDuration) return null;
@@ -1071,6 +1088,10 @@ export function CreateCampaigns({ userId }) {
               </div>
             </div>
           </div>
+        )}
+
+        {alert.visible && (
+          <AlertBox message={alert.message} type={alert.type} />
         )}
 
         {showSuccessModal && (
