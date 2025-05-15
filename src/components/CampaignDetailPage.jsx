@@ -3,7 +3,13 @@
 import Navbar2 from "@/components/Navbar2";
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronDown, CircleAlert, Coffee, Copy } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronDown,
+  CircleAlert,
+  Coffee,
+  Copy,
+} from "lucide-react";
 import Image from "next/image";
 import BarCharts from "@/components/BarCharts";
 import AreaCharts from "@/components/AreaCharts";
@@ -54,7 +60,6 @@ export default function CampaignDetailPage({ campaignData }) {
   const [feedback, setFeedback] = useState("");
   const [sliderValue, setSliderValue] = useState(5); // Default value is 5
 
-
   const FeedbackDialog = ({
     open,
     onClose,
@@ -68,7 +73,7 @@ export default function CampaignDetailPage({ campaignData }) {
           open ? "" : "hidden"
         }`}
       >
-        <div className="bg-white w-[679px] h-[763px] border rounded-[20px] p-[18px] flex flex-col">
+        <div className="bg-white w-full max-w-[679px] h-auto max-h-[90vh] md:h-[763px] border rounded-[20px] p-[18px] flex flex-col mx-4 overflow-y-auto">
           <div className="flex items-center p-[12px] justify-center">
             <Coffee className="w-[54px] h-[54px] text-blue-300 text-center flex items-center justify-center" />
           </div>
@@ -78,7 +83,7 @@ export default function CampaignDetailPage({ campaignData }) {
           </div>
 
           <p className="text-sm text-gray-500 mb-4 text-center">
-            We’d love to hear about your campaign’s performance. Your feedback
+            We'd love to hear about your campaign's performance. Your feedback
             helps us improve!
           </p>
 
@@ -165,16 +170,16 @@ export default function CampaignDetailPage({ campaignData }) {
       <main className="flex min-h-screen w-full max-w-[1440px] mx-auto flex-col">
         <div className="p-6 space-y-6">
           {/* Header Buttons */}
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 p-4 sm:p-0">
             <Link
               href="/userid/campaign-dashboard"
-              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
+              className="order-1 sm:order-none py-2 px-5 sm:ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start"
             >
               <ArrowLeft />
               Back
             </Link>
 
-            <div className="text-[24px] font-md text-center text-gray-800">
+            <div className="order-3 sm:order-none text-[24px] font-md text-center text-gray-800 w-full sm:w-auto">
               Campaign Overview
             </div>
 
@@ -184,7 +189,7 @@ export default function CampaignDetailPage({ campaignData }) {
               customTrigger={
                 <button
                   type="button"
-                  className="flex items-center gap-2 py-2 px-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition"
+                  className="order-2 sm:order-none flex items-center gap-2 py-2 px-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition w-full sm:w-auto justify-center sm:justify-start"
                 >
                   Actions <ChevronDown className="w-4 h-4" />
                 </button>
@@ -194,8 +199,8 @@ export default function CampaignDetailPage({ campaignData }) {
 
           <div className="bg-white p-4 sm:p-6 rounded-[24px]">
             <div className="flex flex-col md:flex-row gap-6">
-              {/* Video Section */}
-              <div className="flex-shrink-0">
+              {/* Video Section - Unchanged but responsive */}
+              <div className="flex-shrink-0 w-full md:w-auto">
                 <video
                   ref={videoRef}
                   src={campaignData.campaignVideoUrl}
@@ -205,9 +210,9 @@ export default function CampaignDetailPage({ campaignData }) {
                 />
               </div>
 
-              {/* Campaign Info */}
+              {/* Campaign Info - Main container unchanged */}
               <div className="flex-1 flex flex-col gap-4">
-                {/* Title and Status */}
+                {/* Title and Status - Exactly the same but responsive */}
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   <h2 className="text-[24px] sm:text-2xl font-md text-gray-900">
                     {campaignData.campaignTitle}
@@ -217,18 +222,18 @@ export default function CampaignDetailPage({ campaignData }) {
                   </span>
                 </div>
 
-                {/* UTM Link */}
-                <div className="flex flex-wrap items-center gap-2 rounded-lg overflow-hidden">
+                {/* UTM Link - Same styling but better mobile behavior */}
+                <div className="flex flex-wrap items-center gap-2 rounded-lg overflow-hidden bg-gray-50 md:bg-transparent p-2 md:p-0">
                   <div className="text-[18px] text-gray-400">UTM Link:</div>
-                  <a className="flex-1 text-black text-[18px] break-words px-3 py-2">
+                  <a className="flex-1 min-w-0 text-black text-[18px] break-all px-3 py-2">
                     {campaignData.websiteLink}
                   </a>
                   <Copy className="text-blue-600 hover:text-blue-800 cursor-pointer" />
                 </div>
 
-                {/* Campaign Details */}
+                {/* Campaign Details - Same layout but responsive */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
-                  {/* Left Column */}
+                  {/* Left Column - Unchanged styling */}
                   <div className="space-y-2 text-[18px]">
                     <div className="flex flex-wrap">
                       <span className="min-w-[80px] text-gray-400">
@@ -252,22 +257,22 @@ export default function CampaignDetailPage({ campaignData }) {
                     </div>
                   </div>
 
-                  {/* Right Column */}
-                  <div className="space-y-2  text-[18px]">
+                  {/* Right Column - Unchanged styling */}
+                  <div className="space-y-2 text-[18px]">
                     <div className="flex flex-wrap">
-                      <span className="min-w-[160px] px-10 text-gray-400">
+                      <span className="min-w-[160px] md:pl-10 text-gray-400">
                         Target Audience Age:
                       </span>
                       <span>{`${campaignData.genderRatio} years`}</span>
                     </div>
                     <div className="flex flex-wrap">
-                      <span className="min-w-[160px] px-10 text-gray-400">
+                      <span className="min-w-[160px] md:pl-10 text-gray-400">
                         Target Audience Gender:
                       </span>
                       <span>{campaignData.genderType}</span>
                     </div>
                     <div className="flex flex-wrap">
-                      <span className="min-w-[160px] px-10 text-gray-400">
+                      <span className="min-w-[160px] md:pl-10 text-gray-400">
                         Target Audience Locations:
                       </span>
                       <span>AL, GA, FL</span>
@@ -318,7 +323,9 @@ export default function CampaignDetailPage({ campaignData }) {
           )}
 
           {/* Budget Summary */}
-          <div><h1 className="font-md text-[18px]">Budget & Spending</h1></div>
+          <div>
+            <h1 className="font-md text-[18px]">Budget & Spending</h1>
+          </div>
 
           <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">
             <div className="flex-1 p-6">
@@ -385,32 +392,42 @@ export default function CampaignDetailPage({ campaignData }) {
                 </div>
               </div>
 
-              {/* Quiz Responses (Mock Donut Chart) */}
-              <BarCharts />
-              
-              <div className="grid grid-cols-3 ml-20 text-sm text-gray-600 w-full max-w-md">
-                <div><span className="w-3 h-3 rounded-full bg-[#3653F7] inline-block mr-2"/> Male ({campaignData?.genderRatio}%)</div>
-                <div><span className="w-3 h-3 rounded-full bg-[#E670C7] inline-block mr-2"/>Female (0%)</div>
-                <div><span className="w-3 h-3 rounded-full bg-[#15B79E] inline-block mr-2"/> Prefer Not to Say (0%)</div>
+              <div>
+                <BarCharts />
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 ml-4 sm:ml-20 text-sm text-gray-600 w-full max-w-md">
+                  <div className="mb-2 sm:mb-0">
+                    <span className="w-3 h-3 rounded-full bg-[#3653F7] inline-block mr-2" />{" "}
+                    Male ({campaignData?.genderRatio}%)
+                  </div>
+                  <div className="mb-2 sm:mb-0">
+                    <span className="w-3 h-3 rounded-full bg-[#E670C7] inline-block mr-2" />
+                    Female (0%)
+                  </div>
+                  <div>
+                    <span className="w-3 h-3 rounded-full bg-[#15B79E] inline-block mr-2" />{" "}
+                    Prefer Not to Say (0%)
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Survey Details */}
-            <div className="bg-white p-6 rounded-xl">
-              <h2 className="text-[18px] font-md text-gray-800 mb-4">
+            <div className="bg-white p-4 sm:p-6 rounded-xl">
+              <h2 className="text-[16px] sm:text-[18px] font-md text-gray-800 mb-4">
                 Survey details
               </h2>
 
               {/* Survey Question 1 */}
               <div className="mb-6">
-                <div className="flex justify-between text-[16px] text-gray-500 mb-1">
+                <div className="flex flex-col sm:flex-row sm:justify-between text-[14px] sm:text-[16px] text-gray-500 mb-1 gap-2 sm:gap-0">
                   <span>SURVEY QUESTION 1</span>
-                  <span className="font-bold text-xl text-gray-700">
+                  <span className="font-bold text-lg sm:text-xl text-gray-700">
                     {campaignData?.engagements?.totalCount} Responses
                   </span>
                 </div>
-                <div className="p-5 rounded-xl bg-[var(--bg-color-off-white)]">
-                  <span className="text-[16px] text-gray-800">
+                <div className="p-4 sm:p-5 rounded-xl bg-[var(--bg-color-off-white)]">
+                  <span className="text-[14px] sm:text-[16px] text-gray-800">
                     {campaignData?.surveyQuestion1?.questionText}
                   </span>
                   <div className="p-1 relative">
@@ -458,14 +475,14 @@ export default function CampaignDetailPage({ campaignData }) {
 
               {/* Survey Question 2 */}
               <div>
-                <div className="flex justify-between text-sm text-gray-500 mb-1">
+                <div className="flex flex-col sm:flex-row sm:justify-between text-[13px] sm:text-[16px] text-gray-500 mb-1 gap-2 sm:gap-0">
                   <span>SURVEY QUESTION 2</span>
-                  <span className="font-bold text-xl text-gray-700">
+                  <span className="font-bold text-lg sm:text-xl text-gray-700">
                     {campaignData?.engagements?.totalCount} Responses
                   </span>
                 </div>
-                <div className="p-5 rounded-xl bg-[var(--bg-color-off-white)]">
-                  <span className="text-md text-gray-800">
+                <div className="p-4 sm:p-5 rounded-xl bg-[var(--bg-color-off-white)]">
+                  <span className="text-[14px] sm:text-[16px] text-gray-800">
                     {campaignData?.surveyQuestion2?.questionText}
                   </span>
 
@@ -513,7 +530,9 @@ export default function CampaignDetailPage({ campaignData }) {
               </div>
             </div>
           </div>
-          <div><h1 className="font-md text-[18px]">Performance Summary</h1></div>
+          <div>
+            <h1 className="font-md text-[18px]">Performance Summary</h1>
+          </div>
 
           <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">
             <div className="flex-1 p-6">
@@ -578,29 +597,29 @@ export default function CampaignDetailPage({ campaignData }) {
           </div> */}
         </div>
 
-         <ConfirmationDialogue
-        open={dialogOpen}
-        title={dialogConfig.title}
-        smallText={dialogConfig.smallText}
-        confirmLabel={dialogConfig.confirmLabel}
-        onConfirm={() => {
-          dialogConfig.onConfirm(); // Perform your confirm action
-          setDialogOpen(false); // Close confirmation dialog
-          setFeedbackDialogOpen(true); // Open feedback dialog
-        }}
-        onCancel={() => setDialogOpen(false)}
-      />
-      <FeedbackDialog
-        open={feedbackDialogOpen}
-        onClose={() => setFeedbackDialogOpen(false)}
-        feedback={feedback}
-        setFeedback={setFeedback}
-        onSubmit={(feedback) => {
-          // Handle feedback submission here
-          console.log("Feedback submitted:", feedback);
-          // You might want to make an API call here
-        }}
-      />
+        <ConfirmationDialogue
+          open={dialogOpen}
+          title={dialogConfig.title}
+          smallText={dialogConfig.smallText}
+          confirmLabel={dialogConfig.confirmLabel}
+          onConfirm={() => {
+            dialogConfig.onConfirm(); // Perform your confirm action
+            setDialogOpen(false); // Close confirmation dialog
+            setFeedbackDialogOpen(true); // Open feedback dialog
+          }}
+          onCancel={() => setDialogOpen(false)}
+        />
+        <FeedbackDialog
+          open={feedbackDialogOpen}
+          onClose={() => setFeedbackDialogOpen(false)}
+          feedback={feedback}
+          setFeedback={setFeedback}
+          onSubmit={(feedback) => {
+            // Handle feedback submission here
+            console.log("Feedback submitted:", feedback);
+            // You might want to make an API call here
+          }}
+        />
       </main>
     </>
   );
