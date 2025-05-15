@@ -15,6 +15,8 @@ import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import AlertBox from "./AlertBox";
+
 
 function SignupUser() {
   const [formData, setFormData] = useState({
@@ -92,6 +94,13 @@ function SignupUser() {
     validateForm();
   };
 
+  const [alert, setAlert] = useState({
+    message: '',
+    type: '', // 'success' | 'error' | 'info' | 'warning'
+    visible: false
+  });
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
@@ -112,18 +121,51 @@ function SignupUser() {
       if (response.status === 200 || response.status === 201) {
         Cookies.set('userId', response.data.userId, { expires: 1 });
         const userId = Cookies.get("userId");
-
-        alert("User created successfully");
+        setAlert({
+          message: "User created successfully",
+          type: "success",
+          visible: true,
+        });
+        
+        setTimeout(() => {
+          setAlert(prev => ({ ...prev, visible: false }));
+        }, 4000);
+        
         router.push(`${userId}/verify-email`);
       } else if (response.status === 200) {
-        alert("User created successfully")
+        setAlert({
+          message: "User created successfully",
+          type: "success",
+          visible: true,
+        });
+        
+        setTimeout(() => {
+          setAlert(prev => ({ ...prev, visible: false }));
+        }, 4000);
       }
     } catch (error) {
       console.error(error);
       if (error.response && error.response.status === 400) {
-        alert("'User with entered email already exists")
+        setAlert({
+          message: "User with entered email already exists",
+          type: "error",
+          visible: true,
+        });
+        
+        setTimeout(() => {
+          setAlert(prev => ({ ...prev, visible: false }));
+        }, 4000);
       } else {
-        alert("Server error. Please try again")
+        setAlert({
+          message: "Server error. Please try again",
+          type: "error",
+          visible: true,
+        });
+        
+        setTimeout(() => {
+          setAlert(prev => ({ ...prev, visible: false }));
+        }, 4000);
+        
       }
     }
   };
@@ -346,6 +388,11 @@ function SignupUser() {
             </div>
           </form>
         </div>
+
+        {alert.visible && (
+          <AlertBox message={alert.message} type={alert.type} />
+        )}
+
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState ,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   Mail,
@@ -13,6 +13,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import axios from "axios";
+import AlertBox from "./AlertBox";
+
 
 function ResetPassword() {
   const router = useRouter();
@@ -20,6 +22,12 @@ function ResetPassword() {
     email: "",
     password: "",
     confirmPassword: "",
+  });
+
+  const [alert, setAlert] = useState({
+    message: "",
+    type: "", // 'success' | 'error' | 'info' | 'warning'
+    visible: false,
   });
 
   const [errors, setErrors] = useState({});
@@ -34,8 +42,6 @@ function ResetPassword() {
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
-
-
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -86,15 +92,18 @@ function ResetPassword() {
 
       setLoading(true);
       try {
-        const response = await fetch("/api/routes/v1/authRoutes?action=forgot-password", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email,
-          }),
-        });
+        const response = await fetch(
+          "/api/routes/v1/authRoutes?action=forgot-password",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: formData.email,
+            }),
+          }
+        );
 
         const data = await response.json();
 
@@ -126,17 +135,20 @@ function ResetPassword() {
 
       setLoading(true);
       try {
-        const response = await fetch("/api/routes/v1/authRoutes?action=reset-password", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-            otp: otp.join(""),
-            newPassword: formData.password,
-          }),
-        });
+        const response = await fetch(
+          "/api/routes/v1/authRoutes?action=reset-password",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: userId,
+              otp: otp.join(""),
+              newPassword: formData.password,
+            }),
+          }
+        );
 
         const data = await response.json();
 
@@ -178,30 +190,45 @@ function ResetPassword() {
     const userId = Cookies.get("userId");
 
     if (!userId) {
-        alert("User ID not found.");
-        return;
+      setAlert({
+        message: "User ID not found.",
+        type: "error",
+        visible: true,
+      });
+      return;
     }
 
     try {
-        const response = await axios.post(
-            "/api/routes/v1/authRoutes?action=resend-otp",
-            { userId }
-        );
-        
-        if (response.data.message === "OTP resent successfully") {
-            alert("New OTP has been sent to your email.");
-            setResendTimer(30);
-        } else {
-            alert("Failed to resend OTP. Please try again.");
-        }
+      const response = await axios.post(
+        "/api/routes/v1/authRoutes?action=resend-otp",
+        { userId }
+      );
+
+      if (response.data.message === "OTP resent successfully") {
+        setAlert({
+          message: "New OTP has been sent to your email.",
+          type: "success",
+          visible: true,
+        });
+        setResendTimer(30);
+      } else {
+        setAlert({
+          message: "Failed to resend OTP. Please try again.",
+          type: "error",
+          visible: true,
+        });
+      }
     } catch (error) {
-        console.error("Error resending OTP:", error);
-        alert(
-            error.response?.data?.message ||
-            "Failed to resend OTP. Please try again."
-        );
+      console.error("Error resending OTP:", error);
+      setAlert({
+        message:
+          error.response?.data?.message ||
+          "Failed to resend OTP. Please try again.",
+        type: "error",
+        visible: true,
+      });
     }
-};
+  };
 
   useEffect(() => {
     let timer;
@@ -210,7 +237,6 @@ function ResetPassword() {
     }
     return () => clearTimeout(timer);
   }, [resendTimer]);
-
 
   const renderField = (
     name,
@@ -384,20 +410,20 @@ function ResetPassword() {
                     ))}
                   </div>
                   <div className="text-center mt-4">
-                {resendTimer > 0 ? (
-                  <p className="text-gray-500 text-sm">
-                    You can resend OTP in {resendTimer}s
-                  </p>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleResendOtp}
-                    className="text-blue-600 font-medium hover:underline"
-                  >
-                    Resend OTP
-                  </button>
-                )}
-              </div>
+                    {resendTimer > 0 ? (
+                      <p className="text-gray-500 text-sm">
+                        You can resend OTP in {resendTimer}s
+                      </p>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleResendOtp}
+                        className="text-blue-600 font-medium hover:underline"
+                      >
+                        Resend OTP
+                      </button>
+                    )}
+                  </div>
 
                   {otpError && (
                     <p className="text-red-500 text-sm text-center mt-2">
@@ -448,6 +474,9 @@ function ResetPassword() {
             </form>
           </div>
         </div>
+        {alert.visible && (
+          <AlertBox message={alert.message} type={alert.type} />
+        )}
       </div>
     </div>
   );

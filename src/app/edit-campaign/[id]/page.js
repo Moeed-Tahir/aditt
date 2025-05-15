@@ -28,6 +28,8 @@ import PaymentMethod from "../../../components/PaymentMethod";
 import LinkBankAccount from "../../../components/LinkBankAccount";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
+import AlertBox from "./AlertBox";
+
 
 const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
 const supabaseKey =
@@ -278,7 +280,16 @@ export default function EditCampaign() {
       console.log("Campaign created successfully:", response.data);
     } catch (error) {
       console.error("Error creating campaign:", error);
-      alert("Failed to create campaign. Please check your form data.");
+      setAlert({
+        message: "Failed to create campaign. Please check your form data.",
+        type: "error",
+        visible: true,
+      });
+      
+      setTimeout(() => {
+        setAlert(prev => ({ ...prev, visible: false }));
+      }, 4000);
+      
     }
   };
 
@@ -1070,6 +1081,10 @@ export default function EditCampaign() {
           </div>
         )}
       </div>
+
+      {alert.visible && (
+          <AlertBox message={alert.message} type={alert.type} />
+        )}
 
       {showSuccessModal && (
         <div className="fixed inset-0 bg-opacity-30 flex items-center justify-center z-50">
