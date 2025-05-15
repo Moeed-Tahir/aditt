@@ -64,20 +64,24 @@ export function ChatSupport() {
       <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
         <Navbar userId={userId} />
         <div className="p-10">
+          <div className="max-w-6xl mx-auto">
           <div className="relative flex items-center mb-10 justify-between">
             <Link
-              href="/Support"
-              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
-            >
-              <ArrowLeft />
-              Back
+              href="/support"
+              className="py-2 px-4 md:px-5 md:ml-5 rounded-full bg-white text-gray-700 hover:bg-blue-600 hover:text-white transition flex items-center gap-2 text-sm md:text-base"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden md:inline">Back</span>
             </Link>
-            <div className="absolute left-1/2 transform -translate-x-1/2 text-center text-gray-800 text-lg">
-              Help Center
+            <div className="absolute left-1/2 transform -translate-x-1/2 text-center text-gray-800 font-md text-base md:text-[24px]">
+            Contact Support
             </div>
             <div className="w-[90px]" />
           </div>
-          <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow p-8 relative">
+
+          </div>
+          
+          <div className="w-full max-w-[1200px] mx-auto bg-white rounded-2xl shadow p-8 relative">
             <form onSubmit={onSubmit}>
               <div className="flex items-center justify-between mb-8">
                 <div className="w-1/3">
@@ -91,7 +95,7 @@ export function ChatSupport() {
 
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white px-16 py-2 rounded-full hover:bg-blue-700 disabled:opacity-50"
+                  className="bg-blue-600 text-white px-[28px] w-[218px] h-[56px] py-[16px] rounded-full hover:bg-blue-700 disabled:opacity-50"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Sending..." : "Send"}

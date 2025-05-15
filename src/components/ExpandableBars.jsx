@@ -10,7 +10,7 @@ import {
 export default function ExpandableBars() {
   return (
     <Accordion type="single" collapsible className="w-full">
-      <AccordionItem className="border-1 rounded-md mb-2 p-3" value="item-1">
+      <AccordionItem className="border-1 rounded-[16px] gap-[8px] py-[5px] px-[24px] mb-2" value="item-1">
         <AccordionTrigger className="text-gray-800">
           How do I create an ad campaign on Aditt?
         </AccordionTrigger>
@@ -22,7 +22,7 @@ export default function ExpandableBars() {
           </li>
         </AccordionContent>
       </AccordionItem>
-      <AccordionItem className="border-1 rounded-md mb-2 p-1" value="item-2">
+      <AccordionItem className="border-1 rounded-[16px] gap-[8px] py-[5px] px-[24px] mb-2" value="item-2">
         <AccordionTrigger className="text-gray-800">
           What targeting options are available for advertisers?
         </AccordionTrigger>
@@ -34,7 +34,10 @@ export default function ExpandableBars() {
           </li>
         </AccordionContent>
       </AccordionItem>
-      <AccordionItem className="border-1 rounded-md mb-2 p-1" value="item-3">
+      <AccordionItem
+        className="border-1 rounded-[16px] gap-[8px] py-[5px] px-[24px] mb-2"
+        value="item-3"
+      >
         <AccordionTrigger className="text-gray-800">
           Can I track the performance of my ads?{" "}
         </AccordionTrigger>
@@ -46,8 +49,11 @@ export default function ExpandableBars() {
           </li>
         </AccordionContent>
       </AccordionItem>
-      <AccordionItem className="border-1 rounded-md mb-5 p-1" value="item-4">
-        <AccordionTrigger className="text-gray-800">
+      <AccordionItem
+        className="border-1 rounded-[16px] gap-[8px] py-[5px] px-[24px] mb-2"
+        value="item-4"
+      >
+        <AccordionTrigger className="text-gray-800 ">
           What types of ads can I run on Aditt?{" "}
         </AccordionTrigger>
         <AccordionContent className="text-gray-500">

@@ -15,19 +15,21 @@ export default function Calendars({ selected, onSelect, fromDate }) {
   };
 
   return (
-    <div>
+    <div className="relative">
+      {/* Date Picker Trigger */}
       <div className="flex items-center mb-2">
         <span
           onClick={() => setIsCalendarOpen(!isCalendarOpen)}
-          className="flex items-center  w-full h-12 text-gray-600 text-m p-3 border rounded-full cursor-pointer"
+          className="flex items-center w-full h-12 text-gray-600 text-m p-3 border rounded-full cursor-pointer"
         >
           <CalendarIcon className="mr-2 text-gray-500 w-5 h-5" />
           {selected ? selected.toLocaleDateString() : "Choose date"}
         </span>
       </div>
 
+      {/* Calendar Popup */}
       {isCalendarOpen && (
-        <div className="relative z-50">
+        <div className="absolute top-full left-0 z-50 mt-1 bg-white shadow-lg rounded-md border">
           <Calendar
             mode="single"
             selected={selected}

@@ -49,7 +49,7 @@ export function CreateCampaigns({ userId }) {
   const currentStep = parseInt(searchParams.get("step") || "0");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [values, setValues] = useState([10, 60]);
-  const userId = Cookies.get("userId");
+  // const userId = Cookies.get("userId");
 
   const [formData, setFormData] = useState({
     campaignTitle: "",
@@ -288,11 +288,10 @@ export function CreateCampaigns({ userId }) {
         type: "error",
         visible: true,
       });
-      
+
       setTimeout(() => {
-        setAlert(prev => ({ ...prev, visible: false }));
+        setAlert((prev) => ({ ...prev, visible: false }));
       }, 4000);
-      
     }
   };
 
@@ -337,11 +336,10 @@ export function CreateCampaigns({ userId }) {
   };
 
   const [alert, setAlert] = useState({
-    message: '',
-    type: '', // 'success' | 'error' | 'info' | 'warning'
-    visible: false
+    message: "",
+    type: "", // 'success' | 'error' | 'info' | 'warning'
+    visible: false,
   });
-  
 
   const calculateEstimatedReach = useCallback(() => {
     if (!formData.budget || !formData.videoDuration) return null;
@@ -360,8 +358,7 @@ export function CreateCampaigns({ userId }) {
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
       <Navbar2 userId={userId} />
 
-      <div className="p-4 md:p-10">
-        {/* Top Header with Back Button */}
+      <div className="px-0 py-4 md:p-10">
         {/* Stepper */}
         <div className="max-w-6xl mx-auto">
           <div className="relative flex items-center mb-6 md:mb-10 justify-between">
@@ -420,7 +417,7 @@ export function CreateCampaigns({ userId }) {
         {/* Step 0: Campaign Info */}
         {currentStep === 0 && (
           <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
-            <div className="max-w-[1200px] w-full mx-auto bg-white rounded-xl md:rounded-2xl shadow p-4 md:p-8 relative">
+            <div className="w-full mx-auto bg-white rounded-none md:rounded-2xl shadow p-4 md:p-8 relative">
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-8 gap-4">
                 <div className="w-full md:w-1/3">
                   <label className="block text-lg md:text-[24px] font-medium">
@@ -453,9 +450,7 @@ export function CreateCampaigns({ userId }) {
                   Next
                 </Link>
               </div>
-
               <hr className="border-t mb-4 border-gray-300" />
-
               <div className="space-y-4 md:space-y-6">
                 {/* Campaign Title */}
                 <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
@@ -837,6 +832,7 @@ export function CreateCampaigns({ userId }) {
                       }
                       isQuiz={true}
                       name="quizQuestion"
+                      buttonLabel="+ Add Quiz Question"
                     />
                   </div>
                 </div>
@@ -861,8 +857,9 @@ export function CreateCampaigns({ userId }) {
                           optionIndex
                         )
                       }
-                      isQuiz={true}
+                      isQuiz={false}
                       name="surveyQuestion1"
+                      buttonLabel="+ Add Survey Question 1"
                     />
                   </div>
                 </div>
@@ -887,8 +884,9 @@ export function CreateCampaigns({ userId }) {
                           optionIndex
                         )
                       }
-                      isQuiz={true}
+                      isQuiz={false}
                       name="surveyQuestion2"
+                      buttonLabel="+ Add Survey Question 2"
                     />
                   </div>
                 </div>
@@ -974,8 +972,8 @@ export function CreateCampaigns({ userId }) {
                       }
                       fromDate={
                         formData.startDate
-                          ? formData.startDate // allow same-day or future end date
-                          : new Date() // allow today if no start date selected
+                          ? formData.startDate 
+                          : new Date() 
                       }
                     />
                   </div>

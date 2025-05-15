@@ -23,7 +23,9 @@ import { useRouter } from "next/navigation";
 export function Settings() {
   const [businessEditMode, setBusinessEditMode] = useState(false);
   const [personalEditMode, setPersonalEditMode] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [businessLoading, setBusinessLoading] = useState(false); // Separate loading state for business
+  const [personalLoading, setPersonalLoading] = useState(false); // Separate loading state for personal
+  const [passwordLoading, setPasswordLoading] = useState(false); // Separate loading state for password
   const [message, setMessage] = useState({ text: "", type: "" });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -86,8 +88,13 @@ export function Settings() {
     }));
   };
 
-  const updateUserData = async () => {
-    setLoading(true);
+  const updateUserData = async (isBusinessUpdate) => {
+    if (isBusinessUpdate) {
+      setBusinessLoading(true);
+    } else {
+      setPersonalLoading(true);
+    }
+    
     try {
       const token = Cookies.get("token");
       const response = await axios.put(
@@ -102,8 +109,11 @@ export function Settings() {
 
       if (response.status === 200) {
         setMessage({ text: "Profile updated successfully!", type: "success" });
-        setBusinessEditMode(false);
-        setPersonalEditMode(false);
+        if (isBusinessUpdate) {
+          setBusinessEditMode(false);
+        } else {
+          setPersonalEditMode(false);
+        }
         fetchProfileData();
       }
     } catch (error) {
@@ -113,12 +123,16 @@ export function Settings() {
         type: "error" 
       });
     } finally {
-      setLoading(false);
+      if (isBusinessUpdate) {
+        setBusinessLoading(false);
+      } else {
+        setPersonalLoading(false);
+      }
     }
   };
 
   const updatePassword = async () => {
-    setLoading(true);
+    setPasswordLoading(true);
     try {
       const token = Cookies.get("token");
       const response = await axios.put(
@@ -148,7 +162,7 @@ export function Settings() {
         type: "error" 
       });
     } finally {
-      setLoading(false);
+      setPasswordLoading(false);
     }
   };
 
@@ -158,7 +172,7 @@ export function Settings() {
     );
     if (!confirm) return;
 
-    setLoading(true);
+    setPasswordLoading(true);
     try {
       const token = Cookies.get("token");
       const response = await axios.delete(
@@ -178,7 +192,7 @@ export function Settings() {
       console.error("Account deletion failed:", error);
       setMessage({ text: "Failed to delete account.", type: "error" });
     } finally {
-      setLoading(false);
+      setPasswordLoading(false);
       setIsModalOpen(false);
     }
   };
@@ -228,12 +242,12 @@ export function Settings() {
                   : "bg-gray-200 text-gray-700 hover:text-white"
               }`}
               onClick={() => {
-                if (businessEditMode) updateUserData();
+                if (businessEditMode) updateUserData(true);
                 setBusinessEditMode(!businessEditMode);
               }}
-              disabled={loading}
+              disabled={businessLoading}
             >
-              {loading ? "Saving..." : businessEditMode ? "Update" : "Edit"}
+              {businessLoading ? "Saving..." : businessEditMode ? "Update" : "Edit"}
             </button>
           </div>
 
@@ -295,7 +309,7 @@ export function Settings() {
                   value={formData.website}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
-                  disabled={!businessEditMode}
+                  disabled
                 />
               </div>
             </div>
@@ -320,12 +334,12 @@ export function Settings() {
                   : "bg-gray-200 text-gray-700 hover:text-white"
               }`}
               onClick={() => {
-                if (personalEditMode) updateUserData();
+                if (personalEditMode) updateUserData(false);
                 setPersonalEditMode(!personalEditMode);
               }}
-              disabled={loading}
+              disabled={personalLoading}
             >
-              {loading ? "Saving..." : personalEditMode ? "Update" : "Edit"}
+              {personalLoading ? "Saving..." : personalEditMode ? "Update" : "Edit"}
             </button>
           </div>
 
@@ -488,6 +502,19 @@ export function Settings() {
                 </button>
               </div>
             </div>
+
+            {/* Update Password Button */}
+            {personalEditMode && (
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={updatePassword}
+                  disabled={passwordLoading}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700"
+                >
+                  {passwordLoading ? "Updating..." : "Update Password"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -503,10 +530,10 @@ export function Settings() {
             </div>
             <button
               className="bg-white text-[14px] md:text-[16px] flex justify-center items-center font-md text-[#FF4319] w-full md:w-[230px] h-[48px] md:h-[56px] rounded-full border-2 border-[#FF4319] hover:bg-[#FF4319] hover:text-white"
-              disabled={loading}
+              disabled={passwordLoading}
               onClick={handleLogout}
             >
-              {loading ? "Processing..." : "Logout Account"}
+              {passwordLoading ? "Processing..." : "Logout Account"}
             </button>
           </div>
         </div>
@@ -526,9 +553,9 @@ export function Settings() {
             <button
               onClick={() => setIsModalOpen(true)}
               className="bg-white text-[14px] md:text-[16px] font-md text-[#FF4319] w-full md:w-[230px] h-[48px] md:h-[56px] rounded-full border-2 border-[#FF4319] hover:bg-[#FF4319] hover:text-white"
-              disabled={loading}
+              disabled={passwordLoading}
             >
-              {loading ? "Processing..." : "Request Account Deletion"}
+              {passwordLoading ? "Processing..." : "Request Account Deletion"}
             </button>
           </div>
         </div>
@@ -556,9 +583,9 @@ export function Settings() {
                 <button
                   onClick={deleteAccount}
                   className="border w-full md:w-[204px] h-[44px] rounded-[58px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                  disabled={loading}
+                  disabled={passwordLoading}
                 >
-                  {loading ? "Processing..." : "Proceed"}
+                  {passwordLoading ? "Processing..." : "Proceed"}
                 </button>
               </div>
             </div>
