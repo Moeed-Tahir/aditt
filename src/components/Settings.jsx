@@ -2,7 +2,7 @@
 
 import { allCountries } from "country-telephone-data";
 import Navbar from "@/components/Navbar";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import axios from "axios";
 import {
   ChevronDown,
@@ -35,20 +35,48 @@ export function Settings() {
     website: "",
     currentPassword: "",
     newPassword: "",
+    companyName: "",
+    phone: "",
   });
   const router = useRouter();
+  const userId = Cookies.get("userId");
+  const [error, setError] = useState("");
+
+  const fetchProfileData = async () => {
+    try {
+      const response = await axios.post(
+        "/api/routes/v1/authRoutes?action=getProfile",
+        {
+          userId: userId
+        }
+      );
+      console.log("response", response);
+
+      if (response.data.profile) {
+        setFormData({
+          userId: response.data.profile.userId || "",
+          name: response.data.profile.name || "",
+          email: response.data.profile.businessEmail || "",
+          website: response.data.profile.businessWebsite || "",
+          companyName: response.data.profile.companyName || "",
+          phone: response.data.profile.phone || "",
+          currentPassword: "",
+          newPassword: ""
+        });
+      } else {
+        setError(response.data.message || "Failed to get profile data");
+      }
+    } catch (error) {
+      console.error("Error getting profile:", error);
+      setError("Failed to fetch profile data");
+    }
+  }
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user"));
-    if (userData) {
-      setFormData({
-        userId: userData._id,
-        name: userData.name || "",
-        email: userData.email || "",
-        website: userData.website || userData.businessWebsite || "",
-      });
+    if (userId) {
+      fetchProfileData();
     }
-  }, []);
+  }, [userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,7 +89,7 @@ export function Settings() {
   const updateUserData = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = Cookies.get("token");
       const response = await axios.put(
         "/api/routes/v1/authRoutes?action=updateProfile",
         formData,
@@ -73,22 +101,17 @@ export function Settings() {
       );
 
       if (response.status === 200) {
-        const updatedUser = {
-          ...JSON.parse(localStorage.getItem("user")),
-          ...formData,
-        };
-
-        localStorage.setItem("user", JSON.stringify(updatedUser));
         setMessage({ text: "Profile updated successfully!", type: "success" });
         setBusinessEditMode(false);
         setPersonalEditMode(false);
-        if (formData.currentPassword && formData.newPassword) {
-          await updatePassword();
-        }
+        fetchProfileData();
       }
     } catch (error) {
       console.error("Update failed:", error);
-      setMessage({ text: "Failed to update profile.", type: "error" });
+      setMessage({ 
+        text: error.response?.data?.message || "Failed to update profile.", 
+        type: "error" 
+      });
     } finally {
       setLoading(false);
     }
@@ -97,7 +120,7 @@ export function Settings() {
   const updatePassword = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = Cookies.get("token");
       const response = await axios.put(
         "/api/routes/v1/authRoutes?action=updatePassword",
         {
@@ -120,7 +143,10 @@ export function Settings() {
       }
     } catch (error) {
       console.error("Password update failed:", error);
-      setMessage({ text: "Failed to update password.", type: "error" });
+      setMessage({ 
+        text: error.response?.data?.message || "Failed to update password.", 
+        type: "error" 
+      });
     } finally {
       setLoading(false);
     }
@@ -134,7 +160,7 @@ export function Settings() {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = Cookies.get("token");
       const response = await axios.delete(
         "/api/routes/v1/authRoutes?action=deleteAccount",
         {
@@ -144,14 +170,16 @@ export function Settings() {
       );
 
       if (response.status === 200) {
-        localStorage.clear();
-        window.location.href = "/";
+        Cookies.remove("userId");
+        Cookies.remove("token");
+        router.push("/signin-user");
       }
     } catch (error) {
       console.error("Account deletion failed:", error);
       setMessage({ text: "Failed to delete account.", type: "error" });
     } finally {
       setLoading(false);
+      setIsModalOpen(false);
     }
   };
 
@@ -163,7 +191,7 @@ export function Settings() {
 
   return (
     <>
-      <Navbar />
+      <Navbar userId={userId} />
 
       <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)] px-4 md:px-0">
         <h1 className="text-[24px] md:text-[30px] p-4 text-center font-md">
@@ -245,7 +273,8 @@ export function Settings() {
                   type="text"
                   placeholder="Reebok promotion"
                   onChange={handleChange}
-                  name="company"
+                  name="companyName"
+                  value={formData.companyName}
                   className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
                   disabled={!businessEditMode}
                 />
@@ -354,6 +383,9 @@ export function Settings() {
                   <span className="h-6 w-px bg-gray-300 mx-2"></span>
                   <input
                     type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
                     placeholder="Enter your phone number"
                     className="flex-1 pl-2 pr-4 py-2 text-sm bg-transparent outline-none"
                     disabled={!personalEditMode}
@@ -374,6 +406,7 @@ export function Settings() {
                   type="email"
                   name="email"
                   value={formData.email}
+                  onChange={handleChange}
                   className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
                   disabled
                 />
@@ -468,14 +501,13 @@ export function Settings() {
                 Logout from your account
               </span>
             </div>
-            <Link
-              href="/signup-user"
+            <button
               className="bg-white text-[14px] md:text-[16px] flex justify-center items-center font-md text-[#FF4319] w-full md:w-[230px] h-[48px] md:h-[56px] rounded-full border-2 border-[#FF4319] hover:bg-[#FF4319] hover:text-white"
               disabled={loading}
               onClick={handleLogout}
             >
               {loading ? "Processing..." : "Logout Account"}
-            </Link>
+            </button>
           </div>
         </div>
 

@@ -167,7 +167,7 @@ export default function CampaignDetailPage({ campaignData }) {
 
   return (
     <>
-      <Navbar2 />
+      <Navbar2 userId={userId} />
 
       <main className="flex min-h-screen w-full max-w-[1440px] mx-auto flex-col">
         <div className="p-6 space-y-6">

@@ -8,7 +8,7 @@ import {
   updatePassword,
   deleteAccount,
   resendOTP,
-  sendPaymentOnClick
+  getProfile
 } from "../../controllers/v1/authControllers";
 
 export default async function handler(req, res) {
@@ -33,10 +33,14 @@ export default async function handler(req, res) {
           return await resetPassword(req, res);
         case "resend-otp":
           return await resendOTP(req, res);
+        case "getProfile":
+          return await getProfile(req, res);
         default:
           return res.status(400).json({ message: "Invalid action parameter" });
       }
     }
+
+
 
     if (req.method === "PUT") {
       switch (action) {

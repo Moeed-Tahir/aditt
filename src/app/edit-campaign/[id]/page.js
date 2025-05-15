@@ -350,7 +350,7 @@ export default function EditCampaign() {
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
-      <Navbar2 />
+      <Navbar2 userId={userId} />
 
       <div className="p-10">
         {/* Top Header with Back Button */}

@@ -13,7 +13,7 @@ export function Notifications() {
   return (
     <>
       <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
-        <Navbar2 />
+      <Navbar2 userId={userId} />
 
         <div className="p-10">
           <div className="relative flex items-center mb-10 justify-between">
@@ -31,7 +31,7 @@ export function Notifications() {
           </div>
 
           <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-            <div className="flex items-center justify-between ">
+            {/* <div className="flex items-center justify-between ">
               <div>
                 <label className="block text-lg font-medium mt-2">
                   Low Balance Alert ⚠️
@@ -80,7 +80,7 @@ export function Notifications() {
                 </span>
                 <p className="text-xs mt-2 text-gray-500">23 feb, 2025</p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </main>

@@ -11,6 +11,14 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    phone: {
+        type: String,
+        required: false,
+    },
+    companyName: {
+        type: String,
+        required: false,
+    },
     businessWebsite: {
         type: String,
         required: true,

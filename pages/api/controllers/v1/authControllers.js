@@ -73,7 +73,6 @@ exports.signUp = async (req, res) => {
     }
 };
 
-// Verify OTP===============================
 exports.verifyOTP = async (req, res) => {
     try {
         const { userId, otp } = req.body;
@@ -132,8 +131,6 @@ exports.verifyOTP = async (req, res) => {
     }
 };
 
-
-// Sign In ===============================
 exports.signIn = async (req, res) => {
     try {
         await connectToDatabase();
@@ -208,7 +205,6 @@ exports.signIn = async (req, res) => {
     }
 };
 
-// Forgot Password - Initiate ===============================
 exports.forgotPassword = async (req, res) => {
     try {
         await connectToDatabase();
@@ -252,7 +248,6 @@ exports.forgotPassword = async (req, res) => {
     }
 };
 
-// Reset Password ===============================
 exports.resetPassword = async (req, res) => {
     try {
         await connectToDatabase();
@@ -315,22 +310,32 @@ exports.resetPassword = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         await connectToDatabase();
-
-        const { userId, name, website } = req.body;
+        const { userId, name, email, website, company, phone, currentPassword, newPassword } = req.body;
 
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
         }
 
-        const user = await User.findById(userId);
+        const user = await User.findOne({ userId });
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Update fields
-        user.name = name;
-        user.businessWebsite = website;
+        if (currentPassword && newPassword) {
+            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            if (!isMatch) {
+                return res.status(400).json({ message: "Current password is incorrect" });
+            }
+            user.password = await bcrypt.hash(newPassword, 10);
+        }
+
+        user.name = name || user.name;
+        user.businessEmail = email || user.businessEmail;
+        user.businessWebsite = website || user.businessWebsite;
+        user.companyName = company || user.companyName;
+        user.phone = phone || user.phone;
+
         await user.save();
 
         res.status(200).json({
@@ -339,7 +344,9 @@ exports.updateProfile = async (req, res) => {
                 name: user.name,
                 email: user.businessEmail,
                 website: user.businessWebsite,
-            },
+                company: user.companyName,
+                phone: user.phone
+            }
         });
 
     } catch (error) {
@@ -349,7 +356,7 @@ exports.updateProfile = async (req, res) => {
 };
 
 
-// Update Password for logged-in user
+
 exports.updatePassword = async (req, res) => {
     try {
         await connectToDatabase();
@@ -381,9 +388,6 @@ exports.updatePassword = async (req, res) => {
     }
 };
 
-
-
-// Add this to your authControllers.js
 exports.deleteAccount = async (req, res) => {
     try {
         await connectToDatabase();
@@ -462,3 +466,44 @@ exports.resendOTP = async (req, res) => {
         });
     }
 };
+
+exports.getProfile = async (req, res) => {
+    try {
+        await connectToDatabase();
+        const { userId } = req.body;
+        console.log("userId in backend", userId);
+        if (!userId) {
+            return res.status(400).send({ message: "User Id not present" });
+        }
+
+        const user = await User.findOne({ userId });
+
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+
+        const userProfile = {
+            userId: user.userId,
+            name: user.name,
+            phone: user.phone,
+            companyName:user.companyName,
+            businessWebsite: user.businessWebsite,
+            businessEmail: user.businessEmail,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+        };
+
+        return res.status(200).json({
+
+            message: "Profile fetched successfully",
+            profile: userProfile
+        });
+
+    } catch (error) {
+        console.error("Error fetching profile:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+}

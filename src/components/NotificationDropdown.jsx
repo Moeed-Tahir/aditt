@@ -7,7 +7,9 @@ export default function NotificationDropdown() {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const userId = Cookies.get("userId");
-  
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   // Close on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -18,6 +20,19 @@ export default function NotificationDropdown() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Fetch notifications when dropdown is opened
+  useEffect(() => {
+    if (showDropdown) {
+      // Here you would typically fetch notifications from your API
+      // For now, we'll simulate an empty response
+      setLoading(true);
+      setTimeout(() => {
+        setNotifications([]); // Empty array simulates no notifications
+        setLoading(false);
+      }, 500);
+    }
+  }, [showDropdown]);
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -38,53 +53,49 @@ export default function NotificationDropdown() {
             d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
           />
         </svg>
-        <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
+        {notifications.length > 0 && (
+          <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
+        )}
       </button>
 
       {showDropdown && (
         <div className="absolute right-0 mt-2 w-80 bg-white border rounded-xl shadow-xl z-50">
           <div className="p-4 border-b text-gray-700">Notifications</div>
-          <ul className="">
-            <li className="px-4 py-3 hover:bg-blue-200 cursor-pointer">
-              <p className="text-sm font-medium">Low Balance Alert ⚠️</p>
-              <p className="text-xs text-gray-500">
-                The balance for your campaign, [Campaign Title], is running low.
-                Add funds now to avoid interruptions in its performance.
+          
+          {loading ? (
+            <div className="p-4 text-center text-gray-500">Loading...</div>
+          ) : notifications.length > 0 ? (
+            <ul>
+              {/* Map through notifications here if they exist */}
+              {notifications.map((notification) => (
+                <li key={notification.id} className="px-4 py-3 hover:bg-blue-100 cursor-pointer">
+                  {/* Notification content would go here */}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="p-8 text-center">
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-6-6H9a6 6 0 00-6 6v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
+              </svg>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">
+                No notifications yet
+              </h3>
+              <p className="mt-1 text-sm text-gray-500">
+                We'll notify you when something new arrives.
               </p>
-              <p className="text-xs mt-2 text-gray-500">Today</p>
-            </li>
-            <hr className="border-t border-gray-300" />
-
-            <li className="px-4 py-3 bg-blue-100 hover:bg-blue-200 cursor-pointer">
-              <p className="text-sm font-medium">
-                Congratulation your campaign has been published.
-              </p>
-              <p className="text-xs text-gray-500">
-                Your campaign is now live and visible to your audience.{" "}
-              </p>
-              <p className="text-xs mt-1 text-gray-500">Today</p>
-            </li>
-            <hr className="border-t border-gray-300" />
-
-            <li className="px-4 py-3 hover:bg-blue-200 cursor-pointer">
-              <p className="text-sm font-medium">New Client Added ✅</p>
-              <p className="text-xs text-gray-500">
-                Your client, [Client Name], has been approved. You can now start
-                creating campaigns for them.
-              </p>
-              <p className="text-xs mt-2 text-gray-500">Today</p>
-            </li>
-            <hr className="border-t border-gray-300" />
-
-            <li className="px-4 py-3 hover:bg-blue-200 cursor-pointer">
-              <p className="text-sm font-medium">Campaign Expired ⏳</p>
-              <p className="text-xs text-gray-500">
-                Your campaign [Campaign Title] has expired, but you still have
-                an available budget. Update the dates or pause the campaign.
-              </p>
-              <p className="text-xs mt-2 text-gray-500">23 feb, 2025</p>
-            </li>
-          </ul>
+            </div>
+          )}
 
           <hr className="border-t mb-2 border-gray-300" />
 

@@ -7,12 +7,15 @@ import { LineBarsChart } from "@/components/LineBarsChart";
 import AreaCharts from "./AreaCharts";
 import BarCharts from "./BarCharts";
 import PieCharts from "./PieCharts";
+import Cookies from "js-cookie";
 
 export function Analytics() {
+  const userId =Cookies.get("userId");
+  
   return (
     <>
       <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
-        <Navbar />
+        <Navbar userId={userId} />
 
         <div className="p-4">
           <div className="flex justify-between">
