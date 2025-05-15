@@ -341,54 +341,53 @@ export function CreateCampaigns({ userId }) {
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
       <Navbar2 />
 
-      <div className="p-10">
+      <div className="p-4 md:p-10">
         {/* Top Header with Back Button */}
-
         {/* Stepper */}
         <div className="max-w-6xl mx-auto">
-          <div className="relative flex items-center mb-10 justify-between">
+          <div className="relative flex items-center mb-6 md:mb-10 justify-between">
             <Link
               href="/userid/campaign-dashboard"
-              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
+              className="py-2 px-4 md:px-5 md:ml-5 rounded-full bg-white text-gray-700 hover:bg-blue-600 hover:text-white transition flex items-center gap-2 text-sm md:text-base"
             >
-              <ArrowLeft />
-              Back
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden md:inline">Back</span>
             </Link>
-            <div className="absolute left-1/2 transform -translate-x-1/2 text-center text-gray-800 font-md text-[24px]">
+            <div className="absolute left-1/2 transform -translate-x-1/2 text-center text-gray-800 font-md text-lg md:text-[24px]">
               Create Campaigns
             </div>
-            <div className="w-[90px]" />
+            <div className="w-[40px] md:w-[90px]" />
           </div>
-          <div className="flex items-center justify-between relative">
+          <div className="flex items-center justify-between relative overflow-x-auto pb-4">
             {steps.map((step, index) => (
               <div
                 key={index}
-                className="relative z-10 flex flex-col items-center"
+                className="relative z-10 flex flex-col items-center min-w-[120px] md:min-w-0"
               >
                 <Link
                   href={`?step=${index}`}
-                  className={` gap-2 h-10 flex items-center justify-start rounded-full text-xs font-medium px-4 ${
+                  className={`gap-1 md:gap-2 h-8 md:h-10 flex items-center justify-start rounded-full text-xs font-medium px-3 md:px-4 ${
                     index === currentStep
                       ? "border-blue-600 border bg-white text-gray-600"
                       : "bg-white text-gray-600"
                   } hover:cursor-pointer transition`}
                 >
                   {index < currentStep ? (
-                    <CircleCheck className="w-7 h-7 text-blue-600 shrink-0" /> // Tick icon for completed steps
+                    <CircleCheck className="w-5 h-5 md:w-7 md:h-7 text-blue-600 shrink-0" />
                   ) : (
                     <CircleDot
-                      className={`w-7 h-7 shrink-0 ${
+                      className={`w-5 h-5 md:w-7 md:h-7 shrink-0 ${
                         index === currentStep
                           ? "text-blue-600"
                           : "text-gray-300"
                       }`}
                     />
                   )}
-                  {step.label}
+                  <span className="whitespace-nowrap">{step.label}</span>
                 </Link>
               </div>
             ))}
-            <div className="absolute top-5 left-[9%] right-[9%] h-0.5 bg-gray-300 z-0">
+            <div className="absolute top-3 md:top-5 left-[5%] right-[5%] h-0.5 bg-gray-300 z-0">
               <div
                 className="h-full bg-blue-600 transition-all duration-700"
                 style={{
@@ -401,21 +400,21 @@ export function CreateCampaigns({ userId }) {
 
         {/* Step 0: Campaign Info */}
         {currentStep === 0 && (
-          <div className="min-h-screen px-4 py-8">
-            <div className="max-w-[1200px] w-full mx-auto bg-white rounded-2xl shadow p-8 relative">
-              <div className="flex items-center justify-between mb-8">
-                <div className="w-1/3">
-                  <label className="block text-[24px] font-medium">
+          <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
+            <div className="max-w-[1200px] w-full mx-auto bg-white rounded-xl md:rounded-2xl shadow p-4 md:p-8 relative">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-8 gap-4">
+                <div className="w-full md:w-1/3">
+                  <label className="block text-lg md:text-[24px] font-medium">
                     Campaign info
                   </label>
-                  <span className="block text-[16px] text-gray-500 mt-1">
+                  <span className="block text-sm md:text-[16px] text-gray-500 mt-1">
                     Add key details to set up and optimize your campaign.
                   </span>
                 </div>
 
                 <Link
                   href="?step=1"
-                  className={`bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
+                  className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
                     !formData.campaignTitle ||
                     !formData.websiteLink ||
                     !formData.videoFile
@@ -438,19 +437,19 @@ export function CreateCampaigns({ userId }) {
 
               <hr className="border-t mb-4 border-gray-300" />
 
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 {/* Campaign Title */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Campaign Title
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Choose a clear and recognizable title to help identify
                       your campaign.
                     </span>
                   </div>
-                  <div className="relative flex-1">
+                  <div className="relative w-full flex-1">
                     <House className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
@@ -458,7 +457,7 @@ export function CreateCampaigns({ userId }) {
                       value={formData.campaignTitle}
                       onChange={handleInputChange}
                       placeholder="Reebok promotion"
-                      className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-3"
+                      className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2 md:py-3"
                     />
                   </div>
                 </div>
@@ -466,19 +465,19 @@ export function CreateCampaigns({ userId }) {
                 <hr className="border-t mb-4 border-gray-300" />
 
                 {/* Website/Product Link */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Website/Product Link
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Add your website or product link. A UTM link will be
                       auto-generated for tracking.
                     </span>
                   </div>
 
-                  <div className="flex-1">
-                    <div className="relative flex-1">
+                  <div className="w-full flex-1">
+                    <div className="relative w-full">
                       <Globe className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
                       <input
                         type="url"
@@ -486,12 +485,12 @@ export function CreateCampaigns({ userId }) {
                         value={formData.websiteLink}
                         onChange={handleInputChange}
                         placeholder="https://shop.app/"
-                        className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-3"
+                        className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2 md:py-3"
                       />
                     </div>
 
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-[16px] text-green-600 select-all">
+                      <p className="text-sm md:text-[16px] text-green-600 select-all truncate">
                         {formData.websiteLink || "https://www.example.com"}
                       </p>
                       {formData.websiteLink && (
@@ -512,23 +511,23 @@ export function CreateCampaigns({ userId }) {
                 <hr className="border-t mb-4 border-gray-300" />
 
                 {/* Campaign Video Upload */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Campaign Video
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Upload your campaign video. For best results, we recommend
                       using vertical videos.
                     </span>
                   </div>
 
-                  <div className="flex-1">
+                  <div className="w-full flex-1">
                     {/* Upload box */}
-                    <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
+                    <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-4 md:p-6 text-center">
                       <label className="cursor-pointer">
-                        <Upload className="mx-auto mb-2 text-blue-500 w-6 h-6" />
-                        <p className="text-sm text-gray-700 mb-1">
+                        <Upload className="mx-auto mb-2 text-blue-500 w-5 h-5 md:w-6 md:h-6" />
+                        <p className="text-xs md:text-sm text-gray-700 mb-1">
                           Upload video
                         </p>
                         <p className="text-xs text-gray-500">Format: mp4</p>
@@ -543,15 +542,15 @@ export function CreateCampaigns({ userId }) {
 
                     {/* File preview and progress bar - below the upload box */}
                     {formData.videoFile && (
-                      <div className="mt-4 flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md">
+                      <div className="mt-3 md:mt-4 flex items-center gap-3 md:gap-4 border bg-white text-blue-700 px-3 py-1 md:px-4 md:py-2 rounded-md">
                         {/* Video icon */}
-                        <div className="bg-blue-50 p-[10px] rounded-full w-10 h-10 flex items-center justify-center">
-                          <Video className="w-5 h-5 text-blue-500" />
+                        <div className="bg-blue-50 p-2 md:p-[10px] rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center">
+                          <Video className="w-4 h-4 md:w-5 md:h-5 text-blue-500" />
                         </div>
 
                         {/* File name and size */}
                         <div className="flex flex-col">
-                          <span className="text-sm">
+                          <span className="text-xs md:text-sm truncate max-w-[120px] md:max-w-none">
                             {formData.videoFile.name}
                           </span>
                           <span className="text-xs text-gray-500">
@@ -573,15 +572,15 @@ export function CreateCampaigns({ userId }) {
                           }
                           className="text-red-500 ml-auto"
                         >
-                          <Trash />
+                          <Trash className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
                       </div>
                     )}
 
                     {isUploading && uploadProgress.video > 0 && (
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                      <div className="w-full bg-gray-200 rounded-full h-2 md:h-2.5 mt-2">
                         <div
-                          className="bg-blue-600 h-2.5 rounded-full"
+                          className="bg-blue-600 h-full rounded-full"
                           style={{ width: `${uploadProgress.video}%` }}
                         ></div>
                       </div>
@@ -592,22 +591,22 @@ export function CreateCampaigns({ userId }) {
                 <hr className="border-t mb-4 border-gray-300" />
 
                 {/* Campaign Image Upload */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Campaign Image (optional)
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       This image will be used as a thumbnail for your campaign.
                     </span>
                   </div>
 
-                  <div className="flex-1">
+                  <div className="w-full flex-1">
                     {/* Upload box */}
-                    <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
+                    <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-4 md:p-6 text-center">
                       <label className="cursor-pointer">
-                        <Upload className="mx-auto mb-2 text-blue-500 w-6 h-6" />
-                        <p className="text-sm text-gray-700 mb-1">
+                        <Upload className="mx-auto mb-2 text-blue-500 w-5 h-5 md:w-6 md:h-6" />
+                        <p className="text-xs md:text-sm text-gray-700 mb-1">
                           Upload image
                         </p>
                         <p className="text-xs text-gray-500">
@@ -624,15 +623,15 @@ export function CreateCampaigns({ userId }) {
 
                     {/* File preview and progress bar - now placed below the box */}
                     {formData.imageFile && (
-                      <div className="mt-4 flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md">
+                      <div className="mt-3 md:mt-4 flex items-center gap-3 md:gap-4 border bg-white text-blue-700 px-3 py-1 md:px-4 md:py-2 rounded-md">
                         {/* Image icon */}
-                        <div className="bg-blue-50 p-[10px] rounded-full w-10 h-10">
-                          <Image className="w-5 h-5 text-blue-500" />
+                        <div className="bg-blue-50 p-2 md:p-[10px] rounded-full w-8 h-8 md:w-10 md:h-10">
+                          <Image className="w-4 h-4 md:w-5 md:h-5 text-blue-500" />
                         </div>
 
                         {/* File name and size */}
                         <div className="flex flex-col">
-                          <span className="text-sm">
+                          <span className="text-xs md:text-sm truncate max-w-[120px] md:max-w-none">
                             {formData.imageFile.name}
                           </span>
                           <span className="text-xs text-gray-500">
@@ -654,15 +653,15 @@ export function CreateCampaigns({ userId }) {
                           }
                           className="text-red-500 ml-auto"
                         >
-                          <Trash />
+                          <Trash className="w-4 h-4 md:w-5 md:h-5" />
                         </button>
                       </div>
                     )}
 
                     {isUploading && uploadProgress.image > 0 && (
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                      <div className="w-full bg-gray-200 rounded-full h-2 md:h-2.5 mt-2">
                         <div
-                          className="bg-blue-600 h-2.5 rounded-full"
+                          className="bg-blue-600 h-full rounded-full"
                           style={{ width: `${uploadProgress.image}%` }}
                         ></div>
                       </div>
@@ -676,14 +675,14 @@ export function CreateCampaigns({ userId }) {
 
         {/* Step 1: Targeting Details */}
         {currentStep === 1 && (
-          <div className="min-h-screen px-4 py-8">
-            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-              <div className="flex items-center justify-between mb-8">
-                <div className="w-1/3">
-                  <label className="block text-[24px] font-medium">
+          <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
+            <div className="max-w-6xl mx-auto bg-white rounded-xl md:rounded-2xl shadow p-4 md:p-8 relative">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-8 gap-4">
+                <div className="w-full md:w-1/3">
+                  <label className="block text-lg md:text-[24px] font-medium">
                     Targeting Details
                   </label>
-                  <span className="block text-[16px] text-gray-500 mt-1">
+                  <span className="block text-sm md:text-[16px] text-gray-500 mt-1">
                     Reach the right people by setting up precise targeting for
                     your ads.
                   </span>
@@ -691,7 +690,7 @@ export function CreateCampaigns({ userId }) {
 
                 <Link
                   href="?step=2"
-                  className="bg-blue-600 w-[218px] h-[56px] text-[16px] font-md  text-white flex justify-center items-center rounded-full hover:bg-blue-700"
+                  className="bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700"
                 >
                   Next
                 </Link>
@@ -699,19 +698,19 @@ export function CreateCampaigns({ userId }) {
 
               <hr className="border-t mb-4 border-gray-300" />
 
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 {/* Gender Ratio */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Gender Ratio
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Define your preferred male-to-female ratio for ad
                       targeting.
                     </span>
                   </div>
-                  <div className="relative bg-blue flex-1">
+                  <div className="relative bg-blue w-full flex-1">
                     <Sliders
                       min={0}
                       max={100}
@@ -737,18 +736,18 @@ export function CreateCampaigns({ userId }) {
                 <hr className="border-t mb-4 border-gray-300" />
 
                 {/* Age Range */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Age
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Select the age range of your target audience.
                     </span>
                   </div>
 
-                  <div className="flex-1">
-                    <div className="relative flex-1">
+                  <div className="w-full flex-1">
+                    <div className="relative w-full flex-1">
                       {/* Slider */}
                       <DualRangeSlider
                         label={(value) => value}
@@ -760,7 +759,7 @@ export function CreateCampaigns({ userId }) {
                         step={1}
                       />
                       {/* Label row for min and max */}
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-xs md:text-sm mb-1">
                         <span>Min 14</span>
                         <span>Any</span>
                       </div>
@@ -776,37 +775,37 @@ export function CreateCampaigns({ userId }) {
 
         {/* Step 2: Set Questions */}
         {currentStep === 2 && (
-          <div className="min-h-screen px-4 py-8">
-            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-              <div className="flex items-center justify-between mb-8">
-                <div className="w-1/3">
-                  <label className="block text-[24px] font-medium">
+          <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
+            <div className="max-w-6xl mx-auto bg-white rounded-xl md:rounded-2xl shadow p-4 md:p-8 relative">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-8 gap-4">
+                <div className="w-full md:w-1/3">
+                  <label className="block text-lg md:text-[24px] font-medium">
                     Set Questions
                   </label>
-                  <span className="block text-[16px] text-gray-500 mt-1">
+                  <span className="block text-sm md:text-[16px] text-gray-500 mt-1">
                     Add a quiz or survey for campaign insights.
                   </span>
                 </div>
                 <Link
                   href="?step=3"
-                  className="bg-blue-600 w-[218px] h-[56px] text-[16px] font-md  text-white flex justify-center items-center rounded-full hover:bg-blue-700"
+                  className="bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700"
                 >
                   Next
                 </Link>
               </div>
 
               <hr className="border-t mb-4 border-gray-300" />
-              <div className="space-y-6">
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+              <div className="space-y-4 md:space-y-6">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Quiz Question (optional)
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Adit will create if you don't
                     </span>
                   </div>
-                  <div className="relative flex-1">
+                  <div className="relative w-full flex-1">
                     <QuestionBox
                       question={formData.quizQuestion}
                       onChange={(field, value, optionIndex) =>
@@ -823,16 +822,16 @@ export function CreateCampaigns({ userId }) {
                   </div>
                 </div>
                 <hr className="border-t mb-4 border-gray-300" />
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Survey Question 1 (optional)
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Adit will NOT create if you don't
                     </span>
                   </div>
-                  <div className="relative flex-1">
+                  <div className="relative w-full flex-1">
                     <QuestionBox
                       question={formData.surveyQuestion1}
                       onChange={(field, value, optionIndex) =>
@@ -849,16 +848,16 @@ export function CreateCampaigns({ userId }) {
                   </div>
                 </div>
                 <hr className="border-t mb-4 border-gray-300" />
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Survey Question 2 (optional)
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Adit will NOT create if you don't
                     </span>
                   </div>
-                  <div className="relative flex-1">
+                  <div className="relative w-full flex-1">
                     <QuestionBox
                       question={formData.surveyQuestion2}
                       onChange={(field, value, optionIndex) =>
@@ -881,21 +880,21 @@ export function CreateCampaigns({ userId }) {
 
         {/* Step 3: Campaign Budget */}
         {currentStep === 3 && (
-          <div className="min-h-screen px-4 py-8">
-            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-              <div className="flex items-center justify-between mb-8">
-                <div className="w-1/3">
-                  <label className="block text-[24px] font-medium">
+          <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
+            <div className="max-w-6xl mx-auto bg-white rounded-xl md:rounded-2xl shadow p-4 md:p-8 relative">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-8 gap-4">
+                <div className="w-full md:w-1/3">
+                  <label className="block text-lg md:text-[24px] font-medium">
                     Campaign budget
                   </label>
-                  <span className="block text-[16px] text-gray-500 mt-1">
+                  <span className="block text-sm md:text-[16px] text-gray-500 mt-1">
                     Define your budget to maximize reach and performance.
                   </span>
                 </div>
 
                 <button
                   onClick={handleSubmit}
-                  className="bg-blue-600 w-[218px] h-[56px] text-[16px] font-md  text-white flex justify-center items-center rounded-full hover:bg-blue-700"
+                  className="bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700"
                 >
                   Submit
                 </button>
@@ -903,19 +902,19 @@ export function CreateCampaigns({ userId }) {
 
               <hr className="border-t mb-4 border-gray-300" />
 
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 {/* Campaign Start Date */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Campaign start date (Required)
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Choose when you want your campaign to go live and start
                       reaching your audience.
                     </span>
                   </div>
-                  <div className="relative flex-1">
+                  <div className="relative w-full flex-1">
                     <Calendars
                       selected={formData.startDate}
                       onSelect={(date) => {
@@ -937,18 +936,18 @@ export function CreateCampaigns({ userId }) {
                 <hr className="border-t mb-4 border-gray-300" />
 
                 {/* Campaign End Date */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Campaign end date (Optional)
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Choose an end date for your campaign or leave it
                       open-ended to run indefinitely.
                     </span>
                   </div>
 
-                  <div className="relative flex-1">
+                  <div className="relative w-full flex-1">
                     <Calendars
                       selected={formData.endDate}
                       onSelect={(date) =>
@@ -966,18 +965,18 @@ export function CreateCampaigns({ userId }) {
                 <hr className="border-t mb-4 border-gray-300" />
 
                 {/* Campaign Budget */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Calculate campaign budget
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Define the total budget for your campaign.
                     </span>
                   </div>
 
-                  <div className="flex-1">
-                    <div className="relative w-full h-12">
+                  <div className="w-full flex-1">
+                    <div className="relative w-full h-10 md:h-12">
                       <CircleDollarSign className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
                       <input
                         type="number"
@@ -985,12 +984,12 @@ export function CreateCampaigns({ userId }) {
                         value={formData.budget}
                         onChange={handleInputChange}
                         placeholder="Enter campaign budget"
-                        className="w-full h-full border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
+                        className="w-full h-full border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-1 md:py-2"
                       />
                     </div>
 
                     {formData.budget && formData.videoDuration && (
-                      <div className="mt-2 text-sm text-gray-500">
+                      <div className="mt-2 text-xs md:text-sm text-gray-500">
                         With a ${formData.budget} budget for your{" "}
                         {formData.videoDuration}-second video, you will reach
                         approximately {formData.campignBudget} unique users.
@@ -1001,17 +1000,17 @@ export function CreateCampaigns({ userId }) {
 
                 <hr className="border-t mb-4 border-gray-300" />
 
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Coupon Code
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Add Coupon code If you have.
                     </span>
                   </div>
 
-                  <div className="relative flex-1">
+                  <div className="relative w-full flex-1">
                     <Tag className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
 
                     <input
@@ -1020,7 +1019,7 @@ export function CreateCampaigns({ userId }) {
                       value={formData.couponCode}
                       onChange={handleInputChange}
                       placeholder="Enter Coupon Code"
-                      className="w-full h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
+                      className="w-full h-10 md:h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-1 md:py-2"
                     />
                   </div>
                 </div>
@@ -1028,17 +1027,17 @@ export function CreateCampaigns({ userId }) {
                 <hr className="border-t mb-4 border-gray-300" />
 
                 {/* Payment Info */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Payment Info
                     </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
                       Choose a payment method to fund your campaign.
                     </span>
                   </div>
 
-                  <div className="relative flex-1">
+                  <div className="relative w-full flex-1">
                     <PaymentMethod
                       value={{
                         cardNumber: formData.cardNumber,
@@ -1073,30 +1072,30 @@ export function CreateCampaigns({ userId }) {
             </div>
           </div>
         )}
-      </div>
 
-      {showSuccessModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl border border-md p-8 max-w-md w-full mx-4">
-            <div className="text-center">
-              <Check className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-              <h3 className="text-[24px] font-md text-gray-800 mb-2">
-                Congratulations
-              </h3>
-              <p className="text-gray-600 text-[16px] mb-6">
-                Your campaign is pending approval.We'll notify you once its
-                active.
-              </p>
-              <Link
-                href="/userid/campaign-dashboard"
-                className="bg-blue-600 w-full h-[45px] px-25 py-3 text-white rounded-full hover:bg-blue-700 transition"
-              >
-                Back to campaigns
-              </Link>
+        {showSuccessModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg md:rounded-xl border border-md p-6 md:p-8 max-w-md w-full mx-4">
+              <div className="text-center">
+                <Check className="w-12 h-12 md:w-16 md:h-16 text-blue-500 mx-auto mb-3 md:mb-4" />
+                <h3 className="text-lg md:text-[24px] font-md text-gray-800 mb-2">
+                  Congratulations
+                </h3>
+                <p className="text-gray-600 text-sm md:text-[16px] mb-4 md:mb-6">
+                  Your campaign is pending approval.We'll notify you once its
+                  active.
+                </p>
+                <Link
+                  href="/userid/campaign-dashboard"
+                  className="bg-blue-600 w-full h-10 md:h-[45px] px-4 py-2 md:px-25 md:py-3 text-white rounded-full hover:bg-blue-700 transition text-sm md:text-base"
+                >
+                  Back to campaigns
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </main>
   );
 }

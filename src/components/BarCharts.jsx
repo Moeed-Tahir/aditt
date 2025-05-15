@@ -2,13 +2,14 @@
 
 import { TrendingUp } from "lucide-react";
 import {
-  Bar,
+  ResponsiveContainer,
   BarChart,
-  CartesianGrid,
-  LabelList,
+  Bar,
   XAxis,
   YAxis,
-  Cell,
+  CartesianGrid,
+  LabelList,
+  Tooltip,
 } from "recharts";
 
 import {
@@ -60,77 +61,73 @@ export default function BarCharts() {
         </CardDescription>
 
         <hr className="border-t border-gray-300" />
-
       </CardHeader>
-      <CardContent >
+      <CardContent>
         <ChartContainer config={chartConfig}>
-          <BarChart
-            data={chartData}
-            layout="vertical"
-            margin={{ top: 20, right: 16, bottom: 10, left: 30 }}
-            width={400}
-            height={300} // Increased chart height
-            barCategoryGap={10} // Smaller value = thinner bars
-          >
-            <CartesianGrid horizontal={false} />
-            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
-
-            <YAxis
-              dataKey="month"
-              type="category"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-            />
-            <XAxis type="number" hide />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-
-            <Bar
-              dataKey="male"
-              stackId="a"
-              fill={chartConfig.male.color}
-              radius={[4, 0, 0, 4]}
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart
+              data={chartData}
+              layout="vertical"
+              margin={{ top: 20, right: 16, bottom: 10, left: 30 }}
+              barCategoryGap={10}
             >
-              <LabelList
+              <CartesianGrid horizontal={false} />
+              <XAxis type="number" domain={[0, 300]} tick={{ fontSize: 10 }} />
+              <YAxis
+                dataKey="month"
+                type="category"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="line" />}
+              />
+
+              <Bar
                 dataKey="male"
-                position="right"
-                offset={8}
-                fontSize={12}
-                className="fill-foreground"
-              />
-            </Bar>
-            <Bar
-              dataKey="preferNotToSay"
-              stackId="a"
-              fill={chartConfig.preferNotToSay.color}
-              radius={[0, 0, 0, 0]}
-            >
-              <LabelList
+                stackId="a"
+                fill={chartConfig.male.color}
+                radius={[4, 0, 0, 4]}
+              >
+                <LabelList
+                  dataKey="male"
+                  position="right"
+                  offset={8}
+                  fontSize={12}
+                  className="fill-foreground"
+                />
+              </Bar>
+              <Bar
                 dataKey="preferNotToSay"
-                position="right"
-                offset={8}
-                fontSize={12}
-                className="fill-foreground"
-              />
-            </Bar>
-            <Bar
-              dataKey="female"
-              stackId="a"
-              fill={chartConfig.female.color}
-              radius={[0, 4, 4, 0]}
-            >
-              <LabelList
+                stackId="a"
+                fill={chartConfig.preferNotToSay.color}
+              >
+                <LabelList
+                  dataKey="preferNotToSay"
+                  position="right"
+                  offset={8}
+                  fontSize={12}
+                  className="fill-foreground"
+                />
+              </Bar>
+              <Bar
                 dataKey="female"
-                position="right"
-                offset={8}
-                fontSize={12}
-                className="fill-foreground"
-              />
-            </Bar>
-          </BarChart>
+                stackId="a"
+                fill={chartConfig.female.color}
+                radius={[0, 4, 4, 0]}
+              >
+                <LabelList
+                  dataKey="female"
+                  position="right"
+                  offset={8}
+                  fontSize={12}
+                  className="fill-foreground"
+                />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </ChartContainer>
       </CardContent>
     </Card>

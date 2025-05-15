@@ -152,7 +152,7 @@ export function DataTable({ campaignData }) {
           open ? "" : "hidden"
         }`}
       >
-        <div className="bg-white w-[679px] h-[763px] border rounded-[20px] p-[18px] flex flex-col">
+        <div className="bg-white w-full max-w-[679px] h-auto max-h-[90vh] md:h-[763px] border rounded-[20px] p-[18px] flex flex-col mx-4 overflow-y-auto">
           <div className="flex items-center p-[12px] justify-center">
             <Coffee className="w-[54px] h-[54px] text-blue-300 text-center flex items-center justify-center" />
           </div>
@@ -162,7 +162,7 @@ export function DataTable({ campaignData }) {
           </div>
 
           <p className="text-sm text-gray-500 mb-4 text-center">
-            We’d love to hear about your campaign’s performance. Your feedback
+            We'd love to hear about your campaign's performance. Your feedback
             helps us improve!
           </p>
 
@@ -269,12 +269,12 @@ export function DataTable({ campaignData }) {
         <Navbar />
 
         <div className="p-4">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <p className="text-[30px] font-md">Campaigns</p>
-            <Link href={`/${userId}/create-campaign`}>
+            <Link href={`/${userId}/create-campaign`} className="w-full md:w-auto">
               <button
                 type="button"
-                className="flex items-center justify-center gap-[12px] px-[28px] py-[16px] rounded-[80px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                className="flex items-center justify-center gap-[12px] px-[28px] py-[16px] rounded-[80px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer w-full md:w-auto"
               >
                 <Plus className="w-5 h-5" />
                 <span>Create new campaign</span>
@@ -320,19 +320,19 @@ export function DataTable({ campaignData }) {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 mb-4 border-none border-gray-200">
+          <div className="bg-white rounded-2xl p-4 md:p-6 mb-4 border-none border-gray-200">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
               <h2 className="text-[18px] font-md text-gray-400">
                 ALL CAMPAIGNS
               </h2>
-              <div className="flex gap-2">
-                {/* Sort Dropdown */}
+              <div className="flex flex-col sm:flex-row gap-2">
+              {/* Sort Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-md text-[16px] items-center gap-1"
+                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-md text-[16px] items-center gap-1 w-full sm:w-auto"
                     >
                       Sort by
                       <div>
@@ -385,12 +385,12 @@ export function DataTable({ campaignData }) {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-md text-[16px] items-center gap-1"
+                      className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-md text-[16px] items-center gap-1 w-full sm:w-auto"
                     >
                       <ListFilter className="w-4 h-4 " /> Filter
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="rounded-[16px] w-[343px] h-[296] p-[20px] gap-[24px] mr-10 mt-10">
+                  <DropdownMenuContent className="rounded-[16px] w-full sm:w-[343px] h-[296] p-[20px] gap-[24px] mr-10 mt-10">
                     <div className="space-y-3">
                       {/* Date Filters */}
                       <div>
@@ -407,7 +407,7 @@ export function DataTable({ campaignData }) {
                                 from: e.target.value,
                               })
                             }
-                            className="w-[146px] h-[44px] rounded-full gap-[8px] text-xs"
+                            className="w-full sm:w-[146px] h-[44px] rounded-full gap-[8px] text-xs"
                           />
                           <Input
                             type="date"
@@ -418,7 +418,7 @@ export function DataTable({ campaignData }) {
                                 to: e.target.value,
                               })
                             }
-                            className="w-[146px] h-[44px] rounded-full gap-[8px] text-xs"
+                            className="w-full sm:w-[146px] h-[44px] rounded-full gap-[8px] text-xs"
                           />
                         </div>
                       </div>
@@ -428,7 +428,7 @@ export function DataTable({ campaignData }) {
                         <label className="block text-[16px] gap-[16px] font-medium text-black mb-1">
                           Status
                         </label>
-                        <div className="flex w-[303px] h-[44px] flex-wrap gap-[11px]">
+                        <div className="flex flex-wrap gap-[11px]">
                           {["Active", "Pending", "Paused"].map((status) => (
                             <Button
                               key={status}
@@ -449,12 +449,12 @@ export function DataTable({ campaignData }) {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="w-[317px] h-[48px] gap-[10px]">
+                      <div className="flex flex-col sm:flex-row gap-[10px]">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={resetFilters}
-                          className="w-[154px] h-[48px] rounded-full border text-blue-600 bg-white hover:bg-blue-600 hover:text-white cursor-pointer"
+                          className="w-full sm:w-[154px] h-[48px] rounded-full border text-blue-600 bg-white hover:bg-blue-600 hover:text-white cursor-pointer"
                         >
                           Clear All
                         </Button>
@@ -465,7 +465,7 @@ export function DataTable({ campaignData }) {
                               new KeyboardEvent("keydown", { key: "Escape" })
                             )
                           }
-                          className="w-[154px] h-[48px] rounded-full border text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                          className="w-full sm:w-[154px] h-[48px] rounded-full border text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
                         >
                           Apply
                         </Button>
@@ -478,17 +478,16 @@ export function DataTable({ campaignData }) {
 
             {/* Table */}
             <div className="overflow-x-auto">
+              
               <Table>
                 <TableHeader>
                   <TableRow className="bg-[var(--bg-color-off-white)]">
-                    <TableHead className=" text-gray-500 ">Title</TableHead>
-                    <TableHead className=" text-gray-500 ">
-                      Total Views
-                    </TableHead>
-                    <TableHead className=" text-gray-500 ">Date</TableHead>
-                    <TableHead className=" text-gray-500 ">Amount</TableHead>
-                    <TableHead className=" text-gray-500 ">Status</TableHead>
-                    <TableHead className=" text-gray-500 ">Action</TableHead>
+                    <TableHead className="text-gray-500">Title</TableHead>
+                    <TableHead className="text-gray-500">Total Views</TableHead>
+                    <TableHead className="text-gray-500">Date</TableHead>
+                    <TableHead className="text-gray-500">Amount</TableHead>
+                    <TableHead className="text-gray-500">Status</TableHead>
+                    <TableHead className="text-gray-500">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -540,12 +539,12 @@ export function DataTable({ campaignData }) {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between mt-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
               <p className="text-sm text-gray-500">
                 Showing {filteredCampaigns.length} result
                 {filteredCampaigns.length !== 1 && "s"}
               </p>
-              <div className="flex gap-2">
+              <div className="flex gap-2 overflow-x-auto">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                   (page) => (
                     <Button
