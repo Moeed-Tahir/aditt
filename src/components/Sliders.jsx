@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 const Sliders = ({
   min,
@@ -11,16 +11,20 @@ const Sliders = ({
   showRadio,
   labelUnit,
   radioOptions = [],
+  selectedRadio: externalSelectedRadio, // receives "male" or "female"
 }) => {
   const [value, setValue] = useState(defaultValue);
-  const [selectedRadio, setSelectedRadio] = useState("");
+  const [selectedRadio, setSelectedRadio] = useState(externalSelectedRadio || "");
 
-  // Update parent whenever value changes
+  useEffect(() => {
+    setSelectedRadio(externalSelectedRadio || "");
+  }, [externalSelectedRadio]);
+
   useEffect(() => {
     if (onChange) {
-      onChange(value);
+      onChange(value, selectedRadio); // sync on load too
     }
-  }, [value]);
+  }, [value, selectedRadio]);
 
   const handleSliderChange = (e) => {
     const newValue = parseInt(e.target.value);
@@ -28,16 +32,10 @@ const Sliders = ({
   };
 
   const handleRadioChange = (e) => {
-    setSelectedRadio(e.target.value);
-    // Optional: call a separate callback like onRadioChange
-    onChange && onChange(value, e.target.value); // Pass both value and selected gender
+    const gender = e.target.value;
+    setSelectedRadio(gender);
+    onChange && onChange(value, gender);
   };
-
-  useEffect(() => {
-    setValue(defaultValue);
-  }, []);
-
-
 
   return (
     <div className="space-y-2">

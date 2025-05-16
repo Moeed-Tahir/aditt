@@ -178,7 +178,7 @@ export default function PaymentMethod({ value, onChange }) {
               placeholder="Card Number"
               value={currentCard.cardNumber || ""}
               onChange={handleCardNumberChange}
-              className=" p-2 w-full"
+              className=" p-2 w-full focus:outline-none"
             />
             {currentCard.cardType && (
               <div className="mt-2">
@@ -195,7 +195,7 @@ export default function PaymentMethod({ value, onChange }) {
               <input
                 type="text"
                 placeholder="MM / YY"
-                className="w-1/2 p-3 text-sm border-t border-r"
+                className="w-1/2 p-3 text-sm focus:outline-none border-t border-r"
                 value={currentCard.monthOnCard || ""}
                 onChange={(e) =>
                   setCurrentCard({
@@ -207,7 +207,7 @@ export default function PaymentMethod({ value, onChange }) {
               <input
                 type="text"
                 placeholder="CVC"
-                className="w-1/2 p-3 text-sm border-t"
+                className="w-1/2 p-3 focus:outline-none text-sm border-t"
                 value={currentCard.cvc || ""}
                 onChange={(e) =>
                   setCurrentCard({ ...currentCard, cvc: e.target.value })
@@ -219,7 +219,7 @@ export default function PaymentMethod({ value, onChange }) {
           <input
             type="text"
             placeholder="Name on card"
-            className="w-full p-3 text-sm border rounded-xl"
+            className="w-full p-3 focus:outline-none text-sm border rounded-xl"
             value={currentCard.nameOnCard || ""}
             onChange={(e) =>
               setCurrentCard({ ...currentCard, nameOnCard: e.target.value })
@@ -228,7 +228,7 @@ export default function PaymentMethod({ value, onChange }) {
           <div className="border p-2 rounded-[12px] w-full">
             <div className="flex">
               <select
-                className="w-full p-3 text-sm"
+                className="w-full p-3 focus:outline-none text-sm"
                 value={currentCard.country || "United States"}
                 onChange={(e) =>
                   setCurrentCard({ ...currentCard, country: e.target.value })
@@ -252,7 +252,7 @@ export default function PaymentMethod({ value, onChange }) {
               <input
                 type="text"
                 placeholder="ZIP"
-                className="w-full p-3 text-sm border-t"
+                className="w-full focus:outline-none p-3 text-sm border-t"
                 value={currentCard.zipCode || ""}
                 onChange={(e) =>
                   setCurrentCard({ ...currentCard, zipCode: e.target.value })

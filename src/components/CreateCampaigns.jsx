@@ -59,10 +59,9 @@ export function CreateCampaigns({ userId }) {
     imageFile: null,
     imageUrl: "",
     videoDuration: "",
-    
 
     genderRatio: 50,
-    genderType: "",
+    genderType: "male",
     ageRange: [18, 65],
     genderAge: "12",
     categories: [],
@@ -94,7 +93,7 @@ export function CreateCampaigns({ userId }) {
     country: "",
     zipCode: "",
     cards: [],
-  bankAccounts: [], 
+    bankAccounts: [],
 
     bankAccountNumber: "",
     routingNumber: "",
@@ -126,8 +125,6 @@ export function CreateCampaigns({ userId }) {
       return newData;
     });
   };
-
-  
 
   const handleFileUpload = useCallback(async (file, type) => {
     if (!file || !type) return;
@@ -207,7 +204,6 @@ export function CreateCampaigns({ userId }) {
     }
   };
 
-
   const [alert, setAlert] = useState({
     message: "",
     type: "", // 'success' | 'error' | 'info' | 'warning'
@@ -266,7 +262,7 @@ export function CreateCampaigns({ userId }) {
         campaignStartDate: formData.startDate.toISOString(),
         campaignEndDate:
           formData.endDate?.toISOString() || formData.startDate.toISOString(),
-          cardDetails: formData.cards,
+        cardDetails: formData.cards,
         cardDetail: {
           cardNumber: formData.cardNumber,
           cvc: formData.cvc,
@@ -347,8 +343,6 @@ export function CreateCampaigns({ userId }) {
     });
   };
 
-
-
   const calculateEstimatedReach = useCallback(() => {
     if (!formData.budget || !formData.videoDuration) return null;
 
@@ -383,51 +377,56 @@ export function CreateCampaigns({ userId }) {
             <div className="w-[40px] md:w-[90px]" />
           </div>
           <div className="flex items-center justify-start md:justify-between relative overflow-x-auto pb-4 gap-4 md:gap-0">
-  {steps.map((step, index) => (
-    <div
-      key={index}
-      className="relative z-10 flex flex-col items-center min-w-[60px] md:min-w-0"
-    >
-      <Link
-        href={`?step=${index}`}
-        className={`gap-1 md:gap-2 h-10 flex items-center justify-center md:justify-start rounded-full text-xs font-medium px-2 md:px-4
-          ${index === currentStep
-            ? "border-blue-600 border bg-white text-gray-600"
-            : "bg-white text-gray-600"}
+            {steps.map((step, index) => (
+              <div
+                key={index}
+                className="relative z-10 flex flex-col items-center min-w-[60px] md:min-w-0"
+              >
+                <Link
+                  href={`?step=${index}`}
+                  className={`gap-1 md:gap-2 h-10 flex items-center justify-center md:justify-start rounded-full text-xs font-medium px-2 md:px-4
+          ${
+            index === currentStep
+              ? "border-blue-600 border bg-white text-gray-600"
+              : "bg-white text-gray-600"
+          }
           hover:cursor-pointer transition`}
-      >
-        {index < currentStep ? (
-          <CircleCheck className="w-5 h-5 md:w-6 md:h-6 text-blue-600 shrink-0" />
-        ) : (
-          <CircleDot
-            className={`w-5 h-5 md:w-6 md:h-6 shrink-0 ${
-              index === currentStep ? "text-blue-600" : "text-gray-300"
-            }`}
-          />
-        )}
-        {/* Hide label on small screens, show on md+ */}
-        <span className="hidden md:inline whitespace-nowrap">{step.label}</span>
-      </Link>
-    </div>
-  ))}
-  {/* Progress bar behind steps */}
-  <div className="absolute top-5 left-[5%] right-[5%] h-0.5 bg-gray-300 z-0">
-    <div
-      className="h-full bg-blue-600 transition-all duration-700"
-      style={{
-        width: `${(currentStep / (steps.length - 1)) * 100}%`,
-      }}
-    />
-  </div>
-</div>
-
+                >
+                  {index < currentStep ? (
+                    <CircleCheck className="w-5 h-5 md:w-6 md:h-6 text-blue-600 shrink-0" />
+                  ) : (
+                    <CircleDot
+                      className={`w-5 h-5 md:w-6 md:h-6 shrink-0 ${
+                        index === currentStep
+                          ? "text-blue-600"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  )}
+                  {/* Hide label on small screens, show on md+ */}
+                  <span className="hidden md:inline whitespace-nowrap">
+                    {step.label}
+                  </span>
+                </Link>
+              </div>
+            ))}
+            {/* Progress bar behind steps */}
+            <div className="absolute top-5 left-[5%] right-[5%] h-0.5 bg-gray-300 z-0">
+              <div
+                className="h-full bg-blue-600 transition-all duration-700"
+                style={{
+                  width: `${(currentStep / (steps.length - 1)) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Step 0: Campaign Info */}
         {currentStep === 0 && (
           <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
             <div className="max-w-6xl mx-auto bg-white rounded-xl md:rounded-2xl shadow p-4 md:p-8 relative">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-8 gap-4">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-8 gap-4">
                 <div className="w-full md:w-1/3">
                   <label className="block text-lg md:text-[24px] font-medium">
                     Campaign info
@@ -752,6 +751,7 @@ export function CreateCampaigns({ userId }) {
                         { value: "male", label: "Male" },
                         { value: "female", label: "Female" },
                       ]}
+                      selectedRadio={formData.genderType}
                     />
                   </div>
                 </div>
@@ -980,9 +980,7 @@ export function CreateCampaigns({ userId }) {
                         setFormData((prev) => ({ ...prev, endDate: date }))
                       }
                       fromDate={
-                        formData.startDate
-                          ? formData.startDate 
-                          : new Date() 
+                        formData.startDate ? formData.startDate : new Date()
                       }
                     />
                   </div>
@@ -1092,7 +1090,6 @@ export function CreateCampaigns({ userId }) {
                         setFormData((prev) => ({ ...prev, ...bankData }))
                       }
                     />
-                    
                   </div>
                 </div>
               </div>

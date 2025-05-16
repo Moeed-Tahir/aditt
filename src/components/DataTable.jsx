@@ -17,7 +17,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { ListFilter, ChevronsUpDown, Plus, X, Coffee, ChevronLeftCircle } from "lucide-react";
+import {
+  ListFilter,
+  ChevronsUpDown,
+  Plus,
+  X,
+  Coffee,
+  ChevronLeftCircle,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -128,17 +135,17 @@ export function DataTable({ campaignData, fetchCampaign }) {
       cancel: "Are you sure you want to cancel this campaign?",
     };
 
-    const smallTexts = {
-      pause: "Are you sure you want to pause this campaign?",
-      complete: "Please share your experience with this campaign",
-      cancel: "Are you sure you want to cancel this campaign?",
-    };
+  //   const smallTexts = {
+  //     pause: "Are you sure you want to pause this campaign?",
+  //     complete: "Please share your experience with this campaign",
+  //     cancel: "Are you sure you want to cancel this campaign?",
+  //   };
 
-    const labels = {
-      pause: "Pause",
-      complete: "Submit Feedback",
-      cancel: "Yes, Cancel Campaign",
-    };
+  //   const labels = {
+  //     pause: "Pause",
+  //     complete: "Submit Feedback",
+  //     cancel: "Yes, Cancel Campaign",
+  //   };
 
     if (type === "complete") {
       setDialogConfig({
@@ -202,11 +209,11 @@ export function DataTable({ campaignData, fetchCampaign }) {
           <div className="flex items-center p-[12px] justify-center">
             <Coffee className="w-[54px] h-[54px] text-blue-300 text-center flex items-center justify-center" />
           </div>
-
+  
           <div className="text-center mb-4">
             <h3 className="text-lg font-medium">Campaign Feedback</h3>
           </div>
-
+  
           <p className="text-sm text-gray-500 mb-4 text-center">
             We'd love to hear about your campaign's performance. Your feedback
             helps us improve!
@@ -323,7 +330,10 @@ export function DataTable({ campaignData, fetchCampaign }) {
         <div className="p-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <p className="text-[30px] font-md">Campaigns</p>
-            <Link href={`/${userId}/create-campaign`} className="w-full md:w-auto">
+            <Link
+              href={`/${userId}/create-campaign`}
+              className="w-full md:w-auto"
+            >
               <button
                 type="button"
                 className="flex items-center justify-center gap-[12px] px-[28px] py-[16px] rounded-[80px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer w-full md:w-auto"
@@ -600,7 +610,7 @@ export function DataTable({ campaignData, fetchCampaign }) {
                       key={page}
                       variant={page === currentPage ? "default" : "outline"}
                       size="sm"
-                      className="bg-blue-500 rounded-full"
+                      className="bg-blue-500 text-white rounded-full"
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}

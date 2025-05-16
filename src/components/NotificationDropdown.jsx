@@ -37,26 +37,32 @@ export default function NotificationDropdown() {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className="relative p-2 rounded-full bg-[var(--bg-color-off-white)] hover:bg-gray-100"
-        onClick={() => setShowDropdown(!showDropdown)}
-      >
-        <svg
-          className="w-6 h-6 text-gray-700"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
-        {notifications.length > 0 && (
-          <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
-        )}
-      </button>
+  className="relative"
+  onClick={() => setShowDropdown(!showDropdown)}
+>
+  {/* Show text on small screens */}
+  <span className="block md:hidden text-sm font-medium text-gray-700">Notifications</span>
+
+  {/* Show bell icon on medium+ screens */}
+  <svg
+    className="hidden md:block w-6 h-6 text-gray-700"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+    />
+  </svg>
+
+  {notifications.length > 0 && (
+    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
+  )}
+</button>
+
 
       {showDropdown && (
         <div className="absolute right-0 mt-2 w-80 bg-white border rounded-xl shadow-xl z-50">
@@ -97,16 +103,16 @@ export default function NotificationDropdown() {
             </div>
           )}
 
-          <hr className="border-t mb-2 border-gray-300" />
+          {/* <hr className="border-t mb-2 border-gray-300" /> */}
 
-          <div className="flex justify-center p-2">
+          {/* <div className="flex justify-center p-2">
             <Link
               href={`/${userId}/campaign-dashboard`}
               className="w-full p-2 text-center rounded-full text-white bg-blue-600 text-sm hover:bg-blue-700 cursor-pointer"
             >
               View all notifications
             </Link>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

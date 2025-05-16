@@ -91,17 +91,19 @@ export default function BarChartComponent({ campaignData }) {
           </CardDescription>
         </div>
 
-        <div className="w-full overflow-x-hidden sm:w-auto sm:max-w-[250px]">
-          <Calendars
-            className="sm:max-w-[250px] w-full"
-            selected={formData.endDate}
-            onSelect={(date) =>
-              setFormData((prev) => ({ ...prev, endDate: date }))
-            }
-            fromDate={formData.startDate ? formData.startDate : new Date()}
-          />
-        </div>
-      </CardHeader>
+  <div className="w-full sm:w-auto sm:max-w-[250px] mr-20">
+    <Calendars
+      className="sm:max-w-[250px] w-full"
+      selected={formData.endDate}
+      onSelect={(date) =>
+        setFormData((prev) => ({ ...prev, endDate: date }))
+      }
+      fromDate={formData.startDate ? formData.startDate : new Date()}
+    />
+  </div>
+</CardHeader>
+
+
 
       <CardContent>
         <div className="w-full overflow-x-auto">

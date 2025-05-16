@@ -569,7 +569,7 @@ export function Settings() {
 
         {/* Modal for Account Deletion */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white border text-center p-6 rounded-[20px] w-full max-w-[456px]">
               <Trash className="w-12 h-12 md:w-16 md:h-16 text-red-500 mx-auto mb-4" />
               <h3 className="text-[20px] md:text-[24px] font-md mb-4">
