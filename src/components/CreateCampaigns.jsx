@@ -293,7 +293,6 @@ export function CreateCampaigns({ userId }) {
       );
 
       setShowSuccessModal(true);
-      console.log("Campaign created successfully:", response.data);
     } catch (error) {
       console.error("Error creating campaign:", error);
       setAlert({

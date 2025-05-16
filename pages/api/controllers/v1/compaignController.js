@@ -1,5 +1,7 @@
 import connectToDatabase from '../../config/dbConnect';
 import Compaign from '../../models/Campaign.model';
+import CampaignFeedback from '../../models/CampaignFeedback';
+
 import Stripe from 'stripe';
 const dotenv = require("dotenv");
 dotenv.config();
@@ -90,7 +92,7 @@ exports.getCampaign = async (req, res) => {
         const { userId } = req.body;
 
         const campaign = await Compaign.find({ userId: userId });
-
+        
         if (!campaign) {
             return res.status(404).json({
                 message: 'Campaign not found'
@@ -304,3 +306,83 @@ exports.addCountInCampaign = async (req, res) => {
         });
     }
 }
+
+exports.updateCampaign = async (req, res) => {
+    try {
+        const { updateData, id } = req.body;
+
+        const updatedCampaign = await Compaign.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true }
+        );
+
+        if (!updatedCampaign) {
+            return res.status(404).json({ message: 'Campaign not found.' });
+        }
+
+        res.status(200).json({ message: 'Campaign updated successfully.', campaign: updatedCampaign });
+    } catch (error) {
+        console.error('Error updating campaign:', error);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+};
+
+exports.campaignStatusUpdate = async (req, res) => {
+    try {
+        const { status, id } = req.body;
+
+        if (!status) {
+            return res.status(400).json({ message: 'Status is required.' });
+        }
+
+        const updatedCampaign = await Compaign.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true }
+        );
+
+        if (!updatedCampaign) {
+            return res.status(404).json({ message: 'Campaign not found.' });
+        }
+
+        res.status(200).json({ message: 'Campaign status updated.', campaign: updatedCampaign });
+    } catch (error) {
+        console.error('Error updating campaign status:', error);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+};
+
+exports.submitFeedback = async (req, res) => {
+    try {
+        const {
+            userId,
+            campaignId,
+            conversion,
+            conversionType,
+            campaignRate,
+            campaignFeedback,
+        } = req.body;
+
+        if (!userId || !campaignId || !conversion || !conversionType || !campaignRate || !campaignFeedback) {
+            return res.status(400).json({ message: 'All fields are required.' });
+        }
+
+        const newFeedback = new CampaignFeedback({
+            userId,
+            campaignId,
+            conversion,
+            conversionType,
+            campaignRate,
+            campaignFeedback,
+        });
+
+        await newFeedback.save();
+
+        res.status(201).json({ message: 'Feedback submitted successfully.' });
+    } catch (error) {
+        console.error('Error submitting feedback:', error);
+        res.status(500).json({ message: 'Server error.' });
+    }
+};
+

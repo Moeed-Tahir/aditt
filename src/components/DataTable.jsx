@@ -25,8 +25,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Cookies from "js-cookie";
+import axios from "axios";
 
-export function DataTable({ campaignData }) {
+export function DataTable({ campaignData, fetchCampaign }) {
+  console.log("campaignData", campaignData);
+
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortBy, setSortBy] = useState("");
   const [dateFilter, setDateFilter] = useState({
@@ -37,13 +40,15 @@ export function DataTable({ campaignData }) {
   const userId = Cookies.get("userId");
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
-  const [sliderValue, setSliderValue] = useState(5); // Default value is 5
+  const [sliderValue, setSliderValue] = useState(5);
+  const [currentCampaignId, setCurrentCampaignId] = useState(null);
+  const [conversion, setConversion] = useState("");
+  const [conversionType, setConversionType] = useState("");
 
-  // Transform the API data to match our table structure
   const transformedCampaigns = campaignData?.map((campaign) => ({
     id: campaign._id,
     title: campaign.campaignTitle,
-    category: "No Category", // Default category since not in API
+    category: "No Category",
     views: campaign.totalViews || 0,
     date: campaign.campaignStartDate,
     amount: parseFloat(campaign.campaignBudget) || 0,
@@ -52,10 +57,7 @@ export function DataTable({ campaignData }) {
 
   const filteredCampaigns = (transformedCampaigns || [])
     .filter((c) => {
-      // Status filter
       const statusMatch = statusFilter === "All" || c.status === statusFilter;
-
-      // Date filter
       let dateMatch = true;
       if (dateFilter.from || dateFilter.to) {
         const campaignDate = new Date(c.date);
@@ -87,7 +89,7 @@ export function DataTable({ campaignData }) {
     title: "",
     smallText: "",
     confirmLabel: "",
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const openDialog = (title, smallText, confirmLabel, onConfirm) => {
@@ -95,7 +97,31 @@ export function DataTable({ campaignData }) {
     setDialogOpen(true);
   };
 
+  const submitFeedback = async (campaignId, feedbackData) => {
+    try {
+      const response = await axios.post('/api/routes/v1/campaignRoutes?action=submitFeedback', {
+        userId,
+        campaignId,
+        conversion: feedbackData.conversion,
+        conversionType: feedbackData.conversionType,
+        campaignRate: feedbackData.campaignRate,
+        campaignFeedback: feedbackData.campaignFeedback,
+
+      });
+
+      if (!response.data.message) {
+        throw new Error('Failed to submit feedback');
+      }
+
+      return await response.data;
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      throw error;
+    }
+  };
+
   const handleAction = (type, campaignId) => {
+    setCurrentCampaignId(campaignId);
     const titles = {
       pause: "Are you sure you want to pause this campaign?",
       complete: "Provide feedback for this completed campaign",
@@ -121,7 +147,7 @@ export function DataTable({ campaignData }) {
         confirmLabel: labels[type],
         onConfirm: () => {
           setDialogOpen(false);
-          setFeedbackDialogOpen(true); // Show feedback dialog after confirmation
+          setFeedbackDialogOpen(true);
         },
       });
       setDialogOpen(true);
@@ -142,17 +168,37 @@ export function DataTable({ campaignData }) {
   const FeedbackDialog = ({
     open,
     onClose,
-    feedback,
-    setFeedback,
     onSubmit,
+    campaignId,
   }) => {
+    // Manage all form states independently
+    const [conversion, setConversion] = useState("");
+    const [conversionType, setConversionType] = useState("");
+    const [rating, setRating] = useState(5);
+    const [feedback, setFeedback] = useState("");
+
+    const handleSubmit = () => {
+      onSubmit({
+        campaignId,
+        conversion,
+        conversionType,
+        campaignRate: rating,
+        campaignFeedback: feedback,
+      });
+      // Reset form after submission
+      setConversion("");
+      setConversionType("");
+      setRating(5);
+      setFeedback("");
+    };
+
     return (
       <div
-        className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${
-          open ? "" : "hidden"
-        }`}
+        className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${open ? "" : "hidden"
+          }`}
       >
         <div className="bg-white w-full max-w-[679px] h-auto max-h-[90vh] md:h-[763px] border rounded-[20px] p-[18px] flex flex-col mx-4 overflow-y-auto">
+          {/* Header */}
           <div className="flex items-center p-[12px] justify-center">
             <Coffee className="w-[54px] h-[54px] text-blue-300 text-center flex items-center justify-center" />
           </div>
@@ -166,55 +212,58 @@ export function DataTable({ campaignData }) {
             helps us improve!
           </p>
 
-          {/* Scrollable content section */}
+          {/* Form Fields */}
           <div className="flex-1 overflow-auto space-y-4">
+            {/* Conversion Input */}
             <div className="relative">
               <p className="text-[14px] mb-2 font-md">
                 How many Conversions did your campaign have?
               </p>
               <input
                 type="text"
-                name="campaignFeedback"
+                value={conversion}
+                onChange={(e) => setConversion(e.target.value)}
                 placeholder="Enter details..."
                 className="w-full h-full p-[16px] border border-gray-300 rounded-full"
               />
             </div>
 
+            {/* Conversion Type Input */}
             <div className="relative">
               <p className="text-[14px] mb-2 font-md">
-                How do you define conversions in this campaign (e.g. purchases,
-                installs, followers, etc.)
+                How do you define conversions in this campaign?
               </p>
               <input
                 type="text"
-                name="campaignFeedback"
+                value={conversionType}
+                onChange={(e) => setConversionType(e.target.value)}
                 placeholder="Enter details..."
                 className="w-full h-full p-[16px] border border-gray-300 rounded-full"
               />
             </div>
 
+            {/* Rating Slider */}
             <div className="relative">
               <p className="text-[14px] font-md mb-2">
                 How satisfied are you with your campaign?{" "}
               </p>
-
               <div className="flex items-center gap-4">
                 <input
                   type="range"
                   min="0"
                   max="10"
-                  value={sliderValue}
-                  onChange={(e) => setSliderValue(e.target.value)}
+                  value={rating}
+                  onChange={(e) => setRating(e.target.value)}
                   className="w-full"
                 />
                 <span className="text-sm font-medium text-gray-700">
-                  {sliderValue}
+                  {rating}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Bottom fixed textarea and button */}
+          {/* Feedback Textarea */}
           <div className="mt-4">
             <p className="text-[14px] font-md mb-2">Feedback</p>
             <textarea
@@ -225,13 +274,16 @@ export function DataTable({ campaignData }) {
               placeholder="Enter details..."
             />
 
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
               <button
-                onClick={() => {
-                  onSubmit(feedback);
-                  onClose();
-                }}
-                className="w-full h-[52px] text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700"
+                onClick={onClose}
+                className="w-1/3 h-[52px] text-sm font-medium text-gray-700 bg-gray-200 rounded-full hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="w-2/3 h-[52px] text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700"
               >
                 Submit Feedback
               </button>
@@ -252,7 +304,7 @@ export function DataTable({ campaignData }) {
   );
 
   const applyFilters = () => {
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
     setShowFilters(false);
   };
 
@@ -321,13 +373,11 @@ export function DataTable({ campaignData }) {
           </div>
 
           <div className="bg-white rounded-2xl p-4 md:p-6 mb-4 border-none border-gray-200">
-            {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
               <h2 className="text-[18px] font-md text-gray-400">
                 ALL CAMPAIGNS
               </h2>
               <div className="flex flex-col sm:flex-row gap-2">
-              {/* Sort Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -380,7 +430,6 @@ export function DataTable({ campaignData }) {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Filter Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -392,7 +441,6 @@ export function DataTable({ campaignData }) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="rounded-[16px] w-full sm:w-[343px] h-[296] p-[20px] gap-[24px] mr-10 mt-10">
                     <div className="space-y-3">
-                      {/* Date Filters */}
                       <div>
                         <label className="block text-[16px] gap-[16px] font-medium text-black mb-1">
                           Date
@@ -423,7 +471,6 @@ export function DataTable({ campaignData }) {
                         </div>
                       </div>
 
-                      {/* Status Filters */}
                       <div>
                         <label className="block text-[16px] gap-[16px] font-medium text-black mb-1">
                           Status
@@ -448,7 +495,6 @@ export function DataTable({ campaignData }) {
                         </div>
                       </div>
 
-                      {/* Action Buttons */}
                       <div className="flex flex-col sm:flex-row gap-[10px]">
                         <Button
                           variant="ghost"
@@ -476,9 +522,7 @@ export function DataTable({ campaignData }) {
               </div>
             </div>
 
-            {/* Table */}
             <div className="overflow-x-auto">
-              
               <Table>
                 <TableHeader>
                   <TableRow className="bg-[var(--bg-color-off-white)]">
@@ -491,54 +535,59 @@ export function DataTable({ campaignData }) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedCampaigns.map((c) => (
-                    <TableRow
-                      key={c.id}
-                      className="hover:bg-gray-50 transition"
-                    >
-                      <TableCell className="text-gray-800 text-[14px] py-6">
-                        <Link
-                          href={`campaigns?id=${c.id}`}
-                          className="text-gray-800 hover:underline"
-                        >
-                          {c.title}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="text-gray-80 text-[14px] py-6">
-                        {c.views.toLocaleString()} k
-                      </TableCell>
-                      <TableCell className="text-gray-800 text-[14px] py-6">
-                        {new Date(c.date).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-gray-800 text-[14px] py-6">
-                        ${c.amount.toFixed(2)}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`text-xs font-medium px-3 py-1 rounded-full ${
-                            c.status === "Active"
+                  {paginatedCampaigns.map((c) => {
+                    const specificCampaignData = campaignData.find(data => data._id === c.id);
+
+                    return (
+                      <TableRow
+                        key={c.id}
+                        className="hover:bg-gray-50 transition"
+                      >
+                        <TableCell className="text-gray-800 text-[14px] py-6">
+                          <Link
+                            href={`campaigns?id=${c.id}`}
+                            className="text-gray-800 hover:underline"
+                          >
+                            {c.title}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="text-gray-800 text-[14px] py-6">
+                          {c.views.toLocaleString()} k
+                        </TableCell>
+                        <TableCell className="text-gray-800 text-[14px] py-6">
+                          {new Date(c.date).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-gray-800 text-[14px] py-6">
+                          ${c.amount.toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          <span
+                            className={`text-xs font-medium px-3 py-1 rounded-full ${c.status === "Active"
                               ? "bg-green-100 text-green-700"
                               : c.status === "Pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-blue-100 text-blue-700"
-                          }`}
-                        >
-                          {c.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <CampaignActionsDropdown
-                          campaignId={c.id}
-                          openDialog={openDialog}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-blue-100 text-blue-700"
+                              }`}
+                          >
+                            {c.status}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <CampaignActionsDropdown
+                            campaignId={c.id}
+                            campaignData={specificCampaignData}
+                            openDialog={openDialog}
+                            handleAction={handleAction}
+                            fetchCampaign={fetchCampaign}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
 
-            {/* Footer */}
             <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
               <p className="text-sm text-gray-500">
                 Showing {filteredCampaigns.length} result
@@ -561,7 +610,7 @@ export function DataTable({ campaignData }) {
               </div>
             </div>
           </div>
-          <Charts />
+          <Charts campaignData={transformedCampaigns} />
         </div>
       </main>
       <ConfirmationDialogue
@@ -570,9 +619,8 @@ export function DataTable({ campaignData }) {
         smallText={dialogConfig.smallText}
         confirmLabel={dialogConfig.confirmLabel}
         onConfirm={() => {
-          dialogConfig.onConfirm(); // Perform your confirm action
-          setDialogOpen(false); // Close confirmation dialog
-          setFeedbackDialogOpen(true); // Open feedback dialog
+          dialogConfig.onConfirm();
+          setDialogOpen(false);
         }}
         onCancel={() => setDialogOpen(false)}
       />
@@ -581,10 +629,17 @@ export function DataTable({ campaignData }) {
         onClose={() => setFeedbackDialogOpen(false)}
         feedback={feedback}
         setFeedback={setFeedback}
-        onSubmit={(feedback) => {
-          // Handle feedback submission here
-          console.log("Feedback submitted:", feedback);
-          // You might want to make an API call here
+        campaignId={currentCampaignId}
+        onSubmit={async (feedbackData) => {
+          try {
+            await submitFeedback(currentCampaignId, feedbackData);
+            setFeedback("");
+            setSliderValue(5);
+            setFeedbackDialogOpen(false);
+            // Optionally show success message or refresh data
+          } catch (error) {
+            console.error("Failed to submit feedback:", error);
+          }
         }}
       />
     </>

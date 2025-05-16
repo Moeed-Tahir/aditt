@@ -310,7 +310,7 @@ exports.resetPassword = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         await connectToDatabase();
-        const { userId, name, email, website, company, phone, currentPassword, newPassword } = req.body;
+        const { userId, name, email, website, companyName, phone, currentPassword, newPassword } = req.body;
 
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
@@ -333,7 +333,7 @@ exports.updateProfile = async (req, res) => {
         user.name = name || user.name;
         user.businessEmail = email || user.businessEmail;
         user.businessWebsite = website || user.businessWebsite;
-        user.companyName = company || user.companyName;
+        user.companyName = companyName || user.companyName;
         user.phone = phone || user.phone;
 
         await user.save();
@@ -344,7 +344,7 @@ exports.updateProfile = async (req, res) => {
                 name: user.name,
                 email: user.businessEmail,
                 website: user.businessWebsite,
-                company: user.companyName,
+                companyName: user.companyName,
                 phone: user.phone
             }
         });
@@ -471,7 +471,7 @@ exports.getProfile = async (req, res) => {
     try {
         await connectToDatabase();
         const { userId } = req.body;
-        console.log("userId in backend", userId);
+        
         if (!userId) {
             return res.status(400).send({ message: "User Id not present" });
         }

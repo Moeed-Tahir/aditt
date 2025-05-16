@@ -58,12 +58,12 @@ export default function AreaCharts() {
       <div className="flex flex-col items-start sm:items-end">
         <span className="text-[16px] font-md "><span className="w-3 h-3 rounded-full bg-blue-500 inline-block mr-2"></span>
         Clicks</span>
-        <span className="text-[14px] text-gray-500">30,000</span>
+        <span className="text-[14px] text-gray-500">0</span>
       </div>
       <div className="flex flex-col items-start sm:items-end">
         <span className="text-[16px] font-md"><span className="w-3 h-3 rounded-full bg-blue-100 inline-block mr-2"></span>
         Engagements</span>
-        <span className="text-[14px] text-gray-500">75,000</span>
+        <span className="text-[14px] text-gray-500">0</span>
       </div>
     </div>
   </div>

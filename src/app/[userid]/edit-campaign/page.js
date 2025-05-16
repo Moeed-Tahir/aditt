@@ -2,16 +2,14 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useState, useCallback } from "react";
+import { useState, useCallback,useEffect } from "react";
 import Navbar2 from "@/components/Navbar2";
 import QuestionBox from "../../../components/QuestionBox";
 import Sliders from "@/components/Sliders";
 import Calendars from "@/components/Calendars";
 import {
   ArrowLeft,
-  Calendar,
   Check,
-  ChevronDown,
   CircleCheck,
   CircleDollarSign,
   CircleDot,
@@ -51,20 +49,23 @@ export default function EditCampaign() {
   const userId = Cookies.get("userId");
 
   const [formData, setFormData] = useState({
+    engagements: {},
+    clickCount: {},
+    _id: "",
+    userId: "",
     campaignTitle: "",
+    status: "",
     websiteLink: "",
     videoFile: null,
     videoUrl: "",
     imageFile: null,
     imageUrl: "",
     videoDuration: "",
-
     genderRatio: 50,
     genderType: "",
     ageRange: [18, 65],
-    genderAge: "12",
+    genderAge: 25,
     categories: [],
-
     quizQuestion: {
       text: "",
       options: ["", "", "", ""],
@@ -73,32 +74,33 @@ export default function EditCampaign() {
     surveyQuestion1: {
       text: "",
       options: ["", "", "", ""],
-      selectedAnswer: null,
+      correctAnswer: null,
     },
     surveyQuestion2: {
       text: "",
       options: ["", "", "", ""],
-      selectedAnswer: null,
+      correctAnswer: null,
     },
-
     startDate: new Date(),
-    endDate: null,
-    budget: "",
-
+    endDate: new Date(),
+    budget: 0,
     cardNumber: "",
     monthOnCard: "",
     cvc: "",
     nameOnCard: "",
     country: "",
     zipCode: "",
-
     bankAccountNumber: "",
     routingNumber: "",
     accountType: "",
     couponCode: "",
-    age: "",
-    campignBudget: "",
+    totalViews: 0,
+    impressions: 0,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    __v: 0,
   });
+  
 
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
@@ -203,7 +205,7 @@ export default function EditCampaign() {
 
   const handleSubmit = async () => {
     try {
-      const campaignData = {
+      const updatedCampaignData = {
         campaignTitle: formData.campaignTitle,
         websiteLink: formData.websiteLink,
         campaignBudget: formData.campignBudget,
@@ -217,8 +219,7 @@ export default function EditCampaign() {
           option2: formData.quizQuestion.options[1],
           option3: formData.quizQuestion.options[2],
           option4: formData.quizQuestion.options[3],
-          answer:
-            formData.quizQuestion.options[formData.quizQuestion.correctAnswer],
+          answer: formData.quizQuestion.options[formData.quizQuestion.correctAnswer],
         },
         surveyQuestion1: {
           questionText: formData.surveyQuestion1.text,
@@ -226,12 +227,9 @@ export default function EditCampaign() {
           option2: formData.surveyQuestion1.options[1],
           option3: formData.surveyQuestion1.options[2],
           option4: formData.surveyQuestion1.options[3],
-          answer:
-            formData.surveyQuestion1.correctAnswer !== null
-              ? formData.surveyQuestion1.options[
-              formData.surveyQuestion1.correctAnswer
-              ]
-              : "",
+          answer: formData.surveyQuestion1.correctAnswer !== null
+            ? formData.surveyQuestion1.options[formData.surveyQuestion1.correctAnswer]
+            : "",
         },
         surveyQuestion2: {
           questionText: formData.surveyQuestion2.text,
@@ -239,20 +237,16 @@ export default function EditCampaign() {
           option2: formData.surveyQuestion2.options[1],
           option3: formData.surveyQuestion2.options[2],
           option4: formData.surveyQuestion2.options[3],
-          answer:
-            formData.surveyQuestion2.correctAnswer !== null
-              ? formData.surveyQuestion2.options[
-              formData.surveyQuestion2.correctAnswer
-              ]
-              : "",
+          answer: formData.surveyQuestion2.correctAnswer !== null
+            ? formData.surveyQuestion2.options[formData.surveyQuestion2.correctAnswer]
+            : "",
         },
         genderType: formData.genderType,
         genderRatio: formData.genderRatio.toString(),
         age: formData.age,
         categories: formData.categories.join(","),
         campaignStartDate: formData.startDate.toISOString(),
-        campaignEndDate:
-          formData.endDate?.toISOString() || formData.startDate.toISOString(),
+        campaignEndDate: formData.endDate?.toISOString() || formData.startDate.toISOString(),
         cardDetail: {
           cardNumber: formData.cardNumber,
           cvc: formData.cvc,
@@ -268,9 +262,14 @@ export default function EditCampaign() {
         },
       };
 
+      // Add campaignId to the data if we're updating
+      if (campaignData?._id) {
+        updatedCampaignData.campaignId = campaignData._id;
+      }
+
       const response = await axios.post(
-        "/api/routes/v1/campaignRoutes?action=createCampaign",
-        campaignData,
+        "/api/routes/v1/campaignRoutes?action=updateCampaign",
+        updatedCampaignData,
         {
           headers: {
             "Content-Type": "application/json",
@@ -279,11 +278,10 @@ export default function EditCampaign() {
       );
 
       setShowSuccessModal(true);
-      console.log("Campaign created successfully:", response.data);
     } catch (error) {
-      console.error("Error creating campaign:", error);
+      console.error("Error updating campaign:", error);
       setAlert({
-        message: "Failed to create campaign. Please check your form data.",
+        message: "Failed to update campaign. Please check your form data.",
         type: "error",
         visible: true,
       });
@@ -291,7 +289,6 @@ export default function EditCampaign() {
       setTimeout(() => {
         setAlert(prev => ({ ...prev, visible: false }));
       }, 4000);
-
     }
   };
 
@@ -347,6 +344,66 @@ export default function EditCampaign() {
 
     return (budget / duration) * 2;
   }, [formData.budget, formData.videoDuration]);
+
+
+  useEffect(() => {
+    if (searchParams) {
+      const paramsData = {
+        engagements: JSON.parse(searchParams.get("engagements") || "{}"),
+        clickCount: JSON.parse(searchParams.get("clickCount") || "{}"),
+        _id: searchParams.get("_id") || "",
+        userId: searchParams.get("userId") || "",
+        campaignTitle: searchParams.get("campaignTitle") || "",
+        status: searchParams.get("status") || "",
+        websiteLink: decodeURIComponent(searchParams.get("websiteLink") || ""),
+        videoUrl: decodeURIComponent(searchParams.get("campaignVideoUrl") || ""),
+        imageUrl: decodeURIComponent(searchParams.get("companyLogo") || ""),
+        quizQuestion: {
+          text: searchParams.get("quizQuestion") || "",
+          options: ["", "", "", ""],
+          correctAnswer: null,
+        },
+        surveyQuestion1: {
+          text: searchParams.get("surveyQuestion1") || "",
+          options: ["", "", "", ""],
+          correctAnswer: null,
+        },
+        surveyQuestion2: {
+          text: searchParams.get("surveyQuestion2") || "",
+          options: ["", "", "", ""],
+          correctAnswer: null,
+        },
+        genderType: searchParams.get("genderType") || "",
+        genderRatio: parseInt(searchParams.get("genderRatio") || 50), // Fixed line
+        genderAge: parseInt(searchParams.get("age")) || 25,
+        startDate: new Date(searchParams.get("campaignStartDate") || new Date()),
+        endDate: new Date(searchParams.get("campaignEndDate") || new Date()),
+        budget: parseFloat(searchParams.get("campaignBudget")) || 0,
+        couponCode: searchParams.get("couponCode") || "",
+        totalViews: parseInt(searchParams.get("totalViews")) || 0,
+        impressions: parseInt(searchParams.get("impressions")) || 0,
+        createdAt: new Date(searchParams.get("createdAt") || new Date()),
+        updatedAt: new Date(searchParams.get("updatedAt") || new Date()),
+        __v: parseInt(searchParams.get("__v")) || 0,
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        ...paramsData,
+        // Parse card and bank details if available
+        cardNumber: searchParams.get("cardDetail.cardNumber") || "",
+        monthOnCard: searchParams.get("cardDetail.dateOnCard") || "",
+        cvc: searchParams.get("cardDetail.cvc") || "",
+        nameOnCard: searchParams.get("cardDetail.nameOnCard") || "",
+        country: searchParams.get("cardDetail.country") || "",
+        zipCode: searchParams.get("cardDetail.zip") || "",
+        bankAccountNumber: searchParams.get("bankDetail.accountNumber") || "",
+        routingNumber: searchParams.get("bankDetail.routingNumber") || "",
+        accountType: searchParams.get("bankDetail.accountType") || "",
+      }));
+    }
+  }, [searchParams]);
+
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
