@@ -28,8 +28,8 @@ import PaymentMethod from "../../../components/PaymentMethod";
 import LinkBankAccount from "../../../components/LinkBankAccount";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
-import AlertBox from "./AlertBox";
 import Cookies from "js-cookie";
+import AlertBox from "@/components/AlertBox";
 
 
 const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
@@ -379,8 +379,8 @@ export default function EditCampaign() {
                 <Link
                   href={`?step=${index}`}
                   className={` gap-2 h-10 flex items-center justify-start rounded-full text-xs font-medium px-4 ${index === currentStep
-                      ? "border-blue-600 border bg-white text-gray-600"
-                      : "bg-white text-gray-600"
+                    ? "border-blue-600 border bg-white text-gray-600"
+                    : "bg-white text-gray-600"
                     } hover:cursor-pointer transition`}
                 >
                   {index < currentStep ? (
@@ -388,8 +388,8 @@ export default function EditCampaign() {
                   ) : (
                     <CircleDot
                       className={`w-7 h-7 shrink-0 ${index === currentStep
-                          ? "text-blue-600"
-                          : "text-gray-300"
+                        ? "text-blue-600"
+                        : "text-gray-300"
                         }`}
                     />
                   )}
@@ -425,10 +425,10 @@ export default function EditCampaign() {
                 <Link
                   href="?step=1"
                   className={`bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${!formData.campaignTitle ||
-                      !formData.websiteLink ||
-                      !formData.videoFile
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
+                    !formData.websiteLink ||
+                    !formData.videoFile
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
                     }`}
                   onClick={(e) => {
                     if (
