@@ -17,7 +17,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { ListFilter, ChevronsUpDown, Plus, X, Coffee, ChevronLeftCircle } from "lucide-react";
+import {
+  ListFilter,
+  ChevronsUpDown,
+  Plus,
+  X,
+  Coffee,
+  ChevronLeftCircle,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -95,49 +102,51 @@ export function DataTable({ campaignData }) {
     setDialogOpen(true);
   };
 
-  const handleAction = (type, campaignId) => {
-    const titles = {
-      pause: "Are you sure you want to pause this campaign?",
-      complete: "Provide feedback for this completed campaign",
-      cancel: "Are you sure you want to cancel this campaign?",
-    };
+  // const handleAction = (type, campaignId) => {
+  //   const titles = {
+  //     pause: "Are you sure you want to pause this campaign?",
+  //     complete: "Provide feedback for this completed campaign",
+  //     cancel: "Are you sure you want to cancel this campaign?",
+  //   };
 
-    const smallTexts = {
-      pause: "Are you sure you want to pause this campaign?",
-      complete: "Please share your experience with this campaign",
-      cancel: "Are you sure you want to cancel this campaign?",
-    };
+  //   const smallTexts = {
+  //     pause: "Are you sure you want to pause this campaign?",
+  //     complete: "Please share your experience with this campaign",
+  //     cancel: "Are you sure you want to cancel this campaign?",
+  //   };
 
-    const labels = {
-      pause: "Pause",
-      complete: "Submit Feedback",
-      cancel: "Yes, Cancel Campaign",
-    };
+  //   const labels = {
+  //     pause: "Pause",
+  //     complete: "Submit Feedback",
+  //     cancel: "Yes, Cancel Campaign",
+  //   };
 
-    if (type === "complete") {
-      setDialogConfig({
-        title: titles[type],
-        smallText: smallTexts[type],
-        confirmLabel: labels[type],
-        onConfirm: () => {
-          setDialogOpen(false);
-          setFeedbackDialogOpen(true); // Show feedback dialog after confirmation
-        },
-      });
-      setDialogOpen(true);
-    } else {
-      setDialogConfig({
-        title: titles[type],
-        smallText: smallTexts[type],
-        confirmLabel: labels[type],
-        onConfirm: () => {
-          setDialogOpen(false);
-          // Handle other actions here
-        },
-      });
-      setDialogOpen(true);
-    }
-  };
+  //   if (type === "complete") {
+  //     setDialogConfig({
+  //       title: titles[type],
+  //       smallText: smallTexts[type],
+  //       confirmLabel: labels[type],
+  //       onConfirm: () => {
+  //         setDialogOpen(false);
+  //         setFeedbackDialogOpen(true); // Show feedback dialog after confirmation
+  //       },
+  //     });
+  //     setDialogOpen(true);
+  //   } else {
+  //     setDialogConfig({
+  //       title: titles[type],
+  //       smallText: smallTexts[type],
+  //       confirmLabel: labels[type],
+  //       onConfirm: () => {
+  //         setDialogOpen(false);
+  //         // Handle other actions here
+  //         setFeedbackDialogOpen(false); // Show feedback dialog after confirmation
+
+  //       },
+  //     });
+  //     setDialogOpen(true);
+  //   }
+  // };
 
   const FeedbackDialog = ({
     open,
@@ -271,7 +280,10 @@ export function DataTable({ campaignData }) {
         <div className="p-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <p className="text-[30px] font-md">Campaigns</p>
-            <Link href={`/${userId}/create-campaign`} className="w-full md:w-auto">
+            <Link
+              href={`/${userId}/create-campaign`}
+              className="w-full md:w-auto"
+            >
               <button
                 type="button"
                 className="flex items-center justify-center gap-[12px] px-[28px] py-[16px] rounded-[80px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer w-full md:w-auto"
@@ -327,7 +339,7 @@ export function DataTable({ campaignData }) {
                 ALL CAMPAIGNS
               </h2>
               <div className="flex flex-col sm:flex-row gap-2">
-              {/* Sort Dropdown */}
+                {/* Sort Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -478,7 +490,6 @@ export function DataTable({ campaignData }) {
 
             {/* Table */}
             <div className="overflow-x-auto">
-              
               <Table>
                 <TableHeader>
                   <TableRow className="bg-[var(--bg-color-off-white)]">
@@ -530,6 +541,7 @@ export function DataTable({ campaignData }) {
                         <CampaignActionsDropdown
                           campaignId={c.id}
                           openDialog={openDialog}
+                          onCompleteConfirm={() => setFeedbackDialogOpen(true)}
                         />
                       </TableCell>
                     </TableRow>
@@ -551,7 +563,7 @@ export function DataTable({ campaignData }) {
                       key={page}
                       variant={page === currentPage ? "default" : "outline"}
                       size="sm"
-                      className="bg-blue-500 rounded-full"
+                      className="bg-blue-500 text-white rounded-full"
                       onClick={() => setCurrentPage(page)}
                     >
                       {page}
@@ -572,7 +584,6 @@ export function DataTable({ campaignData }) {
         onConfirm={() => {
           dialogConfig.onConfirm(); // Perform your confirm action
           setDialogOpen(false); // Close confirmation dialog
-          setFeedbackDialogOpen(true); // Open feedback dialog
         }}
         onCancel={() => setDialogOpen(false)}
       />

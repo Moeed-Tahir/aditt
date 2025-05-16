@@ -21,13 +21,54 @@ function QuestionBox({ question, onChange, isQuiz, name, index, buttonLabel }) {
     visible: false,
   });
 
+  const validateQuestion = () => {
+    // Check question text
+    if (!question.text || !question.text.trim()) {
+      setAlert({
+        message: "Please enter a question title",
+        type: "error",
+        visible: true,
+      });
+      return false;
+    }
+
+    // Check options
+    const emptyOptions = question.options.filter(opt => !opt.trim());
+    if (emptyOptions.length > 0) {
+      setAlert({
+        message: "Please fill in all answer options",
+        type: "error",
+        visible: true,
+      });
+      return false;
+    }
+
+    // For quiz questions, check correct answer
+    if (isQuiz && (question.correctAnswer === null || question.correctAnswer === undefined)) {
+      setAlert({
+        message: "Please select the correct answer for the quiz question",
+        type: "error",
+        visible: true,
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = () => {
+    if (validateQuestion()) {
+      setIsExpanded(false);
+    } else {
+      setTimeout(() => {
+        setAlert(prev => ({ ...prev, visible: false }));
+      }, 4000);
+    }
+  };
+
   return (
     <div className="w-full p-2 md:p-4">
-      {" "}
-      {/* Changed padding for mobile */}
       <div className="bg-white p-3 md:p-4 rounded-[16px] border-1 mb-2 w-full">
-        {" "}
-        {/* Full width */}
         {isExpanded && (
           <>
             <p className="text-[14px] font-md">Question Title</p>
@@ -48,12 +89,14 @@ function QuestionBox({ question, onChange, isQuiz, name, index, buttonLabel }) {
               </p>
               {question.options.map((opt, i) => (
                 <div key={i} className="flex items-center mb-2 gap-2">
-                  {" "}
-                  {/* Added gap */}
                   <input
-                    type={isQuiz ? "radio" : "radio"}
+                    type="radio"
                     name={`question-${name}`}
-                    className="flex-shrink-0" /* Prevent squeezing */
+                    className="flex-shrink-0"
+                    checked={isQuiz 
+                      ? question.correctAnswer === i 
+                      : question.selectedAnswer === i}
+                    onChange={() => handleAnswerSelect(i)}
                   />
                   <input
                     type="text"
@@ -67,37 +110,8 @@ function QuestionBox({ question, onChange, isQuiz, name, index, buttonLabel }) {
             </div>
 
             <button
-              className="bg-blue-600 text-white w-full px-6 py-3 rounded-full mt-4 text-sm md:text-base" /* Larger tap target */
-              onClick={() => {
-                if (
-                  !question.text.trim() ||
-                  question.options.some((opt) => !opt.trim())
-                ) {
-                  setAlert({
-                    message:
-                      "Please fill in the question and all answer options",
-                    type: "error",
-                    visible: true,
-                  });
-                  setTimeout(() => {
-                    setAlert((prev) => ({ ...prev, visible: false }));
-                  }, 4000);
-                  return;
-                }
-                if (isQuiz && question.correctAnswer === null) {
-                  setAlert({
-                    message:
-                      "Please select the correct answer for the quiz question",
-                    type: "error",
-                    visible: true,
-                  });
-                  setTimeout(() => {
-                    setAlert((prev) => ({ ...prev, visible: false }));
-                  }, 4000);
-                  return;
-                }
-                setIsExpanded(false);
-              }}
+              className="bg-blue-600 text-white w-full px-6 py-3 rounded-full mt-4 text-sm md:text-base"
+              onClick={handleSubmit}
             >
               {buttonLabel ||
                 (isQuiz ? "Add Quiz Question" : "Add Survey Question")}
@@ -109,11 +123,8 @@ function QuestionBox({ question, onChange, isQuiz, name, index, buttonLabel }) {
         )}
         {!isExpanded && question.text && (
           <details className="bg-white rounded-xl w-full" open={false}>
-            {" "}
-            {/* Full width */}
             <summary className="cursor-pointer font-medium text-gray-800 flex justify-between items-center w-full">
-              <span className="truncate mr-2">{question.text}</span>{" "}
-              {/* Truncate long text */}
+              <span className="truncate mr-2">{question.text}</span>
               <ChevronDown
                 className="w-5 h-5 text-gray-500 flex-shrink-0"
                 onClick={() => setIsExpanded(true)}
@@ -125,8 +136,7 @@ function QuestionBox({ question, onChange, isQuiz, name, index, buttonLabel }) {
                   key={i}
                   className="flex justify-between text-[14px] items-center pr-2"
                 >
-                  <span className="truncate mr-2">{opt}</span>{" "}
-                  {/* Truncate long options */}
+                  <span className="truncate mr-2">{opt}</span>
                   {(isQuiz
                     ? question.correctAnswer === i
                     : question.selectedAnswer === i) && (
@@ -171,11 +181,9 @@ export default function QuestionManager({ isQuiz = true, buttonLabel }) {
 
   return (
     <div className="w-full px-2 md:px-4">
-      {" "}
-      {/* Full width with small side padding */}
       {!hasQuestion && (
         <button
-          className="bg-[var(--bg-color-off-white)] w-full text-blue-500 px-6 py-4 rounded-full mt-2 text-sm md:text-base" /* Larger tap target */
+          className="bg-[var(--bg-color-off-white)] w-full text-blue-500 px-6 py-4 rounded-full mt-2 text-sm md:text-base"
           onClick={handleAddQuestion}
         >
           {buttonLabel ||

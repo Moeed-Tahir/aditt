@@ -137,7 +137,7 @@ export default function LinkBankAccount({ value, onChange }) {
       {/* Bank Form */}
       {isFormOpen && (
         <div className="w-full space-y-4 mb-4">
-          <div className="border p-2 rounded-[12px] w-full">
+          <div className="border p-2  rounded-[12px] w-full">
             <input
               type="text"
               placeholder="Account Number"
@@ -148,14 +148,14 @@ export default function LinkBankAccount({ value, onChange }) {
                   bankAccountNumber: e.target.value,
                 })
               }
-              className=" p-2 w-full"
+              className=" p-2 focus:outline-none w-full"
             />
 
             <div className="flex">
               <input
                 type="text"
                 placeholder="Routing Number"
-                className="w-1/2 p-3 text-sm border-t border-r"
+                className="w-1/2 p-3 focus:outline-none text-sm border-t border-r"
                 value={currentBank.routingNumber || ""}
                 onChange={(e) =>
                   setCurrentBank({
@@ -167,7 +167,7 @@ export default function LinkBankAccount({ value, onChange }) {
                <input
                 type="text"
                 placeholder="Select Account Type"
-                className="w-1/2 p-3 text-sm border-t"
+                className="w-1/2 p-3 focus:outline-none text-sm border-t"
                 value={currentBank.accountType || ""}
                 onChange={(e) =>
                   setCurrentBank({

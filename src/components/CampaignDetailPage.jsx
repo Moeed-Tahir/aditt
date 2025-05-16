@@ -167,7 +167,7 @@ export default function CampaignDetailPage({ campaignData }) {
 
   return (
     <>
-      <Navbar2 userId={userId} />
+      <Navbar2 />
 
       <main className="flex min-h-screen w-full max-w-[1440px] mx-auto flex-col">
         <div className="p-6 space-y-6">
@@ -207,7 +207,7 @@ export default function CampaignDetailPage({ campaignData }) {
                   ref={videoRef}
                   src={campaignData.campaignVideoUrl}
                   controls
-                  className="rounded-lg object-cover w-full md:w-[170px] h-[180px]"
+                  className="rounded-lg object-cover w-full md:w-[170px] h-[200px]"
                   onLoadedMetadata={handleLoadedMetadata}
                 />
               </div>

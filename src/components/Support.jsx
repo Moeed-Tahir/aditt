@@ -1,6 +1,6 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
+import Navbar2 from "@/components/Navbar2";
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -28,7 +28,7 @@ export function Support() {
   return (
     <>
       <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
-        <Navbar userId={userId} />
+        <Navbar2 userId={userId} />
         <div className="p-4 md:p-10">
           <div className="max-w-6xl mx-auto">
             <div className="relative flex items-center mb-4 md:mb-10 justify-between">
