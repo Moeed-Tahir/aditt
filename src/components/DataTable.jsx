@@ -147,7 +147,6 @@ export function DataTable({ campaignData }) {
   //     setDialogOpen(true);
   //   }
   // };
-
   const FeedbackDialog = ({
     open,
     onClose,
@@ -155,6 +154,13 @@ export function DataTable({ campaignData }) {
     setFeedback,
     onSubmit,
   }) => {
+    const [conversions, setConversions] = useState('');
+    const [conversionDefinition, setConversionDefinition] = useState('');
+    const [sliderValue, setSliderValue] = useState(0);
+  
+    // Check if all fields are filled
+    const isFormValid = conversions && conversionDefinition && feedback && sliderValue > 0;
+  
     return (
       <div
         className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${
@@ -165,16 +171,16 @@ export function DataTable({ campaignData }) {
           <div className="flex items-center p-[12px] justify-center">
             <Coffee className="w-[54px] h-[54px] text-blue-300 text-center flex items-center justify-center" />
           </div>
-
+  
           <div className="text-center mb-4">
             <h3 className="text-lg font-medium">Campaign Feedback</h3>
           </div>
-
+  
           <p className="text-sm text-gray-500 mb-4 text-center">
             We'd love to hear about your campaign's performance. Your feedback
             helps us improve!
           </p>
-
+  
           {/* Scrollable content section */}
           <div className="flex-1 overflow-auto space-y-4">
             <div className="relative">
@@ -183,12 +189,13 @@ export function DataTable({ campaignData }) {
               </p>
               <input
                 type="text"
-                name="campaignFeedback"
+                value={conversions}
+                onChange={(e) => setConversions(e.target.value)}
                 placeholder="Enter details..."
                 className="w-full h-full p-[16px] border border-gray-300 rounded-full"
               />
             </div>
-
+  
             <div className="relative">
               <p className="text-[14px] mb-2 font-md">
                 How do you define conversions in this campaign (e.g. purchases,
@@ -196,24 +203,25 @@ export function DataTable({ campaignData }) {
               </p>
               <input
                 type="text"
-                name="campaignFeedback"
+                value={conversionDefinition}
+                onChange={(e) => setConversionDefinition(e.target.value)}
                 placeholder="Enter details..."
                 className="w-full h-full p-[16px] border border-gray-300 rounded-full"
               />
             </div>
-
+  
             <div className="relative">
               <p className="text-[14px] font-md mb-2">
                 How satisfied are you with your campaign?{" "}
               </p>
-
+  
               <div className="flex items-center gap-4">
                 <input
                   type="range"
                   min="0"
                   max="10"
                   value={sliderValue}
-                  onChange={(e) => setSliderValue(e.target.value)}
+                  onChange={(e) => setSliderValue(parseInt(e.target.value))}
                   className="w-full"
                 />
                 <span className="text-sm font-medium text-gray-700">
@@ -222,7 +230,7 @@ export function DataTable({ campaignData }) {
               </div>
             </div>
           </div>
-
+  
           {/* Bottom fixed textarea and button */}
           <div className="mt-4">
             <p className="text-[14px] font-md mb-2">Feedback</p>
@@ -233,14 +241,17 @@ export function DataTable({ campaignData }) {
               rows={4}
               placeholder="Enter details..."
             />
-
+  
             <div className="flex justify-end">
               <button
                 onClick={() => {
-                  onSubmit(feedback);
+                  onSubmit({ feedback, conversions, conversionDefinition, satisfaction: sliderValue });
                   onClose();
                 }}
-                className="w-full h-[52px] text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700"
+                disabled={!isFormValid}
+                className={`w-full h-[52px] text-sm font-medium text-white rounded-full ${
+                  isFormValid ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
+                }`}
               >
                 Submit Feedback
               </button>

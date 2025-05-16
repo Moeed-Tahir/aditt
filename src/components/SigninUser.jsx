@@ -5,6 +5,7 @@ import { User, Globe, Mail, Lock, AlertCircle, Info } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import AlertBox from "./AlertBox";
 
 function SigninUser() {
   const router = useRouter();
@@ -26,10 +27,26 @@ function SigninUser() {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
+  const [alert, setAlert] = useState({
+    message: "",
+    type: "", // 'success' | 'error' | 'info' | 'warning'
+    visible: false,
+  });
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  };
+
+  const showAlert = (message, type) => {
+    setAlert({
+      message,
+      type,
+      visible: true,
+    });
+    setTimeout(() => {
+      setAlert((prev) => ({ ...prev, visible: false }));
+    }, 4000);
   };
 
   const validateForm = () => {
@@ -39,9 +56,7 @@ function SigninUser() {
         : !isValidEmail(formData.email)
         ? "Invalid email format"
         : "",
-      password: !formData.password
-        ? "Password is required"
-        : "",
+      password: !formData.password ? "Password is required" : "",
     };
 
     setErrors(newErrors);
@@ -71,7 +86,7 @@ function SigninUser() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
-    
+
     if (!validateForm()) {
       return;
     }
@@ -80,28 +95,44 @@ function SigninUser() {
     setApiError("");
 
     try {
-      const response = await fetch('/api/routes/v1/authRoutes?action=signin', {
-        method: 'POST',
+      const response = await fetch("/api/routes/v1/authRoutes?action=signin", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: formData.email,
-          password: formData.password
+          password: formData.password,
         }),
       });
 
       const data = await response.json();
-      
-      Cookies.set('token',  data.token, { expires: 1 });
-      Cookies.set('userId',  data.user.userId, { expires: 1 });
-      Cookies.set('user', JSON.stringify(data.user), { expires: 1 });
+
+      if (!response.ok) {
+        // Handle different error cases
+        if (data.message === "User not found") {
+          showAlert(
+            "No account found with this email address. Please sign up."
+          );
+        } else if (data.message === "Invalid password") {
+          showAlert("Incorrect password. Please try again.");
+        } else {
+          showAlert(data.message || "Sign in failed. Please try again.");
+        }
+        setLoading(false);
+        return;
+      }
+
+      // If successful
+      Cookies.set("token", data.token, { expires: 1 });
+      Cookies.set("userId", data.user.userId, { expires: 1 });
+      Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
 
       const userId = Cookies.get("userId");
       router.push(`${userId}/campaign-dashboard`);
     } catch (error) {
-      console.error('Sign in error:', error);
-      setApiError(error.message);
+      console.error("Sign in error:", error);
+      showAlert("An unexpected error occurred. Please try again.");
       setLoading(false);
     }
   };
@@ -119,6 +150,11 @@ function SigninUser() {
     note = null
   ) => (
     <div className="flex flex-col gap-2">
+      {alert.visible && (
+        <div className="fixed top-4 right-4 z-50">
+          <AlertBox message={alert.message} type={alert.type} />
+        </div>
+      )}
       <label
         htmlFor={name}
         className="text-[16px] font-semibold text-[var(--text-dark-color)]"
@@ -207,9 +243,7 @@ function SigninUser() {
               "password"
             )}
             {apiError && (
-              <div className="text-red-500 text-sm text-center">
-                {apiError}
-              </div>
+              <div className="text-red-500 text-sm text-center">{apiError}</div>
             )}
 
             <div className="flex justify-center gap-3 mt-2">

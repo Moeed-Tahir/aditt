@@ -5,9 +5,9 @@ export default function AlertBox({ message, type = "info" }) {
   const [visible, setVisible] = useState(true);
 
   const baseStyles = {
-    info: "bg-blue-100 text-blue-800 border-blue-300",
+    info: "bg-white text-black",
     success: "bg-white text-black",
-    warning: "bg-yellow-100 text-yellow-800 border-yellow-300",
+    warning: "bg-white text-black",
     error: "bg-white text-black",
   };
 
@@ -18,9 +18,9 @@ export default function AlertBox({ message, type = "info" }) {
       case "error":
         return <Info className="w-5 h-5 text-red-600" />;
       case "warning":
-        return <Info className="w-5 h-5 text-yellow-600" />;
+        return <Info className="w-5 h-5 text-red-600" />;
       default: // info
-        return <Info className="w-5 h-5 text-blue-600" />;
+      return <Info className="w-5 h-5 text-red-600" />;
     }
   };
 
@@ -31,9 +31,9 @@ export default function AlertBox({ message, type = "info" }) {
       case "error":
         return <span className="font-medium">Error</span>;
       case "warning":
-        return <span className="font-medium">Warning</span>;
+        return <span className="font-medium">Error</span>;
       default: // info
-        return <span className="font-medium">Default</span>;
+      return <span className="font-medium">Error</span>;
     }
   };
 
