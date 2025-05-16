@@ -1,12 +1,29 @@
 "use client";
-import { CreditCard, CreditCardIcon, Check, Trash } from "lucide-react";
+import { CreditCard, CreditCardIcon, Check, Trash, Plus } from "lucide-react";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
+import { allCountries } from "country-telephone-data";
+import AlertBox from "./AlertBox";
 
 export default function PaymentMethod({ value, onChange }) {
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showDropdownId, setShowDropdownId] = useState(null);
   const dropdownRef = useRef(null);
-  const [isDefault, setIsDefault] = useState(false);
+  const [cards, setCards] = useState(value.cards || []);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [currentCard, setCurrentCard] = useState({
+    cardNumber: "",
+    monthOnCard: "",
+    cvc: "",
+    nameOnCard: "",
+    country: "United States",
+    zipCode: "",
+    cardType: "",
+    isDefault: false,
+  });
+
+  useEffect(() => {
+    onChange({ ...value, cards });
+  }, [cards]);
 
   const detectCardType = (number) => {
     const sanitized = number.replace(/\s+/g, "");
@@ -23,54 +40,97 @@ export default function PaymentMethod({ value, onChange }) {
   const handleCardNumberChange = (e) => {
     const cardNumber = e.target.value;
     const cardType = detectCardType(cardNumber);
-    onChange({
-      ...value,
+    setCurrentCard({
+      ...currentCard,
       cardNumber,
       cardType,
     });
   };
 
   const toggleForm = () => {
-    onChange({
-      ...value,
-      isFormOpen: !value.isFormOpen,
-    });
+    setIsFormOpen(!isFormOpen);
+    if (isFormOpen) {
+      setCurrentCard({
+        cardNumber: "",
+        monthOnCard: "",
+        cvc: "",
+        nameOnCard: "",
+        country: "United States",
+        zipCode: "",
+        cardType: "",
+        isDefault: cards.length === 0,
+      });
+    }
   };
 
-  const toggleDropdown = (e) => {
-    e.stopPropagation(); // Prevent triggering the parent's onClick
-    setShowDropdown(!showDropdown);
+  const toggleDropdown = (e, cardId) => {
+    e.stopPropagation();
+    setShowDropdownId(showDropdownId === cardId ? null : cardId);
   };
 
-  const handleDeleteCard = () => {
-    onChange({
-      ...value,
-      cardAdded: false,
-      cardNumber: "",
-      cardType: "",
-      monthOnCard: "",
-      cvc: "",
-      nameOnCard: "",
-      country: "United States",
-      zipCode: "",
-    });
-    setShowDropdown(false);
+  const handleDeleteCard = (cardId) => {
+    const newCards = cards.filter((_, idx) => idx !== cardId);
+    if (cards[cardId].isDefault && newCards.length > 0) {
+      newCards[0].isDefault = true;
+    }
+    setCards(newCards);
+    setShowDropdownId(null);
   };
 
-  const handleMakeDefault = () => {
-    setIsDefault(true);
-    setShowDropdown(false);
-    onChange({
-      ...value,
-      isDefault: true,
+  const handleMakeDefault = (cardId) => {
+    setCards(
+      cards.map((card, idx) => ({
+        ...card,
+        isDefault: idx === cardId,
+      }))
+    );
+    setShowDropdownId(null);
+  };
+
+  const [alert, setAlert] = useState({
+    message: "",
+    type: "", // 'success' | 'error' | 'info' | 'warning'
+    visible: false,
+  });
+
+  const showAlert = (message, type) => {
+    setAlert({
+      message,
+      type,
+      visible: true,
     });
+    setTimeout(() => {
+      setAlert((prev) => ({ ...prev, visible: false }));
+    }, 4000);
+  };
+
+  const handleAddCard = () => {
+    // Check if any required field is empty
+    if (
+      !currentCard.cardNumber ||
+      !currentCard.monthOnCard ||
+      !currentCard.cvc ||
+      !currentCard.nameOnCard ||
+      !currentCard.zipCode
+    ) {
+      showAlert("Please fill in all required fields", "error");
+      return;
+    }
+
+    const newCard = {
+      ...currentCard,
+      isDefault: cards.length === 0,
+    };
+    setCards([...cards, newCard]);
+    showAlert("Card added successfully!", "success");
+    toggleForm();
   };
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
+        setShowDropdownId(null);
       }
     };
 
@@ -88,150 +148,181 @@ export default function PaymentMethod({ value, onChange }) {
 
   return (
     <div className="pt-2 w-full mx-auto relative">
-      {!value?.cardAdded && (
-        <div
-          onClick={toggleForm}
-          className="bg-[var(--bg-color-off-white)] rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50"
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-red-600 text-white flex items-center justify-center rounded-full">
-              <span className="text-xl">
-                <CreditCard />
-              </span>
-            </div>
-            <span className="text-sm font-medium">Add card</span>
-          </div>
-          <button className="text-2xl text-gray-400">+</button>
+      {/* Alert Box */}
+      {alert.visible && (
+        <div className="fixed top-4 right-4 z-50">
+          <AlertBox message={alert.message} type={alert.type} />
         </div>
       )}
 
-      {value?.isFormOpen && (
-        <div className="p-6 space-y-4">
-          <input
-            type="text"
-            placeholder="Card Number"
-            value={value.cardNumber || ""}
-            onChange={handleCardNumberChange}
-            className="border p-2 rounded w-full"
-          />
-          {value.cardType && (
-            <div className="mt-2">
-              <Image
-                src={cardLogo[value.cardType]}
-                alt={value.cardType}
-                width={40}
-                height={24}
+      {/* Add Card Button */}
+      <div
+        onClick={toggleForm}
+        className="bg-[var(--bg-color-off-white)] rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 mb-4"
+      >
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-red-600 text-white flex items-center justify-center rounded-full">
+            <CreditCard className="w-4 h-4" />
+          </div>
+          <span className="text-sm font-medium">Add card</span>
+        </div>
+        <Plus className="w-5 h-5 text-gray-400" />
+      </div>
+
+      {/* Card Form */}
+      {isFormOpen && (
+        <div className="w-full space-y-4 mb-4">
+          <div className="border p-2 rounded-[12px] w-full">
+            <input
+              type="text"
+              placeholder="Card Number"
+              value={currentCard.cardNumber || ""}
+              onChange={handleCardNumberChange}
+              className=" p-2 w-full"
+            />
+            {currentCard.cardType && (
+              <div className="mt-2">
+                <Image
+                  src={cardLogo[currentCard.cardType]}
+                  alt={currentCard.cardType}
+                  width={40}
+                  height={24}
+                />
+              </div>
+            )}
+
+            <div className="flex">
+              <input
+                type="text"
+                placeholder="MM / YY"
+                className="w-1/2 p-3 text-sm border-t border-r"
+                value={currentCard.monthOnCard || ""}
+                onChange={(e) =>
+                  setCurrentCard({
+                    ...currentCard,
+                    monthOnCard: e.target.value,
+                  })
+                }
+              />
+              <input
+                type="text"
+                placeholder="CVC"
+                className="w-1/2 p-3 text-sm border-t"
+                value={currentCard.cvc || ""}
+                onChange={(e) =>
+                  setCurrentCard({ ...currentCard, cvc: e.target.value })
+                }
               />
             </div>
-          )}
-
-          <div className="flex gap-4">
-            <input
-              type="text"
-              placeholder="MM / YY"
-              className="w-1/2 p-3 text-sm border rounded-xl"
-              value={value.monthOnCard || ""}
-              onChange={(e) =>
-                onChange({ ...value, monthOnCard: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="CVC"
-              className="w-1/2 p-3 text-sm border rounded-xl"
-              value={value.cvc || ""}
-              onChange={(e) => onChange({ ...value, cvc: e.target.value })}
-            />
           </div>
 
           <input
             type="text"
             placeholder="Name on card"
             className="w-full p-3 text-sm border rounded-xl"
-            value={value.nameOnCard || ""}
-            onChange={(e) => onChange({ ...value, nameOnCard: e.target.value })}
+            value={currentCard.nameOnCard || ""}
+            onChange={(e) =>
+              setCurrentCard({ ...currentCard, nameOnCard: e.target.value })
+            }
           />
-
-          <div className="flex gap-4">
-            <select
-              className="w-1/2 p-3 text-sm border rounded-xl"
-              value={value.country || "United States"}
-              onChange={(e) => onChange({ ...value, country: e.target.value })}
-            >
-              <option>United States</option>
-              <option>Canada</option>
-              <option>UK</option>
-            </select>
-            <input
-              type="text"
-              placeholder="ZIP"
-              className="w-1/2 p-3 text-sm border rounded-xl"
-              value={value.zipCode || ""}
-              onChange={(e) => onChange({ ...value, zipCode: e.target.value })}
-            />
+          <div className="border p-2 rounded-[12px] w-full">
+            <div className="flex">
+              <select
+                className="w-full p-3 text-sm"
+                value={currentCard.country || "United States"}
+                onChange={(e) =>
+                  setCurrentCard({ ...currentCard, country: e.target.value })
+                }
+              >
+                {allCountries.map((country) => {
+                  const flagEmoji = country.iso2
+                    .toUpperCase()
+                    .replace(/./g, (char) =>
+                      String.fromCodePoint(127397 + char.charCodeAt(0))
+                    );
+                  return (
+                    <option key={country.iso2} value={country.name}>
+                      {flagEmoji} {country.name}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <div className="flex">
+              <input
+                type="text"
+                placeholder="ZIP"
+                className="w-full p-3 text-sm border-t"
+                value={currentCard.zipCode || ""}
+                onChange={(e) =>
+                  setCurrentCard({ ...currentCard, zipCode: e.target.value })
+                }
+              />
+            </div>
           </div>
 
           <button
-            onClick={() =>
-              onChange({ ...value, cardAdded: true, isFormOpen: false })
-            }
+            onClick={handleAddCard}
             className="w-full bg-blue-600 text-white py-3 rounded-full hover:bg-blue-700"
           >
-            Add
+            Add Card
           </button>
         </div>
       )}
 
-      {value?.cardAdded && (
+      {/* List of Added Cards */}
+      {cards.map((card, index) => (
         <div
-          onClick={toggleForm}
-          className="bg-white border rounded-xl shadow p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 mt-2"
+          key={index}
+          className="bg-white border rounded-xl shadow p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 mb-2"
         >
           <div className="flex items-center gap-3">
-            {value.cardType && (
+            {card.cardType && (
               <Image
-                src={cardLogo[value.cardType]}
-                alt={value.cardType}
+                src={cardLogo[card.cardType]}
+                alt={card.cardType}
                 width={40}
                 height={24}
               />
             )}
             <div>
               <div className="font-semibold text-gray-800 flex items-center">
-                {value.cardType?.charAt(0).toUpperCase() +
-                  value.cardType?.slice(1)}
-                {isDefault && (
+                {card.cardType?.charAt(0).toUpperCase() +
+                  card.cardType?.slice(1)}
+                {card.isDefault && (
                   <span className="ml-2 text-green-500">
                     <Check className="w-4 h-4" />
                   </span>
                 )}
               </div>
               <div className="text-sm text-gray-500">
-                **** {value.cardNumber?.slice(-4)}
+                **** {card.cardNumber?.slice(-4)}
               </div>
             </div>
           </div>
           <div
             className="text-xl text-gray-400 relative"
-            onClick={toggleDropdown}
+            onClick={(e) => toggleDropdown(e, index)}
             ref={dropdownRef}
           >
             ⋮
-            {showDropdown && (
+            {showDropdownId === index && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border">
                 <div className="py-1">
                   <button
-                    onClick={handleMakeDefault}
+                    onClick={() => handleMakeDefault(index)}
                     className="flex items-center justify-between w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <div className="flex items-center">
                       <CreditCard className="w-4 h-4 mr-2" />
                       Set as Default
                     </div>
-                    {isDefault && <Check className="w-4 h-4 text-green-500" />}
+                    {card.isDefault && (
+                      <Check className="w-4 h-4 text-green-500" />
+                    )}
                   </button>
                   <button
-                    onClick={handleDeleteCard}
+                    onClick={() => handleDeleteCard(index)}
                     className="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                   >
                     <Trash className="w-4 h-4 mr-2" />
@@ -242,7 +333,7 @@ export default function PaymentMethod({ value, onChange }) {
             )}
           </div>
         </div>
-      )}
+      ))}
     </div>
   );
 }

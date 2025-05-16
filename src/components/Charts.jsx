@@ -47,7 +47,7 @@ export default function BarChartComponent() {
 
   return (
     <Card className="w-full shadow-none border-none">
-      <CardHeader className="flex flex-row items-start justify-between">
+      <CardHeader className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <CardTitle className="text-xl font-light">
             Most efficient campaigns
@@ -56,48 +56,47 @@ export default function BarChartComponent() {
             Rank based on Click through rate
           </CardDescription>
         </div>
-        <div className="relative">
+
+        <div className="w-full overflow-x-hidden sm:w-auto sm:max-w-[250px]">
           <Calendars
+            className="sm:max-w-[250px] w-full"
             selected={formData.endDate}
             onSelect={(date) =>
               setFormData((prev) => ({ ...prev, endDate: date }))
             }
-            fromDate={
-              formData.startDate
-                ? formData.startDate // allow same-day or future end date
-                : new Date() // allow today if no start date selected
-            }
-          />{" "}
+            fromDate={formData.startDate ? formData.startDate : new Date()}
+          />
         </div>
       </CardHeader>
 
       <CardContent>
-        <div className="w-full h-[500px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="0 0" />
-              <XAxis
-                dataKey="month"
-                tickFormatter={(value) => value.slice(0, 3)}
-                tickLine={false}
-                axisLine={false}
-                tickMargin={10}
-              />
-              <YAxis
-                tickFormatter={formatYAxis}
-                tickLine={false}
-                axisLine={false}
-                tickMargin={10}
-              />
-              <Tooltip
-                cursor={{ fill: "rgba(0, 0, 0, 0)" }}
-                formatter={(value) => `${(value / 1000).toFixed(1)}K`}
-                labelFormatter={(label) => `Campaign: ${label}`}
-              />
-              <Bar dataKey="desktop" fill="#6297FF" radius={4} />
-              {/* <Bar dataKey="mobile" fill="#FF7F50" radius={4} /> */}
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="w-full overflow-x-auto">
+          <div className="min-w-[800px] h-[500px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="0 0" />
+                <XAxis
+                  dataKey="month"
+                  tickFormatter={(value) => value.slice(0, 3)}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={10}
+                />
+                <YAxis
+                  tickFormatter={formatYAxis}
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={10}
+                />
+                <Tooltip
+                  cursor={{ fill: "rgba(0, 0, 0, 0)" }}
+                  formatter={(value) => `${(value / 1000).toFixed(1)}K`}
+                  labelFormatter={(label) => `Campaign: ${label}`}
+                />
+                <Bar dataKey="desktop" fill="#6297FF" radius={4} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </CardContent>
     </Card>

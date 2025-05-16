@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 
-export default function Calendars({ selected, onSelect, fromDate }) {
+export default function Calendars({ selected, onSelect, fromDate, className = "" }) {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const handleSelectDate = (selectedDate) => {
@@ -15,7 +15,7 @@ export default function Calendars({ selected, onSelect, fromDate }) {
   };
 
   return (
-    <div className="relative">
+    <div className={`relative ${className}`}>
       {/* Date Picker Trigger */}
       <div className="flex items-center mb-2">
         <span
