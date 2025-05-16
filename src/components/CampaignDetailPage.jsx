@@ -341,7 +341,7 @@ export default function CampaignDetailPage({ campaignData }) {
               <h2 className="text-[16px] text-gray-400 mb-2">
                 ALLOCATED BUDGET
               </h2>
-              <p className="text-[30px] font-md text-gray-800">$30,000</p>
+              <p className="text-[30px] font-md text-gray-800">${campaignData.campaignBudget}</p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
@@ -360,7 +360,7 @@ export default function CampaignDetailPage({ campaignData }) {
                 REMAINING BUDGET
               </h2>
               <p className="text-[30px] font-md text-gray-800">
-                {(30000 - campaignData.campaignBudget).toFixed(2)}
+                {/* {(30000 - campaignData.campaignBudget).toFixed(2)} */}
               </p>{" "}
             </div>
           </div>
