@@ -15,11 +15,15 @@ import {
   CheckCheck,
 } from "lucide-react";
 
-export default function CampaignActionsDropdown({ campaignId, openDialog , customTrigger }) {
+export default function CampaignActionsDropdown({ 
+  campaignId, 
+  openDialog, 
+  customTrigger,
+  onCompleteConfirm 
+}) {
   return (
     <DropdownMenu>
-        
-        <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild>
         {customTrigger ? (
           customTrigger
         ) : (
@@ -60,6 +64,7 @@ export default function CampaignActionsDropdown({ campaignId, openDialog , custo
               "Completed",
               () => {
                 console.log("Marked as completed", campaignId);
+                onCompleteConfirm(); // This will trigger the feedback dialog
               }
             )
           }
@@ -67,7 +72,6 @@ export default function CampaignActionsDropdown({ campaignId, openDialog , custo
           <CheckCheck className="h-4 w-4 mr-2 text-green-600" />
           Mark as Completed
         </DropdownMenuItem>
-
       </DropdownMenuContent>
     </DropdownMenu>
   );
