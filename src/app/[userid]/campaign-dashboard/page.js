@@ -30,7 +30,7 @@ export default function CampaignDashboard() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <DataTable campaignData={campaignData} />
+      <DataTable fetchCampaign={fetchCampaign} campaignData={campaignData} />
     </SidebarProvider>
   );
 }

@@ -65,10 +65,10 @@ export function ChatSupport() {
         <Navbar2 userId={userId} />
         <div className="p-4 md:p-10">
           <div className="max-w-6xl mx-auto">
-            <div className="relative flex items-center mb-6 md:mb-10 justify-between">
-              <Link
-                href="/support"
-                className="py-2 px-4 md:px-5 md:ml-5 rounded-full bg-white text-gray-700 hover:bg-blue-600 hover:text-white transition flex items-center gap-2 text-sm md:text-base"
+          <div className="relative flex items-center mb-10 justify-between">
+            <Link
+              href="/Support"
+              className="py-2 px-4 md:px-5 md:ml-5 rounded-full bg-white text-gray-700 hover:bg-blue-600 hover:text-white transition flex items-center gap-2 text-sm md:text-base"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="hidden md:inline">Back</span>

@@ -19,6 +19,8 @@ import ConfirmationDialogue from "@/components/ConfirmationDialogue";
 import Cookies from "js-cookie";
 
 export default function CampaignDetailPage({ campaignData }) {
+  console.log("campaignData", campaignData);
+
   const [duration, setDuration] = useState(null);
   const videoRef = useRef(null);
   const [showExpiredAlert, setShowExpiredAlert] = useState(true);
@@ -29,7 +31,7 @@ export default function CampaignDetailPage({ campaignData }) {
     title: "",
     smallText: "",
     confirmLabel: "",
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const openDialog = (title, smallText, confirmLabel, onConfirm) => {
@@ -78,9 +80,8 @@ export default function CampaignDetailPage({ campaignData }) {
   
     return (
       <div
-        className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${
-          open ? "" : "hidden"
-        }`}
+        className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${open ? "" : "hidden"
+          }`}
       >
         <div className="bg-white w-full max-w-[679px] h-auto max-h-[90vh] md:h-[763px] border rounded-[20px] p-[18px] flex flex-col mx-4 overflow-y-auto">
           <div className="flex items-center p-[12px] justify-center">
@@ -341,7 +342,7 @@ export default function CampaignDetailPage({ campaignData }) {
               <h2 className="text-[16px] text-gray-400 mb-2">
                 ALLOCATED BUDGET
               </h2>
-              <p className="text-[30px] font-md text-gray-800">${campaignData.campaignBudget}</p>
+              <p className="text-[30px] font-md text-gray-800">{campaignData?.campaignBudget}</p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
@@ -349,8 +350,8 @@ export default function CampaignDetailPage({ campaignData }) {
             <div className="flex-1 bg-white rounded-xl p-6">
               <h2 className=" text-gray-400 text-[16px] mb-2">TOTAL SPENT</h2>
               <p className="text-[30px] font-md text-gray-800">
-                {campaignData?.campaignBudget}
-              </p>{" "}
+                0
+              </p>
             </div>
 
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
@@ -360,184 +361,219 @@ export default function CampaignDetailPage({ campaignData }) {
                 REMAINING BUDGET
               </h2>
               <p className="text-[30px] font-md text-gray-800">
-                {/* {(30000 - campaignData.campaignBudget).toFixed(2)} */}
+                {(campaignData.campaignBudget - 0).toFixed(2)}
               </p>{" "}
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Quiz Details */}
-            <div className="bg-white p-6 rounded-xl">
-              <h2 className="text-[18px] font-md text-gray-800 mb-4">
-                Quiz details
-              </h2>
+            {/* Quiz Details - Only show if quizQuestion exists and has non-empty questionText */}
+            {campaignData.quizQuestion && campaignData.quizQuestion.questionText && (
+              <div className="bg-white p-6 rounded-xl">
+                <h2 className="text-[18px] font-md text-gray-800 mb-4">
+                  Quiz details
+                </h2>
 
-              {/* Quiz Info */}
-              <div className="mb-20">
-                <h3 className="text-gray-500 text-[16px] mb-2">QUIZ INFO</h3>
-                <div className="bg-[var(--bg-color-off-white)] p-10 rounded-xl">
-                  <p className="text-gray-700 mb-4 text-[16px]">
-                    {campaignData?.quizQuestion?.questionText}
-                  </p>
-                  <hr className="border-t border-gray-300" />
+                {/* Quiz Info */}
+                <div className="mb-20">
+                  <h3 className="text-gray-500 text-[16px] mb-2">QUIZ INFO</h3>
+                  <div className="bg-[var(--bg-color-off-white)] p-10 rounded-xl">
+                    <p className="text-gray-700 mb-4 text-[16px]">
+                      {campaignData.quizQuestion.questionText}
+                    </p>
+                    <hr className="border-t border-gray-300" />
 
-                  <ul className=" py-2 text-[16px] text-gray-600 space-y-1">
-                    <li className="py-[12px]">
-                      A. {campaignData?.quizQuestion?.option1}
-                      <span className="float-right">0%</span>
-                    </li>
-                    <li className="py-[12px]">
-                      B. {campaignData?.quizQuestion?.option2}
-                      <span className="float-right">0%</span>
-                    </li>
-                    <li className="py-[12px]">
-                      C. {campaignData?.quizQuestion?.option3}
-                      <span className="float-right">0%</span>
-                    </li>
-                    <li className="py-[12px]">
-                      D. {campaignData?.quizQuestion?.option4}
-                      <span className="float-right">0%</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div>
-                <BarCharts />
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 ml-4 sm:ml-20 text-sm text-gray-600 w-full max-w-md">
-                  <div className="mb-2 sm:mb-0">
-                    <span className="w-3 h-3 rounded-full bg-[#3653F7] inline-block mr-2" />{" "}
-                    Male ({campaignData?.genderRatio}%)
-                  </div>
-                  <div className="mb-2 sm:mb-0">
-                    <span className="w-3 h-3 rounded-full bg-[#E670C7] inline-block mr-2" />
-                    Female (0%)
-                  </div>
-                  <div>
-                    <span className="w-3 h-3 rounded-full bg-[#15B79E] inline-block mr-2" />{" "}
-                    Prefer Not to Say (0%)
+                    <ul className=" py-2 text-[16px] text-gray-600 space-y-1">
+                      {campaignData.quizQuestion.option1 && (
+                        <li className="py-[12px]">
+                          A. {campaignData.quizQuestion.option1}
+                          <span className="float-right">0%</span>
+                        </li>
+                      )}
+                      {campaignData.quizQuestion.option2 && (
+                        <li className="py-[12px]">
+                          B. {campaignData.quizQuestion.option2}
+                          <span className="float-right">0%</span>
+                        </li>
+                      )}
+                      {campaignData.quizQuestion.option3 && (
+                        <li className="py-[12px]">
+                          C. {campaignData.quizQuestion.option3}
+                          <span className="float-right">0%</span>
+                        </li>
+                      )}
+                      {campaignData.quizQuestion.option4 && (
+                        <li className="py-[12px]">
+                          D. {campaignData.quizQuestion.option4}
+                          <span className="float-right">0%</span>
+                        </li>
+                      )}
+                    </ul>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Survey Details */}
-            <div className="bg-white p-4 sm:p-6 rounded-xl">
-              <h2 className="text-[16px] sm:text-[18px] font-md text-gray-800 mb-4">
-                Survey details
-              </h2>
+                <div>
+                  <BarCharts />
 
-              {/* Survey Question 1 */}
-              <div className="mb-6">
-                <div className="flex flex-col sm:flex-row sm:justify-between text-[14px] sm:text-[16px] text-gray-500 mb-1 gap-2 sm:gap-0">
-                  <span>SURVEY QUESTION 1</span>
-                  <span className="font-bold text-lg sm:text-xl text-gray-700">
-                    {campaignData?.engagements?.totalCount} Responses
-                  </span>
-                </div>
-                <div className="p-4 sm:p-5 rounded-xl bg-[var(--bg-color-off-white)]">
-                  <span className="text-[14px] sm:text-[16px] text-gray-800">
-                    {campaignData?.surveyQuestion1?.questionText}
-                  </span>
-                  <div className="p-1 relative">
-                    <ProgressBar
-                      value={25}
-                      fill="bg-white rounded-xl"
-                      text={{
-                        left: campaignData?.surveyQuestion1?.option1,
-                        right: "0%",
-                      }}
-                    />
-                  </div>
-                  <div className="p-1 relative">
-                    <ProgressBar
-                      value={60}
-                      fill="bg-white rounded-xl"
-                      text={{
-                        left: campaignData?.surveyQuestion1?.option2,
-                        right: "0%",
-                      }}
-                    />
-                  </div>
-                  <div className="p-1 relative">
-                    <ProgressBar
-                      value={45}
-                      fill="bg-white rounded-xl"
-                      text={{
-                        left: campaignData?.surveyQuestion1?.option3,
-                        right: "0%",
-                      }}
-                    />
-                  </div>
-                  <div className="p-1 relative">
-                    <ProgressBar
-                      value={30}
-                      fill="bg-white rounded-xl"
-                      text={{
-                        left: campaignData?.surveyQuestion1?.option4,
-                        right: "0%",
-                      }}
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-3 ml-4 sm:ml-20 text-sm text-gray-600 w-full max-w-md">
+                    <div className="mb-2 sm:mb-0">
+                      <span className="w-3 h-3 rounded-full bg-[#3653F7] inline-block mr-2" />{" "}
+                      Male ({campaignData.genderRatio}%)
+                    </div>
+                    <div className="mb-2 sm:mb-0">
+                      <span className="w-3 h-3 rounded-full bg-[#E670C7] inline-block mr-2" />
+                      Female (0%)
+                    </div>
+                    <div>
+                      <span className="w-3 h-3 rounded-full bg-[#15B79E] inline-block mr-2" />{" "}
+                      Prefer Not to Say (0%)
+                    </div>
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* Survey Question 2 */}
-              <div>
-                <div className="flex flex-col sm:flex-row sm:justify-between text-[13px] sm:text-[16px] text-gray-500 mb-1 gap-2 sm:gap-0">
-                  <span>SURVEY QUESTION 2</span>
-                  <span className="font-bold text-lg sm:text-xl text-gray-700">
-                    {campaignData?.engagements?.totalCount} Responses
-                  </span>
-                </div>
-                <div className="p-4 sm:p-5 rounded-xl bg-[var(--bg-color-off-white)]">
-                  <span className="text-[14px] sm:text-[16px] text-gray-800">
-                    {campaignData?.surveyQuestion2?.questionText}
-                  </span>
+            {/* Survey Details - Only show if survey questions exist and have non-empty questionText */}
+            {((campaignData.surveyQuestion1 && campaignData.surveyQuestion1.questionText) ||
+              (campaignData.surveyQuestion2 && campaignData.surveyQuestion2.questionText)) && (
+                <div className="bg-white p-4 sm:p-6 rounded-xl">
+                  <h2 className="text-[16px] sm:text-[18px] font-md text-gray-800 mb-4">
+                    Survey details
+                  </h2>
 
-                  <div className="p-1 relative">
-                    <ProgressBar
-                      value={25}
-                      fill="bg-white rounded-xl"
-                      text={{
-                        left: campaignData?.surveyQuestion2?.option1,
-                        right: "0%",
-                      }}
-                    />
-                  </div>
-                  <div className="p-1 relative">
-                    <ProgressBar
-                      value={60}
-                      fill="bg-white rounded-xl"
-                      text={{
-                        left: campaignData?.surveyQuestion2?.option2,
-                        right: "0%",
-                      }}
-                    />
-                  </div>
-                  <div className="p-1 relative">
-                    <ProgressBar
-                      value={45}
-                      fill="bg-white rounded-xl"
-                      text={{
-                        left: campaignData?.surveyQuestion2?.option3,
-                        right: "0%",
-                      }}
-                    />
-                  </div>
-                  <div className="p-1 relative">
-                    <ProgressBar
-                      value={30}
-                      fill="bg-white rounded-xl"
-                      text={{
-                        left: campaignData?.surveyQuestion2?.option4,
-                        right: "0%",
-                      }}
-                    />
-                  </div>
+                  {/* Survey Question 1 - Only show if exists and has non-empty questionText */}
+                  {campaignData.surveyQuestion1 && campaignData.surveyQuestion1.questionText && (
+                    <div className="mb-6">
+                      <div className="flex flex-col sm:flex-row sm:justify-between text-[14px] sm:text-[16px] text-gray-500 mb-1 gap-2 sm:gap-0">
+                        <span>SURVEY QUESTION 1</span>
+                        <span className="font-bold text-lg sm:text-xl text-gray-700">
+                          {campaignData.engagements?.totalCount} Responses
+                        </span>
+                      </div>
+                      <div className="p-4 sm:p-5 rounded-xl bg-[var(--bg-color-off-white)]">
+                        <span className="text-[14px] sm:text-[16px] text-gray-800">
+                          {campaignData.surveyQuestion1.questionText}
+                        </span>
+                        {campaignData.surveyQuestion1.option1 && (
+                          <div className="p-1 relative">
+                            <ProgressBar
+                              value={25}
+                              fill="bg-white rounded-xl"
+                              text={{
+                                left: campaignData.surveyQuestion1.option1,
+                                right: "0%",
+                              }}
+                            />
+                          </div>
+                        )}
+                        {campaignData.surveyQuestion1.option2 && (
+                          <div className="p-1 relative">
+                            <ProgressBar
+                              value={60}
+                              fill="bg-white rounded-xl"
+                              text={{
+                                left: campaignData.surveyQuestion1.option2,
+                                right: "0%",
+                              }}
+                            />
+                          </div>
+                        )}
+                        {campaignData.surveyQuestion1.option3 && (
+                          <div className="p-1 relative">
+                            <ProgressBar
+                              value={45}
+                              fill="bg-white rounded-xl"
+                              text={{
+                                left: campaignData.surveyQuestion1.option3,
+                                right: "0%",
+                              }}
+                            />
+                          </div>
+                        )}
+                        {campaignData.surveyQuestion1.option4 && (
+                          <div className="p-1 relative">
+                            <ProgressBar
+                              value={30}
+                              fill="bg-white rounded-xl"
+                              text={{
+                                left: campaignData.surveyQuestion1.option4,
+                                right: "0%",
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Survey Question 2 - Only show if exists and has non-empty questionText */}
+                  {campaignData.surveyQuestion2 && campaignData.surveyQuestion2.questionText && (
+                    <div>
+                      <div className="flex flex-col sm:flex-row sm:justify-between text-[13px] sm:text-[16px] text-gray-500 mb-1 gap-2 sm:gap-0">
+                        <span>SURVEY QUESTION 2</span>
+                        <span className="font-bold text-lg sm:text-xl text-gray-700">
+                          {campaignData.engagements?.totalCount} Responses
+                        </span>
+                      </div>
+                      <div className="p-4 sm:p-5 rounded-xl bg-[var(--bg-color-off-white)]">
+                        <span className="text-[14px] sm:text-[16px] text-gray-800">
+                          {campaignData.surveyQuestion2.questionText}
+                        </span>
+
+                        {campaignData.surveyQuestion2.option1 && (
+                          <div className="p-1 relative">
+                            <ProgressBar
+                              value={25}
+                              fill="bg-white rounded-xl"
+                              text={{
+                                left: campaignData.surveyQuestion2.option1,
+                                right: "0%",
+                              }}
+                            />
+                          </div>
+                        )}
+                        {campaignData.surveyQuestion2.option2 && (
+                          <div className="p-1 relative">
+                            <ProgressBar
+                              value={60}
+                              fill="bg-white rounded-xl"
+                              text={{
+                                left: campaignData.surveyQuestion2.option2,
+                                right: "0%",
+                              }}
+                            />
+                          </div>
+                        )}
+                        {campaignData.surveyQuestion2.option3 && (
+                          <div className="p-1 relative">
+                            <ProgressBar
+                              value={45}
+                              fill="bg-white rounded-xl"
+                              text={{
+                                left: campaignData.surveyQuestion2.option3,
+                                right: "0%",
+                              }}
+                            />
+                          </div>
+                        )}
+                        {campaignData.surveyQuestion2.option4 && (
+                          <div className="p-1 relative">
+                            <ProgressBar
+                              value={30}
+                              fill="bg-white rounded-xl"
+                              text={{
+                                left: campaignData.surveyQuestion2.option4,
+                                right: "0%",
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
+              )}
+
           </div>
           <div>
             <h1 className="font-md text-[18px]">Performance Summary</h1>
@@ -566,7 +602,7 @@ export default function CampaignDetailPage({ campaignData }) {
 
             <div className="flex-1 bg-white rounded-xl p-6">
               <h2 className="text-[16px] text-gray-400 mb-2">AD CLICKS</h2>
-              <p className="text-[30px] font-md text-gray-800">30,000</p>
+              <p className="text-[30px] font-md text-gray-800">0</p>
             </div>
             <div className="hidden md:block w-px bg-gray-300 mx-4"></div>
 
@@ -574,7 +610,7 @@ export default function CampaignDetailPage({ campaignData }) {
               <h2 className="text-[16px] text-gray-400  mb-2">
                 CLICK-THROUGH RATE
               </h2>
-              <p className="text-[30px] font-md text-gray-800">40%</p>
+              <p className="text-[30px] font-md text-gray-800">0</p>
             </div>
           </div>
 

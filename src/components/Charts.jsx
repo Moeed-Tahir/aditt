@@ -1,6 +1,5 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -9,53 +8,88 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  Text,
 } from "recharts";
 import { useState } from "react";
-
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import Calendars from "./Calendars";
 
-// Sample data
-const chartData = [
-  { month: "Puma Promotion", views: 186000, mobile: 80000 },
-  { month: "Skechers Promotion", views: 305000, mobile: 200000 },
-  { month: "Timberland Promotion", views: 237000, mobile: 120000 },
-  { month: "Skechers Promotion", views: 73000, mobile: 190000 },
-  { month: "Converse Promotion", views: 209000, mobile: 130000 },
-  { month: "Vans ad Campaign", views: 214000, mobile: 140000 },
-  { month: "Reebok Promotion", views: 186000, mobile: 80000 },
-  { month: "Puma Promotion", views: 305000, mobile: 200000 },
-  { month: "New Balance ad", views: 237000, mobile: 120000 },
-  { month: "Adidas Campaign", views: 73000, mobile: 190000 },
-  { month: "Nike Campaign", views: 209000, mobile: 130000 },
-];
+export default function BarChartComponent({ campaignData }) {
+  console.log("campaignData in BarChartComponent",campaignData);
 
-// Y-axis formatter
-const formatYAxis = (value) => `${value / 1000}K`;
-
-export default function BarChartComponent() {
   const [formData, setFormData] = useState({
     startDate: new Date(),
   });
 
+  const transformCampaignData = () => {
+    if (!campaignData || campaignData.length === 0) return [];
+
+    return campaignData.map(campaign => ({
+      name: campaign.title || "Untitled Campaign",
+      clicks: campaign.views || 40,
+      budget: parseFloat(campaign.amount) || 0,
+      minVisibleValue:campaign.amount,
+    }));
+  };
+
+  const chartData = transformCampaignData();
+
+  const formatYAxis = (value) => {
+    if (value >= 1000) return `${value / 1000}k`;
+    return value;
+  };
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-4 border rounded shadow-sm">
+          <p className="font-medium">{label}</p>
+          <p className="text-sm">Clicks: {payload[0].value}</p>
+          <p className="text-sm">Budget: ${payload[1].value.toFixed(2)}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  if (chartData.length === 0 || chartData.every(item => item.clicks === 0)) {
+    return (
+      <Card className="w-full shadow-none border-none">
+        <CardHeader>
+          <CardTitle className="text-xl font-light">
+            Most efficient campaigns
+          </CardTitle>
+          <CardDescription className="font-light">
+            No click data available yet
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="h-[300px] flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <p>Your campaigns haven't received any clicks yet.</p>
+            <p>Check back later when your campaigns are running.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full shadow-none border-none">
-    <CardHeader className="flex flex-wrap items-start justify-between gap-4">
-  <div className="max-w-[300px]">
-    <CardTitle className="text-xl font-light">
-      Most efficient campaigns
-    </CardTitle>
-    <CardDescription className="font-light">
-      Rank based on Click through rate
-    </CardDescription>
-  </div>
+      <CardHeader className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <CardTitle className="text-xl font-light">
+            Most efficient campaigns
+          </CardTitle>
+          <CardDescription className="font-light">
+            Rank based on Click through rate
+          </CardDescription>
+        </div>
 
   <div className="w-full sm:w-auto sm:max-w-[250px] mr-20">
     <Calendars
@@ -75,27 +109,36 @@ export default function BarChartComponent() {
         <div className="w-full overflow-x-auto">
           <div className="min-w-[800px] h-[500px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="0 0" />
+              <BarChart
+                data={chartData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
                 <XAxis
-                  dataKey="month"
-                  tickFormatter={(value) => value.slice(0, 3)}
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={10}
+                  dataKey="name"
+                  angle={-45}
+                  textAnchor="end"
+                  height={70}
+                  tick={{ fontSize: 12 }}
                 />
                 <YAxis
                   tickFormatter={formatYAxis}
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={10}
+                  domain={[0, 'auto']}
                 />
-                <Tooltip
-                  cursor={{ fill: "rgba(0, 0, 0, 0)" }}
-                  formatter={(value) => `${(value / 1000).toFixed(1)}K`}
-                  labelFormatter={(label) => `Campaign: ${label}`}
+                <Tooltip content={<CustomTooltip />} />
+                <Bar
+                  dataKey="clicks"
+                  name="Clicks"
+                  fill="#6297FF"
+                  radius={[4, 4, 0, 0]}
                 />
-                <Bar dataKey="views" fill="#6297FF" radius={4} />
+                <Bar
+                  dataKey="minVisibleValue"
+                  name="Minimum"
+                  fill="#e2e8f0"
+                  radius={[4, 4, 0, 0]}
+                  opacity={0.3}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>

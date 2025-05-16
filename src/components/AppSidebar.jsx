@@ -80,7 +80,7 @@ export function AppSidebar() {
             <p className="font-semibold text-xl mb-2">Need help?</p>
             <p className="text-xs text-gray-600 mb-2">Get answers, resolve issues, or reach out to our support team.</p>
             <Link
-              href="/support"
+              href="/Support"
               className="block w-full text-center bg-white text-blue-600 rounded-full py-2 text-xl hover:bg-blue-700 hover:text-white transition"
             >
               Contact us

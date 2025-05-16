@@ -52,7 +52,6 @@ export function Settings() {
           userId: userId,
         }
       );
-      console.log("response", response);
 
       if (response.data.profile) {
         setFormData({
