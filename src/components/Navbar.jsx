@@ -6,8 +6,9 @@ import NotificationDropdown from "./NotificationDropdown";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 
-export default function Navbar() {
+export default function Navbar({userId}) {
   const [user, setUser] = useState(null);
+  console.log("user", user);
 
   useEffect(() => {
     const userCookie = Cookies.get("user");
@@ -27,7 +28,7 @@ export default function Navbar() {
         Welcome, {user?.name || "User"} 👋
         <p className="text-[12px] md:text-[14px] text-gray-400">Good Morning</p>
       </div>
-      
+
       <div className="flex items-center space-x-2 md:space-x-4 w-full md:w-auto justify-between md:justify-normal">
         <NotificationDropdown />
 
@@ -40,8 +41,8 @@ export default function Navbar() {
             className="rounded-full mr-2 md:mr-3 w-8 h-8 md:w-10 md:h-10"
           />
           <div>
-            <Link href="/settings">
-              <div className="font-bold text-sm md:text-base">Bongo digital</div>
+            <Link href={`/${userId}/Settings`}>
+              <div className="font-bold text-sm md:text-base">{user?.name}</div>
               <p className="text-xs md:text-sm font-light">{user?.email}</p>
             </Link>
           </div>

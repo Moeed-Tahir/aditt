@@ -2,15 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import NotificationDropdown from "./NotificationDropdown";
 
-export default function Navbar2() {
+export default function Navbar2({ userId }) {
   return (
     <nav className="flex flex-col md:flex-row items-center justify-between bg-white shadow px-4 md:px-6 py-3 gap-4 md:gap-0">
       {/* Logo - centered on mobile, aligned left on desktop */}
       <div className="w-full md:w-auto flex justify-center md:justify-start">
-        <Image 
-          src="/Aditt logo.jpg" 
-          alt="logo" 
-          width={100} 
+        <Image
+          src="/Aditt logo.jpg"
+          alt="logo"
+          width={100}
           height={100}
           className="w-20 md:w-[100px] h-auto"
         />
@@ -30,7 +30,7 @@ export default function Navbar2() {
             className="rounded-full mr-2 md:mr-3 w-8 h-8 md:w-10 md:h-10"
           />
           <div>
-            <Link href="/settings">
+            <Link href={`/${userId}/Settings`}>
               <div className="font-bold text-sm md:text-base">Bongo digital</div>
               <p className="text-xs md:text-sm font-light">john@aditt.com</p>
             </Link>

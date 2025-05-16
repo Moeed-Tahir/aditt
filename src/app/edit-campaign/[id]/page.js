@@ -29,6 +29,7 @@ import LinkBankAccount from "../../../components/LinkBankAccount";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
 import AlertBox from "./AlertBox";
+import Cookies from "js-cookie";
 
 
 const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
@@ -47,6 +48,7 @@ export default function EditCampaign() {
   const searchParams = useSearchParams();
   const currentStep = parseInt(searchParams.get("step") || "0");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const userId = Cookies.get("userId");
 
   const [formData, setFormData] = useState({
     campaignTitle: "",
@@ -227,8 +229,8 @@ export default function EditCampaign() {
           answer:
             formData.surveyQuestion1.correctAnswer !== null
               ? formData.surveyQuestion1.options[
-                  formData.surveyQuestion1.correctAnswer
-                ]
+              formData.surveyQuestion1.correctAnswer
+              ]
               : "",
         },
         surveyQuestion2: {
@@ -240,8 +242,8 @@ export default function EditCampaign() {
           answer:
             formData.surveyQuestion2.correctAnswer !== null
               ? formData.surveyQuestion2.options[
-                  formData.surveyQuestion2.correctAnswer
-                ]
+              formData.surveyQuestion2.correctAnswer
+              ]
               : "",
         },
         genderType: formData.genderType,
@@ -285,11 +287,11 @@ export default function EditCampaign() {
         type: "error",
         visible: true,
       });
-      
+
       setTimeout(() => {
         setAlert(prev => ({ ...prev, visible: false }));
       }, 4000);
-      
+
     }
   };
 
@@ -348,7 +350,7 @@ export default function EditCampaign() {
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
-      <Navbar2 />
+      <Navbar2 userId={userId} />
 
       <div className="p-10">
         {/* Top Header with Back Button */}
@@ -357,7 +359,7 @@ export default function EditCampaign() {
         <div className="max-w-6xl mx-auto">
           <div className="relative flex items-center mb-10 justify-between">
             <Link
-              href="/userid/campaign-dashboard"
+              href={`/${userId}/campaign-dashboard`}
               className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
             >
               <ArrowLeft />
@@ -376,21 +378,19 @@ export default function EditCampaign() {
               >
                 <Link
                   href={`?step=${index}`}
-                  className={` gap-2 h-10 flex items-center justify-start rounded-full text-xs font-medium px-4 ${
-                    index === currentStep
+                  className={` gap-2 h-10 flex items-center justify-start rounded-full text-xs font-medium px-4 ${index === currentStep
                       ? "border-blue-600 border bg-white text-gray-600"
                       : "bg-white text-gray-600"
-                  } hover:cursor-pointer transition`}
+                    } hover:cursor-pointer transition`}
                 >
                   {index < currentStep ? (
                     <CircleCheck className="w-7 h-7 text-blue-600 shrink-0" /> // Tick icon for completed steps
                   ) : (
                     <CircleDot
-                      className={`w-7 h-7 shrink-0 ${
-                        index === currentStep
+                      className={`w-7 h-7 shrink-0 ${index === currentStep
                           ? "text-blue-600"
                           : "text-gray-300"
-                      }`}
+                        }`}
                     />
                   )}
                   {step.label}
@@ -424,13 +424,12 @@ export default function EditCampaign() {
 
                 <Link
                   href="?step=1"
-                  className={`bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
-                    !formData.campaignTitle ||
-                    !formData.websiteLink ||
-                    !formData.videoFile
+                  className={`bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${!formData.campaignTitle ||
+                      !formData.websiteLink ||
+                      !formData.videoFile
                       ? "opacity-50 cursor-not-allowed"
                       : ""
-                  }`}
+                    }`}
                   onClick={(e) => {
                     if (
                       !formData.campaignTitle ||
@@ -1044,7 +1043,7 @@ export default function EditCampaign() {
                   </div>
 
                   <div className="relative flex-1">
-                    <PaymentMethod 
+                    <PaymentMethod
                       value={{
                         cardNumber: formData.cardNumber,
                         monthOnCard: formData.monthOnCard,
@@ -1059,8 +1058,8 @@ export default function EditCampaign() {
                       onChange={(paymentData) =>
                         setFormData((prev) => ({ ...prev, ...paymentData }))
                       }
-                      
-                      
+
+
                     />
                     <LinkBankAccount
                       value={{
@@ -1083,8 +1082,8 @@ export default function EditCampaign() {
       </div>
 
       {alert.visible && (
-          <AlertBox message={alert.message} type={alert.type} />
-        )}
+        <AlertBox message={alert.message} type={alert.type} />
+      )}
 
       {showSuccessModal && (
         <div className="fixed inset-0 bg-opacity-30 flex items-center justify-center z-50">
@@ -1099,7 +1098,8 @@ export default function EditCampaign() {
                 active.
               </p>
               <Link
-                href="/userid/campaign-dashboard"
+
+                href={`/${userId}/campaign-dashboard`}
                 className="bg-blue-600 w-full h-[45px] px-25 py-3 text-white rounded-full hover:bg-blue-700 transition"
               >
                 Back to campaigns

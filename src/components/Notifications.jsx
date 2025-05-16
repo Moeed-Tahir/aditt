@@ -1,34 +1,25 @@
 "use client";
 
-import Charts from "@/components/Charts";
-import { LineBarsChart } from "@/components/LineBarsChart";
 import Link from "next/link";
 import {
   ArrowLeft,
-  ChevronDown,
-  Copy,
-  Globe,
-  House,
-  LandmarkIcon,
-  Lock,
-  Mail,
-  Trash,
-  Upload,
-  User,
 } from "lucide-react";
 import Navbar2 from "./Navbar2";
+import Cookies from "js-cookie";
 
 export function Notifications() {
+  const userId = Cookies.get("userId");
+
   return (
     <>
       <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
-        <Navbar2 />
+      <Navbar2 userId={userId} />
 
         <div className="p-10">
           <div className="relative flex items-center mb-10 justify-between">
             <Link
-          href="/userid/campaign-dashboard"
-          className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
+              href={`/${userId}/campaign-dashboard`}
+              className="py-2 px-5 ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2"
             >
               <ArrowLeft />
               Back
@@ -40,7 +31,7 @@ export function Notifications() {
           </div>
 
           <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-            <div className="flex items-center justify-between ">
+            {/* <div className="flex items-center justify-between ">
               <div>
                 <label className="block text-lg font-medium mt-2">
                   Low Balance Alert ⚠️
@@ -89,7 +80,7 @@ export function Notifications() {
                 </span>
                 <p className="text-xs mt-2 text-gray-500">23 feb, 2025</p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </main>

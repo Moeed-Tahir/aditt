@@ -18,13 +18,16 @@ import {
 
 import PaymentMethod from "@/components/PaymentMethod";
 import LinkBankAccount from "@/components/LinkBankAccount";
+import Cookies from "js-cookie";
 
 export default function PaymentManagementDashboard() {
+  const userId = Cookies.get("userId");
+
   return (
     <SidebarProvider>
       <AppSidebar />
       <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
-        <Navbar />
+        <Navbar userId={userId} />
         <div className="p-4">
           <h1 className="text-2xl font-bold">Payment Management</h1>
           <div className="min-h-screen px-4 py-8">
