@@ -26,16 +26,6 @@ const items = [
     url: "/userid/campaign-dashboard",
     icon: Megaphone,
   },
-  // {
-  //   title: "Analytics",
-  //   url: "/analytics",
-  //   icon: ChartColumn,
-  // },
-  // {
-  //   title: "Payment Management",
-  //   url: "/payment-management",
-  //   icon: CircleDollarSign,
-  // },
 ];
 
 export function AppSidebar() {
