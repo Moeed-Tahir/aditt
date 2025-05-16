@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
-import { Router } from "next/router";
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import AlertBox from "./AlertBox";
 
@@ -24,6 +24,7 @@ function SignUpVerifyEmail() {
     confirmPassword: "",
     acceptTerms: false,
   });
+  const router = useRouter();
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -85,7 +86,6 @@ function SignUpVerifyEmail() {
 
     const userId = Cookies.get("userId");
     try {
-      
       const response = await axios.post(
         "/api/routes/v1/authRoutes?action=verify-otp",
         {
@@ -94,13 +94,13 @@ function SignUpVerifyEmail() {
         }
       );
       setAlert({
-        message: "User is created",
+        message: "Your email has been verified successfully",
         type: "success",
         visible: true,
       });
-      
+
       setTimeout(() => {
-        setAlert(prev => ({ ...prev, visible: false }));
+        setAlert((prev) => ({ ...prev, visible: false }));
       }, 4000);
     } catch (error) {
       setAlert({
@@ -108,14 +108,13 @@ function SignUpVerifyEmail() {
         type: "error",
         visible: true,
       });
-      
-      setTimeout(() => {
-        setAlert(prev => ({ ...prev, visible: false }));
-      }, 4000);
 
+      setTimeout(() => {
+        setAlert((prev) => ({ ...prev, visible: false }));
+      }, 4000);
     } finally {
       setSubmitAttempted(false);
-      Router.push("/campaign-dashboard");
+      router.push(`/${userId}/campaign-dashboard`);
     }
   };
 
@@ -135,70 +134,70 @@ function SignUpVerifyEmail() {
   };
 
   const [alert, setAlert] = useState({
-    message: '',
-    type: '', // 'success' | 'error' | 'info' | 'warning'
-    visible: false
+    message: "",
+    type: "", // 'success' | 'error' | 'info' | 'warning'
+    visible: false,
   });
 
   const handleResendOtp = async () => {
     const userId = Cookies.get("userId");
 
     if (!userId) {
-        setAlert({
-          message: "User ID not found.",
-          type: "error",
-          visible: true,
-        });
-        
-        setTimeout(() => {
-          setAlert(prev => ({ ...prev, visible: false }));
-        }, 4000);
-        return;
+      setAlert({
+        message: "User ID not found.",
+        type: "error",
+        visible: true,
+      });
+
+      setTimeout(() => {
+        setAlert((prev) => ({ ...prev, visible: false }));
+      }, 4000);
+      return;
     }
 
     try {
-        const response = await axios.post(
-            "/api/routes/v1/authRoutes?action=resend-otp",
-            { userId }
-        );
-        
-        if (response.data.message === "OTP resent successfully") {
-            setAlert({
-              message: "New OTP has been sent to your email.",
-              type: "success",
-              visible: true,
-            });
-            
-            setTimeout(() => {
-              setAlert(prev => ({ ...prev, visible: false }));
-            }, 4000);
-            setResendTimer(30); // Set timer for 30 seconds
-        } else {
-            setAlert({
-              message: "Failed to resend OTP. Please try again.",
-              type: "errror",
-              visible: true,
-            });
-            
-            setTimeout(() => {
-              setAlert(prev => ({ ...prev, visible: false }));
-            }, 4000);
-        }
-    } catch (error) {
-        console.error("Error resending OTP:", error);
+      const response = await axios.post(
+        "/api/routes/v1/authRoutes?action=resend-otp",
+        { userId }
+      );
+
+      if (response.data.message === "OTP resent successfully") {
         setAlert({
-          message: error.response?.data?.message ||
-          "Failed to resend OTP. Please try again.",
+          message: "New OTP has been sent to your email.",
+          type: "success",
+          visible: true,
+        });
+
+        setTimeout(() => {
+          setAlert((prev) => ({ ...prev, visible: false }));
+        }, 4000);
+        setResendTimer(30); // Set timer for 30 seconds
+      } else {
+        setAlert({
+          message: "Failed to resend OTP. Please try again.",
           type: "errror",
           visible: true,
         });
-        
-        setTimeout(() => {
-          setAlert(prev => ({ ...prev, visible: false }));
-        }, 4000);
 
+        setTimeout(() => {
+          setAlert((prev) => ({ ...prev, visible: false }));
+        }, 4000);
+      }
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+      setAlert({
+        message:
+          error.response?.data?.message ||
+          "Failed to resend OTP. Please try again.",
+        type: "errror",
+        visible: true,
+      });
+
+      setTimeout(() => {
+        setAlert((prev) => ({ ...prev, visible: false }));
+      }, 4000);
     }
-};
+  };
 
   useEffect(() => {
     let timer;
@@ -354,10 +353,7 @@ function SignUpVerifyEmail() {
           </div>
         </div>
       </div>
-      {alert.visible && (
-          <AlertBox message={alert.message} type={alert.type} />
-        )}
-
+      {alert.visible && <AlertBox message={alert.message} type={alert.type} />}
     </div>
   );
 }

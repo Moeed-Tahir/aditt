@@ -49,7 +49,7 @@ export function Settings() {
       const response = await axios.post(
         "/api/routes/v1/authRoutes?action=getProfile",
         {
-          userId: userId
+          userId: userId,
         }
       );
       console.log("response", response);
@@ -63,7 +63,7 @@ export function Settings() {
           companyName: response.data.profile.companyName || "",
           phone: response.data.profile.phone || "",
           currentPassword: "",
-          newPassword: ""
+          newPassword: "",
         });
       } else {
         setError(response.data.message || "Failed to get profile data");
@@ -72,13 +72,13 @@ export function Settings() {
       console.error("Error getting profile:", error);
       setError("Failed to fetch profile data");
     }
-  }
+  };
 
   useEffect(() => {
     if (userId) {
       fetchProfileData();
     }
-  }, [userId]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -94,7 +94,7 @@ export function Settings() {
     } else {
       setPersonalLoading(true);
     }
-    
+
     try {
       const token = Cookies.get("token");
       const response = await axios.put(
@@ -118,9 +118,9 @@ export function Settings() {
       }
     } catch (error) {
       console.error("Update failed:", error);
-      setMessage({ 
-        text: error.response?.data?.message || "Failed to update profile.", 
-        type: "error" 
+      setMessage({
+        text: error.response?.data?.message || "Failed to update profile.",
+        type: "error",
       });
     } finally {
       if (isBusinessUpdate) {
@@ -157,9 +157,9 @@ export function Settings() {
       }
     } catch (error) {
       console.error("Password update failed:", error);
-      setMessage({ 
-        text: error.response?.data?.message || "Failed to update password.", 
-        type: "error" 
+      setMessage({
+        text: error.response?.data?.message || "Failed to update password.",
+        type: "error",
       });
     } finally {
       setPasswordLoading(false);
@@ -247,7 +247,11 @@ export function Settings() {
               }}
               disabled={businessLoading}
             >
-              {businessLoading ? "Saving..." : businessEditMode ? "Update" : "Edit"}
+              {businessLoading
+                ? "Saving..."
+                : businessEditMode
+                ? "Update"
+                : "Edit"}
             </button>
           </div>
 
@@ -339,7 +343,11 @@ export function Settings() {
               }}
               disabled={personalLoading}
             >
-              {personalLoading ? "Saving..." : personalEditMode ? "Update" : "Edit"}
+              {personalLoading
+                ? "Saving..."
+                : personalEditMode
+                ? "Update"
+                : "Edit"}
             </button>
           </div>
 
@@ -529,7 +537,7 @@ export function Settings() {
               </span>
             </div>
             <button
-              className="bg-white text-[14px] md:text-[16px] flex justify-center items-center font-md text-[#FF4319] w-full md:w-[230px] h-[48px] md:h-[56px] rounded-full border-2 border-[#FF4319] hover:bg-[#FF4319] hover:text-white"
+              className="bg-white text-[14px] md:text-[16px] flex justify-center items-center font-md text-[#FF4319] w-full md:w-[230px] h-[48px] md:h-[56px] rounded-full border-2 border-[#FF4319] hover:bg-[#FF4319] hover:text-white cursor-pointer"
               disabled={passwordLoading}
               onClick={handleLogout}
             >

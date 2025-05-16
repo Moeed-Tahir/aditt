@@ -486,7 +486,7 @@ exports.getProfile = async (req, res) => {
             userId: user.userId,
             name: user.name,
             phone: user.phone,
-            companyName:user.companyName,
+            companyName: user.companyName,
             businessWebsite: user.businessWebsite,
             businessEmail: user.businessEmail,
             createdAt: user.createdAt,

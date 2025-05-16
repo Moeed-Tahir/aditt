@@ -17,7 +17,6 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import AlertBox from "./AlertBox";
 
-
 function SignupUser() {
   const [formData, setFormData] = useState({
     name: "",
@@ -61,13 +60,13 @@ function SignupUser() {
       email: !formData.email
         ? "Email is required"
         : !validateEmailDomain(formData.email, formData.website)
-          ? "Email must match your business domain"
-          : "",
+        ? "Email must match your business domain"
+        : "",
       password: !formData.password
         ? "Password is required"
         : formData.password.length < 8
-          ? "Password must be at least 8 characters"
-          : "",
+        ? "Password must be at least 8 characters"
+        : "",
       acceptTerms: !formData.acceptTerms ? "You must accept the terms" : "",
     };
 
@@ -95,42 +94,50 @@ function SignupUser() {
   };
 
   const [alert, setAlert] = useState({
-    message: '',
-    type: '', // 'success' | 'error' | 'info' | 'warning'
-    visible: false
+    message: "",
+    type: "", // 'success' | 'error' | 'info' | 'warning'
+    visible: false,
   });
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
+    setLoading(true);
 
-    if (!formData.name || !formData.website || !formData.email || !formData.password) {
-      setMessage({ text: 'Please fill all fields', type: 'error' });
+    if (
+      !formData.name ||
+      !formData.website ||
+      !formData.email ||
+      !formData.password
+    ) {
+      setMessage({ text: "Please fill all fields", type: "error" });
       return;
     }
 
     try {
-      const response = await axios.post('/api/routes/v1/authRoutes?action=signup', {
-        name: formData.name,
-        businessWebsite: formData.website,
-        businessEmail: formData.email,
-        password: formData.password
-      })
-      
+      const response = await axios.post(
+        "/api/routes/v1/authRoutes?action=signup",
+        {
+          name: formData.name,
+          businessWebsite: formData.website,
+          businessEmail: formData.email,
+          password: formData.password,
+        }
+      );
+
       if (response.status === 200 || response.status === 201) {
-        Cookies.set('userId', response.data.userId, { expires: 1 });
+        Cookies.set("userId", response.data.userId, { expires: 1 });
         const userId = Cookies.get("userId");
         setAlert({
           message: "User created successfully",
           type: "success",
           visible: true,
         });
-        
+
         setTimeout(() => {
-          setAlert(prev => ({ ...prev, visible: false }));
+          setAlert((prev) => ({ ...prev, visible: false }));
         }, 4000);
-        
+
         router.push(`${userId}/verify-email`);
       } else if (response.status === 200) {
         setAlert({
@@ -138,9 +145,9 @@ function SignupUser() {
           type: "success",
           visible: true,
         });
-        
+
         setTimeout(() => {
-          setAlert(prev => ({ ...prev, visible: false }));
+          setAlert((prev) => ({ ...prev, visible: false }));
         }, 4000);
       }
     } catch (error) {
@@ -151,9 +158,9 @@ function SignupUser() {
           type: "error",
           visible: true,
         });
-        
+
         setTimeout(() => {
-          setAlert(prev => ({ ...prev, visible: false }));
+          setAlert((prev) => ({ ...prev, visible: false }));
         }, 4000);
       } else {
         setAlert({
@@ -161,12 +168,13 @@ function SignupUser() {
           type: "error",
           visible: true,
         });
-        
+
         setTimeout(() => {
-          setAlert(prev => ({ ...prev, visible: false }));
+          setAlert((prev) => ({ ...prev, visible: false }));
         }, 4000);
-        
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -202,14 +210,16 @@ function SignupUser() {
             onChange={handleChange}
             onBlur={handleBlur}
             placeholder={placeholder}
-            className={`w-full border ${shouldShowError(name)
+            className={`w-full border ${
+              shouldShowError(name)
                 ? "border-red-500"
                 : "border-[var(--border-color)]"
-              } rounded-[58px] p-4 pl-12 pr-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
+            } rounded-[58px] p-4 pl-12 pr-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
           />
           <Icon
-            className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${shouldShowError(name) ? "text-red-500" : "text-gray-600"
-              }`}
+            className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${
+              shouldShowError(name) ? "text-red-500" : "text-gray-600"
+            }`}
             size={20}
           />
           {isPassword && (
@@ -310,10 +320,7 @@ function SignupUser() {
                 className="text-[16px] font-medium text-gray-700"
               >
                 Accept {""}
-                <Link
-                  href="/guidelines"
-                  className="text-blue-500 underline"
-                >
+                <Link href="/guidelines" className="text-blue-500 underline">
                   Guidelines
                 </Link>
                 ,
@@ -344,10 +351,11 @@ function SignupUser() {
             <button
               type="submit"
               disabled={loading}
-              className={`mt-4 w-full py-4 px-6 rounded-[58px] text-white font-semibold flex items-center justify-center gap-2 ${loading
+              className={`mt-4 w-full py-4 px-6 rounded-[58px] text-white font-semibold cursor-pointer flex items-center justify-center gap-2 ${
+                loading
                   ? "bg-blue-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"
-                }`}
+              }`}
             >
               {loading ? (
                 <svg
@@ -380,7 +388,7 @@ function SignupUser() {
                 Have an account already?{" "}
                 <Link
                   href="/signin-user"
-                  className="text-blue-600 hover:underline font-bold"
+                  className="text-blue-600 hover:underline font-bold cursor-pointer"
                 >
                   Sign In
                 </Link>
@@ -392,7 +400,6 @@ function SignupUser() {
         {alert.visible && (
           <AlertBox message={alert.message} type={alert.type} />
         )}
-
       </div>
     </div>
   );

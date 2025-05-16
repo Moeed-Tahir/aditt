@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 
 export default function Navbar({userId}) {
   const [user, setUser] = useState(null);
-  console.log("user", user);
 
   useEffect(() => {
     const userCookie = Cookies.get("user");
