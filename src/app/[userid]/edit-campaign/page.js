@@ -2,37 +2,26 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useState, useCallback,useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Navbar2 from "@/components/Navbar2";
-import QuestionBox from "../../../components/QuestionBox";
-import Sliders from "@/components/Sliders";
-import Calendars from "@/components/Calendars";
 import {
   ArrowLeft,
   Check,
   CircleCheck,
-  CircleDollarSign,
   CircleDot,
-  Copy,
-  Globe,
-  House,
-  Image,
   Tag,
-  Trash,
-  Upload,
-  Video,
 } from "lucide-react";
-import PaymentMethod from "../../../components/PaymentMethod";
-import LinkBankAccount from "../../../components/LinkBankAccount";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
 import Cookies from "js-cookie";
 import AlertBox from "@/components/AlertBox";
-
+import Step1 from "@/components/edit-campaign/Step1";
+import Step2 from "@/components/edit-campaign/Step2";
+import Step3 from "@/components/edit-campaign/Step3";
+import Step4 from "@/components/edit-campaign/Step4";
 
 const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGRyYm9rZWJudmlkd3l6dnpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI2MjMzMzIsImV4cCI6MjA0ODE5OTMzMn0.Zhnz5rLRoIhtHyF52pFjzYijNdxgZBvEr9LtOxR2Lhw";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGRyYm9rZWJudmlkd3l6dnpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI2MjMzMzIsImV4cCI6MjA0ODE5OTMzMn0.Zhnz5rLRoIhtHyF52pFjzYijNdxgZBvEr9LtOxR2Lhw";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function EditCampaign() {
@@ -47,43 +36,53 @@ export default function EditCampaign() {
   const currentStep = parseInt(searchParams.get("step") || "0");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const userId = Cookies.get("userId");
+  const [alert, setAlert] = useState({
+    message: "",
+    type: "",
+    visible: false,
+  });
 
   const [formData, setFormData] = useState({
-    engagements: {},
-    clickCount: {},
+    engagements: {
+      totalCount: 0
+    },
+    clickCount: {
+      totalCount: 0,
+      dailyCounts: []
+    },
     _id: "",
     userId: "",
     campaignTitle: "",
     status: "",
     websiteLink: "",
-    videoFile: null,
+    videoFile: {},
     videoUrl: "",
-    imageFile: null,
+    imageFile: {},
     imageUrl: "",
     videoDuration: "",
     genderRatio: 50,
     genderType: "",
-    ageRange: [18, 65],
-    genderAge: 25,
+    age: 25,
     categories: [],
     quizQuestion: {
       text: "",
       options: ["", "", "", ""],
-      correctAnswer: null,
+      correctAnswer: null
     },
     surveyQuestion1: {
       text: "",
       options: ["", "", "", ""],
-      correctAnswer: null,
+      correctAnswer: null
     },
     surveyQuestion2: {
       text: "",
       options: ["", "", "", ""],
-      correctAnswer: null,
+      correctAnswer: null
     },
     startDate: new Date(),
     endDate: new Date(),
     budget: 0,
+    campignBudget: 0,
     cardNumber: "",
     monthOnCard: "",
     cvc: "",
@@ -99,8 +98,34 @@ export default function EditCampaign() {
     createdAt: new Date(),
     updatedAt: new Date(),
     __v: 0,
+    cardType: "",
+    cardAdded: false,
+    isFormOpen: false,
+    bankAdded: false,
+    isBankFormOpen: false,
+    campaignVideoUrl: "",
+    companyLogo: "",
+    campaignStartDate: new Date(),
+    campaignEndDate: new Date(),
+    cardDetail: {
+      cardNumber: "",
+      cvc: "",
+      nameOnCard: "",
+      dateOnCard: "",
+      country: "",
+      zip: "",
+      _id: ""
+    },
+    bankDetail: {
+      accountNumber: "",
+      routingNumber: "",
+      accountType: "",
+      _id: ""
+    },
+    campaignBudget: "0"
   });
-  
+
+  console.log("form Data", formData);
 
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
@@ -134,7 +159,6 @@ export default function EditCampaign() {
     const filePath = `addit-assets/${type}s/${fileName}`;
 
     try {
-      // First upload the file
       const { data, error } = await supabase.storage
         .from("new-project")
         .upload(filePath, file, {
@@ -145,10 +169,7 @@ export default function EditCampaign() {
 
       if (error) throw error;
 
-      // Get the public URL
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("new-project").getPublicUrl(filePath);
+      const { data: { publicUrl } } = supabase.storage.from("new-project").getPublicUrl(filePath);
 
       let duration = "";
       if (type === "video") {
@@ -208,7 +229,7 @@ export default function EditCampaign() {
       const updatedCampaignData = {
         campaignTitle: formData.campaignTitle,
         websiteLink: formData.websiteLink,
-        campaignBudget: formData.campignBudget,
+        campaignBudget: formData.budget.toString(),
         campaignVideoUrl: formData.videoUrl,
         companyLogo: formData.imageUrl,
         userId: userId,
@@ -227,9 +248,7 @@ export default function EditCampaign() {
           option2: formData.surveyQuestion1.options[1],
           option3: formData.surveyQuestion1.options[2],
           option4: formData.surveyQuestion1.options[3],
-          answer: formData.surveyQuestion1.correctAnswer !== null
-            ? formData.surveyQuestion1.options[formData.surveyQuestion1.correctAnswer]
-            : "",
+          answer: formData.surveyQuestion1.options[formData.surveyQuestion1.correctAnswer],
         },
         surveyQuestion2: {
           questionText: formData.surveyQuestion2.text,
@@ -237,16 +256,13 @@ export default function EditCampaign() {
           option2: formData.surveyQuestion2.options[1],
           option3: formData.surveyQuestion2.options[2],
           option4: formData.surveyQuestion2.options[3],
-          answer: formData.surveyQuestion2.correctAnswer !== null
-            ? formData.surveyQuestion2.options[formData.surveyQuestion2.correctAnswer]
-            : "",
+          answer: formData.surveyQuestion2.options[formData.surveyQuestion2.correctAnswer],
         },
         genderType: formData.genderType,
         genderRatio: formData.genderRatio.toString(),
-        age: formData.age,
-        categories: formData.categories.join(","),
+        age: formData.age.toString(),
         campaignStartDate: formData.startDate.toISOString(),
-        campaignEndDate: formData.endDate?.toISOString() || formData.startDate.toISOString(),
+        campaignEndDate: formData.endDate ? formData.endDate.toISOString() : null,
         cardDetail: {
           cardNumber: formData.cardNumber,
           cvc: formData.cvc,
@@ -262,19 +278,12 @@ export default function EditCampaign() {
         },
       };
 
-      // Add campaignId to the data if we're updating
-      if (campaignData?._id) {
-        updatedCampaignData.campaignId = campaignData._id;
-      }
-
       const response = await axios.post(
         "/api/routes/v1/campaignRoutes?action=updateCampaign",
-        updatedCampaignData,
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+          ...updatedCampaignData,
+          id: formData._id
+        },
       );
 
       setShowSuccessModal(true);
@@ -292,15 +301,9 @@ export default function EditCampaign() {
     }
   };
 
-  const handleQuestionChange = (
-    questionType,
-    field,
-    value,
-    optionIndex = null
-  ) => {
+  const handleQuestionChange = (questionType, field, value, optionIndex = null) => {
     setFormData((prev) => {
       if (optionIndex !== null) {
-        // Updating an option
         const newOptions = [...prev[questionType].options];
         newOptions[optionIndex] = value;
         return {
@@ -311,7 +314,6 @@ export default function EditCampaign() {
           },
         };
       } else if (field === "correctAnswer" || field === "selectedAnswer") {
-        // Updating the selected/correct answer
         return {
           ...prev,
           [questionType]: {
@@ -320,7 +322,6 @@ export default function EditCampaign() {
           },
         };
       } else {
-        // Updating the question text
         return {
           ...prev,
           [questionType]: {
@@ -345,74 +346,120 @@ export default function EditCampaign() {
     return (budget / duration) * 2;
   }, [formData.budget, formData.videoDuration]);
 
-
   useEffect(() => {
     if (searchParams) {
-      const paramsData = {
-        engagements: JSON.parse(searchParams.get("engagements") || "{}"),
-        clickCount: JSON.parse(searchParams.get("clickCount") || "{}"),
-        _id: searchParams.get("_id") || "",
-        userId: searchParams.get("userId") || "",
-        campaignTitle: searchParams.get("campaignTitle") || "",
-        status: searchParams.get("status") || "",
-        websiteLink: decodeURIComponent(searchParams.get("websiteLink") || ""),
-        videoUrl: decodeURIComponent(searchParams.get("campaignVideoUrl") || ""),
-        imageUrl: decodeURIComponent(searchParams.get("companyLogo") || ""),
-        quizQuestion: {
-          text: searchParams.get("quizQuestion") || "",
-          options: ["", "", "", ""],
-          correctAnswer: null,
-        },
-        surveyQuestion1: {
-          text: searchParams.get("surveyQuestion1") || "",
-          options: ["", "", "", ""],
-          correctAnswer: null,
-        },
-        surveyQuestion2: {
-          text: searchParams.get("surveyQuestion2") || "",
-          options: ["", "", "", ""],
-          correctAnswer: null,
-        },
-        genderType: searchParams.get("genderType") || "",
-        genderRatio: parseInt(searchParams.get("genderRatio") || 50), // Fixed line
-        genderAge: parseInt(searchParams.get("age")) || 25,
-        startDate: new Date(searchParams.get("campaignStartDate") || new Date()),
-        endDate: new Date(searchParams.get("campaignEndDate") || new Date()),
-        budget: parseFloat(searchParams.get("campaignBudget")) || 0,
-        couponCode: searchParams.get("couponCode") || "",
-        totalViews: parseInt(searchParams.get("totalViews")) || 0,
-        impressions: parseInt(searchParams.get("impressions")) || 0,
-        createdAt: new Date(searchParams.get("createdAt") || new Date()),
-        updatedAt: new Date(searchParams.get("updatedAt") || new Date()),
-        __v: parseInt(searchParams.get("__v")) || 0,
-      };
+      const dataParam = searchParams.get('data');
+      if (dataParam) {
+        try {
+          const parsedData = JSON.parse(decodeURIComponent(dataParam));
 
-      setFormData(prev => ({
-        ...prev,
-        ...paramsData,
-        // Parse card and bank details if available
-        cardNumber: searchParams.get("cardDetail.cardNumber") || "",
-        monthOnCard: searchParams.get("cardDetail.dateOnCard") || "",
-        cvc: searchParams.get("cardDetail.cvc") || "",
-        nameOnCard: searchParams.get("cardDetail.nameOnCard") || "",
-        country: searchParams.get("cardDetail.country") || "",
-        zipCode: searchParams.get("cardDetail.zip") || "",
-        bankAccountNumber: searchParams.get("bankDetail.accountNumber") || "",
-        routingNumber: searchParams.get("bankDetail.routingNumber") || "",
-        accountType: searchParams.get("bankDetail.accountType") || "",
-      }));
+          // Transform the data to match your form structure
+          const transformedData = {
+            ...parsedData,
+            engagements: parsedData.engagements || { totalCount: 0 },
+            clickCount: parsedData.clickCount || { totalCount: 0, dailyCounts: [] },
+            videoFile: parsedData.videoFile || {},
+            imageFile: parsedData.imageFile || {},
+            videoUrl: parsedData.campaignVideoUrl || parsedData.videoUrl || "",
+            imageUrl: parsedData.companyLogo || parsedData.imageUrl || "",
+            quizQuestion: {
+              text: parsedData.quizQuestion?.text || parsedData.quizQuestion?.questionText || "",
+              options: parsedData.quizQuestion?.options || [
+                parsedData.quizQuestion?.option1 || "",
+                parsedData.quizQuestion?.option2 || "",
+                parsedData.quizQuestion?.option3 || "",
+                parsedData.quizQuestion?.option4 || "",
+              ],
+              correctAnswer: parsedData.quizQuestion?.correctAnswer ??
+                (parsedData.quizQuestion?.options
+                  ? parsedData.quizQuestion?.options.indexOf(parsedData.quizQuestion?.answer)
+                  : null)
+            },
+            surveyQuestion1: {
+              text: parsedData.surveyQuestion1?.text || parsedData.surveyQuestion1?.questionText || "",
+              options: parsedData.surveyQuestion1?.options || [
+                parsedData.surveyQuestion1?.option1 || "",
+                parsedData.surveyQuestion1?.option2 || "",
+                parsedData.surveyQuestion1?.option3 || "",
+                parsedData.surveyQuestion1?.option4 || "",
+              ],
+              correctAnswer: parsedData.surveyQuestion1?.correctAnswer ??
+                (parsedData.surveyQuestion1?.options
+                  ? parsedData.surveyQuestion1?.options.indexOf(parsedData.surveyQuestion1?.answer)
+                  : null)
+            },
+            surveyQuestion2: {
+              text: parsedData.surveyQuestion2?.text || parsedData.surveyQuestion2?.questionText || "",
+              options: parsedData.surveyQuestion2?.options || [
+                parsedData.surveyQuestion2?.option1 || "",
+                parsedData.surveyQuestion2?.option2 || "",
+                parsedData.surveyQuestion2?.option3 || "",
+                parsedData.surveyQuestion2?.option4 || "",
+              ],
+              correctAnswer: parsedData.surveyQuestion2?.correctAnswer ??
+                (parsedData.surveyQuestion2?.options
+                  ? parsedData.surveyQuestion2?.options.indexOf(parsedData.surveyQuestion2?.answer)
+                  : null)
+            },
+            cardNumber: parsedData.cardDetail?.cardNumber || parsedData.cardNumber || "",
+            monthOnCard: parsedData.cardDetail?.dateOnCard || parsedData.monthOnCard || "",
+            cvc: parsedData.cardDetail?.cvc || parsedData.cvc || "",
+            nameOnCard: parsedData.cardDetail?.nameOnCard || parsedData.nameOnCard || "",
+            country: parsedData.cardDetail?.country || parsedData.country || "",
+            zipCode: parsedData.cardDetail?.zip || parsedData.zipCode || "",
+            bankAccountNumber: parsedData.bankDetail?.accountNumber || parsedData.bankAccountNumber || "",
+            routingNumber: parsedData.bankDetail?.routingNumber || parsedData.routingNumber || "",
+            accountType: parsedData.bankDetail?.accountType || parsedData.accountType || "",
+            cardDetail: parsedData.cardDetail || {
+              cardNumber: parsedData.cardNumber || "",
+              cvc: parsedData.cvc || "",
+              nameOnCard: parsedData.nameOnCard || "",
+              dateOnCard: parsedData.monthOnCard || "",
+              country: parsedData.country || "",
+              zip: parsedData.zipCode || "",
+              _id: parsedData.cardDetail?._id || ""
+            },
+            bankDetail: parsedData.bankDetail || {
+              accountNumber: parsedData.bankAccountNumber || "",
+              routingNumber: parsedData.routingNumber || "",
+              accountType: parsedData.accountType || "",
+              _id: parsedData.bankDetail?._id || ""
+            }
+          };
+
+          setFormData(prev => ({
+            ...prev,
+            ...transformedData,
+            genderRatio: parseInt(parsedData.genderRatio) || 50,
+            genderType: parsedData.genderType || "",
+            age: parseInt(parsedData.age) || 25,
+            budget: parseFloat(parsedData.campaignBudget) || parseFloat(parsedData.budget) || 0,
+            campignBudget: parseFloat(parsedData.campaignBudget) || 0,
+            startDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
+            endDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || new Date(),
+            campaignStartDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
+            campaignEndDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || new Date(),
+            createdAt: parsedData.createdAt ? new Date(parsedData.createdAt) : new Date(),
+            updatedAt: parsedData.updatedAt ? new Date(parsedData.updatedAt) : new Date(),
+            cardAdded: !!parsedData.cardDetail,
+            bankAdded: !!parsedData.bankDetail,
+            categories: Array.isArray(parsedData.categories) ? parsedData.categories : [],
+            videoDuration: parsedData.videoDuration || "0:00"
+          }));
+
+        } catch (error) {
+          console.error("Error parsing campaign data:", error);
+          // Optionally set some error state here
+        }
+      }
     }
   }, [searchParams]);
-
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
       <Navbar2 userId={userId} />
 
       <div className="p-10">
-        {/* Top Header with Back Button */}
-
-        {/* Stepper */}
         <div className="max-w-6xl mx-auto">
           <div className="relative flex items-center mb-10 justify-between">
             <Link
@@ -435,18 +482,16 @@ export default function EditCampaign() {
               >
                 <Link
                   href={`?step=${index}`}
-                  className={` gap-2 h-10 flex items-center justify-start rounded-full text-xs font-medium px-4 ${index === currentStep
+                  className={`gap-2 h-10 flex items-center justify-start rounded-full text-xs font-medium px-4 ${index === currentStep
                     ? "border-blue-600 border bg-white text-gray-600"
                     : "bg-white text-gray-600"
                     } hover:cursor-pointer transition`}
                 >
                   {index < currentStep ? (
-                    <CircleCheck className="w-7 h-7 text-blue-600 shrink-0" /> // Tick icon for completed steps
+                    <CircleCheck className="w-7 h-7 text-blue-600 shrink-0" />
                   ) : (
                     <CircleDot
-                      className={`w-7 h-7 shrink-0 ${index === currentStep
-                        ? "text-blue-600"
-                        : "text-gray-300"
+                      className={`w-7 h-7 shrink-0 ${index === currentStep ? "text-blue-600" : "text-gray-300"
                         }`}
                     />
                   )}
@@ -465,676 +510,20 @@ export default function EditCampaign() {
           </div>
         </div>
 
-        {/* Step 0: Campaign Info */}
         {currentStep === 0 && (
-          <div className="min-h-screen px-4 py-8">
-            <div className="max-w-[1200px] w-full mx-auto bg-white rounded-2xl shadow p-8 relative">
-              <div className="flex items-center justify-between mb-8">
-                <div className="w-1/3">
-                  <label className="block text-[24px] font-medium">
-                    Campaign info
-                  </label>
-                  <span className="block text-[16px] text-gray-500 mt-1">
-                    Add key details to set up and optimize your campaign.
-                  </span>
-                </div>
-
-                <Link
-                  href="?step=1"
-                  className={`bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${!formData.campaignTitle ||
-                    !formData.websiteLink ||
-                    !formData.videoFile
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                    }`}
-                  onClick={(e) => {
-                    if (
-                      !formData.campaignTitle ||
-                      !formData.websiteLink ||
-                      !formData.videoFile
-                    ) {
-                      e.preventDefault();
-                    }
-                  }}
-                >
-                  Next
-                </Link>
-              </div>
-
-              <hr className="border-t mb-4 border-gray-300" />
-
-              <div className="space-y-6">
-                {/* Campaign Title */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Campaign Title
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Choose a clear and recognizable title to help identify
-                      your campaign.
-                    </span>
-                  </div>
-                  <div className="relative flex-1">
-                    <House className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
-                    <input
-                      type="text"
-                      name="campaignTitle"
-                      value={formData.campaignTitle}
-                      onChange={handleInputChange}
-                      placeholder="Reebok promotion"
-                      className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
-                    />
-                  </div>
-                </div>
-
-                <hr className="border-t mb-4 border-gray-300" />
-
-                {/* Website/Product Link */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Website/Product Link
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Add your website or product link. A UTM link will be
-                      auto-generated for tracking.
-                    </span>
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="relative flex-1">
-                      <Globe className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
-                      <input
-                        type="url"
-                        name="websiteLink"
-                        value={formData.websiteLink}
-                        onChange={handleInputChange}
-                        placeholder="https://shop.app/"
-                        className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-[16px] text-green-600 select-all">
-                        {formData.websiteLink || "https://www.example.com"}
-                      </p>
-                      {formData.websiteLink && (
-                        <button
-                          onClick={() =>
-                            navigator.clipboard.writeText(formData.websiteLink)
-                          }
-                          className="text-blue-600 hover:text-blue-800 transition"
-                          title="Copy URL"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <hr className="border-t mb-4 border-gray-300" />
-
-                {/* Campaign Video Upload */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Campaign Video
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Upload your campaign video. For best results, we recommend
-                      using vertical videos.
-                    </span>
-                  </div>
-
-                  <div className="flex-1">
-                    {/* Upload box */}
-                    <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
-                      <label className="cursor-pointer">
-                        <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
-                        <p className="text-sm text-gray-700 mb-1">
-                          Upload video
-                        </p>
-                        <p className="text-xs text-gray-500">Format: mp4</p>
-                        <input
-                          type="file"
-                          accept="video/mp4"
-                          onChange={(e) => handleFileChange(e, "video")}
-                          className="hidden"
-                        />
-                      </label>
-                    </div>
-
-                    {/* File preview and progress bar - below the upload box */}
-                    {formData.videoFile && (
-                      <div className="mt-4 flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md">
-                        {/* Video icon */}
-                        <div className="bg-blue-50 p-[10px] rounded-full w-10 h-10 flex items-center justify-center">
-                          <Video className="w-5 h-5 text-blue-500" />
-                        </div>
-
-                        {/* File name and size */}
-                        <div className="flex flex-col">
-                          <span className="text-sm">
-                            {formData.videoFile.name}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {(formData.videoFile.size / (1024 * 1024)).toFixed(
-                              1
-                            )}{" "}
-                            MB
-                          </span>
-                        </div>
-
-                        {/* Delete button */}
-                        <button
-                          onClick={() =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              videoFile: null,
-                              videoUrl: "",
-                            }))
-                          }
-                          className="text-red-500 ml-auto"
-                        >
-                          <Trash />
-                        </button>
-                      </div>
-                    )}
-
-                    {isUploading && uploadProgress.video > 0 && (
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                        <div
-                          className="bg-blue-600 h-2.5 rounded-full"
-                          style={{ width: `${uploadProgress.video}%` }}
-                        ></div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <hr className="border-t mb-4 border-gray-300" />
-
-                {/* Campaign Image Upload */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Campaign Image (optional)
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      This image will be used as a thumbnail for your campaign.
-                    </span>
-                  </div>
-
-                  <div className="flex-1">
-                    {/* Upload box */}
-                    <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
-                      <label className="cursor-pointer">
-                        <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
-                        <p className="text-sm text-gray-700 mb-1">
-                          Upload image
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Format: jpeg, jpg, png
-                        </p>
-                        <input
-                          type="file"
-                          accept="image/jpeg, image/jpg, image/png"
-                          onChange={(e) => handleFileChange(e, "image")}
-                          className="hidden"
-                        />
-                      </label>
-                    </div>
-
-                    {/* File preview and progress bar - now placed below the box */}
-                    {formData.imageFile && (
-                      <div className="mt-4 flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md">
-                        {/* Image icon */}
-                        <div className="bg-blue-50 p-[10px] rounded-full w-10 h-10">
-                          <Image className="w-5 h-5 text-blue-500" />
-                        </div>
-
-                        {/* File name and size */}
-                        <div className="flex flex-col">
-                          <span className="text-sm">
-                            {formData.imageFile.name}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {(formData.imageFile.size / (1024 * 1024)).toFixed(
-                              1
-                            )}{" "}
-                            MB
-                          </span>
-                        </div>
-
-                        {/* Delete button */}
-                        <button
-                          onClick={() =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              imageFile: null,
-                              imageUrl: "",
-                            }))
-                          }
-                          className="text-red-500 ml-auto"
-                        >
-                          <Trash />
-                        </button>
-                      </div>
-                    )}
-
-                    {isUploading && uploadProgress.image > 0 && (
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                        <div
-                          className="bg-blue-600 h-2.5 rounded-full"
-                          style={{ width: `${uploadProgress.image}%` }}
-                        ></div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Step1 uploadProgress={uploadProgress} handleInputChange={handleInputChange} formData={formData} isUploading={isUploading} handleFileChange={handleFileChange} />
         )}
 
-        {/* Step 1: Targeting Details */}
         {currentStep === 1 && (
-          <div className="min-h-screen px-4 py-8">
-            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-              <div className="flex items-center justify-between mb-8">
-                <div className="w-1/3">
-                  <label className="block text-[24px] font-medium">
-                    Targeting Details
-                  </label>
-                  <span className="block text-[16px] text-gray-500 mt-1">
-                    Reach the right people by setting up precise targeting for
-                    your ads.
-                  </span>
-                </div>
-
-                <Link
-                  href="?step=2"
-                  className="bg-blue-600 w-[218px] h-[56px] text-[16px] font-md  text-white flex justify-center items-center rounded-full hover:bg-blue-700"
-                >
-                  Next
-                </Link>
-              </div>
-
-              <hr className="border-t mb-4 border-gray-300" />
-
-              <div className="space-y-6">
-                {/* Gender Ratio */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Gender Ratio
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Define your preferred male-to-female ratio for ad
-                      targeting.
-                    </span>
-                  </div>
-                  <div className="relative bg-blue flex-1">
-                    <Sliders
-                      min={0}
-                      max={100}
-                      defaultValue={formData.genderRatio}
-                      onChange={(value, selectedGender) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          genderRatio: value,
-                          genderType: selectedGender || prev.genderType,
-                        }))
-                      }
-                      showLabel={true}
-                      showRadio={true}
-                      labelUnit="%"
-                      radioOptions={[
-                        { value: "male", label: "Male" },
-                        { value: "female", label: "Female" },
-                      ]}
-                    />
-                  </div>
-                </div>
-
-                <hr className="border-t mb-4 border-gray-300" />
-
-                {/* Age Range */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Age
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Select the age range of your target audience.
-                    </span>
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="relative flex-1">
-                      <Sliders
-                        min={18}
-                        max={65}
-                        defaultValue={formData.age || 25}
-                        onChange={(value) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            age: value,
-                          }))
-                        }
-                        showLabel={true}
-                        showRadio={false}
-                        labelUnit={`yrs`}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <hr className="border-t mb-4 border-gray-300" />
-              </div>
-            </div>
-          </div>
+           <Step2 formData={formData} setFormData={setFormData} />
         )}
 
-        {/* Step 2: Set Questions */}
         {currentStep === 2 && (
-          <div className="min-h-screen px-4 py-8">
-            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-              <div className="flex items-center justify-between mb-8">
-                <div className="w-1/3">
-                  <label className="block text-[24px] font-medium">
-                    Set Questions
-                  </label>
-                  <span className="block text-[16px] text-gray-500 mt-1">
-                    Add a quiz or survey for campaign insights.
-                  </span>
-                </div>
-                <Link
-                  href="?step=3"
-                  className="bg-blue-600 w-[218px] h-[56px] text-[16px] font-md  text-white flex justify-center items-center rounded-full hover:bg-blue-700"
-                >
-                  Next
-                </Link>
-              </div>
-
-              <hr className="border-t mb-4 border-gray-300" />
-              <div className="space-y-6">
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Quiz Question (optional)
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Adit will create if you dont
-                    </span>
-                  </div>
-                  <div className="relative flex-1">
-                    <QuestionBox
-                      question={formData.quizQuestion}
-                      onChange={(field, value, optionIndex) =>
-                        handleQuestionChange(
-                          "quizQuestion",
-                          field,
-                          value,
-                          optionIndex
-                        )
-                      }
-                      isQuiz={true}
-                      name="quizQuestion"
-                    />
-                  </div>
-                </div>
-                <hr className="border-t mb-4 border-gray-300" />
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Survey Question 1 (optional)
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Adit will NOT create if you dont
-                    </span>
-                  </div>
-                  <div className="relative flex-1">
-                    <QuestionBox
-                      question={formData.surveyQuestion1}
-                      onChange={(field, value, optionIndex) =>
-                        handleQuestionChange(
-                          "surveyQuestion1",
-                          field,
-                          value,
-                          optionIndex
-                        )
-                      }
-                      isQuiz={true}
-                      name="surveyQuestion1"
-                    />
-                  </div>
-                </div>
-                <hr className="border-t mb-4 border-gray-300" />
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Survey Question 2 (optional)
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Adit will NOT create if you dont
-                    </span>
-                  </div>
-                  <div className="relative flex-1">
-                    <QuestionBox
-                      question={formData.surveyQuestion2}
-                      onChange={(field, value, optionIndex) =>
-                        handleQuestionChange(
-                          "surveyQuestion2",
-                          field,
-                          value,
-                          optionIndex
-                        )
-                      }
-                      isQuiz={true}
-                      name="surveyQuestion2"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Step3 formData={formData} handleQuestionChange={handleQuestionChange}/>
         )}
 
-        {/* Step 3: Campaign Budget */}
         {currentStep === 3 && (
-          <div className="min-h-screen px-4 py-8">
-            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-              <div className="flex items-center justify-between mb-8">
-                <div className="w-1/3">
-                  <label className="block text-[24px] font-medium">
-                    Campaign budget
-                  </label>
-                  <span className="block text-[16px] text-gray-500 mt-1">
-                    Define your budget to maximize reach and performance.
-                  </span>
-                </div>
-
-                <button
-                  onClick={handleSubmit}
-                  className="bg-blue-600 w-[218px] h-[56px] text-[16px] font-md  text-white flex justify-center items-center rounded-full hover:bg-blue-700"
-                >
-                  Submit
-                </button>
-              </div>
-
-              <hr className="border-t mb-4 border-gray-300" />
-
-              <div className="space-y-6">
-                {/* Campaign Start Date */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Campaign start date (Required)
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Choose when you want your campaign to go live and start
-                      reaching your audience.
-                    </span>
-                  </div>
-                  <div className="relative flex-1">
-                    <Calendars
-                      selected={formData.startDate}
-                      onSelect={(date) => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          startDate: date,
-                          // Reset end date if it's before or equal to the new start date
-                          endDate:
-                            prev.endDate && date >= prev.endDate
-                              ? null
-                              : prev.endDate,
-                        }));
-                      }}
-                      fromDate={new Date()} // Disable dates before today
-                    />
-                  </div>
-                </div>
-
-                <hr className="border-t mb-4 border-gray-300" />
-
-                {/* Campaign End Date */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Campaign end date (Optional)
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Choose an end date for your campaign or leave it
-                      open-ended to run indefinitely.
-                    </span>
-                  </div>
-
-                  <div className="relative flex-1">
-                    <Calendars
-                      selected={formData.endDate}
-                      onSelect={(date) =>
-                        setFormData((prev) => ({ ...prev, endDate: date }))
-                      }
-                      fromDate={
-                        formData.startDate
-                          ? formData.startDate // allow same-day or future end date
-                          : new Date() // allow today if no start date selected
-                      }
-                    />
-                  </div>
-                </div>
-
-                <hr className="border-t mb-4 border-gray-300" />
-
-                {/* Campaign Budget */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Calculate campaign budget
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Define the total budget for your campaign.
-                    </span>
-                  </div>
-
-                  <div className="relative flex-1">
-                    <CircleDollarSign className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
-
-                    <input
-                      type="number"
-                      name="budget"
-                      value={formData.budget}
-                      onChange={handleInputChange}
-                      placeholder="Enter campaign budget"
-                      className="w-full h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
-                    />
-                    {formData.budget && formData.videoDuration && (
-                      <div className="mt-2 text-sm text-gray-500">
-                        With a ${formData.budget} budget for your{" "}
-                        {formData.videoDuration}-second video, you will reach
-                        approximately {formData.campignBudget} unique users.
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <hr className="border-t mb-4 border-gray-300" />
-
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Coupon Code
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Add Coupon code If you have.
-                    </span>
-                  </div>
-
-                  <div className="relative flex-1">
-                    <Tag className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
-
-                    <input
-                      type="text"
-                      name="couponCode"
-                      value={formData.couponCode}
-                      onChange={handleInputChange}
-                      placeholder="Enter Coupon Code"
-                      className="w-full h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
-                    />
-                  </div>
-                </div>
-
-                <hr className="border-t mb-4 border-gray-300" />
-
-                {/* Payment Info */}
-                <div className="flex items-start gap-6">
-                  <div className="w-1/3">
-                    <label className="block text-[18px] text-gray-800 font-medium">
-                      Payment Info
-                    </label>
-                    <span className="block text-[16px] text-gray-400 mt-1">
-                      Choose a payment method to fund your campaign.
-                    </span>
-                  </div>
-
-                  <div className="relative flex-1">
-                    <PaymentMethod
-                      value={{
-                        cardNumber: formData.cardNumber,
-                        monthOnCard: formData.monthOnCard,
-                        cvc: formData.cvc,
-                        nameOnCard: formData.nameOnCard,
-                        country: formData.country,
-                        zipCode: formData.zipCode,
-                        cardType: formData.cardType,
-                        cardAdded: formData.cardAdded,
-                        isFormOpen: formData.isFormOpen,
-                      }}
-                      onChange={(paymentData) =>
-                        setFormData((prev) => ({ ...prev, ...paymentData }))
-                      }
-
-
-                    />
-                    <LinkBankAccount
-                      value={{
-                        bankAccountNumber: formData.bankAccountNumber,
-                        routingNumber: formData.routingNumber,
-                        accountType: formData.accountType,
-                        bankAdded: formData.bankAdded,
-                        isBankFormOpen: formData.isBankFormOpen,
-                      }}
-                      onChange={(bankData) =>
-                        setFormData((prev) => ({ ...prev, ...bankData }))
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Step4 handleInputChange={handleInputChange} setFormData={setFormData} formData={formData} handleSubmit={handleSubmit} />
         )}
       </div>
 

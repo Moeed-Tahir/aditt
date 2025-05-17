@@ -17,8 +17,9 @@ import {
 import Cookies from "js-cookie";
 import axios from "axios";
 
-export default function CampaignActionsDropdown({ campaignId, openDialog, customTrigger, campaignData, handleAction,fetchCampaign }) {
+export default function CampaignActionsDropdown({ campaignId, openDialog, customTrigger, campaignData, handleAction, fetchCampaign }) {
   const userId = Cookies.get("userId");
+  console.log("campaignData in CampaignActionsDropdown", campaignData);
 
   const updateCampaignStatus = async (status) => {
     try {
@@ -87,7 +88,10 @@ export default function CampaignActionsDropdown({ campaignId, openDialog, custom
         <Link
           href={{
             pathname: `/${userId}/edit-campaign`,
-            query: { id: campaignId, ...campaignData }
+            query: {
+              id: campaignId,
+              data: JSON.stringify(campaignData)
+            }
           }}
           className="w-full"
         >

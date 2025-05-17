@@ -215,7 +215,7 @@ export function CreateCampaigns({ userId }) {
       const campaignData = {
         campaignTitle: formData.campaignTitle,
         websiteLink: formData.websiteLink,
-        campaignBudget: formData.campignBudget,
+        campaignBudget: formData.budget,
         campaignVideoUrl: formData.videoUrl,
         companyLogo: formData.imageUrl,
         userId: userId,
