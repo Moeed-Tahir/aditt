@@ -9,7 +9,6 @@ import {
   Check,
   CircleCheck,
   CircleDot,
-  Tag,
 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
@@ -124,8 +123,6 @@ export default function EditCampaign() {
     },
     campaignBudget: "0"
   });
-
-  console.log("form Data", formData);
 
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
