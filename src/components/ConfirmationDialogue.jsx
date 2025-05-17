@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CheckCheck, ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 
 export default function ConfirmationDialog({
   open,
