@@ -191,7 +191,7 @@ const handleAction = (type, campaignId) => {
 
           <CampaignMetricsDashboard transformedCampaigns={transformedCampaigns} />
 
-          <CampaignDataTable setCurrentPage={setCurrentPage} currentPage={currentPage} fetchCampaign={fetchCampaign} handleAction={handleAction} openDialog={openDialog} campaignData={campaignData} totalPages={totalPages} filteredCampaigns={filteredCampaigns} paginatedCampaigns={paginatedCampaigns} resetFilters={resetFilters} statusFilter={statusFilter} dateFilter={dateFilter} />
+          <CampaignDataTable setDateFilter={setDateFilter} setStatusFilter={setStatusFilter} setCurrentPage={setCurrentPage} currentPage={currentPage} fetchCampaign={fetchCampaign} handleAction={handleAction} openDialog={openDialog} campaignData={campaignData} totalPages={totalPages} filteredCampaigns={filteredCampaigns} paginatedCampaigns={paginatedCampaigns} resetFilters={resetFilters} statusFilter={statusFilter} dateFilter={dateFilter} />
 
           <Charts campaignData={transformedCampaigns} />
         </div>
