@@ -18,25 +18,19 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
-import clsx from "clsx"; // Make sure to install clsx if not already: `npm install clsx`
+import clsx from "clsx";
+import Cookies from "js-cookie";
+
+const userId = Cookies.get("userId");
 
 const items = [
   {
     title: "Campaign",
-    url: "/userid/campaign-dashboard",
+    url: `/${userId}/campaign-dashboard`,
     icon: Megaphone,
   },
-  // {
-  //   title: "Analytics",
-  //   url: "/analytics",
-  //   icon: ChartColumn,
-  // },
-  // {
-  //   title: "Payment Management",
-  //   url: "/payment-management",
-  //   icon: CircleDollarSign,
-  // },
 ];
+
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -86,11 +80,13 @@ export function AppSidebar() {
         {/* Sticky Help Box */}
         <div className="mt-auto p-4">
           <div className="bg-blue-100 text-sm p-4 rounded-xl shadow-md">
-            <Headset className="text-blue-500 mb-4 w-10 h-10"/>
+            <Headset className="text-blue-500 mb-4 w-10 h-10" />
             <p className="font-semibold text-xl mb-2">Need help?</p>
-            <p className="text-xs text-gray-600 mb-2">Get answers, resolve issues, or reach out to our support team.</p>
+            <p className="text-xs text-gray-600 mb-2">
+              Get answers, resolve issues, or reach out to our support team.
+            </p>
             <Link
-              href="/Support"
+              href={`/${userId}/support`}
               className="block w-full text-center bg-white text-blue-600 rounded-full py-2 text-xl hover:bg-blue-700 hover:text-white transition"
             >
               Contact us

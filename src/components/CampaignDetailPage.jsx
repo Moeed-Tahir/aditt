@@ -283,15 +283,9 @@ export default function CampaignDetailPage({ campaignData }) {
                     </div>
                     <div className="flex flex-wrap">
                       <span className="min-w-[160px] md:pl-10 text-gray-400">
-                        Target Audience Gender:
+                        Target Audience Gender:  {" "}
                       </span>
                       <span>{campaignData.genderType}</span>
-                    </div>
-                    <div className="flex flex-wrap">
-                      <span className="min-w-[160px] md:pl-10 text-gray-400">
-                        Target Audience Locations:
-                      </span>
-                      <span>AL, GA, FL</span>
                     </div>
                   </div>
                 </div>
