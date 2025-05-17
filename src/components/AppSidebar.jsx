@@ -21,15 +21,16 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import Cookies from "js-cookie";
 
+const userId = Cookies.get("userId");
+
 const items = [
   {
     title: "Campaign",
-    url: "/userid/campaign-dashboard",
+    url: `/${userId}/campaign-dashboard`,
     icon: Megaphone,
   },
 ];
 
-const userId = Cookies.get("userId");
 
 export function AppSidebar() {
   const pathname = usePathname();

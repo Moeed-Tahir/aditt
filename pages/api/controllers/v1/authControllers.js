@@ -401,7 +401,8 @@ exports.deleteAccount = async (req, res) => {
             });
         }
 
-        const user = await User.findByIdAndDelete(userId);
+        const user = await User.findOneAndDelete({ userId });
+
 
         if (!user) {
             return res.status(404).json({
@@ -471,7 +472,7 @@ exports.getProfile = async (req, res) => {
     try {
         await connectToDatabase();
         const { userId } = req.body;
-        
+
         if (!userId) {
             return res.status(400).send({ message: "User Id not present" });
         }

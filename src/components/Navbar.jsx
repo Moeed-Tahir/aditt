@@ -57,8 +57,8 @@ export default function Navbar({ userId }) {
     </div>
 
     {/* Desktop image with name and email */}
-    <div className="hidden md:flex items-center bg-[var(--bg-color-off-white)] text-gray-800 py-1 md:py-2 px-2 md:px-4 rounded-[58px] hover:bg-blue-700 hover:text-white transition">
-      <Link href={`/${userId}/Settings`} className="flex items-center">
+    <div className="hidden md:flex items-center bg-[rgba(232,240,255,1)] text-gray-800 py-1 md:py-2 px-2 md:px-4 rounded-[58px] hover:bg-blue-700 hover:text-white transition">
+      <Link href={`/${userId}/settings`} className="flex items-center">
         <Image
           src="/navbar-image.png"
           alt="Profile"
@@ -84,7 +84,7 @@ export default function Navbar({ userId }) {
           <NotificationDropdown mobileView />
         </div>
         <Link 
-          href={`/${userId}/Settings`}
+          href={`/${userId}/settings`}
           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
         >
           Settings
