@@ -1,0 +1,167 @@
+// components/SigninUser.jsx
+"use client";
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { Mail, Lock, Info } from "lucide-react";
+import FormField from "./FormField";
+import useSigninForm from "@/hooks/useSigninForm";
+import AuthButton from "./AuthButton";
+import { toast } from "sonner";
+
+function SigninUser() {
+  const router = useRouter();
+  const {
+    formData,
+    errors,
+    touched,
+    submitAttempted,
+    loading,
+    setSubmitAttempted,
+    setLoading,
+    validateForm,
+    handleChange,
+    handleBlur,
+    showAlert,
+  } = useSigninForm();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitAttempted(true);
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/routes/v1/authRoutes?action=signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.message === "User not found") {
+          toast.error("User not found. Please check your email.");
+        } else if (data.message === "User not verified") {
+          toast.error("Account not verified. OTP resent to your email.");
+          router.push(`/verify-email`);
+        } else if (data.message === "Invalid password") {
+          toast.error("Invalid password. Please try again.");
+        } else {
+          toast.error("An unexpected error occurred. Please try again.");
+        }
+        return;
+      }
+
+      Cookies.set("token", data.token, { expires: 1 });
+      Cookies.set("userId", data.user.userId, { expires: 1 });
+      Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+
+      router.push(`/campaign-dashboard`);
+    } catch (error) {
+      console.error("Sign in error:", error);
+      showAlert("An unexpected error occurred. Please try again.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex h-auto min-h-screen w-full">
+      <div className="md:flex w-[40%] h-auto min-h-screen relative hidden items-start justify-center">
+        <Image
+          src="/signin.jpg"
+          alt="signin"
+          fill
+          className="object-cover overflow-clip"
+        />
+      </div>
+      <div className="w-full md:w-[60%] h-auto min-h-screen bg-[var(--bg-color)] flex items-center justify-center p-5">
+        <div className="w-full max-w-[550px] bg-white rounded-[20px] px-8 py-9 flex flex-col gap-[20px] my-8">
+          <Image
+            src="/Aditt logo.jpg"
+            alt="logo"
+            width={100}
+            height={100}
+            className="mb-5"
+          />
+          <div>
+            <p className="text-4xl leading-[50px] font-bold">
+              Sign in to your Advertiser dashboard
+            </p>
+            <p className="text-[16px] text-[var(--text-light-color)] leading-6">
+              Launch, track, and optimize your ad campaigns with ease.
+            </p>
+          </div>
+
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <FormField
+              name="email"
+              label="Business Email"
+              placeholder="Enter your business email"
+              Icon={Mail}
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={errors.email}
+              touched={touched.email}
+              submitAttempted={submitAttempted}
+            />
+
+            <FormField
+              name="password"
+              label="Password"
+              placeholder="Enter your password"
+              Icon={Lock}
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={errors.password}
+              touched={touched.password}
+              submitAttempted={submitAttempted}
+            />
+
+            <div className="flex justify-center gap-3 mt-2">
+              <Link
+                href="/reset-password"
+                className="text-blue-500 hover:underline font-medium text-[16px]"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+
+            <AuthButton loading={loading} text={"Sign in"} />
+
+            <div className="mt-4">
+              <p className="text-gray-600">
+                Don't have account?{" "}
+                <Link
+                  href="/signup-user"
+                  className="text-blue-600 hover:underline font-bold"
+                >
+                  Sign Up
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default SigninUser;

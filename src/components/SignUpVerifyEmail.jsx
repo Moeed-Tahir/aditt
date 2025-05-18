@@ -207,58 +207,6 @@ function SignUpVerifyEmail() {
     return () => clearTimeout(timer);
   }, [resendTimer]);
 
-  const renderField = (
-    name,
-    label,
-    placeholder,
-    Icon,
-    type = "text",
-    note = null
-  ) => (
-    <div className="flex flex-col gap-2">
-      <label
-        htmlFor={name}
-        className="text-[16px] font-semibold text-[var(--text-dark-color)]"
-      >
-        {label}
-      </label>
-      <div className="relative">
-        <input
-          type={type}
-          id={name}
-          name={name}
-          value={formData[name]}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder={placeholder}
-          className={`w-full border ${
-            shouldShowError(name)
-              ? "border-red-500"
-              : "border-[var(--border-color)]"
-          } rounded-[58px] p-4 pl-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
-        />
-        <Icon
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600"
-          size={20}
-        />
-        {shouldShowError(name) && (
-          <AlertCircle
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500"
-            size={20}
-          />
-        )}
-      </div>
-      {note && (
-        <div className="flex items-center gap-1 text-gray-500 text-sm pl-4">
-          <Info size={14} />
-          <p>{note}</p>
-        </div>
-      )}
-      {shouldShowError(name) && (
-        <p className="text-red-500 text-sm pl-4">{errors[name]}</p>
-      )}
-    </div>
-  );
 
   return (
     <div className="flex h-auto min-h-screen w-full">

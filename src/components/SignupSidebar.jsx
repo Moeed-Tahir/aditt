@@ -31,7 +31,7 @@ const steps = [
 
 export function SignupSidebar() {
   return (
-    <Sidebar className="min-h-screen">
+    <Sidebar className="min-h-screen w-[480px]">
       <SidebarContent className="flex flex-col h-full">
         <SidebarGroup>
           <SidebarGroupLabel className="py-10">

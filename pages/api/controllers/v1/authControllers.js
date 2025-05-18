@@ -5,25 +5,45 @@ const jwt = require("jsonwebtoken");
 const connectToDatabase = require("../../config/dbConnect");
 
 exports.signUp = async (req, res) => {
-
     try {
         await connectToDatabase();
 
         const { name, businessWebsite, businessEmail, password } = req.body;
 
+        // Validate input
         if (!name || !businessWebsite || !businessEmail || !password) {
-            return res.status(400).json({ message: "All fields are required" });
+            return res.status(400).json({
+                message: "All fields are required",
+                code: "VALIDATION_ERROR"
+            });
+        }
+
+        // Validate email format
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(businessEmail)) {
+            return res.status(400).json({
+                message: "Please enter a valid email address",
+                code: "INVALID_EMAIL"
+            });
+        }
+
+        // Validate password strength
+        if (password.length < 8) {
+            return res.status(400).json({
+                message: "Password must be at least 8 characters",
+                code: "WEAK_PASSWORD"
+            });
         }
 
         const existingUser = await User.findOne({ businessEmail });
 
         if (existingUser) {
-            if (existingUser.isOtpVerified === true) {
+            if (existingUser.isOtpVerified) {
                 return res.status(400).json({
-                    message: "User with this email already exists",
+                    message: "An account with this email already exists. Please log in instead.",
                     code: "EMAIL_EXISTS"
                 });
             } else {
+                // Resend OTP for unverified accounts
                 existingUser.otp = generateOTP();
                 existingUser.otpExpires = Date.now() + 5 * 60 * 1000;
                 await existingUser.save();
@@ -31,12 +51,14 @@ exports.signUp = async (req, res) => {
                 await sendOTP(businessEmail, existingUser.otp);
 
                 return res.status(200).json({
-                    message: "OTP resent successfully",
-                    userId: existingUser._id
+                    message: "We found an unverified account with this email. A new verification code has been sent.",
+                    userId: existingUser._id,
+                    code: "OTP_RESENT"
                 });
             }
         }
 
+        // Create new user
         const hashedPassword = await bcrypt.hash(password, 10);
         const otp = generateOTP();
 
@@ -55,8 +77,8 @@ exports.signUp = async (req, res) => {
         await sendOTP(businessEmail, otp);
 
         res.status(201).json({
-            message: "User created successfully. OTP sent to your email.",
-            userId: newUser.userId,
+            message: "Account created successfully! Please check your email for the verification code.",
+            userId: newUser._id,
             email: businessEmail
         });
 
@@ -66,9 +88,10 @@ exports.signUp = async (req, res) => {
             stack: error.stack,
             fullError: error
         });
+
         res.status(500).json({
-            message: "Server error during registration",
-            error: error.message
+            message: "An unexpected error occurred. Please try again later.",
+            code: "SERVER_ERROR"
         });
     }
 };
@@ -162,7 +185,7 @@ exports.signIn = async (req, res) => {
             await sendOTP(email, user.otp);
 
             return res.status(403).json({
-                message: "Account not verified. OTP resent to your email.",
+                message: "User not verified",
                 code: "ACCOUNT_NOT_VERIFIED",
                 userId: user._id,
                 requiresVerification: true

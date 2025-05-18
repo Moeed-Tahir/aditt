@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner"
 
 export const metadata = {
   title: "Create Next App",
@@ -10,6 +11,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="bg-[var(--bg-color)]">
         {children}
+        <Toaster />
       </body>
     </html>
   );
