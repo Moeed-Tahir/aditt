@@ -1,20 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import {
-  Mail,
-  AlertCircle,
-  Lock,
-  Info,
-  MoveLeft,
-  ArrowLeft,
-} from "lucide-react";
-import Link from "next/link";
+import { Mail, Lock, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import axios from "axios";
-import AlertBox from "./AlertBox";
-
+import AlertBox from "../AlertBox";
+import FormField from "./FormField";
+import { toast } from "sonner";
+import AuthButton from "./AuthButton";
 
 function ResetPassword() {
   const router = useRouter();
@@ -26,7 +19,7 @@ function ResetPassword() {
 
   const [alert, setAlert] = useState({
     message: "",
-    type: "", // 'success' | 'error' | 'info' | 'warning'
+    type: "",
     visible: false,
   });
 
@@ -53,8 +46,8 @@ function ResetPassword() {
       email: !formData.email
         ? "Email is required"
         : !isValidEmail(formData.email)
-        ? "Invalid email format"
-        : "",
+          ? "Invalid email format"
+          : "",
       password:
         showCreatePassword && !formData.password ? "Password is required" : "",
       confirmPassword:
@@ -92,30 +85,22 @@ function ResetPassword() {
 
       setLoading(true);
       try {
-        const response = await fetch(
+        const response = await axios.post(
           "/api/routes/v1/authRoutes?action=forgot-password",
           {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: formData.email,
-            }),
+            email: formData.email,
           }
         );
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to send OTP");
+        if (response.data) {
+          setUserId(response.data.userId);
+          setShowOtp(true);
+          setResendTimer(30);
+          toast.success("OTP sent to your email successfully!");
         }
-
-        setUserId(data.userId);
-        setShowOtp(true);
       } catch (error) {
         console.error("Forgot password error:", error);
-        setApiError(error.message);
+        toast.error(error?.response?.data.message || "Failed to send OTP. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -124,55 +109,60 @@ function ResetPassword() {
       const isOtpValid = /^\d{4}$/.test(fullOtp);
 
       if (!isOtpValid) {
-        setOtpError("Please enter a valid 4-digit OTP.");
+        toast.error("Please enter a valid 4-digit OTP.");
         return;
       }
 
-      setOtpError("");
-      setCreatePassword(true);
+      setLoading(true);
+      try {
+        const response = await axios.post(
+          "/api/routes/v1/authRoutes?action=verify-otp",
+          {
+            userId: userId,
+            otp: fullOtp,
+          }
+        );
+
+        if (response.data.message === "OTP verified successfully") {
+          setCreatePassword(true);
+          toast.success("OTP verified successfully!");
+        } else {
+          throw new Error(response.data.message || "OTP verification failed");
+        }
+      } catch (error) {
+        console.error("OTP verification error:", error);
+        toast.error(error.response?.data?.message || "Invalid OTP. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     } else if (showCreatePassword) {
       if (!validateForm()) return;
 
       setLoading(true);
       try {
-        const response = await fetch(
+        const response = await axios.post(
           "/api/routes/v1/authRoutes?action=reset-password",
           {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              userId: userId,
-              otp: otp.join(""),
-              newPassword: formData.password,
-            }),
+            userId: userId,
+            newPassword: formData.password,
           }
         );
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Password reset failed");
+        if (!response.data.message) {
+          throw new Error(response.data.message || "Password reset failed");
         }
 
-        setSuccessMessage(
-          "Password reset successfully! Redirecting to login..."
-        );
+        toast.success("Password reset successfully! Redirecting to login...");
         setTimeout(() => {
           router.push("/signin-user");
         }, 2000);
       } catch (error) {
         console.error("Reset password error:", error);
-        setApiError(error.message);
+        toast.error(error.response?.data?.message || "Failed to reset password. Please try again.");
       } finally {
         setLoading(false);
       }
     }
-  };
-
-  const shouldShowError = (name) => {
-    return (touched[name] || submitAttempted) && errors[name];
   };
 
   const handleOtpChange = (index, value) => {
@@ -187,14 +177,8 @@ function ResetPassword() {
   };
 
   const handleResendOtp = async () => {
-    const userId = Cookies.get("userId");
-
     if (!userId) {
-      setAlert({
-        message: "User ID not found.",
-        type: "error",
-        visible: true,
-      });
+      toast.error("User ID not found.");
       return;
     }
 
@@ -205,28 +189,17 @@ function ResetPassword() {
       );
 
       if (response.data.message === "OTP resent successfully") {
-        setAlert({
-          message: "New OTP has been sent to your email.",
-          type: "success",
-          visible: true,
-        });
+        toast.success("New OTP has been sent to your email.");
         setResendTimer(30);
       } else {
-        setAlert({
-          message: "Failed to resend OTP. Please try again.",
-          type: "error",
-          visible: true,
-        });
+        toast.error("Failed to resend OTP. Please try again.");
       }
     } catch (error) {
       console.error("Error resending OTP:", error);
-      setAlert({
-        message:
-          error.response?.data?.message ||
-          "Failed to resend OTP. Please try again.",
-        type: "error",
-        visible: true,
-      });
+      toast.error(
+        error.response?.data?.message ||
+        "Failed to resend OTP. Please try again."
+      );
     }
   };
 
@@ -237,59 +210,6 @@ function ResetPassword() {
     }
     return () => clearTimeout(timer);
   }, [resendTimer]);
-
-  const renderField = (
-    name,
-    label,
-    placeholder,
-    Icon,
-    type = "text",
-    note = null
-  ) => (
-    <div className="flex flex-col gap-2">
-      <label
-        htmlFor={name}
-        className="text-[16px] font-semibold text-[var(--text-dark-color)]"
-      >
-        {label}
-      </label>
-      <div className="relative">
-        <input
-          type={type}
-          id={name}
-          name={name}
-          value={formData[name]}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder={placeholder}
-          className={`w-full border ${
-            shouldShowError(name)
-              ? "border-red-500"
-              : "border-[var(--border-color)]"
-          } rounded-[58px] p-4 pl-12 focus:outline-none focus:border-[var(--primary-color)] placeholder:text-gray-400 placeholder:text-[16px] placeholder:leading-6`}
-        />
-        <Icon
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600"
-          size={20}
-        />
-        {shouldShowError(name) && (
-          <AlertCircle
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-500"
-            size={20}
-          />
-        )}
-      </div>
-      {note && (
-        <div className="flex items-center gap-1 text-gray-500 text-sm pl-4">
-          <Info size={14} />
-          <p>{note}</p>
-        </div>
-      )}
-      {shouldShowError(name) && (
-        <p className="text-red-500 text-sm pl-4">{errors[name]}</p>
-      )}
-    </div>
-  );
 
   return (
     <div className="flex h-auto min-h-screen w-full">
@@ -303,9 +223,7 @@ function ResetPassword() {
         />
       </div>
 
-      {/* Right side content */}
       <div className="w-full md:w-[60%] h-auto min-h-screen bg-[var(--bg-color-off-white)] flex flex-col p-5 relative">
-        {/* Top bar */}
         <div className="flex items-center justify-between mb-6 w-full">
           {!showOtp ? (
             <button
@@ -352,8 +270,8 @@ function ResetPassword() {
                   !showOtp
                     ? "/resetpassword-lock.jpg"
                     : showCreatePassword
-                    ? "/resetpassword-lock.jpg"
-                    : "/resetpassword-mail.jpg"
+                      ? "/resetpassword-lock.jpg"
+                      : "/resetpassword-mail.jpg"
                 }
                 alt="reset"
                 width={200}
@@ -366,8 +284,8 @@ function ResetPassword() {
                   {!showOtp
                     ? "Reset Your Password"
                     : showCreatePassword
-                    ? "Create New Password"
-                    : "Enter OTP"}
+                      ? "Create New Password"
+                      : "Enter OTP"}
                 </p>
               </div>
               <div className="flex justify-center items-center">
@@ -375,21 +293,27 @@ function ResetPassword() {
                   {!showOtp
                     ? "Enter your email address, and we'll send you instructions to reset your password."
                     : showCreatePassword
-                    ? "Your new password must be secure and different from previous ones."
-                    : "Please enter the 4 digit code that we've sent to your email."}
+                      ? "Your new password must be secure and different from previous ones."
+                      : "Please enter the 4 digit code that we've sent to your email."}
                 </p>
               </div>
             </div>
 
             <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
               {!showOtp ? (
-                renderField(
-                  "email",
-                  "Email",
-                  "Enter your business email",
-                  Mail,
-                  "email"
-                )
+                <FormField
+                  name="email"
+                  label="Email"
+                  placeholder="Enter your business email"
+                  Icon={Mail}
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={errors.email}
+                  touched={touched.email}
+                  submitAttempted={submitAttempted}
+                />
               ) : showOtp && !showCreatePassword ? (
                 <div className="flex flex-col gap-2">
                   <label className="text-[16px] font-semibold justify-center items-center flex text-[var(--text-dark-color)]">
@@ -433,20 +357,32 @@ function ResetPassword() {
                 </div>
               ) : (
                 <>
-                  {renderField(
-                    "password",
-                    "New Password",
-                    "Create your password",
-                    Lock,
-                    "password"
-                  )}
-                  {renderField(
-                    "confirmPassword",
-                    "Confirm Password",
-                    "Confirm your password",
-                    Lock,
-                    "password"
-                  )}
+                  <FormField
+                    name="password"
+                    label="New Password"
+                    placeholder="Create your password"
+                    Icon={Lock}
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={errors.password}
+                    touched={touched.password}
+                    submitAttempted={submitAttempted}
+                  />
+                  <FormField
+                    name="confirmPassword"
+                    label="Confirm Password"
+                    placeholder="Confirm your password"
+                    Icon={Lock}
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={errors.confirmPassword}
+                    touched={touched.confirmPassword}
+                    submitAttempted={submitAttempted}
+                  />
                 </>
               )}
               {apiError && (
@@ -461,16 +397,18 @@ function ResetPassword() {
                 </div>
               )}
 
-              <button
-                type="submit"
-                className="mt-4 w-full py-5 px-4 rounded-[58px] text-white font-semibold bg-blue-600 hover:bg-blue-700 cursor-pointer"
-              >
-                {!showOtp
-                  ? "Continue"
-                  : showCreatePassword
-                  ? "Update"
-                  : "Verify"}
-              </button>
+              <AuthButton
+                loading={loading}
+                text={
+                  loading
+                    ? "Processing..."
+                    : !showOtp
+                      ? "Continue"
+                      : showCreatePassword
+                        ? "Update"
+                        : "Verify"
+                }
+              />
             </form>
           </div>
         </div>

@@ -18,6 +18,7 @@ import Step1 from "@/components/edit-campaign/Step1";
 import Step2 from "@/components/edit-campaign/Step2";
 import Step3 from "@/components/edit-campaign/Step3";
 import Step4 from "@/components/edit-campaign/Step4";
+import { toast } from "sonner";
 
 const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGRyYm9rZWJudmlkd3l6dnpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI2MjMzMzIsImV4cCI6MjA0ODE5OTMzMn0.Zhnz5rLRoIhtHyF52pFjzYijNdxgZBvEr9LtOxR2Lhw";
@@ -284,16 +285,9 @@ export default function EditCampaign() {
       );
       setShowSuccessModal(true);
     } catch (error) {
-      console.error("Error updating campaign:", error);
-      setAlert({
-        message: "Failed to update campaign. Please check your form data.",
-        type: "error",
-        visible: true,
-      });
+      console.log("Error is occured", error);
+      toast.error(error?.response?.data?.message || "Error is occur");
 
-      setTimeout(() => {
-        setAlert(prev => ({ ...prev, visible: false }));
-      }, 4000);
     }
   };
 
@@ -511,11 +505,11 @@ export default function EditCampaign() {
         )}
 
         {currentStep === 1 && (
-           <Step2 formData={formData} setFormData={setFormData} />
+          <Step2 formData={formData} setFormData={setFormData} />
         )}
 
         {currentStep === 2 && (
-          <Step3 formData={formData} handleQuestionChange={handleQuestionChange}/>
+          <Step3 formData={formData} handleQuestionChange={handleQuestionChange} />
         )}
 
         {currentStep === 3 && (

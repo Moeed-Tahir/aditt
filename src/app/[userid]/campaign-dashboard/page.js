@@ -5,6 +5,7 @@ import { DataTable } from "@/components/DataTable";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 export default function CampaignDashboard() {
   const [campaignData, setCampaignData] = useState()
@@ -19,6 +20,7 @@ export default function CampaignDashboard() {
 
       setCampaignData(response.data.campaign);
     } catch (error) {
+      toast.error(error?.response?.data?.message || "Error is occur");
       console.error('Error creating campaign:', error);
     }
   };

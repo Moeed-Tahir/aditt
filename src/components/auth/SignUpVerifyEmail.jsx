@@ -1,19 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import {
-  Mail,
-  AlertCircle,
-  Lock,
-  Info,
-  MoveLeft,
-  ArrowLeft,
-} from "lucide-react";
-import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import AlertBox from "./AlertBox";
+import AlertBox from "../AlertBox";
+import { toast } from "sonner";
+import AuthButton from "./AuthButton";
 
 function SignUpVerifyEmail() {
   const [formData, setFormData] = useState({
@@ -29,11 +23,10 @@ function SignUpVerifyEmail() {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
-  const [showOtp, setShowOtp] = useState(false);
-  const [showCreatePassword, setCreatePassword] = useState(false);
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [otpError, setOtpError] = useState("");
   const [resendTimer, setResendTimer] = useState(0);
+  const [loading, setLoading] = useState(false); 
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,44 +40,28 @@ function SignUpVerifyEmail() {
         : !isValidEmail(formData.email)
         ? "Invalid email format"
         : "",
-      password:
-        showCreatePassword && !formData.password ? "Password is required" : "",
-      confirmPassword:
-        showCreatePassword && formData.password !== formData.confirmPassword
-          ? "Passwords do not match"
-          : "",
     };
     setErrors(newErrors);
     return !Object.values(newErrors).some((error) => error);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-    setTouched((prev) => ({ ...prev, [name]: true }));
-  };
-
-  const handleBlur = (e) => {
-    const { name } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
-    validateForm();
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
+    setOtpError("");
 
-    // Validate OTP before proceeding
     if (otp.some((digit) => !digit)) {
       setOtpError("Please enter a valid 4-digit OTP.");
-      setSubmitAttempted(false);
       return;
     }
 
     const userId = Cookies.get("userId");
+    if (!userId) {
+      toast.error("User session not found. Please try signing up again.");
+      return;
+    }
+
+    setLoading(true);
     try {
       const response = await axios.post(
         "/api/routes/v1/authRoutes?action=verify-otp",
@@ -93,33 +70,17 @@ function SignUpVerifyEmail() {
           userId: userId,
         }
       );
-      setAlert({
-        message: "Your email has been verified successfully",
-        type: "success",
-        visible: true,
-      });
-
-      setTimeout(() => {
-        setAlert((prev) => ({ ...prev, visible: false }));
-      }, 4000);
+      
+      if (response.data) {
+        toast.success("Your email has been verified successfully");
+        router.push(`/${userId}/campaign-dashboard`);
+      }
     } catch (error) {
-      setAlert({
-        message: "An error occurred" + error.message,
-        type: "error",
-        visible: true,
-      });
-
-      setTimeout(() => {
-        setAlert((prev) => ({ ...prev, visible: false }));
-      }, 4000);
+      console.error("OTP verification error:", error);
+      toast.error(error?.response?.data?.message || "Error occurred during verification");
     } finally {
-      setSubmitAttempted(false);
-      router.push(`/${userId}/campaign-dashboard`);
+      setLoading(false);
     }
-  };
-
-  const shouldShowError = (name) => {
-    return (touched[name] || submitAttempted) && errors[name];
   };
 
   const handleOtpChange = (index, value) => {
@@ -131,6 +92,7 @@ function SignUpVerifyEmail() {
       const nextInput = document.getElementById(`otp-${index + 1}`);
       if (nextInput) nextInput.focus();
     }
+    setOtpError(""); // Clear error when user types
   };
 
   const [alert, setAlert] = useState({
@@ -143,61 +105,44 @@ function SignUpVerifyEmail() {
     const userId = Cookies.get("userId");
 
     if (!userId) {
-      setAlert({
-        message: "User ID not found.",
-        type: "error",
-        visible: true,
-      });
-
-      setTimeout(() => {
-        setAlert((prev) => ({ ...prev, visible: false }));
-      }, 4000);
+      toast.error("User session not found. Please try signing up again.");
       return;
     }
 
     try {
+      setLoading(true);
       const response = await axios.post(
         "/api/routes/v1/authRoutes?action=resend-otp",
         { userId }
       );
 
       if (response.data.message === "OTP resent successfully") {
-        setAlert({
-          message: "New OTP has been sent to your email.",
-          type: "success",
-          visible: true,
-        });
-
-        setTimeout(() => {
-          setAlert((prev) => ({ ...prev, visible: false }));
-        }, 4000);
+        toast.success("New OTP has been sent to your email.");
         setResendTimer(30); // Set timer for 30 seconds
       } else {
-        setAlert({
-          message: "Failed to resend OTP. Please try again.",
-          type: "errror",
-          visible: true,
-        });
-
-        setTimeout(() => {
-          setAlert((prev) => ({ ...prev, visible: false }));
-        }, 4000);
+        toast.error("Failed to resend OTP. Please try again.");
       }
     } catch (error) {
       console.error("Error resending OTP:", error);
-      setAlert({
-        message:
-          error.response?.data?.message ||
-          "Failed to resend OTP. Please try again.",
-        type: "errror",
-        visible: true,
-      });
-
-      setTimeout(() => {
-        setAlert((prev) => ({ ...prev, visible: false }));
-      }, 4000);
+      toast.error(
+        error.response?.data?.message ||
+        "Failed to resend OTP. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Get email from cookies if available
+    const userEmail = Cookies.get("userEmail");
+    if (userEmail) {
+      setFormData(prev => ({ ...prev, email: userEmail }));
+    }
+
+    // Initialize resend timer
+    setResendTimer(30);
+  }, []);
 
   useEffect(() => {
     let timer;
@@ -207,12 +152,9 @@ function SignUpVerifyEmail() {
     return () => clearTimeout(timer);
   }, [resendTimer]);
 
-
   return (
     <div className="flex h-auto min-h-screen w-full">
-      {/* Right side content */}
       <div className="w-full h-auto min-h-screen bg-[var(--bg-color-off-white)] flex flex-col p-5 relative">
-        {/* Top bar */}
         <div className="flex items-center justify-between mb-6 w-full">
           <button
             type="button"
@@ -224,7 +166,6 @@ function SignUpVerifyEmail() {
           </button>
         </div>
 
-        {/* Form content */}
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-md">
             <div className="flex justify-center mb-5">
@@ -233,6 +174,7 @@ function SignUpVerifyEmail() {
                 alt="reset"
                 width={200}
                 height={200}
+                priority
               />
             </div>
             <div>
@@ -243,27 +185,27 @@ function SignUpVerifyEmail() {
               </div>
               <div className="flex justify-center items-center">
                 <p className="text-[16px] text-center font-light text-gray-600 py-6">
-                  Please enter the 4 digit code that we’ve sent to your email:{" "}
-                  <span className="font-bold"> {formData.email} </span>{" "}
+                  Please enter the 4 digit code that we've sent to your email:{" "}
+                  <span className="font-bold"> {formData.email} </span>
                 </p>
               </div>
             </div>
 
-            <form className="flex flex-col gap-4">
+            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
               <div className="flex flex-col gap-2">
-                <label className="text-[16px] font-semibold justify-center items-center flex text-[var(--text-dark-color)]">
-                  {formData.email}
-                </label>
                 <div className="flex gap-4 justify-center">
                   {otp.map((digit, index) => (
                     <input
                       key={index}
                       id={`otp-${index}`}
                       type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       maxLength={1}
                       value={digit}
                       placeholder="0"
                       onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onFocus={(e) => e.target.select()}
                       className="w-18 h-18 text-center bg-white border border-[var(--border-color)] rounded-2xl text-4xl placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary-color)]"
                     />
                   ))}
@@ -274,6 +216,7 @@ function SignUpVerifyEmail() {
                   </p>
                 )}
               </div>
+              
               <div className="text-center mt-4">
                 {resendTimer > 0 ? (
                   <p className="text-gray-500 text-sm">
@@ -283,20 +226,18 @@ function SignUpVerifyEmail() {
                   <button
                     type="button"
                     onClick={handleResendOtp}
-                    className="text-blue-600 font-medium hover:underline"
+                    disabled={loading}
+                    className="text-blue-600 font-medium hover:underline disabled:text-gray-400 disabled:cursor-not-allowed"
                   >
                     Resend OTP
                   </button>
                 )}
               </div>
 
-              <button
-                onClick={handleSubmit}
-                className="mt-4 w-full py-5 px-4 rounded-[58px] text-white font-semibold bg-blue-600 hover:bg-blue-700 cursor-pointer"
-              >
-                {" "}
-                Verify
-              </button>
+              <AuthButton 
+                loading={loading} 
+                text={loading ? "Verifying..." : "Verify"} 
+              />
             </form>
           </div>
         </div>

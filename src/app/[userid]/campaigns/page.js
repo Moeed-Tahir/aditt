@@ -4,6 +4,7 @@ import CampaignDetailPage from '@/components/CampaignDetailPage'
 import React, { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from "next/navigation";
 import axios from 'axios';
+import { toast } from 'sonner';
 
 const Page = () => {
   const searchParams = useSearchParams();
@@ -19,6 +20,8 @@ const Page = () => {
 
       setCampaignData(response.data.campaign);
     } catch (error) {
+            toast.error(error?.response?.data?.message || "Error is occur");
+
       console.error('Error creating campaign:', error);
     }
   };

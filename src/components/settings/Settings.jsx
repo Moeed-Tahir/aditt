@@ -53,7 +53,7 @@ export default function Settings() {
         setError(response.data.message || "Failed to get profile data");
       }
     } catch (error) {
-      console.error("Error getting profile:", error);
+      toast.error(error?.response?.data?.message || "Error is occur");
       setError("Failed to fetch profile data");
     }
   };

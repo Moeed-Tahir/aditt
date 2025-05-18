@@ -78,7 +78,7 @@ exports.signUp = async (req, res) => {
 
         res.status(201).json({
             message: "Account created successfully! Please check your email for the verification code.",
-            userId: newUser._id,
+            userId: newUser.userId,
             email: businessEmail
         });
 
@@ -153,6 +153,7 @@ exports.verifyOTP = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
 
 exports.signIn = async (req, res) => {
     try {
@@ -271,21 +272,22 @@ exports.forgotPassword = async (req, res) => {
     }
 };
 
+
 exports.resetPassword = async (req, res) => {
     try {
         await connectToDatabase();
 
-        const { userId, otp, newPassword } = req.body;
+        const { userId, newPassword } = req.body;
 
-        if (!userId || !otp || !newPassword) {
+        if (!userId || !newPassword) {
             return res.status(400).json({
-                message: "All fields are required",
+                message: "User ID and new password are required",
                 code: "MISSING_FIELDS"
             });
         }
 
-        const user = await User.findById(userId);
-
+        const user = await User.findOne({ userId: userId });
+        
         if (!user) {
             return res.status(404).json({
                 message: "User not found",
@@ -293,28 +295,20 @@ exports.resetPassword = async (req, res) => {
             });
         }
 
-        // Verify OTP
-        if (user.otp !== otp) {
+        // Optional: Check if OTP was previously verified
+        if (!user.isOtpVerified) {
             return res.status(400).json({
-                message: "Invalid OTP",
-                code: "INVALID_OTP",
-                requiresResend: true
+                message: "OTP not verified",
+                code: "OTP_NOT_VERIFIED",
+                requiresVerification: true
             });
         }
 
-        if (user.otpExpires < Date.now()) {
-            return res.status(400).json({
-                message: "OTP has expired",
-                code: "OTP_EXPIRED",
-                requiresResend: true
-            });
-        }
-
-        // Update password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
         user.otp = null;
         user.otpExpires = null;
+        user.isOtpVerified = false; // Reset verification flag
         await user.save();
 
         res.status(200).json({

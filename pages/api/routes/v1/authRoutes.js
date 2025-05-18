@@ -1,6 +1,5 @@
 import {
   signUp,
-  verifyOTP,
   signIn,
   forgotPassword,
   resetPassword,
@@ -8,7 +7,8 @@ import {
   updatePassword,
   deleteAccount,
   resendOTP,
-  getProfile
+  getProfile,
+  verifyOTP,
 } from "../../controllers/v1/authControllers";
 
 export default async function handler(req, res) {

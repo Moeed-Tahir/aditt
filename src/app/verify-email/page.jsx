@@ -1,10 +1,14 @@
+import SignUpVerifyEmail from '@/components/auth/SignUpVerifyEmail'
+import { SignupSidebar } from '@/components/SignupSidebar'
+import { SidebarProvider } from '@/components/ui/sidebar'
 import React from 'react'
 
 function page() {
   return (
-    <div>
-      
-    </div>
+    <SidebarProvider>
+      <SignupSidebar />
+      <SignUpVerifyEmail />
+    </SidebarProvider>
   )
 }
 

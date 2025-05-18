@@ -10,6 +10,7 @@ import FormField from "./FormField";
 import useSigninForm from "@/hooks/useSigninForm";
 import AuthButton from "./AuthButton";
 import { toast } from "sonner";
+import axios from "axios";
 
 function SigninUser() {
   const router = useRouter();
@@ -27,56 +28,67 @@ function SigninUser() {
     showAlert,
   } = useSigninForm();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitAttempted(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setSubmitAttempted(true);
 
-    if (!validateForm()) {
+  if (!validateForm()) {
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await axios.post("/api/routes/v1/authRoutes?action=signin", {
+      email: formData.email,
+      password: formData.password,
+    });
+
+    const data = response.data;
+
+    if (data.code) {
+      switch (data.code) {
+        case "USER_NOT_FOUND":
+          toast.error("User not found. Please check your email.");
+          break;
+        case "ACCOUNT_NOT_VERIFIED":
+          toast.error("Account not verified. OTP resent to your email.");
+          router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+          break;
+        case "INVALID_PASSWORD":
+          toast.error("Invalid password. Please try again.");
+          break;
+        case "MISSING_FIELDS":
+          toast.error("Email and password are required.");
+          break;
+        default:
+          toast.error("An unexpected error occurred. Please try again.");
+      }
       return;
     }
 
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/routes/v1/authRoutes?action=signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.message === "User not found") {
-          toast.error("User not found. Please check your email.");
-        } else if (data.message === "User not verified") {
-          toast.error("Account not verified. OTP resent to your email.");
-          router.push(`/verify-email`);
-        } else if (data.message === "Invalid password") {
-          toast.error("Invalid password. Please try again.");
-        } else {
-          toast.error("An unexpected error occurred. Please try again.");
-        }
-        return;
-      }
-
+    if (data.token && data.user) {
       Cookies.set("token", data.token, { expires: 1 });
       Cookies.set("userId", data.user.userId, { expires: 1 });
       Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
 
       router.push(`/campaign-dashboard`);
-    } catch (error) {
-      console.error("Sign in error:", error);
-      showAlert("An unexpected error occurred. Please try again.", "error");
-    } finally {
-      setLoading(false);
+    } else {
+      toast.error("Sign in successful but missing user data.");
     }
-  };
+  } catch (error) {
+    console.error("Sign in error:", error);
+    if (error.response) {
+      toast.error(error.response.data.message || "An error occurred during sign in.");
+    } else if (error.request) {
+      toast.error("Network error. Please check your connection.");
+    } else {
+      toast.error("An unexpected error occurred. Please try again.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex h-auto min-h-screen w-full">

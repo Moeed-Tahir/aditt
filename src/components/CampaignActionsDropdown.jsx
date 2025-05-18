@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { toast } from "sonner";
 
 export default function CampaignActionsDropdown({ campaignId, openDialog, customTrigger, campaignData, handleAction, fetchCampaign }) {
   const userId = Cookies.get("userId");
@@ -35,7 +36,7 @@ export default function CampaignActionsDropdown({ campaignId, openDialog, custom
       return response.data;
     } catch (error) {
       console.error('Error updating campaign status:', error);
-      throw error;
+      toast.error(error?.response?.data?.message || "Error is occur");
     }
   };
 

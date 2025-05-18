@@ -35,6 +35,7 @@ import Step1 from "./create-campaign/Step1";
 import Step2 from "./create-campaign/Step2";
 import Step3 from "./create-campaign/Step3";
 import Step4 from "./create-campaign/Step4";
+import { toast } from "sonner";
 
 const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
 const supabaseKey =
@@ -294,15 +295,7 @@ export function CreateCampaigns({ userId }) {
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error creating campaign:", error);
-      setAlert({
-        message: "Failed to create campaign. Please check your form data.",
-        type: "error",
-        visible: true,
-      });
-
-      setTimeout(() => {
-        setAlert((prev) => ({ ...prev, visible: false }));
-      }, 4000);
+      toast.error(error?.response?.data?.message || "Error is occur");
     }
   };
 

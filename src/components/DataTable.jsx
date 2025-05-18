@@ -13,6 +13,7 @@ import axios from "axios";
 import CampaignMetricsDashboard from "./campaign-dashboard/CampaignMetricsDashboard";
 import CampaignDataTable from "./campaign-dashboard/CampaignDataTable";
 import FeedbackDialog from "./campaign-dashboard/FeedbackDialog";
+import { toast } from "sonner";
 
 export function DataTable({ campaignData, fetchCampaign }) {
 
@@ -100,7 +101,7 @@ export function DataTable({ campaignData, fetchCampaign }) {
       return await response.data;
     } catch (error) {
       console.error('Error submitting feedback:', error);
-      throw error;
+      toast.error(error?.response?.data?.message || "Error is occur");
     }
   };
 
