@@ -19,7 +19,6 @@ import ConfirmationDialogue from "@/components/ConfirmationDialogue";
 import Cookies from "js-cookie";
 
 export default function CampaignDetailPage({ campaignData }) {
-  console.log("campaignData", campaignData);
 
   const [duration, setDuration] = useState(null);
   const videoRef = useRef(null);

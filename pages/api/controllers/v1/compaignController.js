@@ -3,19 +3,11 @@ import Compaign from '../../models/Campaign.model';
 import CampaignFeedback from '../../models/CampaignFeedback';
 
 import Stripe from 'stripe';
+import { getVideoDurationFromUrl } from '../../services/campaignServices';
 const dotenv = require("dotenv");
 dotenv.config();
-const ffmpeg = require('fluent-ffmpeg');
 
-const getVideoDurationFromUrl = (videoUrl) => {
-    return new Promise((resolve, reject) => {
-        ffmpeg.ffprobe(videoUrl, (err, metadata) => {
-            if (err) return reject(err);
-            const duration = metadata.format.duration;
-            resolve(duration);
-        });
-    });
-};
+
 
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 exports.createCampaign = async (req, res) => {
@@ -92,7 +84,7 @@ exports.getCampaign = async (req, res) => {
         const { userId } = req.body;
 
         const campaign = await Compaign.find({ userId: userId });
-        
+
         if (!campaign) {
             return res.status(404).json({
                 message: 'Campaign not found'
@@ -309,24 +301,26 @@ exports.addCountInCampaign = async (req, res) => {
 
 exports.updateCampaign = async (req, res) => {
     try {
-        const { updateData, id } = req.body;
+        const { id, ...updateData } = req.body;
 
-        const updatedCampaign = await Compaign.findByIdAndUpdate(
-            id,
-            updateData,
-            { new: true }
-        );
-
-        if (!updatedCampaign) {
+        const campaign = await Compaign.findById(id);
+        if (!campaign) {
             return res.status(404).json({ message: 'Campaign not found.' });
         }
 
-        res.status(200).json({ message: 'Campaign updated successfully.', campaign: updatedCampaign });
+        Object.assign(campaign, updateData);
+        const updatedCampaign = await campaign.save();
+
+        res.status(200).json({
+            message: 'Campaign updated successfully.',
+            campaign: updatedCampaign
+        });
     } catch (error) {
         console.error('Error updating campaign:', error);
         res.status(500).json({ message: 'Internal server error.' });
     }
 };
+
 
 exports.campaignStatusUpdate = async (req, res) => {
     try {

@@ -18,7 +18,6 @@ const Page = () => {
       });
 
       setCampaignData(response.data.campaign);
-      console.log("Campaign data:", response.data.campaign);
     } catch (error) {
       console.error('Error creating campaign:', error);
     }
