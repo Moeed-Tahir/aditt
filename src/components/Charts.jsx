@@ -21,7 +21,6 @@ import {
 import Calendars from "./Calendars";
 
 export default function BarChartComponent({ campaignData }) {
-  console.log("campaignData in BarChartComponent",campaignData);
 
   const [formData, setFormData] = useState({
     startDate: new Date(),

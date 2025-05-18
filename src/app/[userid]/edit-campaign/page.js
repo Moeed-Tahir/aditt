@@ -282,7 +282,6 @@ export default function EditCampaign() {
           id: formData._id
         },
       );
-
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error updating campaign:", error);
