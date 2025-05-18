@@ -308,7 +308,7 @@ exports.resetPassword = async (req, res) => {
         user.password = hashedPassword;
         user.otp = null;
         user.otpExpires = null;
-        user.isOtpVerified = false; // Reset verification flag
+        user.isOtpVerified = true; // Reset verification flag
         await user.save();
 
         res.status(200).json({

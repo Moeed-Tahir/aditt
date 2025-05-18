@@ -61,9 +61,7 @@ function SignupUser() {
 
       if (response.status === 201) {
         Cookies.set("userId", response.data.userId, { expires: 1 });
-        toast.success("Account Created Successfully!", {
-          description: response.data.message,
-        });
+        toast.success(response.data.message);
         router.push(`/verify-email`);
       }
     } catch (error) {

@@ -44,7 +44,7 @@ export default function Navbar2({ userId }) {
         <div className="hidden md:flex items-center gap-4">
           <NotificationDropdown />
           <Link
-            href={`/${userId}/settings`}
+            href={`/${userId}/Settings`}
             className="flex items-center bg-[rgba(232,240,255,1)] text-gray-800 py-2 px-4 rounded-[58px] hover:bg-blue-700 hover:text-white transition"
           >
             <Image
@@ -88,7 +88,7 @@ export default function Navbar2({ userId }) {
                 <NotificationDropdown mobileView />
               </div>
               <Link
-                href={`/${userId}/settings`}
+                href={`/${userId}/Settings`}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 Settings
