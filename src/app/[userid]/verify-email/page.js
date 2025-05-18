@@ -1,7 +1,7 @@
 "use client";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import SignUpVerifyEmail from "@/components/auth/SignUpVerifyEmail";
-import { SignupSidebar } from "@/components/SignupSidebar";
+import { SignupSidebar } from "@/components/auth/SignupSidebar";
 
 export default function VerifyEmails() {
   return (

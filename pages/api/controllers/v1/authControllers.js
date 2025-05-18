@@ -172,7 +172,7 @@ exports.signIn = async (req, res) => {
 
         if (!user) {
             return res.status(404).json({
-                message: "User not found",
+                message: "User not found. Sign up to create an account.",
                 code: "USER_NOT_FOUND"
             });
         }
@@ -186,7 +186,7 @@ exports.signIn = async (req, res) => {
             await sendOTP(email, user.otp);
 
             return res.status(403).json({
-                message: "User not verified",
+                message: "User not verified. Please check your email for the verification code.",
                 code: "ACCOUNT_NOT_VERIFIED",
                 userId: user._id,
                 requiresVerification: true
@@ -197,7 +197,7 @@ exports.signIn = async (req, res) => {
 
         if (!isPasswordValid) {
             return res.status(401).json({
-                message: "Invalid password",
+                message: "Invalid password. Please try again.",
                 code: "INVALID_PASSWORD"
             });
         }

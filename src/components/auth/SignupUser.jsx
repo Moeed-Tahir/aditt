@@ -49,30 +49,20 @@ function SignupUser() {
 
       if (response.status === 200 && response.data.code === "OTP_RESENT") {
         Cookies.set("userId", response.data.userId, { expires: 1 });
-        toast.warning("Account Exists", {
-          description: response.data.message,
-          action: {
-            label: "Verify Now",
-            onClick: () => router.push(`/verify-email`),
-          },
-        });
+        toast.warning("Account Exists. OTP resent");
         return;
       }
 
       if (response.status === 201) {
         Cookies.set("userId", response.data.userId, { expires: 1 });
-        toast.success("Account Created Successfully!", {
-          description: response.data.message,
-        });
+        toast.success("Account Created Successfully!");
         router.push(`/verify-email`);
       }
     } catch (error) {
       console.error(error);
       if (error.response?.status === 400) {
         if (error.response.data.code === "EMAIL_EXISTS") {
-          toast.error("Account Exists", {
-            description: error.response.data.message,
-          });
+          toast.error("Email already exists. Please sign in or try again.");
           router.push(`/signin-user`);
         } else {
           toast.error("Validation Error", {
@@ -191,7 +181,10 @@ function SignupUser() {
                 className="text-[16px] font-normal text-gray-700"
               >
                 Accept&nbsp;
-                <Link href="/guidelines" className="text-blue-500 underline font-medium">
+                <Link
+                  href="/guidelines"
+                  className="text-blue-500 underline font-medium"
+                >
                   Guidelines
                 </Link>
                 ,&nbsp;
@@ -220,7 +213,7 @@ function SignupUser() {
               </p>
             )}
 
-            <AuthButton loading={loading} text="Sign up"/>
+            <AuthButton loading={loading} text="Sign up" />
 
             <div className="mt-4">
               <p className="text-gray-600">

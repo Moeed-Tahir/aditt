@@ -1,15 +1,14 @@
-import SignUpVerifyEmail from '@/components/auth/SignUpVerifyEmail'
-import { SignupSidebar } from '@/components/SignupSidebar'
-import { SidebarProvider } from '@/components/ui/sidebar'
-import React from 'react'
+import SignUpVerifyEmail from "@/components/auth/SignUpVerifyEmail";
+import { SignupSidebar } from "@/components/auth/SignupSidebar";
+import React from "react";
 
 function page() {
   return (
-    <SidebarProvider>
+    <div className="flex flex-col items-center justify-center md:flex-row min-h-screen bg-gray-100">
       <SignupSidebar />
       <SignUpVerifyEmail />
-    </SidebarProvider>
-  )
+    </div>
+  );
 }
 
-export default page
+export default page;

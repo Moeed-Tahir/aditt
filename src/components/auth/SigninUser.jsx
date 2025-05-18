@@ -46,33 +46,15 @@ const handleSubmit = async (e) => {
 
     const data = response.data;
 
-    if (data.code) {
-      switch (data.code) {
-        case "USER_NOT_FOUND":
-          toast.error("User not found. Please check your email.");
-          break;
-        case "ACCOUNT_NOT_VERIFIED":
-          toast.error("Account not verified. OTP resent to your email.");
-          router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
-          break;
-        case "INVALID_PASSWORD":
-          toast.error("Invalid password. Please try again.");
-          break;
-        case "MISSING_FIELDS":
-          toast.error("Email and password are required.");
-          break;
-        default:
-          toast.error("An unexpected error occurred. Please try again.");
-      }
-      return;
-    }
-
     if (data.token && data.user) {
       Cookies.set("token", data.token, { expires: 1 });
       Cookies.set("userId", data.user.userId, { expires: 1 });
       Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
 
+      toast.success("Sign in successful!");
+
       router.push(`/campaign-dashboard`);
+
     } else {
       toast.error("Sign in successful but missing user data.");
     }
@@ -100,8 +82,8 @@ const handleSubmit = async (e) => {
           className="object-cover overflow-clip"
         />
       </div>
-      <div className="w-full md:w-[60%] h-auto min-h-screen bg-[var(--bg-color)] flex items-center justify-center p-5">
-        <div className="w-full max-w-[550px] bg-white rounded-[20px] px-8 py-9 flex flex-col gap-[20px] my-8">
+      <div className="w-full md:w-[60%] h-auto min-h-screen bg-[var(--bg-color)] flex items-center justify-center md:p-5 p-2">
+        <div className="w-full max-w-[550px] bg-white rounded-[20px] md:px-8 px-2 py-9 flex flex-col gap-[20px] my-8">
           <Image
             src="/Aditt logo.jpg"
             alt="logo"
