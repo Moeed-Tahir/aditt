@@ -50,11 +50,13 @@ const handleSubmit = async (e) => {
       Cookies.set("token", data.token, { expires: 1 });
       Cookies.set("userId", data.user.userId, { expires: 1 });
       Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+      const userId = Cookies.get("userId");
 
       toast.success("Sign in successful!");
 
       router.push(`/campaign-dashboard`);
 
+      router.push(`/${userId}/campaign-dashboard`);
     } else {
       toast.error("Sign in successful but missing user data.");
     }
