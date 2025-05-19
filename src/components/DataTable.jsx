@@ -91,7 +91,6 @@ export function DataTable({ campaignData, fetchCampaign }) {
         conversionType: feedbackData.conversionType,
         campaignRate: feedbackData.campaignRate,
         campaignFeedback: feedbackData.campaignFeedback,
-
       });
 
       if (!response.data.message) {
@@ -105,47 +104,34 @@ export function DataTable({ campaignData, fetchCampaign }) {
     }
   };
 
-const handleAction = (type, campaignId) => {
-  setCurrentCampaignId(campaignId);
-  
-  const dialogTexts = {
-    pause: {
-      title: "Are you sure you want to pause this campaign?",
-      smallText: "Pausing will temporarily stop your campaign from running.",
-      confirmLabel: "Pause Campaign"
-    },
-    complete: {
-      title: "Provide feedback for this completed campaign",
-      smallText: "Please share your feedback to help us improve.",
-      confirmLabel: "Continue to Feedback"
-    },
-    cancel: {
-      title: "Are you sure you want to cancel this campaign?",
-      smallText: "Canceling will permanently stop this campaign.",
-      confirmLabel: "Cancel Campaign"
+  const handleAction = (type, campaignId) => {
+    setCurrentCampaignId(campaignId);
+    
+    if (type === "complete") {
+      setFeedbackDialogOpen(true);
+    } else {
+      const dialogTexts = {
+        pause: {
+          title: "Are you sure you want to pause this campaign?",
+          smallText: "Pausing will temporarily stop your campaign from running.",
+          confirmLabel: "Pause Campaign"
+        },
+        cancel: {
+          title: "Are you sure you want to cancel this campaign?",
+          smallText: "Canceling will permanently stop this campaign.",
+          confirmLabel: "Cancel Campaign"
+        }
+      };
+
+      setDialogConfig({
+        ...dialogTexts[type],
+        onConfirm: () => {
+          setDialogOpen(false);
+        },
+      });
+      setDialogOpen(true);
     }
   };
-
-  if (type === "complete") {
-    setDialogConfig({
-      ...dialogTexts[type],
-      onConfirm: () => {
-        setDialogOpen(false);
-        setFeedbackDialogOpen(true);
-      },
-    });
-  } else {
-    setDialogConfig({
-      ...dialogTexts[type],
-      onConfirm: () => {
-        setDialogOpen(false);
-      },
-    });
-  }
-  setDialogOpen(true);
-};
-
-
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -192,7 +178,22 @@ const handleAction = (type, campaignId) => {
 
           <CampaignMetricsDashboard transformedCampaigns={transformedCampaigns} />
 
-          <CampaignDataTable setDateFilter={setDateFilter} setStatusFilter={setStatusFilter} setCurrentPage={setCurrentPage} currentPage={currentPage} fetchCampaign={fetchCampaign} handleAction={handleAction} openDialog={openDialog} campaignData={campaignData} totalPages={totalPages} filteredCampaigns={filteredCampaigns} paginatedCampaigns={paginatedCampaigns} resetFilters={resetFilters} statusFilter={statusFilter} dateFilter={dateFilter} />
+          <CampaignDataTable 
+            setDateFilter={setDateFilter} 
+            setStatusFilter={setStatusFilter} 
+            setCurrentPage={setCurrentPage} 
+            currentPage={currentPage} 
+            fetchCampaign={fetchCampaign} 
+            handleAction={handleAction} 
+            openDialog={openDialog} 
+            campaignData={campaignData} 
+            totalPages={totalPages} 
+            filteredCampaigns={filteredCampaigns} 
+            paginatedCampaigns={paginatedCampaigns} 
+            resetFilters={resetFilters} 
+            statusFilter={statusFilter} 
+            dateFilter={dateFilter} 
+          />
 
           <Charts campaignData={transformedCampaigns} />
         </div>
