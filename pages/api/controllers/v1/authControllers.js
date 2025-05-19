@@ -43,7 +43,6 @@ exports.signUp = async (req, res) => {
                     code: "EMAIL_EXISTS"
                 });
             } else {
-                // Resend OTP for unverified accounts
                 existingUser.otp = generateOTP();
                 existingUser.otpExpires = Date.now() + 5 * 60 * 1000;
                 await existingUser.save();
@@ -58,7 +57,6 @@ exports.signUp = async (req, res) => {
             }
         }
 
-        // Create new user
         const hashedPassword = await bcrypt.hash(password, 10);
         const otp = generateOTP();
 
@@ -76,10 +74,21 @@ exports.signUp = async (req, res) => {
 
         await sendOTP(businessEmail, otp);
 
+        const token = jwt.sign(
+            { userId: newUser.userId },
+            process.env.SECRET_KEY,
+            { expiresIn: '1h' }
+        );
+
         res.status(201).json({
             message: "Account created successfully! Please check your email for the verification code.",
-            userId: newUser.userId,
-            email: businessEmail
+            user: {
+                userId: newUser.userId,
+                name: newUser.name,
+                email: newUser.businessEmail,
+                website: newUser.businessWebsite,
+            },
+            token
         });
 
     } catch (error) {
@@ -178,7 +187,6 @@ exports.signIn = async (req, res) => {
         }
 
         if (!user.isOtpVerified) {
-            // Resend OTP if not verified
             user.otp = generateOTP();
             user.otpExpires = Date.now() + 5 * 60 * 1000;
             await user.save();
@@ -295,7 +303,6 @@ exports.resetPassword = async (req, res) => {
             });
         }
 
-        // Optional: Check if OTP was previously verified
         if (!user.isOtpVerified) {
             return res.status(400).json({
                 message: "OTP not verified",
@@ -308,7 +315,7 @@ exports.resetPassword = async (req, res) => {
         user.password = hashedPassword;
         user.otp = null;
         user.otpExpires = null;
-        user.isOtpVerified = true; // Reset verification flag
+        user.isOtpVerified = true;
         await user.save();
 
         res.status(200).json({

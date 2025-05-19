@@ -1,7 +1,15 @@
 import Link from 'next/link'
 import React from 'react'
-import QuestionBox from "../QuestionBox"
-const Step3 = ({formData,handleQuestionChange}) => {
+import QuestionManager from "../QuestionBox"
+
+const Step3 = ({formData, setFormData}) => {
+    const handleQuestionChange = (questionType, updatedQuestion) => {
+        setFormData(prev => ({
+            ...prev,
+            [questionType]: updatedQuestion
+        }));
+    };
+
     return (
         <>
             <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
@@ -35,15 +43,10 @@ const Step3 = ({formData,handleQuestionChange}) => {
                                 </span>
                             </div>
                             <div className="relative w-full flex-1">
-                                <QuestionBox
+                                <QuestionManager
                                     question={formData.quizQuestion}
-                                    onChange={(field, value, optionIndex) =>
-                                        handleQuestionChange(
-                                            "quizQuestion",
-                                            field,
-                                            value,
-                                            optionIndex
-                                        )
+                                    onChange={(updatedQuestion) => 
+                                        handleQuestionChange("quizQuestion", updatedQuestion)
                                     }
                                     isQuiz={true}
                                     name="quizQuestion"
@@ -62,15 +65,10 @@ const Step3 = ({formData,handleQuestionChange}) => {
                                 </span>
                             </div>
                             <div className="relative w-full flex-1">
-                                <QuestionBox
+                                <QuestionManager
                                     question={formData.surveyQuestion1}
-                                    onChange={(field, value, optionIndex) =>
-                                        handleQuestionChange(
-                                            "surveyQuestion1",
-                                            field,
-                                            value,
-                                            optionIndex
-                                        )
+                                    onChange={(updatedQuestion) => 
+                                        handleQuestionChange("surveyQuestion1", updatedQuestion)
                                     }
                                     isQuiz={false}
                                     name="surveyQuestion1"
@@ -89,15 +87,10 @@ const Step3 = ({formData,handleQuestionChange}) => {
                                 </span>
                             </div>
                             <div className="relative w-full flex-1">
-                                <QuestionBox
+                                <QuestionManager
                                     question={formData.surveyQuestion2}
-                                    onChange={(field, value, optionIndex) =>
-                                        handleQuestionChange(
-                                            "surveyQuestion2",
-                                            field,
-                                            value,
-                                            optionIndex
-                                        )
+                                    onChange={(updatedQuestion) => 
+                                        handleQuestionChange("surveyQuestion2", updatedQuestion)
                                     }
                                     isQuiz={false}
                                     name="surveyQuestion2"

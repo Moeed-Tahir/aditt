@@ -4,33 +4,15 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useState, useCallback } from "react";
 import Navbar2 from "@/components/Navbar2";
-import QuestionBox from "./QuestionBox";
-import Sliders from "@/components/Sliders";
-import Calendars from "@/components/Calendars";
 import {
   ArrowLeft,
-  Calendar,
   Check,
-  ChevronDown,
   CircleCheck,
-  CircleDollarSign,
   CircleDot,
-  Copy,
-  Globe,
-  House,
-  Image,
-  Tag,
-  Trash,
-  Upload,
-  Video,
 } from "lucide-react";
-import PaymentMethod from "./PaymentMethod";
-import LinkBankAccount from "./LinkBankAccount";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
-import { DualRangeSlider } from "./DualSlider";
 import AlertBox from "./AlertBox";
-import Cookies from "js-cookie";
 import Step1 from "./create-campaign/Step1";
 import Step2 from "./create-campaign/Step2";
 import Step3 from "./create-campaign/Step3";
@@ -139,7 +121,6 @@ export function CreateCampaigns({ userId }) {
     const filePath = `addit-assets/${type}s/${fileName}`;
 
     try {
-      // First upload the file
       const { data, error } = await supabase.storage
         .from("new-project")
         .upload(filePath, file, {
@@ -150,7 +131,6 @@ export function CreateCampaigns({ userId }) {
 
       if (error) throw error;
 
-      // Get the public URL
       const {
         data: { publicUrl },
       } = supabase.storage.from("new-project").getPublicUrl(filePath);
@@ -210,7 +190,7 @@ export function CreateCampaigns({ userId }) {
 
   const [alert, setAlert] = useState({
     message: "",
-    type: "", // 'success' | 'error' | 'info' | 'warning'
+    type: "",
     visible: false,
   });
 
@@ -224,48 +204,43 @@ export function CreateCampaigns({ userId }) {
         companyLogo: formData.imageUrl,
         userId: userId,
         couponCode: formData.couponCode,
-        quizQuestion: {
+        quizQuestion: formData.quizQuestion.text ? {
           questionText: formData.quizQuestion.text,
           option1: formData.quizQuestion.options[0],
           option2: formData.quizQuestion.options[1],
           option3: formData.quizQuestion.options[2],
           option4: formData.quizQuestion.options[3],
-          answer:
-            formData.quizQuestion.options[formData.quizQuestion.correctAnswer],
-        },
-        surveyQuestion1: {
+          answer: formData.quizQuestion.correctAnswer !== null
+            ? formData.quizQuestion.options[formData.quizQuestion.correctAnswer]
+            : "",
+        } : null,
+        surveyQuestion1: formData.surveyQuestion1.text ? {
           questionText: formData.surveyQuestion1.text,
           option1: formData.surveyQuestion1.options[0],
           option2: formData.surveyQuestion1.options[1],
           option3: formData.surveyQuestion1.options[2],
           option4: formData.surveyQuestion1.options[3],
-          answer:
-            formData.surveyQuestion1.correctAnswer !== null
-              ? formData.surveyQuestion1.options[
-              formData.surveyQuestion1.correctAnswer
-              ]
-              : "",
-        },
-        surveyQuestion2: {
+          answer: formData.surveyQuestion1.selectedAnswer !== null
+            ? formData.surveyQuestion1.options[formData.surveyQuestion1.selectedAnswer]
+            : "",
+        } : null,
+        surveyQuestion2: formData.surveyQuestion2.text ? {
           questionText: formData.surveyQuestion2.text,
           option1: formData.surveyQuestion2.options[0],
           option2: formData.surveyQuestion2.options[1],
           option3: formData.surveyQuestion2.options[2],
           option4: formData.surveyQuestion2.options[3],
-          answer:
-            formData.surveyQuestion2.correctAnswer !== null
-              ? formData.surveyQuestion2.options[
-              formData.surveyQuestion2.correctAnswer
-              ]
-              : "",
-        },
+          answer: formData.surveyQuestion2.selectedAnswer !== null
+            ? formData.surveyQuestion2.options[formData.surveyQuestion2.selectedAnswer]
+            : "",
+        } : null,
         genderType: formData.genderType,
         genderRatio: formData.genderRatio.toString(),
-        age: formData.age,
+        ageRange: formData.ageRange,
         categories: formData.categories.join(","),
         campaignStartDate: formData.startDate.toISOString(),
         campaignEndDate:
-          formData.endDate?.toISOString() || formData.startDate.toISOString(),
+          formData.endDate?.toISOString() || formData.endDate.toISOString(),
         cardDetails: formData.cards,
         cardDetail: {
           cardNumber: formData.cardNumber,
@@ -297,46 +272,6 @@ export function CreateCampaigns({ userId }) {
       console.error("Error creating campaign:", error);
       toast.error(error?.response?.data?.message || "Error is occur");
     }
-  };
-
-  const handleQuestionChange = (
-    questionType,
-    field,
-    value,
-    optionIndex = null
-  ) => {
-    setFormData((prev) => {
-      if (optionIndex !== null) {
-        // Updating an option
-        const newOptions = [...prev[questionType].options];
-        newOptions[optionIndex] = value;
-        return {
-          ...prev,
-          [questionType]: {
-            ...prev[questionType],
-            options: newOptions,
-          },
-        };
-      } else if (field === "correctAnswer" || field === "selectedAnswer") {
-        // Updating the selected/correct answer
-        return {
-          ...prev,
-          [questionType]: {
-            ...prev[questionType],
-            [field]: value,
-          },
-        };
-      } else {
-        // Updating the question text
-        return {
-          ...prev,
-          [questionType]: {
-            ...prev[questionType],
-            text: value,
-          },
-        };
-      }
-    });
   };
 
   const calculateEstimatedReach = useCallback(() => {
@@ -392,8 +327,8 @@ export function CreateCampaigns({ userId }) {
                   ) : (
                     <CircleDot
                       className={`w-5 h-5 md:w-6 md:h-6 shrink-0 ${index === currentStep
-                          ? "text-blue-600"
-                          : "text-gray-300"
+                        ? "text-blue-600"
+                        : "text-gray-300"
                         }`}
                     />
                   )}
@@ -421,21 +356,17 @@ export function CreateCampaigns({ userId }) {
           <Step1 uploadProgress={uploadProgress} handleFileChange={handleFileChange} isUploading={isUploading} handleInputChange={handleInputChange} setFormData={setFormData} formData={formData} />
         )}
 
-        {/* Step 1: Targeting Details */}
         {currentStep === 1 && (
           <Step2 setValues={setValues} values={values} setFormData={setFormData} formData={formData} />
 
         )}
 
-        {/* Step 2: Set Questions */}
         {currentStep === 2 && (
-          <Step3 handleQuestionChange={handleQuestionChange} formData={formData} />
-
+          <Step3 setFormData={setFormData} formData={formData} />
         )}
 
-        {/* Step 3: Campaign Budget */}
         {currentStep === 3 && (
-          <Step4 handleInputChange={handleInputChange} setFormData={setFormData} handleSubmit={handleSubmit} formData={formData}  />
+          <Step4 handleInputChange={handleInputChange} setFormData={setFormData} handleSubmit={handleSubmit} formData={formData} />
 
         )}
 

@@ -1,8 +1,17 @@
 import Link from 'next/link'
 import React from 'react'
 import Sliders from '../Sliders'
+import { DualRangeSlider } from '../DualSlider'
 
 const Step2 = ({ setFormData, formData }) => {
+
+    const handleAgeRangeChange = (newRange) => {
+        setFormData(prev => ({
+            ...prev,
+            ageRange: newRange
+        }));
+    };
+
     return (
         <>
             <div className="min-h-screen px-4 py-8">
@@ -44,7 +53,7 @@ const Step2 = ({ setFormData, formData }) => {
                                     min={0}
                                     max={100}
                                     defaultValue={formData.genderRatio || 50}
-                                    selectedRadio={formData.genderType} 
+                                    selectedRadio={formData.genderType}
                                     onChange={(value, selectedGender) =>
                                         setFormData((prev) => ({
                                             ...prev,
@@ -68,7 +77,7 @@ const Step2 = ({ setFormData, formData }) => {
                         <div className="flex items-start gap-6">
                             <div className="w-1/3">
                                 <label className="block text-[18px] text-gray-800 font-medium">
-                                    Age
+                                    Age Range
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
                                     Select the age range of your target audience.
@@ -76,21 +85,19 @@ const Step2 = ({ setFormData, formData }) => {
                             </div>
 
                             <div className="flex-1">
-                                <div className="relative flex-1">
-                                    <Sliders
-                                        min={18}
-                                        max={65}
-                                        defaultValue={formData.age || 25} // Fallback to 25 if not set
-                                        onChange={(value) =>
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                age: value,
-                                            }))
-                                        }
-                                        showLabel={true}
-                                        showRadio={false}
-                                        labelUnit={`yrs`}
+                                <div className="relative flex-1 space-y-4">
+                                    <DualRangeSlider
+                                        min={0}
+                                        max={100}
+                                        value={formData.ageRange || [18, 65]}
+                                        onValueChange={handleAgeRangeChange}
+                                        label={(value) => `${value}`}
+                                        labelPosition="top"
                                     />
+                                    <div className="flex justify-between text-sm text-gray-500">
+                                        <span>18 yrs</span>
+                                        <span>65 yrs</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

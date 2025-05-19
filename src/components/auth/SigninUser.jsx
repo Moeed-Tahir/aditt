@@ -28,51 +28,53 @@ function SigninUser() {
     showAlert,
   } = useSigninForm();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setSubmitAttempted(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitAttempted(true);
 
-  if (!validateForm()) {
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const response = await axios.post("/api/routes/v1/authRoutes?action=signin", {
-      email: formData.email,
-      password: formData.password,
-    });
-
-    const data = response.data;
-
-    if (data.token && data.user) {
-      Cookies.set("token", data.token, { expires: 1 });
-      Cookies.set("userId", data.user.userId, { expires: 1 });
-      Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
-      const userId = Cookies.get("userId");
-
-      toast.success("Sign in successful!");
-
-      router.push(`/campaign-dashboard`);
-
-      router.push(`/${userId}/campaign-dashboard`);
-    } else {
-      toast.error("Sign in successful but missing user data.");
+    if (!validateForm()) {
+      return;
     }
-  } catch (error) {
-    console.error("Sign in error:", error);
-    if (error.response) {
-      toast.error(error.response.data.message || "An error occurred during sign in.");
-    } else if (error.request) {
-      toast.error("Network error. Please check your connection.");
-    } else {
-      toast.error("An unexpected error occurred. Please try again.");
+
+    setLoading(true);
+
+    try {
+      const response = await axios.post("/api/routes/v1/authRoutes?action=signin", {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      const data = response.data;
+
+      if (data.token && data.user) {
+        Cookies.set("token", data.token, { expires: 1 });
+        Cookies.set("userId", data.user.userId, { expires: 1 });
+        Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+        const userId = Cookies.get("userId");
+
+        toast.success("Sign in successful!");
+        router.push(`/${userId}/campaign-dashboard`);
+      } else {
+        toast.error("Sign in successful but missing user data.");
+      }
+    } catch (error) {
+      console.error("Sign in error:", error);
+      if (error.response) {
+        if (error.response.data.code === "ACCOUNT_NOT_VERIFIED") {
+          router.push("/verify-email");
+          toast.message("Please verify your email to continue.");
+        } else {
+          toast.error(error.response.data.message || "An error occurred during sign in.");
+        }
+      } else if (error.request) {
+        toast.error("Network error. Please check your connection.");
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="flex h-auto min-h-screen w-full">

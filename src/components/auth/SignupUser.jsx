@@ -46,6 +46,8 @@ function SignupUser() {
           password: formData.password,
         }
       );
+            
+      const data = response.data;
 
       if (response.status === 200 && response.data.code === "OTP_RESENT") {
         Cookies.set("userId", response.data.userId, { expires: 1 });
@@ -53,8 +55,11 @@ function SignupUser() {
         return;
       }
 
-      if (response.status === 201) {
-        Cookies.set("userId", response.data.userId, { expires: 1 });
+      if (data.token && data.user) {
+        Cookies.set("token", data.token, { expires: 1 });
+        Cookies.set("userId", data.user.userId, { expires: 1 });
+        Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+
         toast.success(response.data.message);
         router.push(`/verify-email`);
       }

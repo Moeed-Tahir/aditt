@@ -4,15 +4,21 @@ import { Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import AlertBox from "./AlertBox";
 
-function QuestionBox({ question, onChange, isQuiz, name, index, buttonLabel }) {
+function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
   const [isExpanded, setIsExpanded] = useState(!question.text);
 
   const handleOptionChange = (optionIndex, value) => {
-    onChange(index, "options", value, optionIndex);
+    const newOptions = [...question.options];
+    newOptions[optionIndex] = value;
+    onChange({ ...question, options: newOptions });
   };
 
   const handleAnswerSelect = (answerIndex) => {
-    onChange(index, isQuiz ? "correctAnswer" : "selectedAnswer", answerIndex);
+    if (isQuiz) {
+      onChange({ ...question, correctAnswer: answerIndex });
+    } else {
+      onChange({ ...question, selectedAnswer: answerIndex });
+    }
   };
 
   const [alert, setAlert] = useState({
@@ -22,7 +28,6 @@ function QuestionBox({ question, onChange, isQuiz, name, index, buttonLabel }) {
   });
 
   const validateQuestion = () => {
-    // Check question text
     if (!question.text || !question.text.trim()) {
       setAlert({
         message: "Please enter a question title",
@@ -32,7 +37,6 @@ function QuestionBox({ question, onChange, isQuiz, name, index, buttonLabel }) {
       return false;
     }
 
-    // Check options
     const emptyOptions = question.options.filter(opt => !opt.trim());
     if (emptyOptions.length > 0) {
       setAlert({
@@ -43,7 +47,6 @@ function QuestionBox({ question, onChange, isQuiz, name, index, buttonLabel }) {
       return false;
     }
 
-    // For quiz questions, check correct answer
     if (isQuiz && (question.correctAnswer === null || question.correctAnswer === undefined)) {
       setAlert({
         message: "Please select the correct answer for the quiz question",
@@ -77,7 +80,7 @@ function QuestionBox({ question, onChange, isQuiz, name, index, buttonLabel }) {
               placeholder="Question Title"
               className="w-full mb-3 p-3 border text-gray-600 text-sm rounded-full"
               value={question.text}
-              onChange={(e) => onChange(index, "text", e.target.value)}
+              onChange={(e) => onChange({ ...question, text: e.target.value })}
             />
             <p className="text-[14px]">Question Answer</p>
 
@@ -152,31 +155,21 @@ function QuestionBox({ question, onChange, isQuiz, name, index, buttonLabel }) {
   );
 }
 
-export default function QuestionManager({ isQuiz = true, buttonLabel }) {
-  const [questions, setQuestions] = useState([]);
-  const [hasQuestion, setHasQuestion] = useState(false);
-
-  const handleChange = (index, field, value, optionIndex = null) => {
-    const updated = [...questions];
-    if (field === "options") {
-      updated[index].options[optionIndex] = value;
-    } else {
-      updated[index][field] = value;
-    }
-    setQuestions(updated);
-  };
+export default function QuestionManager({ question, onChange, isQuiz, name, buttonLabel }) {
+  const [hasQuestion, setHasQuestion] = useState(!!question.text);
 
   const handleAddQuestion = () => {
-    setQuestions([
-      ...questions,
-      {
-        text: "",
-        options: ["", "", "", ""],
-        correctAnswer: null,
-        selectedAnswer: null,
-      },
-    ]);
     setHasQuestion(true);
+    onChange({
+      text: "",
+      options: ["", "", "", ""],
+      correctAnswer: null,
+      selectedAnswer: null,
+    });
+  };
+
+  const handleQuestionChange = (updatedQuestion) => {
+    onChange(updatedQuestion);
   };
 
   return (
@@ -190,17 +183,15 @@ export default function QuestionManager({ isQuiz = true, buttonLabel }) {
             (isQuiz ? "+ Add Quiz Question" : "+ Add Survey Question")}
         </button>
       )}
-      {questions.map((q, i) => (
+      {hasQuestion && (
         <QuestionBox
-          key={i}
-          index={i}
-          question={q}
-          name={`q-${i}`}
+          question={question}
+          name={name}
           isQuiz={isQuiz}
-          onChange={handleChange}
+          onChange={handleQuestionChange}
           buttonLabel={buttonLabel}
         />
-      ))}
+      )}
     </div>
   );
 }

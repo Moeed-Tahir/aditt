@@ -4,7 +4,7 @@ import { CircleDollarSign, Tag } from 'lucide-react';
 import PaymentMethod from '../PaymentMethod';
 import LinkBankAccount from '../LinkBankAccount';
 
-const Step4 = ({formData,handleSubmit,setFormData,handleInputChange}) => {
+const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
     return (
         <>
             <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
@@ -53,7 +53,7 @@ const Step4 = ({formData,handleSubmit,setFormData,handleInputChange}) => {
                                                     : prev.endDate,
                                         }));
                                     }}
-                                    fromDate={new Date()} 
+                                    fromDate={new Date()}
                                 />
                             </div>
                         </div>
@@ -73,12 +73,14 @@ const Step4 = ({formData,handleSubmit,setFormData,handleInputChange}) => {
                             <div className="relative w-full flex-1">
                                 <Calendars
                                     selected={formData.endDate}
-                                    onSelect={(date) =>
-                                        setFormData((prev) => ({ ...prev, endDate: date }))
-                                    }
-                                    fromDate={
-                                        formData.startDate ? formData.startDate : new Date()
-                                    }
+                                    onSelect={(date) => {
+                                        console.log("Saving end date:", date);
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            endDate: date,
+                                        }));
+                                    }}
+                                    fromDate={formData.startDate || new Date()}
                                 />
                             </div>
                         </div>

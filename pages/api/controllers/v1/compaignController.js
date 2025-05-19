@@ -24,7 +24,7 @@ exports.createCampaign = async (req, res) => {
             surveyQuestion2,
             genderType,
             genderRatio,
-            age,
+            ageRange,
             campaignStartDate,
             campaignEndDate,
             cardDetail,
@@ -34,11 +34,17 @@ exports.createCampaign = async (req, res) => {
             campaignBudget
         } = req.body;
 
+        // Validate required fields
         if (!campaignTitle || !websiteLink || !campaignVideoUrl ||
-            !genderType ||
+            !genderType || !ageRange || !Array.isArray(ageRange) ||
             !campaignStartDate || !campaignEndDate || !userId) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
+
+        const processedAgeRange = ageRange.map(age => {
+            const num = Number(age);
+            return isNaN(num) ? 0 : num;
+        });
 
         const newCampaign = new Compaign({
             campaignTitle,
@@ -50,7 +56,7 @@ exports.createCampaign = async (req, res) => {
             surveyQuestion2,
             genderType,
             genderRatio,
-            age,
+            ageRange: processedAgeRange,  // Use the processed array
             campaignStartDate,
             campaignEndDate,
             cardDetail,
@@ -69,7 +75,6 @@ exports.createCampaign = async (req, res) => {
 
     } catch (error) {
         console.error('Error creating campaign:', error);
-
         res.status(500).json({
             message: 'Failed to create campaign',
             error: error.message

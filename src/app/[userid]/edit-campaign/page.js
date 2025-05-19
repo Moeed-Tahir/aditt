@@ -62,7 +62,7 @@ export default function EditCampaign() {
     videoDuration: "",
     genderRatio: 50,
     genderType: "",
-    age: 25,
+    ageRange: [15,45],
     categories: [],
     quizQuestion: {
       text: "",
@@ -258,7 +258,7 @@ export default function EditCampaign() {
         },
         genderType: formData.genderType,
         genderRatio: formData.genderRatio.toString(),
-        age: formData.age.toString(),
+        ageRange: formData.ageRange,
         campaignStartDate: formData.startDate.toISOString(),
         campaignEndDate: formData.endDate ? formData.endDate.toISOString() : null,
         cardDetail: {
@@ -336,114 +336,113 @@ export default function EditCampaign() {
     return (budget / duration) * 2;
   }, [formData.budget, formData.videoDuration]);
 
-  useEffect(() => {
-    if (searchParams) {
-      const dataParam = searchParams.get('data');
-      if (dataParam) {
-        try {
-          const parsedData = JSON.parse(decodeURIComponent(dataParam));
+useEffect(() => {
+  if (searchParams) {
+    const dataParam = searchParams.get('data');
+    if (dataParam) {
+      try {
+        const parsedData = JSON.parse(decodeURIComponent(dataParam));
 
-          // Transform the data to match your form structure
-          const transformedData = {
-            ...parsedData,
-            engagements: parsedData.engagements || { totalCount: 0 },
-            clickCount: parsedData.clickCount || { totalCount: 0, dailyCounts: [] },
-            videoFile: parsedData.videoFile || {},
-            imageFile: parsedData.imageFile || {},
-            videoUrl: parsedData.campaignVideoUrl || parsedData.videoUrl || "",
-            imageUrl: parsedData.companyLogo || parsedData.imageUrl || "",
-            quizQuestion: {
-              text: parsedData.quizQuestion?.text || parsedData.quizQuestion?.questionText || "",
-              options: parsedData.quizQuestion?.options || [
-                parsedData.quizQuestion?.option1 || "",
-                parsedData.quizQuestion?.option2 || "",
-                parsedData.quizQuestion?.option3 || "",
-                parsedData.quizQuestion?.option4 || "",
-              ],
-              correctAnswer: parsedData.quizQuestion?.correctAnswer ??
-                (parsedData.quizQuestion?.options
-                  ? parsedData.quizQuestion?.options.indexOf(parsedData.quizQuestion?.answer)
-                  : null)
-            },
-            surveyQuestion1: {
-              text: parsedData.surveyQuestion1?.text || parsedData.surveyQuestion1?.questionText || "",
-              options: parsedData.surveyQuestion1?.options || [
-                parsedData.surveyQuestion1?.option1 || "",
-                parsedData.surveyQuestion1?.option2 || "",
-                parsedData.surveyQuestion1?.option3 || "",
-                parsedData.surveyQuestion1?.option4 || "",
-              ],
-              correctAnswer: parsedData.surveyQuestion1?.correctAnswer ??
-                (parsedData.surveyQuestion1?.options
-                  ? parsedData.surveyQuestion1?.options.indexOf(parsedData.surveyQuestion1?.answer)
-                  : null)
-            },
-            surveyQuestion2: {
-              text: parsedData.surveyQuestion2?.text || parsedData.surveyQuestion2?.questionText || "",
-              options: parsedData.surveyQuestion2?.options || [
-                parsedData.surveyQuestion2?.option1 || "",
-                parsedData.surveyQuestion2?.option2 || "",
-                parsedData.surveyQuestion2?.option3 || "",
-                parsedData.surveyQuestion2?.option4 || "",
-              ],
-              correctAnswer: parsedData.surveyQuestion2?.correctAnswer ??
-                (parsedData.surveyQuestion2?.options
-                  ? parsedData.surveyQuestion2?.options.indexOf(parsedData.surveyQuestion2?.answer)
-                  : null)
-            },
-            cardNumber: parsedData.cardDetail?.cardNumber || parsedData.cardNumber || "",
-            monthOnCard: parsedData.cardDetail?.dateOnCard || parsedData.monthOnCard || "",
-            cvc: parsedData.cardDetail?.cvc || parsedData.cvc || "",
-            nameOnCard: parsedData.cardDetail?.nameOnCard || parsedData.nameOnCard || "",
-            country: parsedData.cardDetail?.country || parsedData.country || "",
-            zipCode: parsedData.cardDetail?.zip || parsedData.zipCode || "",
-            bankAccountNumber: parsedData.bankDetail?.accountNumber || parsedData.bankAccountNumber || "",
-            routingNumber: parsedData.bankDetail?.routingNumber || parsedData.routingNumber || "",
-            accountType: parsedData.bankDetail?.accountType || parsedData.accountType || "",
-            cardDetail: parsedData.cardDetail || {
-              cardNumber: parsedData.cardNumber || "",
-              cvc: parsedData.cvc || "",
-              nameOnCard: parsedData.nameOnCard || "",
-              dateOnCard: parsedData.monthOnCard || "",
-              country: parsedData.country || "",
-              zip: parsedData.zipCode || "",
-              _id: parsedData.cardDetail?._id || ""
-            },
-            bankDetail: parsedData.bankDetail || {
-              accountNumber: parsedData.bankAccountNumber || "",
-              routingNumber: parsedData.routingNumber || "",
-              accountType: parsedData.accountType || "",
-              _id: parsedData.bankDetail?._id || ""
-            }
-          };
+        const transformedData = {
+          ...parsedData,
+          engagements: parsedData.engagements || { totalCount: 0 },
+          clickCount: parsedData.clickCount || { totalCount: 0, dailyCounts: [] },
+          videoFile: parsedData.videoFile || {},
+          imageFile: parsedData.imageFile || {},
+          videoUrl: parsedData.campaignVideoUrl || parsedData.videoUrl || "",
+          imageUrl: parsedData.companyLogo || parsedData.imageUrl || "",
+          quizQuestion: {
+            text: parsedData.quizQuestion?.text || parsedData.quizQuestion?.questionText || "",
+            options: parsedData.quizQuestion?.options || [
+              parsedData.quizQuestion?.option1 || "",
+              parsedData.quizQuestion?.option2 || "",
+              parsedData.quizQuestion?.option3 || "",
+              parsedData.quizQuestion?.option4 || "",
+            ],
+            correctAnswer: parsedData.quizQuestion?.correctAnswer ??
+              (parsedData.quizQuestion?.options
+                ? parsedData.quizQuestion?.options.indexOf(parsedData.quizQuestion?.answer)
+                : null)
+          },
+          surveyQuestion1: {
+            text: parsedData.surveyQuestion1?.text || parsedData.surveyQuestion1?.questionText || "",
+            options: parsedData.surveyQuestion1?.options || [
+              parsedData.surveyQuestion1?.option1 || "",
+              parsedData.surveyQuestion1?.option2 || "",
+              parsedData.surveyQuestion1?.option3 || "",
+              parsedData.surveyQuestion1?.option4 || "",
+            ],
+            correctAnswer: parsedData.surveyQuestion1?.correctAnswer ??
+              (parsedData.surveyQuestion1?.options
+                ? parsedData.surveyQuestion1?.options.indexOf(parsedData.surveyQuestion1?.answer)
+                : null)
+          },
+          surveyQuestion2: {
+            text: parsedData.surveyQuestion2?.text || parsedData.surveyQuestion2?.questionText || "",
+            options: parsedData.surveyQuestion2?.options || [
+              parsedData.surveyQuestion2?.option1 || "",
+              parsedData.surveyQuestion2?.option2 || "",
+              parsedData.surveyQuestion2?.option3 || "",
+              parsedData.surveyQuestion2?.option4 || "",
+            ],
+            correctAnswer: parsedData.surveyQuestion2?.correctAnswer ??
+              (parsedData.surveyQuestion2?.options
+                ? parsedData.surveyQuestion2?.options.indexOf(parsedData.surveyQuestion2?.answer)
+                : null)
+          },
+          cardNumber: parsedData.cardDetail?.cardNumber || parsedData.cardNumber || "",
+          monthOnCard: parsedData.cardDetail?.dateOnCard || parsedData.monthOnCard || "",
+          cvc: parsedData.cardDetail?.cvc || parsedData.cvc || "",
+          nameOnCard: parsedData.cardDetail?.nameOnCard || parsedData.nameOnCard || "",
+          country: parsedData.cardDetail?.country || parsedData.country || "",
+          zipCode: parsedData.cardDetail?.zip || parsedData.zipCode || "",
+          bankAccountNumber: parsedData.bankDetail?.accountNumber || parsedData.bankAccountNumber || "",
+          routingNumber: parsedData.bankDetail?.routingNumber || parsedData.routingNumber || "",
+          accountType: parsedData.bankDetail?.accountType || parsedData.accountType || "",
+          cardDetail: parsedData.cardDetail || {
+            cardNumber: parsedData.cardNumber || "",
+            cvc: parsedData.cvc || "",
+            nameOnCard: parsedData.nameOnCard || "",
+            dateOnCard: parsedData.monthOnCard || "",
+            country: parsedData.country || "",
+            zip: parsedData.zipCode || "",
+            _id: parsedData.cardDetail?._id || ""
+          },
+          bankDetail: parsedData.bankDetail || {
+            accountNumber: parsedData.bankAccountNumber || "",
+            routingNumber: parsedData.routingNumber || "",
+            accountType: parsedData.accountType || "",
+            _id: parsedData.bankDetail?._id || ""
+          }
+        };
 
-          setFormData(prev => ({
-            ...prev,
-            ...transformedData,
-            genderRatio: parseInt(parsedData.genderRatio) || 50,
-            genderType: parsedData.genderType || "",
-            age: parseInt(parsedData.age) || 25,
-            budget: parseFloat(parsedData.campaignBudget) || parseFloat(parsedData.budget) || 0,
-            campignBudget: parseFloat(parsedData.campaignBudget) || 0,
-            startDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
-            endDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || new Date(),
-            campaignStartDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
-            campaignEndDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || new Date(),
-            createdAt: parsedData.createdAt ? new Date(parsedData.createdAt) : new Date(),
-            updatedAt: parsedData.updatedAt ? new Date(parsedData.updatedAt) : new Date(),
-            cardAdded: !!parsedData.cardDetail,
-            bankAdded: !!parsedData.bankDetail,
-            categories: Array.isArray(parsedData.categories) ? parsedData.categories : [],
-            videoDuration: parsedData.videoDuration || "0:00"
-          }));
+        setFormData(prev => ({
+          ...prev,
+          ...transformedData,
+          genderRatio: parseInt(parsedData.genderRatio) || 50,
+          genderType: parsedData.genderType || "",
+          ageRange: Array.isArray(parsedData.ageRange) ? parsedData.ageRange : [18, 65], // Set ageRange here
+          budget: parseFloat(parsedData.campaignBudget) || parseFloat(parsedData.budget) || 0,
+          campignBudget: parseFloat(parsedData.campaignBudget) || 0,
+          startDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
+          endDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || new Date(),
+          campaignStartDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
+          campaignEndDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || new Date(),
+          createdAt: parsedData.createdAt ? new Date(parsedData.createdAt) : new Date(),
+          updatedAt: parsedData.updatedAt ? new Date(parsedData.updatedAt) : new Date(),
+          cardAdded: !!parsedData.cardDetail,
+          bankAdded: !!parsedData.bankDetail,
+          categories: Array.isArray(parsedData.categories) ? parsedData.categories : [],
+          videoDuration: parsedData.videoDuration || "0:00"
+        }));
 
-        } catch (error) {
-          console.error("Error parsing campaign data:", error);
-          // Optionally set some error state here
-        }
+      } catch (error) {
+        console.error("Error parsing campaign data:", error);
+        // Optionally set some error state here
       }
     }
-  }, [searchParams]);
+  }
+}, [searchParams]);
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
@@ -522,7 +521,7 @@ export default function EditCampaign() {
       )}
 
       {showSuccessModal && (
-        <div className="fixed inset-0 bg-opacity-30 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl border border-md p-8 max-w-md w-full mx-4">
             <div className="text-center">
               <Check className="w-16 h-16 text-blue-500 mx-auto mb-4" />
