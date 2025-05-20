@@ -620,25 +620,6 @@ export default function CampaignDetailPage({ campaignData }) {
               </div>
             </div>
           </div>
-          {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="col-span-1  md:col-span-2 bg-white p-6 rounded-xl border">
-              <BarCharts />
-            </div>
-            <div className="col-span-1  bg-white p-6 rounded-xl border">
-              <h3 className="text-gray-600 text-xl font-bold mb-3">
-                Gender breakdown
-              </h3>
-              <h3 className="text-gray-500 text-sm font-medium mb-3">
-                Percentage of users based on gender
-              </h3>
-              <PieCharts />
-              <div className="grid grid-cols-3 text-sm text-gray-600 w-full max-w-md">
-                <div>🔵 Male</div>
-                <div>🟣 Female</div>
-                <div>🟢 Prefer Not to Say</div>
-              </div>
-            </div>
-          </div> */}
         </div>
 
         <ConfirmationDialogue
