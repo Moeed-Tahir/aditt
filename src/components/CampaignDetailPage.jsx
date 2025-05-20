@@ -505,7 +505,6 @@ export default function CampaignDetailPage({ campaignData }) {
                     </div>
                   )}
 
-                  {/* Survey Question 2 - Only show if exists and has non-empty questionText */}
                   {campaignData.surveyQuestion2 && campaignData.surveyQuestion2.questionText && (
                     <div>
                       <div className="flex flex-col sm:flex-row sm:justify-between text-[13px] sm:text-[16px] text-gray-500 mb-1 gap-2 sm:gap-0">
@@ -628,8 +627,8 @@ export default function CampaignDetailPage({ campaignData }) {
         smallText={dialogConfig.smallText}
         confirmLabel={dialogConfig.confirmLabel}
         onConfirm={() => {
-          dialogConfig.onConfirm(); // Perform your confirm action
-          setDialogOpen(false); // Close confirmation dialog
+          dialogConfig.onConfirm();
+          setDialogOpen(false);
         }}
         onCancel={() => setDialogOpen(false)}
       />

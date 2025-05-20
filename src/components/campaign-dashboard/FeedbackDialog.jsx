@@ -33,8 +33,7 @@ const FeedbackDialog = ({
       className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${open ? "" : "hidden"
         }`}
     >
-      <div className="bg-white w-full max-w-[679px] h-auto max-h-[90vh] md:h-[763px] border rounded-[20px] p-[18px] flex flex-col mx-4 overflow-y-auto">
-        <div className="flex items-center p-[12px] justify-center">
+   <div className="bg-white h-[95vh] border rounded-[20px] p-[18px] flex flex-col mx-4 w-[calc(100%-32px)] max-w-[679px] overflow-y-auto scrollbar-hide">        <div className="flex items-center p-[12px] justify-center">
           <Coffee className="w-[54px] h-[54px] text-blue-300 text-center flex items-center justify-center" />
         </div>
 
@@ -47,8 +46,8 @@ const FeedbackDialog = ({
           helps us improve!
         </p>
 
-        <div className="flex-1 overflow-auto space-y-4">
-          <div className="relative">
+        <div className="space-y-4">
+          <div>
             <p className="text-[14px] mb-2 font-md">
               How many Conversions did your campaign have?
             </p>
@@ -57,11 +56,11 @@ const FeedbackDialog = ({
               value={conversion}
               onChange={(e) => setConversion(e.target.value)}
               placeholder="Enter details..."
-              className="w-full h-full p-[16px] border border-gray-300 rounded-full"
+              className="w-full p-[16px] border border-gray-300 rounded-full"
             />
           </div>
 
-          <div className="relative">
+          <div>
             <p className="text-[14px] mb-2 font-md">
               How do you define conversions in this campaign?
             </p>
@@ -70,11 +69,11 @@ const FeedbackDialog = ({
               value={conversionType}
               onChange={(e) => setConversionType(e.target.value)}
               placeholder="Enter details..."
-              className="w-full h-full p-[16px] border border-gray-300 rounded-full"
+              className="w-full p-[16px] border border-gray-300 rounded-full"
             />
           </div>
 
-          <div className="relative">
+          <div>
             <p className="text-[14px] font-md mb-2">
               How satisfied are you with your campaign?{" "}
             </p>
@@ -92,18 +91,20 @@ const FeedbackDialog = ({
               </span>
             </div>
           </div>
+
+          <div className="mt-4">
+            <p className="text-[14px] font-md mb-2">Feedback</p>
+            <textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-[20px] resize-none"
+              rows={4}
+              placeholder="Enter details..."
+            />
+          </div>
         </div>
 
-        <div className="mt-4">
-          <p className="text-[14px] font-md mb-2">Feedback</p>
-          <textarea
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-[20px] mb-4 resize-none"
-            rows={4}
-            placeholder="Enter details..."
-          />
-
+        <div className="pt-4 mt-auto">
           <div className="flex justify-end gap-2">
             <button
               onClick={onClose}
