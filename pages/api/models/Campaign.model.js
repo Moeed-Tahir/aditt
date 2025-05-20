@@ -158,7 +158,7 @@ const CompaignSchema = new mongoose.Schema({
     },
     campaignEndDate: {
         type: String,
-        required: true,
+        required: false,
     },
     cardDetail: {
         type: CardDetailSchema,
