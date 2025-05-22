@@ -7,7 +7,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import CampaignActionsDropdown from '../CampaignActionsDropdown'
+import CampaignActionsDropdown from '../campaign/CampaignActionsDropdown'
 import Link from 'next/link'
 
 const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAction, fetchCampaign }) => {

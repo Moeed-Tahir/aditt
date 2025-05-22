@@ -10,8 +10,8 @@ export default function ProgressBar({ value = 0, fill = "bg-blue-500", text }) {
   }, [value]);
 
   return (
-    <div className="w-[80%] relative">
-      <Progress value={progress} className={`h-15 bg-gray-600 ${fill}`} />
+    <div className="w-[100%] relative h-[80px]">
+      <Progress value={progress} className={`h-[80px] bg-gray-600 ${fill}`} />
       {/* Left side text */}
       <span className="absolute left-0 top-1/2 transform -translate-y-1/2 text-black px-2">
         {text && text.left}

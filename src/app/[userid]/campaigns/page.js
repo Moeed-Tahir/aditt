@@ -1,6 +1,6 @@
 "use client"
 
-import CampaignDetailPage from '@/components/CampaignDetailPage'
+import CampaignDetailPage from '@/components/campaign/CampaignDetailPage'
 import React, { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from "next/navigation";
 import axios from 'axios';

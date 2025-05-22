@@ -242,7 +242,7 @@ export function CreateCampaigns({ userId }) {
         categories: formData.categories.join(","),
         campaignStartDate: formData.startDate.toISOString(),
         campaignEndDate:
-          formData.endDate?.toISOString() || formData.endDate.toISOString(),
+          formData.endDate?.toISOString() || null,
         cardDetails: formData.cards,
         cardDetail: {
           cardNumber: formData.cardNumber,
