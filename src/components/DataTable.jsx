@@ -29,13 +29,13 @@ export function DataTable({ campaignData, fetchCampaign }) {
   const [feedback, setFeedback] = useState("");
   const [sliderValue, setSliderValue] = useState(5);
   const [currentCampaignId, setCurrentCampaignId] = useState(null);
-
   const transformedCampaigns = campaignData?.map((campaign) => ({
     id: campaign._id,
     title: campaign.campaignTitle,
     category: "No Category",
     views: campaign.totalViews || 0,
     date: campaign.campaignStartDate,
+    engagements:campaign.engagements?.totalCount ,
     amount: parseFloat(campaign.campaignBudget) || 0,
     status: campaign.status || "Pending",
   }));

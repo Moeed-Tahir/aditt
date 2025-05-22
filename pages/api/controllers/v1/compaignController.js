@@ -31,15 +31,28 @@ exports.createCampaign = async (req, res) => {
             bankDetail,
             couponCode,
             userId,
-            campaignBudget
+            campaignBudget,
+            brandName
         } = req.body;
 
-        // Validate required fields
-        if (!campaignTitle || !websiteLink || !campaignVideoUrl ||
-            !genderType || !ageRange || !Array.isArray(ageRange) ||
-            !campaignStartDate || !campaignEndDate || !userId) {
+        if (
+            !campaignTitle ||
+            !websiteLink ||
+            !campaignVideoUrl ||
+            !brandName ||
+            !genderType ||
+            !Array.isArray(ageRange) || !ageRange.length ||
+            !campaignStartDate ||
+            !campaignEndDate ||
+            !userId
+        ) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
+
+        if (!quizQuestion) {
+            return res.status(400).json({ message: 'Quiz Question Missing' });
+        }
+
 
         const processedAgeRange = ageRange.map(age => {
             const num = Number(age);
@@ -56,14 +69,15 @@ exports.createCampaign = async (req, res) => {
             surveyQuestion2,
             genderType,
             genderRatio,
-            ageRange: processedAgeRange,  // Use the processed array
+            ageRange: processedAgeRange,
             campaignStartDate,
             campaignEndDate,
             cardDetail,
             bankDetail,
             couponCode,
             userId,
-            campaignBudget
+            campaignBudget,
+            brandName
         });
 
         const savedCampaign = await newCampaign.save();
@@ -95,6 +109,8 @@ exports.getCampaign = async (req, res) => {
                 message: 'Campaign not found'
             });
         }
+
+        console.log("campaign",campaign);
 
         res.status(200).json({
             message: 'Campaign Retrieved Successfully',

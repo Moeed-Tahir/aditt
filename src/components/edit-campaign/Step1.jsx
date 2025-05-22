@@ -51,6 +51,31 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                     <hr className="border-t mb-4 border-gray-300" />
 
                     <div className="space-y-6">
+
+                        <div className="flex items-start gap-6">
+                            <div className="w-1/3">
+                                <label className="block text-[18px] text-gray-800 font-medium">
+                                     Brand Name
+                                </label>
+                                <span className="block text-[16px] text-gray-400 mt-1">
+                                 This is the name of the business or product the campaign represents.
+                                </span>
+                            </div>
+                            <div className="relative flex-1">
+                                <House className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                                <input
+                                    type="text"
+                                    name="brandName"
+                                    value={formData.brandName}
+                                    onChange={handleInputChange}
+                                    placeholder="Reebok promotion"
+                                    className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
+                                />
+                            </div>
+                        </div>
+
+                        <hr className="border-t mb-4 border-gray-300" />
+
                         <div className="flex items-start gap-6">
                             <div className="w-1/3">
                                 <label className="block text-[18px] text-gray-800 font-medium">

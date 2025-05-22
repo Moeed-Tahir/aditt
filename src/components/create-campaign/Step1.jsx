@@ -44,6 +44,31 @@ const Step1 = ({handleFileChange,formData,setFormData,handleInputChange,isUpload
                 <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
                   <div className="w-full md:w-1/3">
                     <label className="block text-base md:text-[18px] text-gray-800 font-medium">
+                      Brand Name
+                    </label>
+                    <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
+                      This is the name of the business or product the campaign represents.
+                    </span>
+                  </div>
+                  <div className="relative w-full flex-1">
+                    <House className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      name="brandName"
+                      value={formData.brandName}
+                      onChange={handleInputChange}
+                      placeholder="Enter Brand Name"
+                      className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2 md:py-3"
+                    />
+                  </div>
+                </div>
+
+                <hr className="border-t mb-4 border-gray-300" />
+
+
+                <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                  <div className="w-full md:w-1/3">
+                    <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                       Campaign Title
                     </label>
                     <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
@@ -58,7 +83,7 @@ const Step1 = ({handleFileChange,formData,setFormData,handleInputChange,isUpload
                       name="campaignTitle"
                       value={formData.campaignTitle}
                       onChange={handleInputChange}
-                      placeholder="Reebok promotion"
+                      placeholder="Enter your campaign titile"
                       className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2 md:py-3"
                     />
                   </div>
@@ -72,12 +97,12 @@ const Step1 = ({handleFileChange,formData,setFormData,handleInputChange,isUpload
                       Website/Product Link
                     </label>
                     <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                      Add your website or product link. A UTM link will be
-                      auto-generated for tracking.
+                     What is your call to action (CTA)?Add your website or product link.(A UTM link is best for tracking)
                     </span>
                   </div>
 
                   <div className="w-full flex-1">
+                    
                     <div className="relative w-full">
                       <Globe className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
                       <input
@@ -85,7 +110,7 @@ const Step1 = ({handleFileChange,formData,setFormData,handleInputChange,isUpload
                         name="websiteLink"
                         value={formData.websiteLink}
                         onChange={handleInputChange}
-                        placeholder="https://shop.app/"
+                        placeholder="Enter website link"
                         className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2 md:py-3"
                       />
                     </div>
@@ -187,10 +212,10 @@ const Step1 = ({handleFileChange,formData,setFormData,handleInputChange,isUpload
                 <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
                   <div className="w-full md:w-1/3">
                     <label className="block text-base md:text-[18px] text-gray-800 font-medium">
-                      Campaign Image (optional)
+                      Brand Logo
                     </label>
                     <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                      This image will be used as a thumbnail for your campaign.
+                      This logo will be used as a company logo for your campaign.
                     </span>
                   </div>
 

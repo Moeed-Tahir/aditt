@@ -108,6 +108,10 @@ const CompaignSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    brandName: {
+        type: String,
+        required: true,
+    },
     status: {
         type: String,
         required: false,
@@ -128,7 +132,7 @@ const CompaignSchema = new mongoose.Schema({
     },
     quizQuestion: {
         type: QuestionSchema,
-        require: false,
+        require: true,
     },
     surveyQuestion1: {
         type: QuestionSchema,
