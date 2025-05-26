@@ -19,7 +19,7 @@ const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAc
                 <TableHeader>
                     <TableRow className="bg-[var(--bg-color-off-white)]">
                         <TableHead className="text-gray-500">Title</TableHead>
-                        <TableHead className="text-gray-500">Total Views</TableHead>
+                        <TableHead className="text-gray-500">Total Attentive Engagements</TableHead>
                         <TableHead className="text-gray-500">Date</TableHead>
                         <TableHead className="text-gray-500">Amount</TableHead>
                         <TableHead className="text-gray-500">Status</TableHead>
@@ -31,7 +31,7 @@ const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAc
                 <TableBody>
                     {paginatedCampaigns.map((c) => {
                         const specificCampaignData = campaignData.find(data => data._id === c.id)
-
+                        console.log("Data c",c)
                         return (
                             <TableRow key={c.id} className="hover:bg-gray-50 transition">
                                 <TableCell className="text-gray-800 text-[14px] py-6">
@@ -43,7 +43,7 @@ const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAc
                                     </Link>
                                 </TableCell>
                                 <TableCell className="text-gray-800 text-[14px] py-6">
-                                    {c.views.toLocaleString()} k
+                                    {c.engagements}
                                 </TableCell>
                                 <TableCell className="text-gray-800 text-[14px] py-6">
                                     {new Date(c.date).toLocaleDateString()}

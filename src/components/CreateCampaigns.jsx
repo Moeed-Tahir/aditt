@@ -38,6 +38,7 @@ export function CreateCampaigns({ userId }) {
   const [values, setValues] = useState([10, 60]);
 
   const [formData, setFormData] = useState({
+    brandName: "",
     campaignTitle: "",
     websiteLink: "",
     videoFile: null,
@@ -197,6 +198,7 @@ export function CreateCampaigns({ userId }) {
   const handleSubmit = async () => {
     try {
       const campaignData = {
+        brandName: formData.brandName,
         campaignTitle: formData.campaignTitle,
         websiteLink: formData.websiteLink,
         campaignBudget: formData.budget,
@@ -284,8 +286,9 @@ export function CreateCampaigns({ userId }) {
     if (isNaN(budget)) return null;
     if (isNaN(duration) || duration <= 0) return null;
 
-    return (budget / duration) * 2;
+    return (budget / duration) * 100;
   }, [formData.budget, formData.videoDuration]);
+
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">

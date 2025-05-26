@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 import QuestionManager from "../QuestionBox"
 
-const Step3 = ({formData, setFormData}) => {
+const Step3 = ({ formData, setFormData }) => {
     const handleQuestionChange = (questionType, updatedQuestion) => {
         setFormData(prev => ({
             ...prev,
@@ -36,16 +36,16 @@ const Step3 = ({formData, setFormData}) => {
                         <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
                             <div className="w-full md:w-1/3">
                                 <label className="block text-base md:text-[18px] text-gray-800 font-medium">
-                                    Quiz Question (optional)
+                                    Quiz Question
                                 </label>
                                 <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                                    Adit will create if you don't
+                                    This question should confirm the viewer paid attention to your video.
                                 </span>
                             </div>
                             <div className="relative w-full flex-1">
                                 <QuestionManager
                                     question={formData.quizQuestion}
-                                    onChange={(updatedQuestion) => 
+                                    onChange={(updatedQuestion) =>
                                         handleQuestionChange("quizQuestion", updatedQuestion)
                                     }
                                     isQuiz={true}
@@ -61,13 +61,13 @@ const Step3 = ({formData, setFormData}) => {
                                     Survey Question 1 (optional)
                                 </label>
                                 <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                                    Adit will NOT create if you don't
+                                    This is a space for you to gather customizable feedback
                                 </span>
                             </div>
                             <div className="relative w-full flex-1">
                                 <QuestionManager
                                     question={formData.surveyQuestion1}
-                                    onChange={(updatedQuestion) => 
+                                    onChange={(updatedQuestion) =>
                                         handleQuestionChange("surveyQuestion1", updatedQuestion)
                                     }
                                     isQuiz={false}
@@ -83,13 +83,12 @@ const Step3 = ({formData, setFormData}) => {
                                     Survey Question 2 (optional)
                                 </label>
                                 <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                                    Adit will NOT create if you don't
-                                </span>
+                                    This is a space for you to gather customizable feedback                                </span>
                             </div>
                             <div className="relative w-full flex-1">
                                 <QuestionManager
                                     question={formData.surveyQuestion2}
-                                    onChange={(updatedQuestion) => 
+                                    onChange={(updatedQuestion) =>
                                         handleQuestionChange("surveyQuestion2", updatedQuestion)
                                     }
                                     isQuiz={false}

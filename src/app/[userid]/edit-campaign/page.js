@@ -43,6 +43,7 @@ export default function EditCampaign() {
   });
 
   const [formData, setFormData] = useState({
+    brandName:"",
     engagements: {
       totalCount: 0
     },
@@ -225,6 +226,7 @@ export default function EditCampaign() {
   const handleSubmit = async () => {
     try {
       const updatedCampaignData = {
+        brandName:formData.brandName,
         campaignTitle: formData.campaignTitle,
         websiteLink: formData.websiteLink,
         campaignBudget: formData.budget.toString(),
@@ -347,6 +349,7 @@ useEffect(() => {
           ...parsedData,
           engagements: parsedData.engagements || { totalCount: 0 },
           clickCount: parsedData.clickCount || { totalCount: 0, dailyCounts: [] },
+          brandName: parsedData.brandName || {},
           videoFile: parsedData.videoFile || {},
           imageFile: parsedData.imageFile || {},
           videoUrl: parsedData.campaignVideoUrl || parsedData.videoUrl || "",

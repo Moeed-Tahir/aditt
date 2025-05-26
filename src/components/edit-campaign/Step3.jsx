@@ -30,7 +30,7 @@ const Step3 = ({ handleQuestionChange, formData }) => {
                         <div className="flex items-start gap-6">
                             <div className="w-1/3">
                                 <label className="block text-[18px] text-gray-800 font-medium">
-                                    Quiz Question (optional)
+                                    Quiz Question
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
                                     Adit will create if you dont
