@@ -37,7 +37,7 @@ exports.createCampaign = async (req, res) => {
         // Validate required fields
         if (!campaignTitle || !websiteLink || !campaignVideoUrl ||
             !genderType || !ageRange || !Array.isArray(ageRange) ||
-            !campaignStartDate || !campaignEndDate || !userId) {
+            !campaignStartDate || !userId) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 

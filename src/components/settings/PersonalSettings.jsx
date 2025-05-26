@@ -208,17 +208,6 @@ export default function PersonalSettings({
           </div>
         </div>
 
-        {personalEditMode && (
-          <div className="flex justify-end mt-4">
-            <button
-              onClick={updatePassword}
-              disabled={passwordLoading}
-              className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700"
-            >
-              {passwordLoading ? "Updating..." : "Update Password"}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
