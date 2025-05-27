@@ -82,7 +82,7 @@ export default function DeleteAccountSection() {
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-white text-[14px] md:text-[16px] font-md text-[#FF4319] md:w-[300px] h-[48px] md:h-[56px] rounded-full border-2 border-[#FF4319] hover:bg-[#FF4319] hover:text-white cursor-pointer w-max"
+          className="bg-white text-[14px] md:text-[16px] flex justify-center items-center font-medium text-[#FF4319] w-full md:w-[300px] h-[48px] md:h-[56px] rounded-full border-2 border-[#FF4319] hover:bg-[#FF4319] hover:text-white cursor-pointer"
           disabled={isLoading}
         >
           {isLoading ? "Processing..." : "Request account deletion"}

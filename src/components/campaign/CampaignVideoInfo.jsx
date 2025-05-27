@@ -54,9 +54,7 @@ export const CampaignVideoInfo = ({ campaignData }) => {
                 Campaign Length:
               </span>
               <span>
-                {`${new Date(campaignData.campaignStartDate).toLocaleDateString()} - ${new Date(
-                  campaignData.campaignEndDate
-                ).toLocaleDateString()}`}
+                {`${new Date(campaignData.campaignStartDate).toLocaleDateString()}`}
               </span>
             </div>
           </div>

@@ -13,17 +13,9 @@ function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
     onChange({ ...question, options: newOptions });
   };
 
-  const handleAnswerSelect = (answerIndex) => {
-    if (isQuiz) {
-      onChange({ ...question, correctAnswer: answerIndex });
-    } else {
-      onChange({ ...question, selectedAnswer: answerIndex });
-    }
-  };
-
   const [alert, setAlert] = useState({
     message: "",
-    type: "", // 'success' | 'error' | 'info' | 'warning'
+    type: "",
     visible: false,
   });
 
@@ -92,15 +84,15 @@ function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
               </p>
               {question.options.map((opt, i) => (
                 <div key={i} className="flex items-center mb-2 gap-2">
-                  <input
-                    type="radio"
-                    name={`question-${name}`}
-                    className="flex-shrink-0"
-                    checked={isQuiz 
-                      ? question.correctAnswer === i 
-                      : question.selectedAnswer === i}
-                    onChange={() => handleAnswerSelect(i)}
-                  />
+                  {isQuiz && (
+                    <input
+                      type="radio"
+                      name={`question-${name}`}
+                      className="flex-shrink-0"
+                      checked={question.correctAnswer === i}
+                      onChange={() => onChange({ ...question, correctAnswer: i })}
+                    />
+                  )}
                   <input
                     type="text"
                     placeholder={`Enter an answer choice`}
@@ -140,9 +132,7 @@ function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
                   className="flex justify-between text-[14px] items-center pr-2"
                 >
                   <span className="truncate mr-2">{opt}</span>
-                  {(isQuiz
-                    ? question.correctAnswer === i
-                    : question.selectedAnswer === i) && (
+                  {isQuiz && question.correctAnswer === i && (
                     <Check className="w-4 h-4 flex-shrink-0" />
                   )}
                 </li>
@@ -156,14 +146,14 @@ function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
 }
 
 export default function QuestionManager({ question, onChange, isQuiz, name, buttonLabel }) {
-  const [hasQuestion, setHasQuestion] = useState(!!question.text);
+  const [hasQuestion, setHasQuestion] = useState(!!question?.text);
 
   const handleAddQuestion = () => {
     setHasQuestion(true);
     onChange({
       text: "",
       options: ["", "", "", ""],
-      correctAnswer: null,
+      correctAnswer: isQuiz ? null : undefined,
       selectedAnswer: null,
     });
   };

@@ -17,6 +17,12 @@ const DualRangeSlider = React.forwardRef((props, ref) => {
 
   const initialValue = Array.isArray(value) ? value : [min, max];
 
+  // Custom label formatter
+  const formatLabel = (val) => {
+    if (val === max) return '65+';
+    return val === min ? '13' : val;
+  };
+
   return (
     <SliderPrimitive.Root
       ref={ref}
@@ -34,14 +40,13 @@ const DualRangeSlider = React.forwardRef((props, ref) => {
         <React.Fragment key={index}>
           <SliderPrimitive.Thumb className="relative block h-5 w-5 rounded-full border-2 border-blue-600 bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
             {label && (
-              <span
-                className={cn(
-                  'absolute flex w-full justify-center',
-                  labelPosition === 'top' ? '-top-7' : 'top-4'
-                )}
-              >
-                {label(val)}
-              </span>
+              <div className={cn(
+                'absolute flex justify-center w-full',
+                labelPosition === 'top' ? '-top-8' : 'top-11',
+                'transform -translate-x-1/2 left-1/2'
+              )}>
+                  {formatLabel(val)}
+              </div>
             )}
           </SliderPrimitive.Thumb>
         </React.Fragment>

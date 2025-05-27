@@ -87,19 +87,18 @@ const handleAgeRangeChange = (newValues) => {
 
               <div className="w-full flex-1">
                 <div className="relative w-full flex-1">
-                  {/* Slider */}
                   <DualRangeSlider
                     label={(value) => value}
                     labelPosition="bottom"
                     value={values}
                     onValueChange={handleAgeRangeChange}
-                    min={0}
-                    max={100}
+                    min={13}
+                    max={65}
                     step={1}
                   />
-                  <div className="flex justify-between text-xs md:text-sm mb-1">
+                  <div className="flex justify-between text-xs md:text-sm mt-1.5">
                     <span>Min 14</span>
-                    <span>Any</span>
+                    <span>65 +</span>
                   </div>
                 </div>
               </div>

@@ -10,7 +10,6 @@ const Step3 = ({ formData, setFormData }) => {
         }));
     };
 
-    // Updated check to match the actual question structure
     const isQuizQuestionFilled = formData.quizQuestion &&
         formData.quizQuestion.text &&
         formData.quizQuestion.text.trim() !== '' &&

@@ -61,12 +61,10 @@ export function CreateCampaigns({ userId }) {
     surveyQuestion1: {
       text: "",
       options: ["", "", "", ""],
-      selectedAnswer: null,
     },
     surveyQuestion2: {
       text: "",
       options: ["", "", "", ""],
-      selectedAnswer: null,
     },
 
     startDate: new Date(),
@@ -222,9 +220,7 @@ export function CreateCampaigns({ userId }) {
           option2: formData.surveyQuestion1.options[1],
           option3: formData.surveyQuestion1.options[2],
           option4: formData.surveyQuestion1.options[3],
-          answer: formData.surveyQuestion1.selectedAnswer !== null
-            ? formData.surveyQuestion1.options[formData.surveyQuestion1.selectedAnswer]
-            : "",
+          
         } : null,
         surveyQuestion2: formData.surveyQuestion2.text ? {
           questionText: formData.surveyQuestion2.text,
@@ -232,9 +228,6 @@ export function CreateCampaigns({ userId }) {
           option2: formData.surveyQuestion2.options[1],
           option3: formData.surveyQuestion2.options[2],
           option4: formData.surveyQuestion2.options[3],
-          answer: formData.surveyQuestion2.selectedAnswer !== null
-            ? formData.surveyQuestion2.options[formData.surveyQuestion2.selectedAnswer]
-            : "",
         } : null,
         genderType: formData.genderType,
         genderRatio: formData.genderRatio.toString(),

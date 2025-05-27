@@ -53,6 +53,54 @@ const QuestionSchema = new mongoose.Schema({
     }
 });
 
+const SurveyQuestionSchema = new mongoose.Schema({
+    questionText: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    option1: {
+        type: String,
+        required: false,
+        trim: true,
+        totalCount: {
+            type: Number,
+            required: false,
+            default: 0
+        },
+    },
+    option2: {
+        type: String,
+        required: false,
+        trim: true,
+        totalCount: {
+            type: Number,
+            required: false,
+            default: 0
+        },
+    },
+    option3: {
+        type: String,
+        required: false,
+        trim: true,
+        totalCount: {
+            type: Number,
+            required: false,
+            default: 0
+        },
+    },
+    option4: {
+        type: String,
+        required: false,
+        trim: true,
+        totalCount: {
+            type: Number,
+            required: false,
+            default: 0
+        },
+    }
+});
+
 const CardDetailSchema = new mongoose.Schema({
     cardNumber: {
         type: String,
@@ -135,12 +183,12 @@ const CompaignSchema = new mongoose.Schema({
         require: true,
     },
     surveyQuestion1: {
-        type: QuestionSchema,
+        type: SurveyQuestionSchema,
         require: false,
 
     },
     surveyQuestion2: {
-        type: QuestionSchema,
+        type: SurveyQuestionSchema,
         require: false,
 
     },
