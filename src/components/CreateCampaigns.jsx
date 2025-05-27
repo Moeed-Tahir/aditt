@@ -279,7 +279,7 @@ export function CreateCampaigns({ userId }) {
     if (isNaN(budget)) return null;
     if (isNaN(duration) || duration <= 0) return null;
 
-    return (budget / duration) * 100;
+    return (budget / duration) * 1000;
   }, [formData.budget, formData.videoDuration]);
 
 
