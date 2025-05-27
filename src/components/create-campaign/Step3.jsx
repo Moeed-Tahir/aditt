@@ -10,6 +10,15 @@ const Step3 = ({ formData, setFormData }) => {
         }));
     };
 
+    // Updated check to match the actual question structure
+    const isQuizQuestionFilled = formData.quizQuestion &&
+        formData.quizQuestion.text &&
+        formData.quizQuestion.text.trim() !== '' &&
+        formData.quizQuestion.options &&
+        formData.quizQuestion.options.length > 0 &&
+        formData.quizQuestion.options.every(opt => opt.trim() !== '') &&
+        formData.quizQuestion.correctAnswer !== null;
+
     return (
         <>
             <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
@@ -24,8 +33,18 @@ const Step3 = ({ formData, setFormData }) => {
                             </span>
                         </div>
                         <Link
-                            href="?step=3"
-                            className="bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700"
+                            href={isQuizQuestionFilled ? "?step=3" : "#"}
+                            className={`w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full ${isQuizQuestionFilled
+                                    ? 'bg-blue-600 hover:bg-blue-700'
+                                    : 'bg-blue-600 opacity-50 cursor-not-allowed'
+                                }`}
+                            aria-disabled={!isQuizQuestionFilled}
+                            tabIndex={!isQuizQuestionFilled ? -1 : undefined}
+                            onClick={(e) => {
+                                if (!isQuizQuestionFilled) {
+                                    e.preventDefault();
+                                }
+                            }}
                         >
                             Next
                         </Link>
@@ -44,7 +63,12 @@ const Step3 = ({ formData, setFormData }) => {
                             </div>
                             <div className="relative w-full flex-1">
                                 <QuestionManager
-                                    question={formData.quizQuestion}
+                                    question={formData.quizQuestion || {
+                                        text: "",
+                                        options: ["", "", "", ""],
+                                        correctAnswer: null,
+                                        selectedAnswer: null
+                                    }}
                                     onChange={(updatedQuestion) =>
                                         handleQuestionChange("quizQuestion", updatedQuestion)
                                     }
