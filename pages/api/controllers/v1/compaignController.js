@@ -42,7 +42,6 @@ exports.createCampaign = async (req, res) => {
             !genderType ||
             !Array.isArray(ageRange) || !ageRange.length ||
             !campaignStartDate ||
-            !campaignEndDate ||
             !userId
         ) {
             return res.status(400).json({ message: 'Missing required fields' });
@@ -109,7 +108,7 @@ exports.getCampaign = async (req, res) => {
             });
         }
 
-        console.log("campaign",campaign);
+        console.log("campaign", campaign);
 
         res.status(200).json({
             message: 'Campaign Retrieved Successfully',

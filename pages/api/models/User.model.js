@@ -23,6 +23,9 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    profileType: {
+        type: String,
+    },
     businessEmail: {
         type: String,
         required: true,

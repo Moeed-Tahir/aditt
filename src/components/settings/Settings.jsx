@@ -27,6 +27,7 @@ export default function Settings() {
     newPassword: "",
     companyName: "",
     phone: "",
+    profileType: "",
   });
   const userId = Cookies.get("userId");
   const [error, setError] = useState("");
@@ -46,9 +47,12 @@ export default function Settings() {
           website: response.data.profile.businessWebsite || "",
           companyName: response.data.profile.companyName || "",
           phone: response.data.profile.phone || "",
+          profileType: response.data.profile.profileType || "",
           currentPassword: "",
           newPassword: "",
         });
+
+        console.log("Profile data fetched successfully:", response.data.profile);
       } else {
         setError(response.data.message || "Failed to get profile data");
       }
@@ -71,6 +75,8 @@ export default function Settings() {
     if (isBusinessUpdate) setBusinessLoading(true);
     else setPersonalLoading(true);
 
+    console.log("Updating user data:", formData);
+
     try {
       const token = Cookies.get("token");
       const response = await axios.put(
@@ -81,6 +87,7 @@ export default function Settings() {
 
       if (response.status === 200) {
         setMessage({ text: "Profile updated successfully!", type: "success" });
+        console.log("Profile updated successfully:", response.data);
         if (isBusinessUpdate) setBusinessEditMode(false);
         else setPersonalEditMode(false);
         fetchProfileData();

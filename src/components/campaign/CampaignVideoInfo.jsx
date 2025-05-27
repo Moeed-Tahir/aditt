@@ -54,7 +54,9 @@ export const CampaignVideoInfo = ({ campaignData }) => {
                 Campaign Length:
               </span>
               <span>
-                {`${new Date(campaignData.campaignStartDate).toLocaleDateString()}`}
+                {`${new Date(
+                  campaignData.campaignStartDate
+                ).toLocaleDateString()}`}
               </span>
             </div>
           </div>
@@ -64,13 +66,19 @@ export const CampaignVideoInfo = ({ campaignData }) => {
               <span className="min-w-[160px] md:pl-10 text-gray-400">
                 Target Audience Age:
               </span>
-              <span>{`${campaignData.genderRatio} years`}</span>
+              <span>
+                {Array.isArray(campaignData.ageRange)
+                  ? `${campaignData.ageRange[0]} - ${campaignData.ageRange[1]} Years`
+                  : "N/A"}
+              </span>
             </div>
             <div className="flex flex-wrap">
               <span className="min-w-[160px] md:pl-10 text-gray-400">
                 Target Audience Gender:{" "}
               </span>
-              <span>{campaignData.genderType}</span>
+              <span>{`${campaignData.genderRatio} / ${
+                100 - campaignData.genderRatio
+              }`}</span>
             </div>
           </div>
         </div>

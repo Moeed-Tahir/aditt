@@ -334,7 +334,7 @@ exports.resetPassword = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         await connectToDatabase();
-        const { userId, name, email, website, companyName, phone, currentPassword, newPassword } = req.body;
+        const { userId, name, email, website, companyName, phone, currentPassword, newPassword, profileType } = req.body;
 
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
@@ -359,6 +359,7 @@ exports.updateProfile = async (req, res) => {
         user.businessWebsite = website || user.businessWebsite;
         user.companyName = companyName || user.companyName;
         user.phone = phone || user.phone;
+        user.profileType = profileType || user.profileType;
 
         await user.save();
 
@@ -369,7 +370,8 @@ exports.updateProfile = async (req, res) => {
                 email: user.businessEmail,
                 website: user.businessWebsite,
                 companyName: user.companyName,
-                phone: user.phone
+                phone: user.phone,
+                profileType: user.profileType,
             }
         });
 
@@ -514,6 +516,7 @@ exports.getProfile = async (req, res) => {
             companyName: user.companyName,
             businessWebsite: user.businessWebsite,
             businessEmail: user.businessEmail,
+            profileType: user.profileType,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt
         };

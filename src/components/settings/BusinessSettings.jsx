@@ -50,15 +50,27 @@ export default function BusinessSettings({
           <div className="relative w-full md:flex-1">
             <LandmarkIcon className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
             <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
-            <select
-              className="w-full appearance-none border border-gray-300 rounded-full pl-10 pr-10 py-2 text-gray-700 h-[56px]"
-              disabled={!businessEditMode}
-            >
-              <option value="">Select Profile</option>
-              <option value="agency">Marketing Agency</option>
-              <option value="freelancer">Freelancer</option>
-              <option value="corporate">Corporate</option>
-            </select>
+            {businessEditMode ? (
+              <select
+                className="w-full appearance-none border border-gray-300 rounded-full pl-10 pr-10 py-2 text-gray-700 h-[56px]"
+                onChange={handleChange}
+                name="profileType"
+                value={formData.profileType || ""}
+              >
+                <option value="" disabled>
+                  Select Profile Type
+                </option>
+                <option value="Marketing agency">Marketing Agency</option>
+                <option value="Freelancer">Freelancer</option>
+                <option value="Corporate">Corporate</option>
+              </select>
+            ) : (
+              <div className="w-full h-[56px] flex items-center pl-10 pr-4 border border-gray-300 rounded-full ">
+                {formData.profileType
+                  ? `${formData.profileType}`
+                  : "Select Profile Type"}
+              </div>
+            )}
           </div>
         </div>
 

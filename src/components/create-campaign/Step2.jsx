@@ -1,17 +1,16 @@
-import React from 'react'
-import Sliders from '../Sliders'
-import { DualRangeSlider } from '../DualSlider'
-import Link from 'next/link'
+import React from "react";
+import Sliders from "../Sliders";
+import { DualRangeSlider } from "../DualSlider";
+import Link from "next/link";
 
-const Step2 = ({formData, setFormData, values, setValues}) => {
-  
-const handleAgeRangeChange = (newValues) => {
-  setValues(newValues);
-  setFormData(prev => ({
-    ...prev,
-    ageRange: newValues.map(Number)
-  }));
-};
+const Step2 = ({ formData, setFormData, values, setValues }) => {
+  const handleAgeRangeChange = (newValues) => {
+    setValues(newValues);
+    setFormData((prev) => ({
+      ...prev,
+      ageRange: newValues.map(Number),
+    }));
+  };
 
   return (
     <>
@@ -23,8 +22,8 @@ const handleAgeRangeChange = (newValues) => {
                 Targeting Details
               </label>
               <span className="block text-sm md:text-[16px] text-gray-500 mt-1">
-                Reach the right people by setting up precise targeting for
-                your ads.
+                Reach the right people by setting up precise targeting for your
+                ads.
               </span>
             </div>
 
@@ -45,8 +44,7 @@ const handleAgeRangeChange = (newValues) => {
                   Gender Ratio
                 </label>
                 <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                  Define your preferred male-to-female ratio for ad
-                  targeting.
+                  Define your preferred male-to-female ratio for ad targeting.
                 </span>
               </div>
               <div className="relative bg-blue w-full flex-1">
@@ -96,9 +94,9 @@ const handleAgeRangeChange = (newValues) => {
                     max={65}
                     step={1}
                   />
-                  <div className="flex justify-between text-xs md:text-sm mt-1.5">
-                    <span>Min 14</span>
-                    <span>65 +</span>
+                  <div className="flex justify-between text-xs md:text-sm mt-2.5">
+                    {/* <span>13</span>
+                    <span>65 +</span> */}
                   </div>
                 </div>
               </div>
@@ -109,7 +107,7 @@ const handleAgeRangeChange = (newValues) => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Step2
+export default Step2;

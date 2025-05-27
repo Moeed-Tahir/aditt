@@ -35,7 +35,7 @@ export function CreateCampaigns({ userId }) {
   const searchParams = useSearchParams();
   const currentStep = parseInt(searchParams.get("step") || "0");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [values, setValues] = useState([10, 60]);
+  const [values, setValues] = useState([13, 25]);
 
   const [formData, setFormData] = useState({
     brandName: "",
@@ -303,7 +303,7 @@ export function CreateCampaigns({ userId }) {
             </div>
             <div className="w-[40px] md:w-[90px]" />
           </div>
-          <div className="flex items-center justify-start md:justify-between relative overflow-x-auto pb-4 gap-4 md:gap-0">
+          <div className="hidden md:flex items-center justify-start md:justify-between relative overflow-x-auto pb-4 gap-4 md:gap-0">
             {steps.map((step, index) => (
               <div
                 key={index}
