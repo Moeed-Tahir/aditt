@@ -10,7 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ListFilter, ChevronsUpDown } from "lucide-react";
+import {
+  ListFilter,
+  ChevronsUpDown,
+  Eye,
+  Trash,
+  EllipsisVertical,
+} from "lucide-react";
 
 export function UsersPage({ campaignData = [] }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,7 +78,6 @@ export function UsersPage({ campaignData = [] }) {
   );
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
@@ -275,8 +280,12 @@ export function UsersPage({ campaignData = [] }) {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       ${user.totalWithdrawal}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-500 cursor-pointer">
-                      View
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 cursor-pointer">
+                      <div className="flex items-center space-x-2">
+                        <Trash className="w-4 h-4" />
+                        <Eye className="w-4 h-4" />
+                        <EllipsisVertical className="w-4 h-4" />
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -284,30 +293,31 @@ export function UsersPage({ campaignData = [] }) {
             </table>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
-          <p className="text-sm text-gray-500">
-            Showing {filteredUsers.length} result
-            {filteredUsers.length !== 1 && "s"}
-          </p>
-          <div className="flex gap-2 overflow-x-auto">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <Button
-                key={page}
-                variant={page === currentPage ? "default" : "outline"}
-                size="sm"
-                className={`rounded-full ${
-                  page === currentPage
-                    ? "bg-blue-500 text-white"
-                    : "bg-white text-blue-500"
-                }`}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </Button>
-            ))}
+            <p className="text-sm text-gray-500">
+              Showing {filteredUsers.length} result
+              {filteredUsers.length !== 1 && "s"}
+            </p>
+            <div className="flex gap-2 overflow-x-auto">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <Button
+                    key={page}
+                    variant={page === currentPage ? "default" : "outline"}
+                    size="sm"
+                    className={`rounded-full ${
+                      page === currentPage
+                        ? "bg-blue-500 text-white"
+                        : "bg-white text-blue-500"
+                    }`}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </Button>
+                )
+              )}
+            </div>
           </div>
         </div>
-        </div>
-        
       </div>
     </main>
   );
