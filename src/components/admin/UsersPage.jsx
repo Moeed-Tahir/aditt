@@ -24,7 +24,7 @@ export function UsersPage({ campaignData = [] }) {
   const [statusFilter, setStatusFilter] = useState("All");
   const [dateFilter, setDateFilter] = useState({ from: "", to: "" });
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   const resetFilters = () => {
     setStatusFilter("All");
