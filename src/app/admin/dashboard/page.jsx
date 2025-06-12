@@ -1,11 +1,13 @@
-import React from 'react'
+"use client";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { AdminDashboard } from "@/components/admin/AdminDashboard";
 
-function page() {
+export default function Dashboard() {
   return (
-    <div>
-      I am admin dashboard
-    </div>
-  )
+    <SidebarProvider>
+      <AppSidebar mode="admin" />
+      <AdminDashboard />
+    </SidebarProvider>
+  );
 }
-
-export default page

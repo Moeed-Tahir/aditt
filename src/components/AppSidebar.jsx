@@ -1,9 +1,17 @@
 "use client";
+
 import {
   ChartColumn,
   Megaphone,
   CircleDollarSign,
   Headset,
+  LayoutDashboard,
+  Users,
+  User2,
+  Speaker,
+  ChartPie,
+  TicketPercent,
+  Trash2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,19 +29,57 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import Cookies from "js-cookie";
 
-const userId = Cookies.get("userId");
-
-const items = [
-  {
-    title: "Campaign",
-    url: `/${userId}/campaign-dashboard`,
-    icon: Megaphone,
-  },
-];
-
-
-export function AppSidebar() {
+export function AppSidebar({ mode }) {
   const pathname = usePathname();
+  const userId = Cookies.get("userId");
+
+  const campaignItems = [
+    {
+      title: "Campaign",
+      url: `/${userId}/campaign-dashboard`,
+      icon: Megaphone,
+    },
+  ];
+
+  const adminItems = [
+    {
+      title: "Dashboards",
+      url: `/admin/dashboard`,
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Users",
+      url: `/admin/users`,
+      icon: User2,
+    },
+    {
+      title: "Advertisers",
+      url: `/admin/advertisers`,
+      icon: Users,
+    },
+    {
+      title: "Total Campaigns",
+      url: `/admin/total-campaigns`,
+      icon: Megaphone,
+    },
+    {
+      title: "Ads for Approval",
+      url: `/admin/ads-approval`,
+      icon: ChartPie,
+    },
+    {
+      title: "Promo Codes",
+      url: `/admin/promo-codes`,
+      icon: TicketPercent,
+    },
+    {
+      title: "Account Delete Requests",
+      url: `/admin/account-delete-requests`,
+      icon: Trash2,
+    },
+  ];
+
+  const items = mode === "admin" ? adminItems : campaignItems;
 
   return (
     <Sidebar className="min-h-screen">
