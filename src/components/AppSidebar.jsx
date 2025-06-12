@@ -43,7 +43,7 @@ export function AppSidebar({ mode }) {
 
   const adminItems = [
     {
-      title: "Dashboards",
+      title: "Dashboard",
       url: `/admin/dashboard`,
       icon: LayoutDashboard,
     },
@@ -124,21 +124,23 @@ export function AppSidebar({ mode }) {
         </SidebarGroup>
 
         {/* Sticky Help Box */}
-        <div className="mt-auto p-4">
-          <div className="bg-blue-100 text-sm p-4 rounded-xl shadow-md">
-            <Headset className="text-blue-500 mb-4 w-10 h-10" />
-            <p className="font-semibold text-xl mb-2">Need help?</p>
-            <p className="text-xs text-gray-600 mb-2">
-              Get answers, resolve issues, or reach out to our support team.
-            </p>
-            <Link
-              href={`/${userId}/support`}
-              className="block w-full text-center bg-white text-blue-600 rounded-full py-2 text-xl hover:bg-blue-700 hover:text-white transition"
-            >
-              Contact us
-            </Link>
+        {mode === "user" && (
+          <div className="mt-auto p-4">
+            <div className="bg-blue-100 text-sm p-4 rounded-xl shadow-md">
+              <Headset className="text-blue-500 mb-4 w-10 h-10" />
+              <p className="font-semibold text-xl mb-2">Need help?</p>
+              <p className="text-xs text-gray-600 mb-2">
+                Get answers, resolve issues, or reach out to our support team.
+              </p>
+              <Link
+                href={`/${userId}/support`}
+                className="block w-full text-center bg-white text-blue-600 rounded-full py-2 text-xl hover:bg-blue-700 hover:text-white transition"
+              >
+                Contact us
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </SidebarContent>
     </Sidebar>
   );
