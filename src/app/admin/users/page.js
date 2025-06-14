@@ -1,8 +1,9 @@
 "use client";
 
-import { UsersPage } from "@/components/admin/UsersPage";
+
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { GenericTablePage } from "@/components/admin/GenericTablePage"; // adjust path
 
 const dummyData = [
   {
@@ -157,12 +158,48 @@ const dummyData = [
   },
 ];
 
-
 export default function Users() {
+  const columns = [
+    {
+      label: "USER",
+      key: "name",
+      render: (user) => (
+        <div className="flex items-center gap-2">
+          <img src={`/${user.image}`} alt={user.name} className="w-8 h-8 rounded-full" />
+          <div>
+            <div>{user.name}</div>
+            <div className="text-xs text-gray-500">{user.gender}</div>
+          </div>
+        </div>
+      ),
+    },
+    { label: "PHONE NUMBER", key: "phoneNumber" },
+    {
+      label: "DOB",
+      key: "dob",
+      render: (user) => new Date(user.dob).toLocaleDateString(),
+    },
+    { label: "TOTAL EARNING", key: "totalEarning", render: (u) => `$${u.totalEarning}` },
+    { label: "TOTAL WITHDRAWAL", key: "totalWithdrawal", render: (u) => `$${u.totalWithdrawal}` },
+  ];
+
+  const sortOptions = [
+    { label: "A to Z", value: (a, b) => a.name.localeCompare(b.name) },
+    { label: "Z to A", value: (a, b) => b.name.localeCompare(a.name) },
+  ];
+
+
+
   return (
     <SidebarProvider>
-    <AppSidebar mode="admin" />
-    <UsersPage campaignData={dummyData} />
+      <AppSidebar mode="admin" />
+      <GenericTablePage
+        title="USERS"
+        data={dummyData}
+        columns={columns}
+        sortOptions={sortOptions}
+        filters={{ dateKey: "dob", statusKey: "status" }}
+      />
     </SidebarProvider>
   );
 }
