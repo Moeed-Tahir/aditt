@@ -140,7 +140,7 @@ export default function Adversiters() {
               pathname: "/admin/advertisers-profile",
               query: { name: adverstisers.name },
             }}
-            className="text-blue-600 hover:underline"
+            className="hover:underline"
           >
             {adverstisers.name}
           </Link>

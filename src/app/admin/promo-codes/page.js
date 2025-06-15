@@ -1,11 +1,12 @@
 "use client";
 
-
+import { useState } from "react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage"; // adjust path
 import CampaignActionsDropdown from "@/components/campaign/CampaignActionsDropdown";
 import { EllipsisVertical, Plus } from "lucide-react";
+import PromoCodeDialog from "@/components/PromoCodeDialog";
 
 const dummyData = [
   {
@@ -79,25 +80,40 @@ export default function PromoCodes() {
     { label: "Z to A", value: (a, b) => b.name.localeCompare(a.name) },
   ];
 
+  const [openCreate, setOpenCreate] = useState(false);
+
+
   const getPromoActions = (totalCampaigns) => (
     <CampaignActionsDropdown
       customTrigger={<EllipsisVertical className="w-5 h-5 cursor-pointer text-gray-600" />}
     />
   );
-
   const headerAction = (
     <button
       type="button"
+      onClick={() => setOpenCreate(true)}
       className="flex items-center justify-center gap-[12px] px-[28px] py-[16px] rounded-[80px] text-white bg-blue-600 hover:bg-blue-700 cursor-pointer w-full md:w-auto"
     >
       <Plus className="w-5 h-5" />
       <span>Create Promo Code</span>
     </button>
   );
+  
 
   return (
     <SidebarProvider>
       <AppSidebar mode="admin" />
+  
+      <PromoCodeDialog
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+        onSave={(data) => {
+          console.log("Saved promo code data:", data);
+          setOpenCreate(false);
+          // Optional: Update your table data
+        }}
+      />
+  
       <GenericTablePage
         title="PROMO CODES"
         data={dummyData}
@@ -110,4 +126,5 @@ export default function PromoCodes() {
       />
     </SidebarProvider>
   );
+  
 }

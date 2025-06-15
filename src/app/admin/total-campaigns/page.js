@@ -1,11 +1,11 @@
 "use client";
 
-
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage"; // adjust path
 import CampaignActionsDropdown from "@/components/campaign/CampaignActionsDropdown";
 import { EllipsisVertical } from "lucide-react";
+import Link from "next/link";
 
 const dummyData = [
   {
@@ -29,7 +29,6 @@ const dummyData = [
     dateExpiry: "1992-03-21",
     budget: 900,
     status: "Paused",
-
   },
   {
     _id: "3",
@@ -63,7 +62,6 @@ const dummyData = [
     dateExpiry: "1992-03-21",
     budget: 900,
     status: "Paused",
-
   },
   {
     _id: "6",
@@ -86,7 +84,6 @@ const dummyData = [
     dateExpiry: "1992-03-21",
     budget: 800,
     status: "Active",
-
   },
   {
     _id: "8",
@@ -187,8 +184,17 @@ export default function TotalCampaigns() {
       render: (totalCampaigns) => (
         <div className="flex items-center gap-2">
           <div>
-            <div>{totalCampaigns.name}</div>
-            <div className="text-xs text-gray-500">{totalCampaigns.businessEmail}</div>
+            <Link
+              href={{
+                pathname: "/admin/campaign-overview",
+                query: { name: totalCampaigns.name },
+              }}
+            >
+              {totalCampaigns.name}
+            </Link>
+            <div className="text-xs text-gray-500">
+              {totalCampaigns.businessEmail}
+            </div>
           </div>
         </div>
       ),
@@ -202,10 +208,11 @@ export default function TotalCampaigns() {
     {
       label: "EXPIRY DATE",
       key: "dateExpiry",
-      render: (totalCampaigns) => new Date(totalCampaigns.dateExpiry).toLocaleDateString(),
+      render: (totalCampaigns) =>
+        new Date(totalCampaigns.dateExpiry).toLocaleDateString(),
     },
     { label: "BUDGET", key: "budget", render: (u) => `$${u.budget}` },
-    
+
     {
       label: "STATUS",
       key: "status",
@@ -223,7 +230,6 @@ export default function TotalCampaigns() {
         </span>
       ),
     },
-    
   ];
 
   const sortOptions = [
@@ -233,7 +239,9 @@ export default function TotalCampaigns() {
 
   const getCampaignsActions = (totalCampaigns) => (
     <CampaignActionsDropdown
-      customTrigger={<EllipsisVertical className="w-5 h-5 cursor-pointer text-gray-600" />}
+      customTrigger={
+        <EllipsisVertical className="w-5 h-5 cursor-pointer text-gray-600" />
+      }
     />
   );
 

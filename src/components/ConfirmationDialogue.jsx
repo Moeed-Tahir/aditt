@@ -17,6 +17,7 @@ export default function ConfirmationDialog({
   confirmLabel,
   onConfirm,
   onCancel,
+  children,
 }) {
   return (
     <Dialog open={open} onOpenChange={onCancel}>
@@ -28,7 +29,7 @@ export default function ConfirmationDialog({
           <DialogTitle className="text-center text-xl sm:text-2xl font-normal mt-2">{title}</DialogTitle>
           <DialogTitle className="text-center font-light text-gray-600 text-xs sm:text-sm mt-2">{smallText}</DialogTitle>
         </DialogHeader>
-
+        {children}
         <DialogFooter className="flex justify-center gap-4 mt-auto">
           <div className="flex gap-2 sm:gap-4">
             <Button className="mt-4 py-5 sm:py-7 px-12 sm:px-20 rounded-[58px] text-blue-600 bg-white hover:bg-blue-600 hover:text-white cursor-pointer" variant="outline" onClick={onCancel}>
