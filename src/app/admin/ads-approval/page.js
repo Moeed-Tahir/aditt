@@ -2,7 +2,7 @@
 
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { GenericTablePage } from "@/components/admin/GenericTablePage";
+import { GenericTablePage } from "@/components/admin/GenericTablePage"; // adjust path
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -133,7 +133,7 @@ export default function AdsApproval() {
       <AppSidebar mode="admin" />
       <GenericTablePage
         title="ADS FOR APPROVAL"
-        data={approvalData} // Changed from data to fetchData
+        data={approvalData}
         columns={columns}
         sortOptions={sortOptions}
         filters={{ dateKey: "dob", statusKey: "status" }}
