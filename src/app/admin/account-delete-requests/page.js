@@ -3,7 +3,6 @@
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage"; // adjust path
-import CampaignActionsDropdown from "@/components/campaign/CampaignActionsDropdown";
 
 const dummyData = [
   {

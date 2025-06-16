@@ -18,11 +18,12 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
     discountValue: "",
     startDate: "",
     endDate: "",
-    appliesTo: "New Signup",
+    appliesTo: "",
     customUserLimit: "",
     limitUsers: false,
     status: true,
   });
+  console.log("formData", formData.appliesTo);
 
   const [loading, setLoading] = useState(false);
   const [showCustomUserInput, setShowCustomUserInput] = useState(false);
@@ -116,6 +117,7 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
         onSave(data);
       }
 
+      setFormData({});
       onClose();
     } catch (error) {
       toast.error(error.message);
@@ -240,7 +242,6 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                 value={showCustomUserInput ? "custom" : formData.appliesTo}
                 onChange={handleAppliesToChange}
               >
-                <option value="New Signup">New Signup</option>
                 <option value="First 50 Users">First 50 Users</option>
                 <option value="First 100 Users">First 100 Users</option>
                 <option value="custom">Add other...</option>
@@ -261,17 +262,6 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                 </div>
               )}
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.limitUsers}
-              onChange={() =>
-                setFormData({ ...formData, limitUsers: !formData.limitUsers })
-              }
-            />
-            <label className="text-sm">Limit to all users for each campaign</label>
           </div>
 
           <div className="flex items-center justify-between">

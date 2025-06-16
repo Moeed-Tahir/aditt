@@ -34,7 +34,6 @@ const PromoCodeSchema = new mongoose.Schema({
   appliesTo: {
     type: String,
     required: true,
-    enum: ['New Signup', 'First 50 Users', 'First 100 Users', 'Custom'],
     default: 'New Signup'
   },
   customUserLimit: {
@@ -48,6 +47,10 @@ const PromoCodeSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  appliedCount: {
+    type: Number,
+    default: 0
+  },
   status: {
     type: Boolean,
     default: true
@@ -59,7 +62,7 @@ const PromoCodeSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
-  }
+  },
 }, { timestamps: true });
 
 PromoCodeSchema.index({ name: 1 });

@@ -9,6 +9,7 @@ import {
   resendOTP,
   getProfile,
   verifyOTP,
+  getAllUsers
 } from "../../controllers/v1/authControllers";
 
 export default async function handler(req, res) {
@@ -35,6 +36,8 @@ export default async function handler(req, res) {
           return await resendOTP(req, res);
         case "getProfile":
           return await getProfile(req, res);
+        case "getAllUsers":
+          return await getAllUsers(req, res);
         default:
           return res.status(400).json({ message: "Invalid action parameter" });
       }

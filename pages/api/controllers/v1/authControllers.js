@@ -535,3 +535,22 @@ exports.getProfile = async (req, res) => {
         });
     }
 }
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const verifiedUsers = await User.find({ isOtpVerified: true });
+        
+        res.status(200).json({
+            success: true,
+            message: "Verified users retrieved successfully",
+            data: verifiedUsers
+        });
+    } catch (error) {
+        console.error("Error fetching verified users:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+};

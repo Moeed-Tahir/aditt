@@ -202,3 +202,35 @@ export const validatePromoCode = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const applyPromoCode = async (req, res) => {
+  const { code } = req.body;
+  try {
+    const promo = await PromoCode.findOne({ name: code, status: true });
+    console.log("promo",promo);
+
+    if (!promo) {
+      return res.status(404).json({ error: 'Promo code not found or inactive' });
+    }
+
+    const now = new Date();
+    console.log("now",now);
+    console.log("promo.startDate",promo.startDate);
+    console.log("promo.endDate",promo.endDate);
+
+    if (now > promo.endDate) {
+      return res.status(400).json({ error: 'Promo code is not active currently' });
+    }
+
+    if (promo.limitUsers && promo.customUserLimit && promo.appliedCount >= promo.customUserLimit) {
+      return res.status(400).json({ error: 'Promo code usage limit reached' });
+    }
+
+    promo.appliedCount += 1;
+    await promo.save();
+
+    return res.status(200).json({ success: true, discountType: promo.discountType, discountValue: promo.discountValue });
+  } catch (error) {
+    return res.status(500).json({ error: 'Server error' });
+  }
+};

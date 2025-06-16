@@ -16,6 +16,7 @@ import {
   Trash,
   EllipsisVertical,
 } from "lucide-react";
+import CampaignActionsDropdown from "../campaign/CampaignActionsDropdown";
 
 export function GenericTablePage({
   title = "Data Table",

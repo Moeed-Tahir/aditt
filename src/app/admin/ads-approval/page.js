@@ -2,131 +2,97 @@
 
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { GenericTablePage } from "@/components/admin/GenericTablePage"; // adjust path
-import CampaignActionsDropdown from "@/components/campaign/CampaignActionsDropdown";
-
-const dummyData = [
-  {
-    _id: "1",
-    name: "Marvin Ramos",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "150",
-  },
-  {
-    _id: "2",
-    name: "Jane Smith",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "250",
-  },
-  {
-    _id: "3",
-    name: "Alice Johnson",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "500",
-  },
-  {
-    _id: "4",
-    name: "Marvin Ramos",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "150",
-  },
-  {
-    _id: "5",
-    name: "Jane Smith",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "250",
-  },
-  {
-    _id: "6",
-    name: "Alice Johnson",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "500",
-  },
-  {
-    _id: "7",
-    name: "Marvin Ramos",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "150",
-  },
-  {
-    _id: "8",
-    name: "Jane Smith",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "250",
-  },
-  {
-    _id: "9",
-    name: "Alice Johnson",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "500",
-  },
-  {
-    _id: "10",
-    name: "Marvin Ramos",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "150",
-  },
-  {
-    _id: "11",
-    name: "Jane Smith",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "250",
-  },
-  {
-    _id: "12",
-    name: "Alice Johnson",
-    businessEmail: "business@gmail.com",
-    businessWebsite: "www.business.com",
-    title: "Adidas Campaign",
-    totalSpent: "500",
-  },
-];
+import { GenericTablePage } from "@/components/admin/GenericTablePage";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AdsApproval() {
+  const [loading, setLoading] = useState(false);
+  const [approvalData, setApprovalData] = useState([]);
+  console.log("approvalData", approvalData);
+
+  const router = useRouter();
+
+  const fetchApprovalData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/routes/v1/campaignRoutes?action=getPendingCampaign",);
+      setApprovalData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching campaigns:", error);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCampaignAction = async (campaignId, action) => {
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/routes/v1/campaignRoutes?action=activeOrRejectCampaign", {
+        id: campaignId,
+        status: action === "accept" ? "Active" : "Rejected"
+      });
+
+      if (response.data.success) {
+        fetchApprovalData();
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error updating campaign status:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const columns = [
     {
-      label: "ADVERTISERS",
-      key: "name",
-      render: (adverstisers) => (
-        <div className="flex items-center gap-2">
-          <div>
-            <div>{adverstisers.name}</div>
-          </div>
+      label: "CAMPAIGN TITLE",
+      key: "campaignTitle",
+    },
+    {
+      label: "WEBSITE LINK",
+      key: "websiteLink",
+      render: (item) => (
+        <a href={item.websiteLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+          {item.websiteLink}
+        </a>
+      )
+    },
+    {
+      label: "STATUS",
+      key: "status",
+      render: (item) => (
+        <span className={`px-2 py-1 rounded-full text-xs ${item.status === "Active" ? "bg-green-100 text-green-800" :
+            item.status === "Pending" ? "bg-yellow-100 text-yellow-800" :
+              "bg-red-100 text-red-800"
+          }`}>
+          {item.status}
+        </span>
+      )
+    },
+    {
+      label: "GENDER TARGETING",
+      key: "genderType",
+      render: (item) => `${item.genderType} (${item.genderRatio}%)`
+    },
+    {
+      label: "BUDGET",
+      key: "campaignBudget",
+      render: (item) => `$${item.campaignBudget}`
+    },
+    {
+      label: "DATES",
+      key: "campaignStartDate",
+      render: (item) => (
+        <div className="flex flex-col">
+          <span>{new Date(item.campaignStartDate).toLocaleDateString()}</span>
+          <span>to</span>
+          <span>{new Date(item.campaignEndDate).toLocaleDateString()}</span>
         </div>
-      ),
-    },
-    { label: "BUSINESS EMAIL", key: "businessEmail" },
-    {
-      label: "BUSINESS WEBSITE",
-      key: "businessWebsite",
-    },
-    { label: "CAMPAIGN TITLE", key: "title" },
-    {
-      label: "ADS BUDGET",
-      key: "totalSpent",
-      render: (u) => `$${u.totalSpent}`,
+      )
     },
   ];
 
@@ -135,30 +101,44 @@ export default function AdsApproval() {
     { label: "Z to A", value: (a, b) => b.name.localeCompare(a.name) },
   ];
 
-  const getAdsApprovalActions = (adsApproval) => (
+  const getAdsApprovalActions = (campaign) => (
     <div className="flex gap-2">
-      <span className="text-xs font-medium px-3 py-1 rounded-full bg-green-100 text-green-700">
+      <button
+        onClick={() => handleCampaignAction(campaign._id, "accept")}
+        className="text-xs font-medium px-3 py-1 rounded-full bg-green-100 text-green-700 hover:bg-green-200"
+      >
         Accept
-      </span>
-      <span className="text-xs font-medium px-3 py-1 rounded-full bg-red-100 text-red-700">
+      </button>
+      <button
+        onClick={() => handleCampaignAction(campaign._id, "reject")}
+        className="text-xs font-medium px-3 py-1 rounded-full bg-red-100 text-red-700 hover:bg-red-200"
+      >
         Reject
-      </span>
-      <span className="text-xs font-medium px-3 py-1 rounded-full bg-blue-100 text-blue-700">
+      </button>
+      <button
+        onClick={() => router.push(`/admin/campaigns/${campaign._id}`)}
+        className="text-xs font-medium px-3 py-1 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200"
+      >
         View
-      </span>
+      </button>
     </div>
   );
+
+  useEffect(() => {
+    fetchApprovalData();
+  }, []);
 
   return (
     <SidebarProvider>
       <AppSidebar mode="admin" />
       <GenericTablePage
         title="ADS FOR APPROVAL"
-        data={dummyData}
+        data={approvalData} // Changed from data to fetchData
         columns={columns}
         sortOptions={sortOptions}
         filters={{ dateKey: "dob", statusKey: "status" }}
         getActions={getAdsApprovalActions}
+        loading={loading}
       />
     </SidebarProvider>
   );

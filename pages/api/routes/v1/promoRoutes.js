@@ -3,7 +3,8 @@ import {
   getAllPromoCodes,
   togglePromoCodeStatus,
   updatePromoCode,
-  deletePromoCode
+  deletePromoCode,
+  applyPromoCode
 } from "../../controllers/v1/promoControllers";
 
 export default async function handler(req, res) {
@@ -26,6 +27,8 @@ export default async function handler(req, res) {
           return await updatePromoCode(req, res);
         case "deletePromoCode":
           return await deletePromoCode(req, res);
+        case "applyPromoCode":
+          return await applyPromoCode(req, res);
         default:
           return res.status(400).json({ message: "Invalid action parameter" });
       }

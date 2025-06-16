@@ -339,8 +339,6 @@ exports.updateCampaign = async (req, res) => {
         res.status(500).json({ message: 'Internal server error.' });
     }
 };
-
-
 exports.campaignStatusUpdate = async (req, res) => {
     try {
         const { status, id } = req.body;
@@ -398,4 +396,84 @@ exports.submitFeedback = async (req, res) => {
         res.status(500).json({ message: 'Server error.' });
     }
 };
+
+exports.getPendingCampaign = async (req, res) => {
+    try {
+        const pendingCampaigns = await Compaign.find({ status: "Pending" });
+        
+        if (!pendingCampaigns || pendingCampaigns.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No pending campaigns found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            count: pendingCampaigns.length,
+            data: pendingCampaigns
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error fetching pending campaigns",
+            error: error.message
+        });
+    }
+}
+
+exports.activeOrRejectCampaign = async (req, res) => {
+    try {
+        const {status,id } = req.body;
+
+        if (!status || (status !== "Active" && status !== "Rejected")) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid status. Must be either 'Active' or 'Rejected'"
+            });
+        }
+
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide a campaign ID"
+            });
+        }
+
+        const updatedCampaign = await Compaign.findOneAndUpdate(
+            { 
+                _id: id,
+                status: "Pending"
+            },
+            { 
+                $set: { 
+                    status: status,
+                    updatedAt: new Date() 
+                } 
+            },
+            { new: true } 
+        );
+
+        if (!updatedCampaign) {
+            return res.status(404).json({
+                success: false,
+                message: "Campaign not found or not in Pending status"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `Campaign status successfully updated to ${status}`,
+            data: updatedCampaign
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error updating campaign status",
+            error: error.message
+        });
+    }
+}
 
