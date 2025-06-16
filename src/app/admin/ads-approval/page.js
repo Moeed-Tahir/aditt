@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage"; // adjust path
 import CampaignActionsDropdown from "@/components/campaign/CampaignActionsDropdown";
+import Link from "next/link";
 
 const dummyData = [
   {
@@ -109,10 +110,17 @@ export default function AdsApproval() {
     {
       label: "ADVERTISERS",
       key: "name",
-      render: (adverstisers) => (
+      render: (advertisers) => (
         <div className="flex items-center gap-2">
           <div>
-            <div>{adverstisers.name}</div>
+          <Link
+              href={{
+                pathname: "/admin/campaign-overview",
+                query: { view: "adsApproval", name: advertisers.name },
+              }}
+            >
+              {advertisers.name}
+            </Link>
           </div>
         </div>
       ),
