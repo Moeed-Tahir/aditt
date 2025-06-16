@@ -19,8 +19,14 @@ export function OverViewPage({ variant = "campaign" }) {
     videoUrl: "https://www.example.com/sample.mp4",
     budget: 1000,
     spent: 750,
-    quizQuestion: "What's your favorite color?",
-    genderRatio: { male: 60, female: 40 },
+    quizQuestion: {
+      questionText: "What's your favorite color?",
+      option1: "Red",
+      option2: "Blue",
+      option3: "Green",
+      option4: "Yellow",
+    },
+    genderRatio: 60,
     surveyQuestion1: "Where did you hear about us?",
     surveyQuestion2: "Would you recommend our service?",
     engagements: 350,
@@ -29,7 +35,25 @@ export function OverViewPage({ variant = "campaign" }) {
       impressions: 5000,
       conversions: 45,
     },
+    surveyQuestion1: {
+      questionText: "Where did you hear about us?",
+      option1: "Social Media",
+      option2: "Friend",
+      option3: "Advertisement",
+      option4: "Other",
+    },
+    surveyQuestion2: {
+      questionText: "Would you recommend our service?",
+      option1: "Yes",
+      option2: "No",
+      option3: "Maybe",
+      option4: "Not Sure",
+    },
+    engagements: {
+      totalCount: 300,
+    },
   };
+  
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
@@ -58,7 +82,7 @@ export function OverViewPage({ variant = "campaign" }) {
           <div className="bg-white p-4 sm:p-6 rounded-[24px] shadow">
             <QuizDetails
               quizQuestion={campaignData.quizQuestion}
-              genderRatio={campaignData.genderRatio}
+              genderRatio={campaignData.genderRatio.male}
             />
           </div>
 
