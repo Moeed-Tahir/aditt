@@ -39,23 +39,35 @@ function SigninUser() {
     setLoading(true);
 
     try {
-      const response = await axios.post("/api/routes/v1/authRoutes?action=signin", {
-        email: formData.email,
-        password: formData.password,
-      });
+      const isAdmin =
+        formData.email === "admin123@gmail.com" &&
+        formData.password === "admin123$$";
 
-      const data = response.data;
+      if (isAdmin) {
+        Cookies.set("Role", "Admin", { expires: 1 });
+        Cookies.set("email", "admin123@gmail.com", { expires: 1 });
 
-      if (data.token && data.user) {
-        Cookies.set("token", data.token, { expires: 1 });
-        Cookies.set("userId", data.user.userId, { expires: 1 });
-        Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
-        const userId = Cookies.get("userId");
-
-        toast.success("Sign in successful!");
-        router.push(`/${userId}/campaign-dashboard`);
+        toast.success("Admin sign in successful!");
+        router.push("/admin/dashboard");
       } else {
-        toast.error("Sign in successful but missing user data.");
+        const response = await axios.post("/api/routes/v1/authRoutes?action=signin", {
+          email: formData.email,
+          password: formData.password,
+        });
+
+        const data = response.data;
+
+        if (data.token && data.user) {
+          Cookies.set("token", data.token, { expires: 1 });
+          Cookies.set("userId", data.user.userId, { expires: 1 });
+          Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+
+          toast.success("Sign in successful!");
+          const userId = Cookies.get("userId");
+          router.push(`/${userId}/campaign-dashboard`);
+        } else {
+          toast.error("Sign in successful but missing user data.");
+        }
       }
     } catch (error) {
       console.error("Sign in error:", error);
@@ -75,6 +87,7 @@ function SigninUser() {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="flex h-auto min-h-screen w-full">

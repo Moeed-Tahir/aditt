@@ -16,7 +16,6 @@ import {
   Trash,
   EllipsisVertical,
 } from "lucide-react";
-import CampaignActionsDropdown from "../campaign/CampaignActionsDropdown";
 
 export function GenericTablePage({
   title = "Data Table",
@@ -35,7 +34,6 @@ export function GenericTablePage({
   const [sortBy, setSortBy] = useState(null);
   const [statusFilter, setStatusFilter] = useState("All");
   const [dateFilter, setDateFilter] = useState({ from: "", to: "" });
-
   const itemsPerPage = 10;
 
   let filteredData = [...data];
@@ -220,7 +218,7 @@ export function GenericTablePage({
                     ))}
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                       {getActions ? (
-                        getActions(item) // NEW preferred method
+                        getActions(item)
                       ) : renderActions ? (
                         renderActions(item)
                       ) : (

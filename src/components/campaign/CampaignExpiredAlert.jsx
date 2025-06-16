@@ -1,6 +1,4 @@
-// components/campaign/CampaignExpiredAlert.jsx
 "use client";
-import { useState } from "react";
 import { CircleAlert } from "lucide-react";
 
 export const CampaignExpiredAlert = ({ 

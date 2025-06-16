@@ -8,10 +8,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import axios from "axios";
 
-export default function PromoCodeDialog({ open, onClose, onSave }) {
+export default function EditPromoCodeDialog({ open, onClose, onSave, promoData }) {
   const [formData, setFormData] = useState({
     name: "",
     discountType: "Percentage",
@@ -26,6 +27,36 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
 
   const [loading, setLoading] = useState(false);
   const [showCustomUserInput, setShowCustomUserInput] = useState(false);
+
+  useEffect(() => {
+    if (promoData) {
+      // Check if appliesTo is a custom user limit (e.g., "First 50 Users")
+      const isCustomUserLimit = promoData.appliesTo?.startsWith("First ") && 
+                               promoData.appliesTo?.endsWith(" Users");
+      
+      let customUserLimit = "";
+      let appliesTo = promoData.appliesTo;
+      
+      if (isCustomUserLimit) {
+        customUserLimit = promoData.appliesTo.replace("First ", "").replace(" Users", "");
+        appliesTo = "";
+      }
+
+      setFormData({
+        name: promoData.name || "",
+        discountType: promoData.discountType || "Percentage",
+        discountValue: promoData.discountValue || "",
+        startDate: promoData.startDate ? new Date(promoData.startDate).toISOString().split('T')[0] : "",
+        endDate: promoData.endDate ? new Date(promoData.endDate).toISOString().split('T')[0] : "",
+        appliesTo: appliesTo || "New Signup",
+        customUserLimit: customUserLimit || "",
+        limitUsers: promoData.limitUsers || false,
+        status: promoData.status !== undefined ? promoData.status : true,
+      });
+
+      setShowCustomUserInput(isCustomUserLimit);
+    }
+  }, [promoData]);
 
   const handleAppliesToChange = (e) => {
     const value = e.target.value;
@@ -49,76 +80,62 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
     }
   };
 
-  const handleSubmit = async () => {
-    // Validate required fields
-    if (!formData.name.trim()) {
-      toast.error("Please enter a promo code name");
+const handleSubmit = async () => {
+    if (!formData.name) {
+      toast.error("Code name is required");
       return;
     }
-
     if (!formData.discountValue) {
-      toast.error("Please enter a discount value");
+      toast.error("Discount value is required");
       return;
     }
-
-    if (!formData.startDate || !formData.endDate) {
-      toast.error("Please select both start and end dates");
+    if (formData.discountType === "Percentage" && (formData.discountValue < 0 || formData.discountValue > 100)) {
+      toast.error("Percentage discount must be between 0 and 100");
       return;
     }
-
-    // Validate discount value
-    if (formData.discountType === "Percentage" &&
-      (formData.discountValue < 0 || formData.discountValue > 100)) {
-      toast.error("Percentage must be between 0 and 100");
-      return;
-    }
-
     if (formData.discountType === "Fixed Amount" && formData.discountValue < 0) {
-      toast.error("Fixed amount cannot be negative");
+      toast.error("Fixed amount discount cannot be negative");
       return;
     }
-
-    // Validate dates
-    if (new Date(formData.endDate) <= new Date(formData.startDate)) {
-      toast.error("End date must be after start date");
+    if (!formData.startDate) {
+      toast.error("Start date is required");
+      return;
+    }
+    if (!formData.endDate) {
+      toast.error("End date is required");
+      return;
+    }
+    if (new Date(formData.endDate) < new Date(formData.startDate)) {
+      toast.error("End date cannot be before start date");
+      return;
+    }
+    if (formData.appliesTo === "Custom" && !formData.customUserLimit) {
+      toast.error("Please specify the number of users");
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch('/api/routes/v1/promoRoutes?action=createPromoCode', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          discountType: formData.discountType,
-          discountValue: Number(formData.discountValue),
-          startDate: formData.startDate,
-          endDate: formData.endDate,
-          appliesTo: formData.appliesTo,
-          customUserLimit: formData.customUserLimit ? Number(formData.customUserLimit) : undefined,
-          limitUsers: formData.limitUsers,
-          status: formData.status
-        }),
+      const response = await axios.post("/api/routes/v1/promoRoutes?action=updatePromoCode", {
+        id: promoData._id,
+        name: formData.name,
+        discountType: formData.discountType,
+        discountValue: formData.discountValue,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        appliesTo: formData.appliesTo,
+        customUserLimit: formData.appliesTo === "Custom" ? formData.customUserLimit : undefined,
+        limitUsers: formData.limitUsers,
+        status: formData.status
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to create promo code');
+      if (response.data) {
+        toast.success("Promo code updated successfully");
+        onSave(response.data);
       }
-
-      toast.success("Promo code created successfully");
-
-      if (onSave) {
-        onSave(data);
-      }
-
-      onClose();
     } catch (error) {
-      toast.error(error.message);
+      console.error("Error updating promo:", error);
+      toast.error(error.response?.data?.error || "Failed to update promo code");
     } finally {
       setLoading(false);
     }
@@ -129,7 +146,7 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
       <DialogContent className="max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="text-center text-lg sm:text-2xl font-medium">
-            Create New Promo Code
+            Edit Promo Code
           </DialogTitle>
         </DialogHeader>
 
@@ -155,7 +172,7 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                   value="Percentage"
                   checked={formData.discountType === "Percentage"}
                   onChange={() =>
-                    setFormData({ ...formData, discountType: "Percentage", discountValue: "" })
+                    setFormData({ ...formData, discountType: "Percentage" })
                   }
                 />
                 Percentage
@@ -167,7 +184,7 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                   value="Fixed Amount"
                   checked={formData.discountType === "Fixed Amount"}
                   onChange={() =>
-                    setFormData({ ...formData, discountType: "Fixed Amount", discountValue: "" })
+                    setFormData({ ...formData, discountType: "Fixed Amount" })
                   }
                 />
                 Fixed Amount
@@ -317,9 +334,9 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Creating...
+                  Updating...
                 </span>
-              ) : "Save"}
+              ) : "Update"}
             </Button>
           </div>
         </DialogFooter>
