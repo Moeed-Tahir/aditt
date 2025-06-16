@@ -13,7 +13,7 @@ import { useState } from "react";
 export default function PromoCodeDialog({ open, onClose, onSave }) {
   const [formData, setFormData] = useState({
     name: "",
-    discountType: "Full Waiver",
+    discountType: "Percentage",
     startDate: "",
     endDate: "",
     appliesTo: "New Signup",
@@ -48,13 +48,13 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                 <input
                   type="radio"
                   name="discountType"
-                  value="Full Waiver"
-                  checked={formData.discountType === "Full Waiver"}
+                  value="Percentage"
+                  checked={formData.discountType === "Percentage"}
                   onChange={() =>
-                    setFormData({ ...formData, discountType: "Full Waiver" })
+                    setFormData({ ...formData, discountType: "Percentage" })
                   }
                 />
-                Full Waiver
+                Percentage
               </label>
               <label className="flex items-center gap-2">
                 <input
