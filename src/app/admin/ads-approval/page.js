@@ -115,8 +115,8 @@ export default function AdsApproval() {
           <div>
           <Link
               href={{
-                pathname: "/admin/campaign-overview",
-                query: { view: "adsApproval", name: advertisers.name },
+                pathname: "/admin/ads-overview",
+                query: { name: advertisers.name },
               }}
             >
               {advertisers.name}
