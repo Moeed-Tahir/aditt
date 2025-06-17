@@ -6,7 +6,9 @@ import {
     addCountInCampaign,
     campaignStatusUpdate,
     submitFeedback,
-    updateCampaign
+    updateCampaign,
+    getPendingCampaign,
+    activeOrRejectCampaign
 } from "../../controllers/v1/compaignController";
 
 export default async function handler(req, res) {
@@ -35,6 +37,10 @@ export default async function handler(req, res) {
                     return await submitFeedback(req, res);
                 case "updateCampaign":
                     return await updateCampaign(req, res);
+                case "getPendingCampaign":
+                    return await getPendingCampaign(req, res);
+                case "activeOrRejectCampaign":
+                    return await activeOrRejectCampaign(req, res);
                 default:
                     return res.status(400).json({ message: "Invalid action parameter" });
             }

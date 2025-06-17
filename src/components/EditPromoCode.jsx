@@ -257,7 +257,6 @@ const handleSubmit = async () => {
                 value={showCustomUserInput ? "custom" : formData.appliesTo}
                 onChange={handleAppliesToChange}
               >
-                <option value="New Signup">New Signup</option>
                 <option value="First 50 Users">First 50 Users</option>
                 <option value="First 100 Users">First 100 Users</option>
                 <option value="custom">Add other...</option>
@@ -278,17 +277,6 @@ const handleSubmit = async () => {
                 </div>
               )}
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.limitUsers}
-              onChange={() =>
-                setFormData({ ...formData, limitUsers: !formData.limitUsers })
-              }
-            />
-            <label className="text-sm">Limit to all users for each campaign</label>
           </div>
 
           <div className="flex items-center justify-between">

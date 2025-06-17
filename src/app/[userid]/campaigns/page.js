@@ -10,6 +10,7 @@ const Page = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const [campaignData, setCampaignData] = useState([]);
+  console.log("campaignData", campaignData);
 
   const fetchCampaign = async () => {
     try {
@@ -17,10 +18,11 @@ const Page = () => {
       const response = await axios.post("/api/routes/v1/campaignRoutes?action=getCampaignAgainstId", {
         id: id
       });
-
+       console.log("response",response);
+       
       setCampaignData(response.data.campaign);
     } catch (error) {
-            toast.error(error?.response?.data?.message || "Error is occur");
+      toast.error(error?.response?.data?.message || "Error is occur");
 
       console.error('Error creating campaign:', error);
     }
@@ -32,7 +34,7 @@ const Page = () => {
 
   return (
     <>
-      <CampaignDetailPage campaignData={campaignData} />
+      <CampaignDetailPage campaignId={id} campaignData={campaignData} />
     </>
   )
 }

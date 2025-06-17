@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import CampaignActionsDropdown from "./CampaignActionsDropdown";
 
-const CampaignHeader = ({ userId, openDialog, setFeedbackDialogOpen }) => (
+const CampaignHeader = ({ userId, openDialog, setFeedbackDialogOpen, campaignData, campaignId }) => (
   <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 p-4 sm:p-0">
     <Link
       href={`/${userId}/campaign-dashboard`}
@@ -18,6 +18,8 @@ const CampaignHeader = ({ userId, openDialog, setFeedbackDialogOpen }) => (
     </div>
 
     <CampaignActionsDropdown
+      campaignId={campaignId}
+      campaignData={campaignData}
       openDialog={openDialog}
       onCompleteConfirm={() => setFeedbackDialogOpen(true)}
       customTrigger={

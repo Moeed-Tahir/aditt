@@ -69,12 +69,12 @@ export function GenericTablePage({
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   return (
-    <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
+    <main className="flex h-auto min-h-screen w-full flex-col gap-0 bg-[var(--bg-color-off-white)]">
       <Navbar />
-      <div className="p-4 sm:p-6 lg:p-8">
+      <div className="p-4 sm:p-6">
         {" "}
         {showHeaderProfile && headerProfile && (
-          <div className="max-w-[1440px] bg-white rounded-[15px] p-[20px] gap-[10px] mx-auto">
+          <div className="max-w-[1440px] bg-white rounded-[15px] p-[0px] gap-[10px] mx-auto">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="text-blue-600 font-md text-lg md:text-[24px]">
                 {headerProfile}

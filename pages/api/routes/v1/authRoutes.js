@@ -1,5 +1,4 @@
 import {
-  signUp,
   signIn,
   forgotPassword,
   resetPassword,
@@ -9,6 +8,12 @@ import {
   resendOTP,
   getProfile,
   verifyOTP,
+  getAllUsers,
+  signUp,
+  requestAccountDeletion,
+  getPendingDeletionRequests,
+  rejectDeletionRequest,
+  approveDeletionRequest
 } from "../../controllers/v1/authControllers";
 
 export default async function handler(req, res) {
@@ -21,10 +26,10 @@ export default async function handler(req, res) {
   try {
     if (req.method === "POST") {
       switch (action) {
-        case "signup":
-          return await signUp(req, res);
         case "verify-otp":
           return await verifyOTP(req, res);
+        case "signUp":
+          return await signUp(req, res);
         case "signin":
           return await signIn(req, res);
         case "forgot-password":
@@ -35,6 +40,16 @@ export default async function handler(req, res) {
           return await resendOTP(req, res);
         case "getProfile":
           return await getProfile(req, res);
+        case "getAllUsers":
+          return await getAllUsers(req, res);
+        case "requestAccountDeletion":
+          return await requestAccountDeletion(req, res);
+        case "getPendingDeletionRequests":
+          return await getPendingDeletionRequests(req, res);
+        case "rejectDeletionRequest":
+          return await rejectDeletionRequest(req, res);
+        case "approveDeletionRequest":
+          return await approveDeletionRequest(req, res);
         default:
           return res.status(400).json({ message: "Invalid action parameter" });
       }

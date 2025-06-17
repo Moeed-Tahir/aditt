@@ -46,7 +46,7 @@ export const QuizDetails = ({ quizQuestion, genderRatio }) => {
       </div>
 
       <div>
-        <BarCharts />
+        <BarCharts genderRatio={genderRatio} />
 
         <div className="grid grid-cols-1 sm:grid-cols-3 ml-4 sm:ml-20 text-sm text-gray-600 w-full max-w-md">
           <div className="mb-2 sm:mb-0">

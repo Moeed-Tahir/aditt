@@ -1,7 +1,10 @@
+import connectToDatabase from '../../config/dbConnect';
 import UserChatSupport  from '../../models/UserChatSupport.model';
 
 const addChatSupport = async (req, res) => {
     try {
+        await connectToDatabase();
+        
         const { userId,queryTitle, queryDetail } = req.body;
 
         if (!queryTitle || !queryDetail || !userId) {

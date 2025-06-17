@@ -13,7 +13,7 @@ import {SurveyDetails} from "@/components/campaign/SurveyDetails";
 import {PerformanceSummary} from "@/components/campaign/PerformanceSummary";
 import FeedbackDialog from "../campaign-dashboard/FeedbackDialog";
 
-export default function CampaignDetailPage({ campaignData }) {
+export default function CampaignDetailPage({ campaignData,campaignId }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [showExpiredAlert, setShowExpiredAlert] = useState(true);
@@ -45,6 +45,8 @@ export default function CampaignDetailPage({ campaignData }) {
       <main className="flex min-h-screen w-full max-w-[1440px] mx-auto flex-col">
         <div className="p-6 space-y-6">
           <CampaignHeader
+          campaignId={campaignId}
+          campaignData={campaignData}
             userId={userId}
             openDialog={openDialog}
             setFeedbackDialogOpen={setFeedbackDialogOpen}
