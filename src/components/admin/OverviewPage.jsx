@@ -11,7 +11,7 @@ import EngagementChart from "@/components/AreaCharts";
 import CampaignFeedbackForm from "../CampaignFeedbackForm";
 
 export function OverViewPage({ variant = "campaign" }) {
-  const isAds = variant === "ads";
+  const isAds = variant === "campaign";
 
   const campaignData = {
     title: "Dummy Campaign Title",
