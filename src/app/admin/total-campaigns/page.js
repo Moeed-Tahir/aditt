@@ -87,8 +87,20 @@ export default function TotalCampaigns() {
   ];
 
   const sortOptions = [
-    { label: "A to Z", value: (a, b) => a.campaignTitle.localeCompare(b.campaignTitle) },
-    { label: "Z to A", value: (a, b) => b.campaignTitle.localeCompare(a.campaignTitle) },
+    { 
+      label: "A to Z", 
+      value: (a, b) => {
+        if (!a || !b) return 0;
+        return (a.name || '').localeCompare(b.name || '')
+      } 
+    },
+    { 
+      label: "Z to A", 
+      value: (a, b) => {
+        if (!a || !b) return 0;
+        return (b.name || '').localeCompare(a.name || '')
+      } 
+    },
   ];
 
   const getCampaignsActions = (campaign) => {

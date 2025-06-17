@@ -95,8 +95,20 @@ export default function AdversitersProfile() {
   ];
 
   const sortOptions = [
-    { label: "A to Z", value: (a, b) => a.name.localeCompare(b.name) },
-    { label: "Z to A", value: (a, b) => b.name.localeCompare(a.name) },
+    { 
+      label: "A to Z", 
+      value: (a, b) => {
+        if (!a || !b) return 0;
+        return (a.name || '').localeCompare(b.name || '')
+      } 
+    },
+    { 
+      label: "Z to A", 
+      value: (a, b) => {
+        if (!a || !b) return 0;
+        return (b.name || '').localeCompare(a.name || '')
+      } 
+    },
   ];
 
   const getProfileActions = (adverstisersProfile) => (
