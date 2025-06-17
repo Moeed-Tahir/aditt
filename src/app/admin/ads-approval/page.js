@@ -2,7 +2,7 @@
 
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { GenericTablePage } from "@/components/admin/GenericTablePage"; // adjust path
+import { GenericTablePage } from "@/components/admin/GenericTablePage";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";

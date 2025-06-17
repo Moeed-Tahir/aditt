@@ -23,24 +23,18 @@ export default function DeleteAccountSection() {
         throw new Error("User session expired. Please login again.");
       }
 
-      const response = await axios.delete(
-        "/api/routes/v1/authRoutes?action=deleteAccount",
+      const response = await axios.post(
+        "/api/routes/v1/authRoutes?action=requestAccountDeletion",
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          data: { userId },
+
+          userId
         }
       );
 
       if (response.status === 200) {
-        // Clear all relevant cookies
         Cookies.remove("userId");
         Cookies.remove("token");
         // Cookies.remove("user");
-
-        // Redirect to login page
         router.push("/signin-user");
       }
     } catch (error) {

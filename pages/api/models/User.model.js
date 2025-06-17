@@ -47,6 +47,27 @@ const UserSchema = new mongoose.Schema({
     isOtpVerified: {
         type: Boolean,
         default: false
+    },
+    deletionRequest: {
+        requested: {
+            type: Boolean,
+            default: false
+        },
+        status: {
+            type: String,
+            enum: ['pending', 'approved', 'rejected', null],
+            default: null
+        },
+        requestedAt: {
+            type: Date
+        },
+        processedAt: {
+            type: Date
+        },
+        processedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
     }
 }, { timestamps: true });
 

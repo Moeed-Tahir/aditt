@@ -38,7 +38,7 @@ function SignupUser() {
 
     try {
       const response = await axios.post(
-        "/api/routes/v1/authRoutes?action=signup",
+        "/api/routes/v1/authRoutes?action=signUp",
         {
           name: formData.name,
           businessWebsite: formData.website,

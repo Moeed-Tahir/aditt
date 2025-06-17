@@ -4,7 +4,7 @@ const { generateOTP, sendOTP } = require("../../services/otpServices");
 const jwt = require("jsonwebtoken");
 const connectToDatabase = require("../../config/dbConnect");
 
-exports.signUp = async (req, res) => {
+export const signUp = async (req, res) => {
     try {
         await connectToDatabase();
 
@@ -105,7 +105,7 @@ exports.signUp = async (req, res) => {
     }
 };
 
-exports.verifyOTP = async (req, res) => {
+export const verifyOTP = async (req, res) => {
     try {
         const { userId, otp } = req.body;
 
@@ -164,7 +164,7 @@ exports.verifyOTP = async (req, res) => {
 };
 
 
-exports.signIn = async (req, res) => {
+export const signIn = async (req, res) => {
     try {
         await connectToDatabase();
 
@@ -183,6 +183,13 @@ exports.signIn = async (req, res) => {
             return res.status(404).json({
                 message: "User not found. Sign up to create an account.",
                 code: "USER_NOT_FOUND"
+            });
+        }
+
+        if (user.deletionRequest?.requested && user.deletionRequest?.status === 'pending') {
+            return res.status(403).json({
+                message: "Your account deletion is under process. Please contact support for more information.",
+                code: "ACCOUNT_DELETION_PENDING"
             });
         }
 
@@ -237,7 +244,7 @@ exports.signIn = async (req, res) => {
     }
 };
 
-exports.forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res) => {
     try {
         await connectToDatabase();
 
@@ -281,7 +288,7 @@ exports.forgotPassword = async (req, res) => {
 };
 
 
-exports.resetPassword = async (req, res) => {
+export const resetPassword = async (req, res) => {
     try {
         await connectToDatabase();
 
@@ -331,7 +338,7 @@ exports.resetPassword = async (req, res) => {
     }
 };
 
-exports.updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
     try {
         await connectToDatabase();
         const { userId, name, email, website, companyName, phone, currentPassword, newPassword, profileType } = req.body;
@@ -383,7 +390,7 @@ exports.updateProfile = async (req, res) => {
 
 
 
-exports.updatePassword = async (req, res) => {
+export const updatePassword = async (req, res) => {
     try {
         await connectToDatabase();
 
@@ -414,7 +421,7 @@ exports.updatePassword = async (req, res) => {
     }
 };
 
-exports.deleteAccount = async (req, res) => {
+export const deleteAccount = async (req, res) => {
     try {
         await connectToDatabase();
 
@@ -450,7 +457,7 @@ exports.deleteAccount = async (req, res) => {
     }
 };
 
-exports.resendOTP = async (req, res) => {
+export const resendOTP = async (req, res) => {
     try {
         await connectToDatabase();
 
@@ -494,7 +501,7 @@ exports.resendOTP = async (req, res) => {
     }
 };
 
-exports.getProfile = async (req, res) => {
+export const getProfile = async (req, res) => {
     try {
         await connectToDatabase();
         const { userId } = req.body;
@@ -536,7 +543,7 @@ exports.getProfile = async (req, res) => {
     }
 }
 
-exports.getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
     try {
         const verifiedUsers = await User.find({ isOtpVerified: true });
         
@@ -552,5 +559,113 @@ exports.getAllUsers = async (req, res) => {
             message: "Internal server error",
             error: error.message
         });
+    }
+};
+
+export const requestAccountDeletion = async (req, res) => {
+    try {
+        await connectToDatabase();
+
+        const { userId } = req.body; 
+        
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is required' });
+        }
+
+        const user = await User.findOne({userId:userId});
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (user.deletionRequest && user.deletionRequest.requested && user.deletionRequest.status === 'pending') {
+            return res.status(400).json({ message: 'Deletion request already pending' });
+        }
+
+        user.deletionRequest = {
+            requested: true,
+            status: 'pending',
+            requestedAt: new Date()
+        };
+
+        await user.save();
+
+        res.status(200).json({ 
+            message: 'Account deletion request submitted. Waiting for admin approval.',
+            requestStatus: 'pending'
+        });
+    } catch (error) {
+        console.error('Account deletion request error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+export const getPendingDeletionRequests = async (req, res) => {
+    try {
+        await connectToDatabase();
+
+        const pendingRequests = await User.find({ 
+            'deletionRequest.requested': true,
+            'deletionRequest.status': 'pending'
+        }).select('-password -otp');
+
+        res.status(200).json({message:"Recieved Successfully Deletion Request",pendingRequests});
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+export const approveDeletionRequest = async (req, res) => {
+    try {
+        await connectToDatabase();
+
+        const { userId } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (!user.deletionRequest.requested || user.deletionRequest.status !== 'pending') {
+            return res.status(400).json({ message: 'No pending deletion request for this user' });
+        }
+
+        user.deletionRequest.status = 'approved';
+        user.deletionRequest.processedAt = new Date();
+
+        await user.save();
+
+        await User.findByIdAndDelete(userId);
+
+        res.status(200).json({ message: 'Account deletion approved and user account removed' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+export const rejectDeletionRequest = async (req, res) => {
+    try {
+        await connectToDatabase();
+        const { reason,userId } = req.body; 
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (!user.deletionRequest.requested || user.deletionRequest.status !== 'pending') {
+            return res.status(400).json({ message: 'No pending deletion request for this user' });
+        }
+
+        user.deletionRequest.status = 'rejected';
+        user.deletionRequest.processedAt = new Date();
+
+        await user.save();
+
+        res.status(200).json({ 
+            message: 'Account deletion request rejected',
+            reason: reason || 'No reason provided'
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
