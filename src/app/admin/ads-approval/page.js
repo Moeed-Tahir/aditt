@@ -7,10 +7,14 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import RejectDialog from "@/components/RejectDialog";
 
 export default function AdsApproval() {
   const [loading, setLoading] = useState(false);
   const [approvalData, setApprovalData] = useState([]);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
+
   console.log("approvalData", approvalData);
 
   const router = useRouter();
@@ -18,7 +22,9 @@ export default function AdsApproval() {
   const fetchApprovalData = async () => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/routes/v1/campaignRoutes?action=getPendingCampaign",);
+      const response = await axios.post(
+        "/api/routes/v1/campaignRoutes?action=getPendingCampaign"
+      );
       setApprovalData(response.data.data);
     } catch (error) {
       console.error("Error fetching campaigns:", error);
@@ -31,10 +37,13 @@ export default function AdsApproval() {
   const handleCampaignAction = async (campaignId, action) => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/routes/v1/campaignRoutes?action=activeOrRejectCampaign", {
-        id: campaignId,
-        status: action === "accept" ? "Active" : "Rejected"
-      });
+      const response = await axios.post(
+        "/api/routes/v1/campaignRoutes?action=activeOrRejectCampaign",
+        {
+          id: campaignId,
+          status: action === "accept" ? "Active" : "Rejected",
+        }
+      );
 
       if (response.data.success) {
         fetchApprovalData();
@@ -68,32 +77,42 @@ export default function AdsApproval() {
       label: "WEBSITE LINK",
       key: "websiteLink",
       render: (item) => (
-        <a href={item.websiteLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+        <a
+          href={item.websiteLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline"
+        >
           {item.websiteLink}
         </a>
-      )
+      ),
     },
     {
       label: "STATUS",
       key: "status",
       render: (item) => (
-        <span className={`px-2 py-1 rounded-full text-xs ${item.status === "Active" ? "bg-green-100 text-green-800" :
-          item.status === "Pending" ? "bg-yellow-100 text-yellow-800" :
-            "bg-red-100 text-red-800"
-          }`}>
+        <span
+          className={`px-2 py-1 rounded-full text-xs ${
+            item.status === "Active"
+              ? "bg-green-100 text-green-800"
+              : item.status === "Pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
           {item.status}
         </span>
-      )
+      ),
     },
     {
       label: "GENDER TARGETING",
       key: "genderType",
-      render: (item) => `${item.genderType} (${item.genderRatio}%)`
+      render: (item) => `${item.genderType} (${item.genderRatio}%)`,
     },
     {
       label: "BUDGET",
       key: "campaignBudget",
-      render: (item) => `$${item.campaignBudget}`
+      render: (item) => `$${item.campaignBudget}`,
     },
     {
       label: "DATES",
@@ -104,7 +123,7 @@ export default function AdsApproval() {
           <span>to</span>
           <span>{new Date(item.campaignEndDate).toLocaleDateString()}</span>
         </div>
-      )
+      ),
     },
   ];
 
@@ -122,7 +141,10 @@ export default function AdsApproval() {
         Accept
       </button>
       <button
-        onClick={() => handleCampaignAction(campaign._id, "reject")}
+        onClick={() => {
+          setSelectedCampaign(campaign);
+          setShowRejectDialog(true);
+        }}
         className="text-xs font-medium px-3 py-1 rounded-full bg-red-100 text-red-700 hover:bg-red-200"
       >
         Reject
@@ -152,6 +174,37 @@ export default function AdsApproval() {
         getActions={getAdsApprovalActions}
         loading={loading}
       />
+      <RejectDialog
+  open={showRejectDialog}
+  onClose={() => {
+    setShowRejectDialog(false);
+    setSelectedCampaign(null);
+  }}
+  onSave={async (formData) => {
+    try {
+      // call the same API with rejection reason
+      const response = await axios.post("/api/routes/v1/campaignRoutes?action=activeOrRejectCampaign", {
+        id: selectedCampaign._id,
+        status: "Rejected",
+        reason: formData.name, // or whatever you name the field
+      });
+
+      if (response.data.success) {
+        toast.success("Campaign rejected successfully");
+        fetchApprovalData();
+      } else {
+        toast.error("Failed to reject campaign");
+      }
+    } catch (error) {
+      console.error("Rejection failed:", error);
+      toast.error("Something went wrong");
+    } finally {
+      setShowRejectDialog(false);
+      setSelectedCampaign(null);
+    }
+  }}
+/>
+
     </SidebarProvider>
   );
 }
