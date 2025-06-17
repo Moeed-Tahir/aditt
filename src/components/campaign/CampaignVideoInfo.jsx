@@ -1,4 +1,3 @@
-// components/campaign/CampaignVideoInfo.jsx
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { Copy } from "lucide-react";
@@ -13,12 +12,21 @@ export const CampaignVideoInfo = ({ campaignData }) => {
     }
   };
 
+  // Format date range
+  const formatDateRange = () => {
+    if (!campaignData?.campaignStartDate || !campaignData?.campaignEndDate) return "N/A";
+    
+    const startDate = new Date(campaignData.campaignStartDate).toLocaleDateString();
+    const endDate = new Date(campaignData.campaignEndDate).toLocaleDateString();
+    return `${startDate} - ${endDate}`;
+  };
+
   return (
     <div className="flex flex-col md:flex-row gap-6">
       <div className="flex-shrink-0 w-full md:w-auto">
         <video
           ref={videoRef}
-          src={campaignData.campaignVideoUrl}
+          src={campaignData?.campaignVideoUrl}
           controls
           className="rounded-lg object-cover w-full md:w-[170px] h-[200px]"
           onLoadedMetadata={handleLoadedMetadata}
@@ -28,17 +36,17 @@ export const CampaignVideoInfo = ({ campaignData }) => {
       <div className="flex-1 flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <h2 className="text-[24px] sm:text-2xl font-md text-gray-900">
-            {campaignData.campaignTitle}
+            {campaignData?.campaignTitle || "No title"}
           </h2>
           <span className="text-xs font-medium bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
-            {campaignData.status}
+            {campaignData?.status || "Unknown status"}
           </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 rounded-lg overflow-hidden bg-gray-50 md:bg-transparent p-2 md:p-0">
           <div className="text-[18px] text-gray-400">UTM Link:</div>
           <a className="flex-1 min-w-0 text-black text-[18px] break-all px-3 py-2">
-            {campaignData.websiteLink}
+            {campaignData?.websiteLink || "No link provided"}
           </a>
           <Copy className="text-blue-600 hover:text-blue-800 cursor-pointer" />
         </div>
@@ -53,11 +61,7 @@ export const CampaignVideoInfo = ({ campaignData }) => {
               <span className="min-w-[130px] text-gray-400">
                 Campaign Length:
               </span>
-              <span>
-                {`${new Date(
-                  campaignData.campaignStartDate
-                ).toLocaleDateString()}`}
-              </span>
+              <span>{formatDateRange()}</span>
             </div>
           </div>
 
@@ -67,18 +71,17 @@ export const CampaignVideoInfo = ({ campaignData }) => {
                 Target Audience Age:
               </span>
               <span>
-                {Array.isArray(campaignData.ageRange)
-                  ? `${campaignData.ageRange[0]} - ${campaignData.ageRange[1]} Years`
-                  : "N/A"}
+                {campaignData?.age || "N/A"} Years
               </span>
             </div>
             <div className="flex flex-wrap">
               <span className="min-w-[160px] md:pl-10 text-gray-400">
                 Target Audience Gender:{" "}
               </span>
-              <span>{`${campaignData.genderRatio} / ${
-                100 - campaignData.genderRatio
-              }`}</span>
+              <span>{campaignData?.genderType === "male" 
+                ? `${campaignData?.genderRatio || 0}% Male / ${100 - (campaignData?.genderRatio || 0)}% Female` 
+                : `${100 - (campaignData?.genderRatio || 0)}% Male / ${campaignData?.genderRatio || 0}% Female`}
+              </span>
             </div>
           </div>
         </div>

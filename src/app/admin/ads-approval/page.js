@@ -6,6 +6,7 @@ import { GenericTablePage } from "@/components/admin/GenericTablePage";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function AdsApproval() {
   const [loading, setLoading] = useState(false);
@@ -51,6 +52,17 @@ export default function AdsApproval() {
     {
       label: "CAMPAIGN TITLE",
       key: "campaignTitle",
+      render: (item) => (
+        <Link
+          href={{
+            pathname: "/admin/ads-overview",
+            query: { data: JSON.stringify(item) },
+          }}
+          className="text-blue-600 hover:underline"
+        >
+          {item.campaignTitle}
+        </Link>
+      ),
     },
     {
       label: "WEBSITE LINK",
@@ -66,8 +78,8 @@ export default function AdsApproval() {
       key: "status",
       render: (item) => (
         <span className={`px-2 py-1 rounded-full text-xs ${item.status === "Active" ? "bg-green-100 text-green-800" :
-            item.status === "Pending" ? "bg-yellow-100 text-yellow-800" :
-              "bg-red-100 text-red-800"
+          item.status === "Pending" ? "bg-yellow-100 text-yellow-800" :
+            "bg-red-100 text-red-800"
           }`}>
           {item.status}
         </span>

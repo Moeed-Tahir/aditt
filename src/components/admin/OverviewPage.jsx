@@ -9,25 +9,55 @@ import { SurveyDetails } from "@/components/campaign/SurveyDetails";
 import { PerformanceSummary } from "@/components/campaign/PerformanceSummary";
 import EngagementChart from "@/components/AreaCharts";
 import CampaignFeedbackForm from "../CampaignFeedbackForm";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "sonner";
 
-export function OverViewPage() {
-  const campaignData = {
-    title: "Dummy Campaign Title",
-    views: 1200,
-    videoUrl: "https://www.example.com/sample.mp4",
-    budget: 1000,
-    spent: 750,
-    quizQuestion: "What's your favorite color?",
-    genderRatio: { male: 60, female: 40 },
-    surveyQuestion1: "Where did you hear about us?",
-    surveyQuestion2: "Would you recommend our service?",
-    engagements: 350,
-    performance: {
-      clicks: 180,
-      impressions: 5000,
-      conversions: 45,
-    },
+export function OverViewPage({ id }) {
+  const [campaignData, setCampaignData] = useState([]);
+  const [feedbackData, setFeedbackData] = useState([]);
+  console.log("id", id);
+  console.log("campaignData", campaignData);
+
+  // const campaignData = {
+  //   title: "Dummy Campaign Title",
+  //   views: 1200,
+  //   videoUrl: "https://www.example.com/sample.mp4",
+  //   budget: 1000,
+  //   spent: 750,
+  //   quizQuestion: "What's your favorite color?",
+  //   genderRatio: { male: 60, female: 40 },
+  //   surveyQuestion1: "Where did you hear about us?",
+  //   surveyQuestion2: "Would you recommend our service?",
+  //   engagements: 350,
+  //   performance: {
+  //     clicks: 180,
+  //     impressions: 5000,
+  //     conversions: 45,
+  //   },
+  // };
+
+  const fetchCampaign = async () => {
+    try {
+
+      const response = await axios.post("/api/routes/v1/campaignRoutes?action=getCampaignAgainstId", {
+        id: id
+      });
+      console.log("response", response);
+      if(response.data.message === "Campaign Retrieved Successfully"){
+      setCampaignData(response.data.campaign);
+      setFeedbackData(response.data.feedback);
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error is occur");
+
+      console.error('Error creating campaign:', error);
+    }
   };
+
+  useEffect(() => {
+    fetchCampaign()
+  }, [id]);
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
@@ -40,14 +70,13 @@ export function OverViewPage() {
           <CampaignVideoInfo campaignData={campaignData} />
         </div>
 
-        <CampaignFeedbackForm />
+        <CampaignFeedbackForm feedbackData={feedbackData} />
 
         <div className="bg-white p-4 sm:p-6 rounded-[24px] shadow">
           <h2 className="text-lg font-semibold mb-2">Budget & Spending</h2>
           <BudgetSummary campaignData={campaignData} />
         </div>
 
-        {/* Quiz and Survey */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white p-4 sm:p-6 rounded-[24px] shadow">
             <QuizDetails

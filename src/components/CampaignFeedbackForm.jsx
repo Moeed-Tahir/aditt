@@ -1,18 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input"; // adjust path if needed
+import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
 import Sliders from "./Sliders";
 
-export default function CampaignFeedbackForm() {
-  const [conversions, setConversions] = useState("12");
+export default function CampaignFeedbackForm({ feedbackData }) {
+  const [conversions, setConversions] = useState(feedbackData?.conversion || "");
   const [conversionType, setConversionType] = useState(
-    "📱 Entertainment & Technology"
+    feedbackData?.conversionType || ""
   );
-  const [satisfaction, setSatisfaction] = useState([3]);
+  const [satisfaction, setSatisfaction] = useState(
+    feedbackData?.campaignRate ? [feedbackData.campaignRate] : [3]
+  );
   const [feedback, setFeedback] = useState(
-    "We were able to see that 21–23 year olds resonated the most with our app and the content as they made up 80% of our conversions. Although, we would have liked to have been able to see where users dropped off when skipping our video."
+    feedbackData?.campaignFeedback || ""
   );
+
+  useEffect(() => {
+    if (feedbackData) {
+      setConversions(feedbackData.conversion || "");
+      setConversionType(feedbackData.conversionType || "");
+      setSatisfaction(feedbackData.campaignRate ? [feedbackData.campaignRate] : [3]);
+      setFeedback(feedbackData.campaignFeedback || "");
+    }
+  }, [feedbackData]);
 
   return (
     <div className="bg-white rounded-[24px] p-6 shadow space-y-6 w-full">

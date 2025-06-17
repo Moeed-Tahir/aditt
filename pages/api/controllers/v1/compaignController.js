@@ -139,9 +139,21 @@ exports.getCampaignAgainstId = async (req, res) => {
             });
         }
 
+        const campaignFeedback = await CampaignFeedback.findOne({ campaignId: id });
+        const isCompleted = !!campaignFeedback;
+
         res.status(200).json({
             message: 'Campaign Retrieved Successfully',
-            campaign: campaign
+            campaign: campaign,
+            isCompleted: isCompleted,
+            ...(isCompleted && {
+                feedback: {
+                    conversion: campaignFeedback.conversion,
+                    conversionType: campaignFeedback.conversionType,
+                    campaignRate: campaignFeedback.campaignRate,
+                    campaignFeedback: campaignFeedback.campaignFeedback
+                }
+            })
         });
 
     } catch (error) {
@@ -472,6 +484,26 @@ exports.activeOrRejectCampaign = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Error updating campaign status",
+            error: error.message
+        });
+    }
+}
+
+exports.getAllCampaign = async (req, res) => {
+    try {
+        await connectToDatabase();
+
+        const campaigns = await Compaign.find({ status: { $ne: "Pending" } });
+        
+        res.status(200).json({
+            success: true,
+            data: campaigns,
+            message: "Campaigns retrieved successfully"
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve campaigns",
             error: error.message
         });
     }
