@@ -21,7 +21,8 @@ export function GenericTablePage({
   headerAction = null,
   showHeaderProfile,
   headerProfile = null,
-  fetchData
+  fetchData,
+  compactLayout = false,
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState(null);
@@ -70,16 +71,16 @@ export function GenericTablePage({
     setIsDeleteModalOpen(true);
   };
 
-const deleteAccount = async () => {
+  const deleteAccount = async () => {
     if (!itemToDelete) return;
-    console.log("itemToDelete",itemToDelete);
+    console.log("itemToDelete", itemToDelete);
 
     setIsDeleting(true);
     try {
       const response = await axios.post(
         "/api/routes/v1/authRoutes?action=deleteAccount",
         {
-          userId: itemToDelete.userId
+          userId: itemToDelete.userId,
         }
       );
 
@@ -97,7 +98,8 @@ const deleteAccount = async () => {
       console.error("Account deletion failed:", error);
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to delete account",
+        description:
+          error.response?.data?.message || "Failed to delete account",
         variant: "destructive",
       });
     } finally {
@@ -129,9 +131,14 @@ const deleteAccount = async () => {
   );
 
   return (
-    <main className="flex h-auto min-h-screen w-full flex-col gap-0 bg-[var(--bg-color-off-white)]">
-      <Navbar />
-      <div className="p-4 sm:p-6">
+    <main
+      className={`flex h-auto min-h-screen w-full flex-col ${
+        compactLayout ? "" : "bg-[var(--bg-color-off-white)]"
+      }`}
+    >
+      {" "}
+      {!compactLayout && <Navbar />}
+      <div className={`${compactLayout ? "" : "p-4 sm:p-6"}`}>
         {showHeaderProfile && headerProfile && (
           <div className="max-w-[1440px] bg-white rounded-[15px] p-[0px] gap-[10px] mx-auto">
             <div className="flex items-center justify-between flex-wrap gap-4">
@@ -144,7 +151,7 @@ const deleteAccount = async () => {
 
         <div className="max-w-[1440px] mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6">
-            <p className="text-[30px] font-md">{showHeaderAction && title}</p>
+            <p className="text-[30px] font-md">{showHeaderAction}</p>
             {showHeaderAction && headerAction}
           </div>
         </div>
@@ -228,40 +235,45 @@ const deleteAccount = async () => {
                 Showing {paginatedData.length} of {filteredData.length} results
               </p>
               <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                >
-                  Previous
-                </Button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <Button
-                      key={page}
-                      size="sm"
-                      variant={page === currentPage ? "default" : "outline"}
-                      onClick={() => setCurrentPage(page)}
-                    >
-                      {page}
-                    </Button>
-                  )
-                )}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                >
-                  Next
-                </Button>
-              </div>
+  <Button
+    size="sm"
+    variant="outline"
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage(currentPage - 1)}
+  >
+    Previous
+  </Button>
+
+  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+    <Button
+      key={page}
+      size="sm"
+      variant={page === currentPage ? "default" : "outline"}
+      onClick={() => setCurrentPage(page)}
+      className={
+        page === currentPage
+          ? "bg-blue-600 text-white hover:bg-blue-700"
+          : ""
+      }
+    >
+      {page}
+    </Button>
+  ))}
+
+  <Button
+    size="sm"
+    variant="outline"
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage(currentPage + 1)}
+  >
+    Next
+  </Button>
+</div>
+
             </div>
           )}
         </div>
       </div>
-
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
