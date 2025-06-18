@@ -132,7 +132,7 @@ export function GenericTablePage({
 
   return (
     <main
-      className={`flex h-auto min-h-screen w-full flex-col ${
+      className={`flex h-auto w-full flex-col ${
         compactLayout ? "" : "bg-[var(--bg-color-off-white)]"
       }`}
     >

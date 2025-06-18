@@ -19,24 +19,26 @@ export function OverViewPage({ id }) {
 
   const fetchCampaign = async () => {
     try {
-
-      const response = await axios.post("/api/routes/v1/campaignRoutes?action=getCampaignAgainstId", {
-        id: id
-      });
+      const response = await axios.post(
+        "/api/routes/v1/campaignRoutes?action=getCampaignAgainstId",
+        {
+          id: id,
+        }
+      );
       console.log("response", response);
-      if(response.data.message === "Campaign Retrieved Successfully"){
-      setCampaignData(response.data.campaign);
-      setFeedbackData(response.data.feedback);
+      if (response.data.message === "Campaign Retrieved Successfully") {
+        setCampaignData(response.data.campaign);
+        setFeedbackData(response.data.feedback);
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Error is occur");
 
-      console.error('Error creating campaign:', error);
+      console.error("Error creating campaign:", error);
     }
   };
 
   useEffect(() => {
-    fetchCampaign()
+    fetchCampaign();
   }, [id]);
 
   return (
@@ -49,7 +51,9 @@ export function OverViewPage({ id }) {
           <CampaignVideoInfo campaignData={campaignData} />
         </div>
 
-        <CampaignFeedbackForm feedbackData={feedbackData} />
+        {campaignData?.status === "Completed" && (
+          <CampaignFeedbackForm feedbackData={feedbackData} />
+        )}
 
         <div className="bg-white p-4 sm:p-6 rounded-[24px] shadow">
           <h2 className="text-lg font-semibold mb-2">Budget & Spending</h2>
@@ -80,7 +84,10 @@ export function OverViewPage({ id }) {
 
         <div className="bg-white p-4 sm:p-6 rounded-[24px] shadow">
           <h2 className="text-lg font-semibold mb-2">Engagement Chart</h2>
-          <EngagementChart clicks={campaignData?.clickCount?.totalCount} videoWatchTime={campaignData?.videoWatchTime} />
+          <EngagementChart
+            clicks={campaignData?.clickCount?.totalCount}
+            videoWatchTime={campaignData?.videoWatchTime}
+          />
         </div>
       </div>
     </main>

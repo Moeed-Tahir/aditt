@@ -7,7 +7,7 @@ const CampaignHeader = ({ userId, openDialog, setFeedbackDialogOpen, campaignDat
 
   <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 p-4 sm:p-0">
     <Link
-      href={`/${userId}/campaign-dashboard`}
+      href={`/admin/total-campaigns`}
       className="order-1 sm:order-none py-2 px-5 sm:ml-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start"
     >
       <ArrowLeft />
