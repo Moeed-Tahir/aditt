@@ -14,8 +14,6 @@ export default function AccountDeleteRequests() {
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   
-  console.log("deletionData", deletionData);
-
   const fetchDeletionRequest = async () => {
     try {
       setLoading(true);

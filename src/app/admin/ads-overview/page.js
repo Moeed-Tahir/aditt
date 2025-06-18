@@ -9,8 +9,7 @@ import { useEffect, useState } from "react";
 export default function CampaignOverView() {
   const searchParams = useSearchParams();
   const [campaignData, setCampaignData] = useState(null);
-  console.log("campaignData", campaignData);
-
+  
   useEffect(() => {
     const dataParam = searchParams.get('data');
     if (dataParam) {

@@ -178,7 +178,7 @@ export default function AdversitersProfile() {
 
   const headerProfile = userData.user && (
     <div className="p-5">
-      <h1 className="text-gray-700">{userData.user.companyName}</h1>
+      <h1 className="text-gray-700">{userData.user.name}</h1>
       <p className="text-xs text-gray-500">
         Joining Date: {new Date(userData.user.createdAt).toLocaleDateString()}
       </p>

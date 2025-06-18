@@ -50,6 +50,33 @@ const QuestionSchema = new mongoose.Schema({
         type: String,
         required: false,
         trim: true
+    },
+    demographicStats: {
+        type: {
+            ageGroups: {
+                age18_24: {
+                    male: { type: Number, default: 0 },
+                    female: { type: Number, default: 0 },
+                    other: { type: Number, default: 0 }
+                },
+                age25_33: {
+                    male: { type: Number, default: 0 },
+                    female: { type: Number, default: 0 },
+                    other: { type: Number, default: 0 }
+                },
+                age35_44: {
+                    male: { type: Number, default: 0 },
+                    female: { type: Number, default: 0 },
+                    other: { type: Number, default: 0 }
+                },
+                age45Plus: {
+                    male: { type: Number, default: 0 },
+                    female: { type: Number, default: 0 },
+                    other: { type: Number, default: 0 }
+                }
+            }
+        },
+        required: false
     }
 });
 
@@ -249,6 +276,10 @@ const CompaignSchema = new mongoose.Schema({
             type: String,
             required: false
         }
+    },
+    videoWatchTime: {
+        type: Number,
+        required: false,
     },
     clickCount: {
         totalCount: {

@@ -101,9 +101,8 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange }) => {
                                 </span>
                             </div>
 
-                            <div className="relative flex-1">
+                            <div className="relative h-10 md:h-12">
                                 <CircleDollarSign className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
-
                                 <input
                                     type="number"
                                     name="budget"
