@@ -1,19 +1,19 @@
 "use client";
 import { useState, useRef } from "react";
 import Navbar2 from "@/components/Navbar2";
-import EngagementChart  from "@/components/AreaCharts";
+import EngagementChart from "@/components/AreaCharts";
 import ConfirmationDialogue from "@/components/ConfirmationDialogue";
 import Cookies from "js-cookie";
 import CampaignHeader from "@/components/campaign/CampaignHeader";
-import {CampaignVideoInfo} from "@/components/campaign/CampaignVideoInfo";
-import {CampaignExpiredAlert} from "@/components/campaign/CampaignExpiredAlert";
-import {BudgetSummary} from "@/components/campaign/BudgetSummary";
-import {QuizDetails} from "@/components/campaign/QuizDetails";
-import {SurveyDetails} from "@/components/campaign/SurveyDetails";
-import {PerformanceSummary} from "@/components/campaign/PerformanceSummary";
+import { CampaignVideoInfo } from "@/components/campaign/CampaignVideoInfo";
+import { CampaignExpiredAlert } from "@/components/campaign/CampaignExpiredAlert";
+import { BudgetSummary } from "@/components/campaign/BudgetSummary";
+import { QuizDetails } from "@/components/campaign/QuizDetails";
+import { SurveyDetails } from "@/components/campaign/SurveyDetails";
+import { PerformanceSummary } from "@/components/campaign/PerformanceSummary";
 import FeedbackDialog from "../campaign-dashboard/FeedbackDialog";
 
-export default function CampaignDetailPage({ campaignData,campaignId }) {
+export default function CampaignDetailPage({ campaignData, campaignId }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [showExpiredAlert, setShowExpiredAlert] = useState(true);
@@ -23,7 +23,7 @@ export default function CampaignDetailPage({ campaignData,campaignId }) {
     title: "",
     smallText: "",
     confirmLabel: "",
-    onConfirm: () => {},
+    onConfirm: () => { },
   });
 
   const openDialog = (title, smallText, confirmLabel, onConfirm) => {
@@ -45,8 +45,8 @@ export default function CampaignDetailPage({ campaignData,campaignId }) {
       <main className="flex min-h-screen w-full max-w-[1440px] mx-auto flex-col">
         <div className="p-6 space-y-6">
           <CampaignHeader
-          campaignId={campaignId}
-          campaignData={campaignData}
+            campaignId={campaignId}
+            campaignData={campaignData}
             userId={userId}
             openDialog={openDialog}
             setFeedbackDialogOpen={setFeedbackDialogOpen}
@@ -55,6 +55,25 @@ export default function CampaignDetailPage({ campaignData,campaignId }) {
           <div className="bg-white p-4 sm:p-6 rounded-[24px]">
             <CampaignVideoInfo campaignData={campaignData} />
           </div>
+
+          {/* Add rejection reason display */}
+          {campaignData.status === "Rejected" && campaignData.reason && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-[24px]">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">Campaign Rejected</h3>
+                  <div className="mt-2 text-sm text-red-700">
+                    <p>Reason : {campaignData.reason}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <CampaignExpiredAlert
             isCampaignExpired={isCampaignExpired}

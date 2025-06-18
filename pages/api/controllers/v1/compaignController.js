@@ -437,7 +437,7 @@ exports.getPendingCampaign = async (req, res) => {
 
 exports.activeOrRejectCampaign = async (req, res) => {
     try {
-        const {status,id } = req.body;
+        const { status, id, reason } = req.body;
 
         if (!status || (status !== "Active" && status !== "Rejected")) {
             return res.status(400).json({
@@ -453,16 +453,31 @@ exports.activeOrRejectCampaign = async (req, res) => {
             });
         }
 
+        if (status === "Rejected" && !reason) {
+            return res.status(400).json({
+                success: false,
+                message: "Reason is required when rejecting a campaign"
+            });
+        }
+
+        const updateFields = {
+            status: status,
+            updatedAt: new Date()
+        };
+
+        if (status === "Rejected") {
+            updateFields.reason = reason;
+        } else {
+            updateFields.reason = null;
+        }
+
         const updatedCampaign = await Compaign.findOneAndUpdate(
             { 
                 _id: id,
                 status: "Pending"
             },
             { 
-                $set: { 
-                    status: status,
-                    updatedAt: new Date() 
-                } 
+                $set: updateFields
             },
             { new: true } 
         );

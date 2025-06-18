@@ -263,6 +263,7 @@ export default function EditCampaign() {
         ageRange: formData.ageRange,
         campaignStartDate: formData.startDate.toISOString(),
         campaignEndDate: formData.endDate ? formData.endDate.toISOString() : null,
+        status: "Pending",
         cardDetail: {
           cardNumber: formData.cardNumber,
           cvc: formData.cvc,

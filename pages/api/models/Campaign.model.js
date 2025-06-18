@@ -165,6 +165,10 @@ const CompaignSchema = new mongoose.Schema({
         required: false,
         default: "Pending"
     },
+    reason: {
+        type: String,
+        required: function () { return this.status === "Rejected"; }
+    },
     websiteLink: {
         type: String,
         required: true,
