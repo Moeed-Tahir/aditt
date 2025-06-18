@@ -1,5 +1,7 @@
 const bcrypt = require("bcrypt");
 import User from '../../models/User.model';
+import Campaign from '../../models/Campaign.model';
+
 const { generateOTP, sendOTP } = require("../../services/otpServices");
 const jwt = require("jsonwebtoken");
 const connectToDatabase = require("../../config/dbConnect");
@@ -667,5 +669,33 @@ export const rejectDeletionRequest = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+export const getAllUserDataAgainstId = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        console.log("userId",userId);
+        
+        const user = await User.findOne({ userId });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const campaigns = await Campaign.find({ userId });
+
+        const userData = {
+            user: user.toObject(),
+            campaigns
+        };
+
+        res.status(200).json({ success: true, data: userData });
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error',
+            error: error.message 
+        });
     }
 };

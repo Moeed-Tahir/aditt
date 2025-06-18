@@ -13,7 +13,8 @@ import {
   requestAccountDeletion,
   getPendingDeletionRequests,
   rejectDeletionRequest,
-  approveDeletionRequest
+  approveDeletionRequest,
+  getAllUserDataAgainstId
 } from "../../controllers/v1/authControllers";
 
 export default async function handler(req, res) {
@@ -50,6 +51,8 @@ export default async function handler(req, res) {
           return await rejectDeletionRequest(req, res);
         case "approveDeletionRequest":
           return await approveDeletionRequest(req, res);
+        case "getAllUserDataAgainstId":
+          return await getAllUserDataAgainstId(req, res);
         default:
           return res.status(400).json({ message: "Invalid action parameter" });
       }

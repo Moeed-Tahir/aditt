@@ -17,6 +17,7 @@ import {
   EllipsisVertical,
 } from "lucide-react";
 import CampaignActionsDropdown from "../campaign/CampaignActionsDropdown";
+import Link from "next/link";
 
 export function GenericTablePage({
   title = "Data Table",
@@ -224,13 +225,16 @@ export function GenericTablePage({
                         renderActions(item)
                       ) : (
                         <div className="flex gap-2">
+                          <Link
+                            href={{
+                              pathname: "/admin/advertisers-profile",
+                              query: { id: item.userId },
+                            }}
+                            className="hover:underline"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Link>
                           <Trash className="w-4 h-4" />
-                          <Eye className="w-4 h-4" />
-                          <CampaignActionsDropdown
-                            customTrigger={
-                              <EllipsisVertical className="w-4 h-4" />
-                            }
-                          />
                         </div>
                       )}
                     </td>
@@ -251,9 +255,8 @@ export function GenericTablePage({
                     key={page}
                     size="sm"
                     variant={page === currentPage ? "default" : "outline"}
-                    className={`rounded-full ${
-                      page === currentPage ? "bg-blue-500 text-white" : ""
-                    }`}
+                    className={`rounded-full ${page === currentPage ? "bg-blue-500 text-white" : ""
+                      }`}
                     onClick={() => setCurrentPage(page)}
                   >
                     {page}

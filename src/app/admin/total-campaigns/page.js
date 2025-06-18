@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { EllipsisVertical, Play, Pause, Trash } from "lucide-react";
+import { EllipsisVertical, Play, Pause, CheckCheck } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -92,6 +92,10 @@ export default function TotalCampaigns() {
   ];
 
   const getCampaignsActions = (campaign) => {
+    if (campaign.status === 'Completed') {
+      return null;
+    }
+
     const updateCampaignStatus = async (status, id) => {
       try {
         const response = await axios.post('/api/routes/v1/campaignRoutes?action=campaignStatusUpdate', {
@@ -120,34 +124,30 @@ export default function TotalCampaigns() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {campaign.status !== 'Completed' && (
-            <>
-              <DropdownMenuItem
-                onClick={() => updateCampaignStatus(
-                  campaign.status === 'Active' ? 'Paused' : 'Active',
-                  campaign._id
-                )}
-              >
-                {campaign.status === 'Active' ? (
-                  <>
-                    <Pause className="h-4 w-4 mr-2" />
-                    Pause
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4 mr-2" />
-                    Activate
-                  </>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => updateCampaignStatus('Completed', campaign._id)}
-              >
-                <Trash className="h-4 w-4 mr-2" />
-                Mark as Completed
-              </DropdownMenuItem>
-            </>
-          )}
+          <DropdownMenuItem
+            onClick={() => updateCampaignStatus(
+              campaign.status === 'Active' ? 'Paused' : 'Active',
+              campaign._id
+            )}
+          >
+            {campaign.status === 'Active' ? (
+              <>
+                <Pause className="h-4 w-4 mr-2" />
+                Pause
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4 mr-2" />
+                Activate
+              </>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => updateCampaignStatus('Completed', campaign._id)}
+          >
+            <CheckCheck className="h-4 w-4 mr-2" />
+            Mark as Completed
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     );

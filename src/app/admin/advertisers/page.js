@@ -2,13 +2,11 @@
 
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { GenericTablePage } from "@/components/admin/GenericTablePage"; // adjust path
+import { GenericTablePage } from "@/components/admin/GenericTablePage";
 import Link from "next/link";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-
-
 export default function Adversiters() {
   const [advertiserUser, setAdvertiserUser] = useState([]);
   console.log("advertiserUser", advertiserUser);
@@ -17,7 +15,6 @@ export default function Adversiters() {
     try {
       const response = await axios.post("/api/routes/v1/authRoutes?action=getAllUsers");
       if (response.data.success) {
-        // Add default values for missing fields
         const usersWithDefaults = response.data.data.map(user => ({
           ...user,
           numOfAds: user.numOfAds || 0,
@@ -45,7 +42,7 @@ export default function Adversiters() {
           <Link
             href={{
               pathname: "/admin/advertisers-profile",
-              query: { id: advertiser._id }, // using _id is more reliable than name
+              query: { id: advertiser.userId },
             }}
             className="hover:underline"
           >

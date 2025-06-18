@@ -2,117 +2,180 @@
 
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { GenericTablePage } from "@/components/admin/GenericTablePage"; // adjust path
-import { EllipsisVertical } from "lucide-react";
-import CampaignActionsDropdown from "@/components/campaign/CampaignActionsDropdown";
+import { GenericTablePage } from "@/components/admin/GenericTablePage";
+import { CheckCheck, EllipsisVertical, Pause, Play } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-
-const dummyData = [
-  {
-    _id: "1",
-    title: "Nike Campaign",
-    categories: "Entertainment and Technology",
-    dob: "1985-09-12",
-    totalViews: "03",
-    totalSpent: "150",
-    status: "Active",
-  },
-  {
-    _id: "2",
-    title: "Adidas Campaign",
-    categories: "Food and Drink",
-    dob: "1985-09-12",
-    totalViews: "05",
-    totalSpent: "250",
-    status: "Completed",
-  },
-
-  {
-    _id: "3",
-    title: "Nike Campaign",
-    categories: "Entertainment and Technology",
-    dob: "1985-09-12",
-    totalViews: "03",
-    totalSpent: "150",
-    status: "Active",
-  },
-  {
-    _id: "4",
-    title: "Adidas Campaign",
-    categories: "Food and Drink",
-    dob: "1985-09-12",
-    totalViews: "05",
-    totalSpent: "250",
-    status: "Pending",
-  },
-];
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export default function AdversitersProfile() {
   const searchParams = useSearchParams();
-  const name = searchParams.get("name");
+  const id = searchParams.get("id");
+  const [userData, setUserData] = useState({ user: null, campaigns: [] });
+  const [loading, setLoading] = useState(false);
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        "/api/routes/v1/authRoutes?action=getAllUserDataAgainstId", 
+        { userId: id }
+      );
+
+      if (response.data.success) {
+        setUserData(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      toast.error("Failed to fetch user data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchUserData();
+    }
+  }, [id]);
 
   const columns = [
     {
       label: "Title",
-      key: "title",
-      render: (adverstisersProfile) => (
+      key: "campaignTitle",
+      render: (campaign) => (
         <div className="flex items-center gap-2">
           <div>
-            <div>{adverstisersProfile.title}</div>
+            <div>{campaign.campaignTitle}</div>
+            <div className="text-xs text-gray-500">{campaign.brandName || "No brand name"}</div>
           </div>
         </div>
       ),
     },
-    { label: "Categories", key: "categories" },
+    {
+      label: "Type",
+      key: "profileType",
+      render: () => userData.user?.profileType || "N/A"
+    },
     {
       label: "Total Views",
       key: "totalViews",
-      render: (u) => `${u.totalViews}k`,
+      render: (campaign) => `${campaign.totalViews}`,
     },
     {
-      label: "DOB",
-      key: "dob",
-      render: (user) => new Date(user.dob).toLocaleDateString(),
+      label: "Date",
+      key: "createdAt",
+      render: (campaign) => new Date(campaign.createdAt).toLocaleDateString(),
     },
     {
       label: "Status",
       key: "status",
-      render: (c) => (
+      render: (campaign) => (
         <span
           className={`text-xs font-medium px-3 py-1 rounded-full ${
-            c.status === "Active"
+            campaign.status === "Active"
               ? "bg-blue-100 text-blue-700"
-              : c.status === "Pending"
+              : campaign.status === "Pending"
               ? "bg-yellow-100 text-yellow-700"
+              : campaign.status === "Rejected"
+              ? "bg-red-100 text-red-700"
               : "bg-green-100 text-green-700"
           }`}
         >
-          {c.status}
+          {campaign.status}
         </span>
       ),
     },
-    { label: "Budget", key: "totalSpent", render: (u) => `$${u.totalSpent}` },
+    { 
+      label: "Budget", 
+      key: "campaignBudget", 
+      render: (campaign) => `$${campaign.campaignBudget}` 
+    },
   ];
 
   const sortOptions = [
-    { label: "A to Z", value: (a, b) => a.name.localeCompare(b.name) },
-    { label: "Z to A", value: (a, b) => b.name.localeCompare(a.name) },
+    { label: "A to Z", value: (a, b) => a.campaignTitle.localeCompare(b.campaignTitle) },
+    { label: "Z to A", value: (a, b) => b.campaignTitle.localeCompare(a.campaignTitle) },
+    { label: "Newest", value: (a, b) => new Date(b.createdAt) - new Date(a.createdAt) },
+    { label: "Oldest", value: (a, b) => new Date(a.createdAt) - new Date(b.createdAt) },
   ];
 
-  const getProfileActions = (adverstisersProfile) => (
-    <CampaignActionsDropdown
-      customTrigger={
-        <EllipsisVertical className="w-5 h-5 cursor-pointer text-gray-600" />
+  const getProfileActions = (campaign) => {
+    if (campaign.status === 'Completed') {
+      return null;
+    }
+
+    const updateCampaignStatus = async (status, id) => {
+      try {
+        const response = await axios.post('/api/routes/v1/campaignRoutes?action=campaignStatusUpdate', {
+          status,
+          id: id || campaign._id
+        });
+
+        if (response.status !== 200) {
+          throw new Error(response.data.message || 'Failed to update status');
+        }
+
+        toast.success(`Campaign ${status.toLowerCase()} successfully`);
+        fetchUserData();
+        return response.data;
+      } catch (error) {
+        console.error('Error updating campaign status:', error);
+        toast.error(error?.response?.data?.message || "Error occurred");
       }
-    />
-  );
+    };
 
-  const headerProfile = (
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <EllipsisVertical className="w-5 h-5 cursor-pointer text-gray-600" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            onClick={() => updateCampaignStatus(
+              campaign.status === 'Active' ? 'Paused' : 'Active',
+              campaign._id
+            )}
+          >
+            {campaign.status === 'Active' ? (
+              <>
+                <Pause className="h-4 w-4 mr-2" />
+                Pause
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4 mr-2" />
+                Activate
+              </>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => updateCampaignStatus('Completed', campaign._id)}
+          >
+            <CheckCheck className="h-4 w-4 mr-2" />
+            Mark as Completed
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
+  const headerProfile = userData.user && (
     <div className="p-5">
-
-      <h1 className="text-gray-700">TESTING</h1>
-
-      <p className="text-xs text-gray-500">Joingin Date: 14/02/2025</p>
+      <h1 className="text-gray-700">{userData.user.companyName}</h1>
+      <p className="text-xs text-gray-500">
+        Joining Date: {new Date(userData.user.createdAt).toLocaleDateString()}
+      </p>
 
       <div className="flex flex-wrap items-center gap-x-8 gap-y-2 pt-2">
         <p className="text-sm text-blue-600">
@@ -120,17 +183,19 @@ export default function AdversitersProfile() {
         </p>
         <p className="text-sm text-blue-600">
           Business Email:{" "}
-          <span className="text-gray-600">business@gmail.com</span>
+          <span className="text-gray-600">{userData.user.businessEmail}</span>
         </p>
         <p className="text-sm text-blue-600">
           Business Website:{" "}
-          <span className="text-gray-600">www.business.com</span>
+          <span className="text-gray-600">{userData.user.businessWebsite}</span>
         </p>
         <p className="text-sm text-blue-600">
-          Ads Run: <span className="text-gray-600">10</span>
+          Ads Run: <span className="text-gray-600">{userData.campaigns.length}</span>
         </p>
         <p className="text-sm text-blue-600">
-          Total Spent: <span className="text-gray-600">$500</span>
+          Total Spent: <span className="text-gray-600">
+            ${userData.campaigns.reduce((total, campaign) => total + Number(campaign.campaignBudget || 0), 0)}
+          </span>
         </p>
       </div>
     </div>
@@ -141,13 +206,18 @@ export default function AdversitersProfile() {
       <AppSidebar mode="admin" />
       <GenericTablePage
         title="ALL CAMPAIGNS"
-        data={dummyData}
+        data={userData.campaigns || []}
         columns={columns}
         sortOptions={sortOptions}
-        filters={{ dateKey: "dob", statusKey: "status" }}
+        filters={{ 
+          dateKey: "createdAt", 
+          statusKey: "status",
+          searchKeys: ["campaignTitle", "brandName", "status"]
+        }}
         getActions={getProfileActions}
         showHeaderProfile={true}
         headerProfile={headerProfile}
+        loading={loading}
       />
     </SidebarProvider>
   );
