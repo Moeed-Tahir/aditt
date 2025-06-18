@@ -29,7 +29,7 @@ export default function Navbar({ userId = "" }) {
   const handleLogout = () => {
     Cookies.remove("email");
     Cookies.remove("Role");
-    window.location.href = "/sign-in-user"; 
+    window.location.href = "/signin-user"; 
   };
 
   return (
