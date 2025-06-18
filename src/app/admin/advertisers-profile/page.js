@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function AdversitersProfile() {
   const searchParams = useSearchParams();
@@ -26,7 +27,7 @@ export default function AdversitersProfile() {
     try {
       setLoading(true);
       const response = await axios.post(
-        "/api/routes/v1/authRoutes?action=getAllUserDataAgainstId", 
+        "/api/routes/v1/authRoutes?action=getAllUserDataAgainstId",
         { userId: id }
       );
 
@@ -52,12 +53,18 @@ export default function AdversitersProfile() {
       label: "Title",
       key: "campaignTitle",
       render: (campaign) => (
-        <div className="flex items-center gap-2">
+        <Link
+          href={{
+            pathname: "/admin/campaign-overview",
+            query: { id: campaign._id },
+          }}
+          className="flex items-center gap-2 hover:text-blue-600"
+        >
           <div>
             <div>{campaign.campaignTitle}</div>
             <div className="text-xs text-gray-500">{campaign.brandName || "No brand name"}</div>
           </div>
-        </div>
+        </Link>
       ),
     },
     {
@@ -80,24 +87,23 @@ export default function AdversitersProfile() {
       key: "status",
       render: (campaign) => (
         <span
-          className={`text-xs font-medium px-3 py-1 rounded-full ${
-            campaign.status === "Active"
+          className={`text-xs font-medium px-3 py-1 rounded-full ${campaign.status === "Active"
               ? "bg-blue-100 text-blue-700"
               : campaign.status === "Pending"
-              ? "bg-yellow-100 text-yellow-700"
-              : campaign.status === "Rejected"
-              ? "bg-red-100 text-red-700"
-              : "bg-green-100 text-green-700"
-          }`}
+                ? "bg-yellow-100 text-yellow-700"
+                : campaign.status === "Rejected"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-green-100 text-green-700"
+            }`}
         >
           {campaign.status}
         </span>
       ),
     },
-    { 
-      label: "Budget", 
-      key: "campaignBudget", 
-      render: (campaign) => `$${campaign.campaignBudget}` 
+    {
+      label: "Budget",
+      key: "campaignBudget",
+      render: (campaign) => `$${campaign.campaignBudget}`
     },
   ];
 
@@ -209,8 +215,8 @@ export default function AdversitersProfile() {
         data={userData.campaigns || []}
         columns={columns}
         sortOptions={sortOptions}
-        filters={{ 
-          dateKey: "createdAt", 
+        filters={{
+          dateKey: "createdAt",
           statusKey: "status",
           searchKeys: ["campaignTitle", "brandName", "status"]
         }}

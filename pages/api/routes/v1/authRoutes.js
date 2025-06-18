@@ -53,6 +53,8 @@ export default async function handler(req, res) {
           return await approveDeletionRequest(req, res);
         case "getAllUserDataAgainstId":
           return await getAllUserDataAgainstId(req, res);
+        case "deleteAccount":
+          return await deleteAccount(req, res);
         default:
           return res.status(400).json({ message: "Invalid action parameter" });
       }
@@ -76,8 +78,6 @@ export default async function handler(req, res) {
     // Add DELETE method handler
     if (req.method === "DELETE") {
       switch (action) {
-        case "deleteAccount":
-          return await deleteAccount(req, res);
         default:
           return res
             .status(400)

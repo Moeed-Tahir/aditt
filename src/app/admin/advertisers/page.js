@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 export default function Adversiters() {
   const [advertiserUser, setAdvertiserUser] = useState([]);
-  console.log("advertiserUser", advertiserUser);
 
   const fetchUsers = async () => {
     try {
@@ -58,14 +57,27 @@ export default function Adversiters() {
   ];
 
   const sortOptions = [
-    { label: "A to Z", value: (a, b) => a.name.localeCompare(b.name) },
-    { label: "Z to A", value: (a, b) => b.name.localeCompare(a.name) },
+    {
+      label: "A to Z",
+      value: (a, b) => {
+        if (!a || !b) return 0;
+        return (a.name || '').localeCompare(b.name || '')
+      }
+    },
+    {
+      label: "Z to A",
+      value: (a, b) => {
+        if (!a || !b) return 0;
+        return (b.name || '').localeCompare(a.name || '')
+      }
+    },
   ];
 
   return (
     <SidebarProvider>
       <AppSidebar mode="admin" />
       <GenericTablePage
+        fetchData={fetchUsers}
         title="ADVERTISERS"
         data={advertiserUser}
         columns={columns}

@@ -6,11 +6,15 @@ import { GenericTablePage } from "@/components/admin/GenericTablePage";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import RejectDialog from "@/components/RejectDialog";
 
 export default function AccountDeleteRequests() {
   const [loading, setLoading] = useState("");
   const [deletionData, setDeletionData] = useState([]);
-  console.log("deletionData",deletionData);
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  
+  console.log("deletionData", deletionData);
 
   const fetchDeletionRequest = async () => {
     try {
@@ -36,11 +40,10 @@ export default function AccountDeleteRequests() {
 
   const handleApprove = async (userId) => {
     try {
-      setLoading(true);
+      setLoading(`approving-${userId}`);
       const response = await axios.post(
-        `/api/routes/v1/authRoutes?action=approveDeletionRequest`,{
-          userId
-        }
+        `/api/routes/v1/authRoutes?action=approveDeletionRequest`,
+        { userId }
       );
       
       if (response.data.message === "Account deletion approved and user account removed") {
@@ -51,18 +54,23 @@ export default function AccountDeleteRequests() {
       console.error("Error approving deletion:", error);
       toast.error("Failed to approve deletion");
     } finally {
-      setLoading(false);
+      setLoading("");
     }
   };
 
-  const handleReject = async (userId) => {
+  const handleRejectClick = (userId) => {
+    setSelectedUserId(userId);
+    setIsRejectDialogOpen(true);
+  };
+
+  const handleReject = async ({ reason }) => {
+    if (!selectedUserId) return;
 
     try {
-      setLoading(true);
-      const reason = "Advertiser request to delete Account"
+      setLoading(`rejecting-${selectedUserId}`);
       const response = await axios.post(
         `/api/routes/v1/authRoutes?action=rejectDeletionRequest`,
-        { reason,userId }
+        { reason, userId: selectedUserId }
       );
       
       if (response.data.message === "Account deletion request rejected") {
@@ -73,7 +81,9 @@ export default function AccountDeleteRequests() {
       console.error("Error rejecting deletion:", error);
       toast.error("Failed to reject deletion");
     } finally {
-      setLoading(false);
+      setLoading("");
+      setIsRejectDialogOpen(false);
+      setSelectedUserId(null);
     }
   };
 
@@ -111,7 +121,7 @@ export default function AccountDeleteRequests() {
         {loading === `approving-${request._id}` ? "Processing..." : "Accept"}
       </button>
       <button
-        onClick={() => handleReject(request._id)}
+        onClick={() => handleRejectClick(request._id)}
         disabled={loading === `rejecting-${request._id}`}
         className="text-xs font-medium px-3 py-1 rounded-full bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
       >
@@ -133,6 +143,15 @@ export default function AccountDeleteRequests() {
         sortOptions={sortOptions}
         filters={{ dateKey: "dob", statusKey: "status" }}
         getActions={getAdsApprovalActions}
+      />
+      
+      <RejectDialog
+        open={isRejectDialogOpen}
+        onClose={() => {
+          setIsRejectDialogOpen(false);
+          setSelectedUserId(null);
+        }}
+        onSave={handleReject}
       />
     </SidebarProvider>
   );
