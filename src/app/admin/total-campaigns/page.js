@@ -46,7 +46,7 @@ export default function TotalCampaigns() {
                 query: { id: campaign._id },
               }}
             >
-              {campaign.userId}
+              {campaign.campaignTitle}
             </Link>
             <div className="text-xs text-gray-500">
               {campaign.websiteLink}

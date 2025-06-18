@@ -5,6 +5,7 @@ export const AdsSurveyDetails = ({
   surveyQuestion2,
   engagements,
 }) => {
+
   if (
     (!surveyQuestion1 || !surveyQuestion1.questionText) &&
     (!surveyQuestion2 || !surveyQuestion2.questionText)
@@ -18,7 +19,7 @@ export const AdsSurveyDetails = ({
         Survey details
       </h2>
 
-      {surveyQuestion1 && surveyQuestion1.questionText && (
+      {surveyQuestion1 && surveyQuestion1?.questionText && (
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row sm:justify-between text-[14px] sm:text-[16px] text-gray-500 mb-1 gap-2 sm:gap-0">
             <span>SURVEY QUESTION 1</span>
@@ -28,27 +29,27 @@ export const AdsSurveyDetails = ({
           </div>
           <div className="p-4 sm:p-5 rounded-xl bg-[var(--bg-color-off-white)]">
             <span className="text-[14px] sm:text-[16px] text-gray-800">
-              {surveyQuestion1.questionText}
+              {surveyQuestion1?.questionText}
             </span>
-            {surveyQuestion1.option1 && (
+            {surveyQuestion1?.option1 && (
               <div className="p-1 relative">
                 <ProgressBar
-                  value={surveyQuestion1.option1.totalCount}
+                  value={surveyQuestion1?.option1?.totalCount}
                   fill="bg-white rounded-xl"
                   text={{
-                    left: surveyQuestion1.option1,
+                    left: surveyQuestion1?.option1,
                     right: "0%",
                   }}
                 />
               </div>
             )}
-            {surveyQuestion1.option2 && (
+            {surveyQuestion1?.option2 && (
               <div className="p-1 relative">
                 <ProgressBar
-                  value={surveyQuestion1.option2.totalCount}
+                  value={surveyQuestion1?.option2?.totalCount}
                   fill="bg-white rounded-xl"
                   text={{
-                    left: surveyQuestion1.option2,
+                    left: surveyQuestion1?.option2,
                     right: "0%",
                   }}
                 />

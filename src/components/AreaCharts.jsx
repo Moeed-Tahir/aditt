@@ -15,18 +15,9 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const engagementData = [
-  { month: "Jan", engagements: 0, clicks: 120 },
-  { month: "Feb", engagements: 0, clicks: 90 },
-  { month: "Mar", engagements: 0, clicks: 70 },
-  { month: "Apr", engagements: 0, clicks: 60 },
-  { month: "May", engagements: 0, clicks: 40 },
-  { month: "Jun", engagements: 0, clicks: 20 },
-];
-
 const chartConfig = {
-  engagements: {
-    label: "Engagements",
+  videoWatchTime: {
+    label: "Video Watch Time",
     color: "#6297FF",
   },
   clicks: {
@@ -35,9 +26,14 @@ const chartConfig = {
   },
 };
 
-export default function EngagementChart() {
-  const engagements = engagementData.reduce((sum, item) => sum + item.engagements, 0);
-  const clicks = engagementData.reduce((sum, item) => sum + item.clicks, 0);
+export default function EngagementChart({ clicks, videoWatchTime }) {
+  const engagementData = [
+    { name: "current", videoWatchTime: videoWatchTime, clicks: clicks },
+    { name: "start", videoWatchTime: 0, clicks: 0 },
+  ];
+
+  const totalVideoWatchTime = engagementData.reduce((sum, item) => sum + item.videoWatchTime, 0);
+  const currentClicks = engagementData[engagementData.length - 1].clicks;
 
   return (
     <Card className="shadow-none border-none">
@@ -58,14 +54,14 @@ export default function EngagementChart() {
                 <span className="w-3 h-3 rounded-full bg-blue-500 inline-block mr-2"></span>
                 Clicks
               </span>
-              <span className="text-[14px] text-gray-500">{clicks}</span>
+              <span className="text-[14px] text-gray-500">{currentClicks}</span>
             </div>
             <div className="flex flex-col items-start sm:items-end">
               <span className="text-[16px] font-md">
                 <span className="w-3 h-3 rounded-full bg-blue-100 inline-block mr-2"></span>
-                Engagements
+                Video Watch Time
               </span>
-              <span className="text-[14px] text-gray-500">{engagements}</span>
+              <span className="text-[14px] text-gray-500">{totalVideoWatchTime}</span>
             </div>
           </div>
         </div>
@@ -75,29 +71,31 @@ export default function EngagementChart() {
       <CardContent>
         <ChartContainer config={chartConfig}>
           <AreaChart
-            accessibilityLayer
             data={engagementData}
             margin={{
               top: 10,
-              left: 12,
+              left: 50,
               right: 12,
               bottom: 0,
             }}
+            width={600}
+            height={300}
           >
             <CartesianGrid vertical={false} horizontal={true} />
-
             <YAxis
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 12, fill: "#94a3b8" }}
               width={35}
+              orientation="left"
+              tickMargin={20}
             />
-
             <XAxis
-              dataKey="month"
+              dataKey="name"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
+              hide={true}
             />
 
             <ChartTooltip
@@ -106,11 +104,12 @@ export default function EngagementChart() {
             />
 
             <Area
-              dataKey="engagements"
+              dataKey="videoWatchTime"
               type="monotone"
-              fill="var(--color-engagements)"
+              fill="var(--color-videoWatchTime)"
               fillOpacity={0.4}
-              stroke="var(--color-engagements)"
+              stroke="var(--color-videoWatchTime)"
+              strokeWidth={2}
             />
             <Area
               dataKey="clicks"
@@ -118,6 +117,7 @@ export default function EngagementChart() {
               fill="var(--color-clicks)"
               fillOpacity={0.8}
               stroke="var(--color-clicks)"
+              strokeWidth={2}
             />
           </AreaChart>
         </ChartContainer>

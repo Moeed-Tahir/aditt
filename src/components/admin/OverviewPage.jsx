@@ -16,26 +16,6 @@ import { toast } from "sonner";
 export function OverViewPage({ id }) {
   const [campaignData, setCampaignData] = useState([]);
   const [feedbackData, setFeedbackData] = useState([]);
-  console.log("id", id);
-  console.log("campaignData", campaignData);
-
-  // const campaignData = {
-  //   title: "Dummy Campaign Title",
-  //   views: 1200,
-  //   videoUrl: "https://www.example.com/sample.mp4",
-  //   budget: 1000,
-  //   spent: 750,
-  //   quizQuestion: "What's your favorite color?",
-  //   genderRatio: { male: 60, female: 40 },
-  //   surveyQuestion1: "Where did you hear about us?",
-  //   surveyQuestion2: "Would you recommend our service?",
-  //   engagements: 350,
-  //   performance: {
-  //     clicks: 180,
-  //     impressions: 5000,
-  //     conversions: 45,
-  //   },
-  // };
 
   const fetchCampaign = async () => {
     try {
@@ -63,9 +43,8 @@ export function OverViewPage({ id }) {
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
       <Navbar />
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-        <CampaignHeader />
+        <CampaignHeader campaignData={campaignData} />
 
-        {/* Campaign Video Info */}
         <div className="bg-white p-4 sm:p-6 rounded-[24px] shadow">
           <CampaignVideoInfo campaignData={campaignData} />
         </div>
@@ -101,7 +80,7 @@ export function OverViewPage({ id }) {
 
         <div className="bg-white p-4 sm:p-6 rounded-[24px] shadow">
           <h2 className="text-lg font-semibold mb-2">Engagement Chart</h2>
-          <EngagementChart />
+          <EngagementChart clicks={campaignData?.clickCount?.totalCount} videoWatchTime={campaignData?.videoWatchTime} />
         </div>
       </div>
     </main>

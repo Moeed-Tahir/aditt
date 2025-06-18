@@ -107,9 +107,6 @@ exports.getCampaign = async (req, res) => {
                 message: 'Campaign not found'
             });
         }
-
-        console.log("campaign", campaign);
-
         res.status(200).json({
             message: 'Campaign Retrieved Successfully',
             campaign: campaign

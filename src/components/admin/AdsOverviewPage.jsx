@@ -15,7 +15,7 @@ export function AdsOverview({ campaignData }) {
   const router = useRouter();
   const [acceptLoading, setAcceptLoading] = useState(false);
   const [rejectLoading, setRejectLoading] = useState(false);
-
+  
   const handleCampaignAction = async (action) => {
     try {
       if (action === "accept") {
@@ -69,7 +69,7 @@ export function AdsOverview({ campaignData }) {
             <button
               type="button"
               onClick={() => handleCampaignAction("reject")}
-              disabled={rejectLoading || acceptLoading} // Disable if either is loading
+              disabled={rejectLoading || acceptLoading}
               className={`py-2 px-5 rounded-full bg-red-100 text-red-700 border border-red-800 hover:bg-red-200 transition flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start ${
                 rejectLoading || acceptLoading ? "opacity-50 cursor-not-allowed" : ""
               }`}
@@ -80,7 +80,7 @@ export function AdsOverview({ campaignData }) {
             <button
               type="button"
               onClick={() => handleCampaignAction("accept")}
-              disabled={acceptLoading || rejectLoading} // Disable if either is loading
+              disabled={acceptLoading || rejectLoading} 
               className={`py-2 px-5 rounded-full bg-green-100 text-green-700 border border-green-800 hover:bg-green-200 transition flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start ${
                 acceptLoading || rejectLoading ? "opacity-50 cursor-not-allowed" : ""
               }`}

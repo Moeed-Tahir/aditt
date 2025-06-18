@@ -23,7 +23,6 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
     limitUsers: false,
     status: true,
   });
-  console.log("formData", formData.appliesTo);
 
   const [loading, setLoading] = useState(false);
   const [showCustomUserInput, setShowCustomUserInput] = useState(false);

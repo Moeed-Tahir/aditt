@@ -1,6 +1,5 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -9,14 +8,12 @@ import {
   YAxis,
   CartesianGrid,
   LabelList,
-  Tooltip,
 } from "recharts";
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -26,22 +23,14 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-// Custom color added to each data object
-const chartData = [
-  { month: "45+", male: 120, female: 66 },
-  { month: "35-44", male: 200, female: 105 },
-  { month: "25-33", male: 140, female: 97, preferNotToSay: 30 },
-  { month: "18-24", male: 50, female: 23, preferNotToSay: 50 },
-];
-
 const chartConfig = {
   male: {
     label: "Male",
-    color: "#3653F7", // Blue
+    color: "#3653F7",
   },
   female: {
     label: "Female",
-    color: "#E670C7", // Pink
+    color: "#E670C7",
   },
   preferNotToSay: {
     label: "Prefer Not To Say",
@@ -49,7 +38,49 @@ const chartConfig = {
   },
 };
 
-export default function BarCharts() {
+export default function BarCharts({ quizQuestion }) {
+  const demographicStats = quizQuestion?.demographicStats || {
+    ageGroups: {
+      age18_24: { male: 0, female: 0, other: 0 },
+      age25_33: { male: 0, female: 0, other: 0 },
+      age35_44: { male: 0, female: 0, other: 0 },
+      age45Plus: { male: 0, female: 0, other: 0 },
+    },
+  };
+
+  // Format data for the chart
+  const chartData = [
+    {
+      month: "45+",
+      male: demographicStats.ageGroups.age45Plus.male,
+      female: demographicStats.ageGroups.age45Plus.female,
+      preferNotToSay: demographicStats.ageGroups.age45Plus.other,
+    },
+    {
+      month: "35-44",
+      male: demographicStats.ageGroups.age35_44.male,
+      female: demographicStats.ageGroups.age35_44.female,
+      preferNotToSay: demographicStats.ageGroups.age35_44.other,
+    },
+    {
+      month: "25-33",
+      male: demographicStats.ageGroups.age25_33.male,
+      female: demographicStats.ageGroups.age25_33.female,
+      preferNotToSay: demographicStats.ageGroups.age25_33.other,
+    },
+    {
+      month: "18-24",
+      male: demographicStats.ageGroups.age18_24.male,
+      female: demographicStats.ageGroups.age18_24.female,
+      preferNotToSay: demographicStats.ageGroups.age18_24.other,
+    },
+  ];
+
+  // Calculate the maximum value for the XAxis domain
+  const maxValue = Math.max(
+    ...chartData.map((item) => item.male + item.female + item.preferNotToSay)
+  );
+
   return (
     <Card className="border-none shadow-none">
       <CardHeader>
@@ -59,7 +90,6 @@ export default function BarCharts() {
         <CardDescription>
           Audience demographics by Age and Gender.
         </CardDescription>
-
         <hr className="border-t border-gray-300" />
       </CardHeader>
       <CardContent>
@@ -72,7 +102,11 @@ export default function BarCharts() {
               barCategoryGap={10}
             >
               <CartesianGrid horizontal={false} />
-              <XAxis type="number" domain={[0, 300]} tick={{ fontSize: 10 }} />
+              <XAxis
+                type="number"
+                domain={[0, Math.ceil(maxValue * 1.1)]} // Add 10% padding
+                tick={{ fontSize: 10 }}
+              />
               <YAxis
                 dataKey="month"
                 type="category"
@@ -97,6 +131,7 @@ export default function BarCharts() {
                   offset={8}
                   fontSize={12}
                   className="fill-foreground"
+                  formatter={(value) => (value > 0 ? value : '')} // Only show label if value > 0
                 />
               </Bar>
               <Bar
@@ -110,6 +145,7 @@ export default function BarCharts() {
                   offset={8}
                   fontSize={12}
                   className="fill-foreground"
+                  formatter={(value) => (value > 0 ? value : '')}
                 />
               </Bar>
               <Bar
@@ -124,6 +160,7 @@ export default function BarCharts() {
                   offset={8}
                   fontSize={12}
                   className="fill-foreground"
+                  formatter={(value) => (value > 0 ? value : '')}
                 />
               </Bar>
             </BarChart>

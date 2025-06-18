@@ -105,7 +105,7 @@ export default function CampaignDetailPage({ campaignData, campaignId }) {
 
           <div className="flex justify-center">
             <div className="w-full">
-              <EngagementChart />
+          <EngagementChart clicks={campaignData?.clickCount?.totalCount } videoWatchTime={campaignData?.videoWatchTime } />
             </div>
           </div>
         </div>

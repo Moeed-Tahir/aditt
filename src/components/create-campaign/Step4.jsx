@@ -189,7 +189,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                             <Calendars
                                 selected={formData.endDate}
                                 onSelect={(date) => {
-                                    console.log("Saving end date:", date);
                                     setFormData(prev => ({
                                         ...prev,
                                         endDate: date,
