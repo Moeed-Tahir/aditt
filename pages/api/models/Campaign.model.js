@@ -98,8 +98,30 @@ const SurveyQuestionSchema = new mongoose.Schema({
             required: false,
             default: 0
         },
+    },
+    countStats: {
+        // totalcount : {
+        //     [{
+        //         countmymaleofage1: Number,
+        //         countmyfemalemaleofage1: Number,
+        //         countmyotherofage1: Number,
+        //         countmymaleofage2: Number,
+        //         countmyfemalemaleofage2: Number,
+        //         countmyotherofage2: Number,
+        //         countmymaleofage3: Number,
+        //         countmyfemalemaleofage3: Number,
+        //         countmyotherofage3: Number,
+        //         countmymaleofage4: Number,
+        //         countmyfemalemaleofage4: Number,
+        //         countmyotherofage4: Number,
+        //     }]
+        // }
     }
 });
+
+
+
+
 
 const CardDetailSchema = new mongoose.Schema({
     cardNumber: {

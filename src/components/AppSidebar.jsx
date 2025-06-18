@@ -29,7 +29,7 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import Cookies from "js-cookie";
 
-export function AppSidebar({ mode }) {
+export function AppSidebar({ mode = "user" }) {
   const pathname = usePathname();
   const userId = Cookies.get("userId");
 
