@@ -1,4 +1,4 @@
-import connectToDatabase from '../../config/dbConnect';
+import {connectToDatabase} from '../../config/dbConnect';
 import PromoCode from '../../models/PromoCode.model';
 
 export const createPromoCode = async (req, res) => {

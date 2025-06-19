@@ -10,8 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -48,18 +46,16 @@ export default function UsersPage() {
     setShowLimitModal(false);
   };
 
-  // Process users based on active/waitlist limits
   const processUsers = () => {
     if (!consumerUsers.length) return { activeUsers: [], waitlistUsers: [] };
 
-    // Sort users by OTP expiration date (newest first)
-    const sortedUsers = [...consumerUsers].sort((a, b) => 
+    const sortedUsers = [...consumerUsers].sort((a, b) =>
       new Date(b.otpExpires) - new Date(a.otpExpires)
     );
 
     // Active users are the first N users up to activeLimit
     const activeUsers = sortedUsers.slice(0, activeLimit);
-    
+
     // Waitlist users are the next M users up to waitlistLimit
     const waitlistUsers = sortedUsers.slice(activeLimit, activeLimit + waitlistLimit);
 
@@ -74,11 +70,17 @@ export default function UsersPage() {
       key: "name",
       render: (user) => (
         <div className="flex items-center gap-2">
-          <img
-            src="/user-placeholder.png" // Using placeholder since image isn't in your data
-            alt={user.name}
-            className="w-8 h-8 rounded-full"
-          />
+          {user.image ? (
+            <img
+              src={user.image}
+              alt={user.name}
+              className="w-8 h-8 rounded-full"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
+              {user.name ? user.name.charAt(0).toUpperCase() : "?"}
+            </div>
+          )}
           <div>
             <div>{user.name || "No Name"}</div>
             <div className="text-xs text-gray-500">{user.gender || "Not specified"}</div>
@@ -86,8 +88,8 @@ export default function UsersPage() {
         </div>
       ),
     },
-    { 
-      label: "PHONE NUMBER", 
+    {
+      label: "PHONE NUMBER",
       key: "phone",
       render: (user) => user.phone || "N/A"
     },
@@ -97,41 +99,20 @@ export default function UsersPage() {
       render: (user) => user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString("en-GB") : "N/A",
     },
     {
-      label: "VERIFICATION",
-      key: "isVerified",
+      label: "TOTAL EARNINGS",
+      key: "earnings",
       render: (user) => (
-        <span className={`px-2 py-1 rounded-full text-xs ${
-          user.isVerified 
-            ? "bg-green-100 text-green-800" 
-            : "bg-yellow-100 text-yellow-800"
-        }`}>
-          {user.isVerified ? "Verified" : "Not Verified"}
+        <span className="font-medium">
+          {typeof user.earnings === 'number' ? `$${user.earnings.toLocaleString()}` : "$0"}
         </span>
       ),
     },
     {
-      label: "OTP VERIFIED",
-      key: "isOtpVerified",
+      label: "TOTAL WITHDRAW",
+      key: "withdraw",
       render: (user) => (
-        <span className={`px-2 py-1 rounded-full text-xs ${
-          user.isOtpVerified 
-            ? "bg-green-100 text-green-800" 
-            : "bg-yellow-100 text-yellow-800"
-        }`}>
-          {user.isOtpVerified ? "Verified" : "Pending"}
-        </span>
-      ),
-    },
-    {
-      label: "STATUS",
-      key: "status",
-      render: (u) => (
-        <span className={`px-2 py-1 rounded-full text-xs ${
-          activeUsers.some(au => au._id === u._id) 
-            ? "bg-green-100 text-green-800" 
-            : "bg-yellow-100 text-yellow-800"
-        }`}>
-          {activeUsers.some(au => au._id === u._id) ? "Active" : "Waitlist"}
+        <span className="font-medium">
+          {typeof user.withdraw === 'number' ? `$${user.withdraw.toLocaleString()}` : "$0"}
         </span>
       ),
     },
@@ -152,8 +133,8 @@ export default function UsersPage() {
       <div className="flex gap-2 rounded p-1 text-sm font-semibold w-full max-w-md">
         <button
           className={`flex-1 py-2 px-4 rounded-full ${activeTab === "active"
-              ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
-              : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
+            ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
+            : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
             } transition flex items-center justify-center`}
           onClick={() => setActiveTab("active")}
         >
@@ -161,8 +142,8 @@ export default function UsersPage() {
         </button>
         <button
           className={`flex-1 py-2 px-4 rounded-full ${activeTab === "waitlist"
-              ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
-              : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
+            ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
+            : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
             } transition flex items-center justify-center`}
           onClick={() => setActiveTab("waitlist")}
         >
@@ -174,8 +155,8 @@ export default function UsersPage() {
       <div className="bg-white shadow-sm rounded-xl px-6 py-4 w-full flex justify-between items-start flex-wrap gap-4">
         <div>
           <p className="text-[22px] font-semibold text-gray-800">
-            {activeTab === "active" 
-              ? `Active Users Limit: ${activeLimit} (${activeUsers.length} active)` 
+            {activeTab === "active"
+              ? `Active Users Limit: ${activeLimit} (${activeUsers.length} active)`
               : `Waitlist Limit: ${waitlistLimit} (${waitlistUsers.length} in waitlist)`}
           </p>
           <p className="text-sm text-gray-500">

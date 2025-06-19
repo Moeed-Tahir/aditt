@@ -75,7 +75,7 @@ export function AdminDashboard() {
       gender: user.gender || "Not specified",
       phone: user.phone,
       dob: user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "Not specified",
-      earnings: "$0", 
+      earnings: "$0",
       withdraw: "$0",
       isVerified: user.isVerified,
       isOtpVerified: user.isOtpVerified,
@@ -131,21 +131,28 @@ export function AdminDashboard() {
   const handleCampaignAction = async (campaignId, action, reason = "") => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/routes/v1/campaignRoutes?action=updateCampaignStatus", {
-        campaignId,
-        status: action === "accept" ? "Approved" : "Rejected",
-        reason
-      });
-      
+      const payload = {
+        id: campaignId,
+        status: action === "accept" ? "Active" : "Rejected",
+      };
+
+      if (action === "reject" && reason) {
+        payload.reason = reason;
+      }
+
+      const response = await axios.post(
+        "/api/routes/v1/campaignRoutes?action=activeOrRejectCampaign",
+        payload
+      );
+
       if (response.data.success) {
         toast.success(`Campaign ${action === "accept" ? "approved" : "rejected"} successfully`);
         fetchLatestCampaign();
-        return { success: true };
-      } else {
-        throw new Error(response.data.message || "Action failed");
       }
+      return response.data;
     } catch (error) {
-      toast.error(`Failed to ${action === "accept" ? "approve" : "reject"} campaign: ${error.message}`);
+      console.error("Error updating campaign status:", error);
+      toast.error(`Failed to ${action === "accept" ? "approve" : "reject"} campaign`);
       throw error;
     } finally {
       setLoading(false);
@@ -201,11 +208,11 @@ export function AdminDashboard() {
   const advertiserColumns = [
     { label: "ADVERTISER", key: "name" },
     { label: "BUSINESS EMAIL", key: "email" },
-    { 
-      label: "BUSINESS WEBSITE", 
+    {
+      label: "BUSINESS WEBSITE",
       key: "website",
       render: (item) => (
-        <a 
+        <a
           href={item.website.startsWith('http') ? item.website : `https://${item.website}`}
           target="_blank"
           rel="noopener noreferrer"
@@ -255,13 +262,12 @@ export function AdminDashboard() {
       key: "status",
       render: (item) => (
         <span
-          className={`px-2 py-1 rounded-full text-xs ${
-            item.status === "Approved"
-              ? "bg-green-100 text-green-800"
-              : item.status === "Pending"
+          className={`px-2 py-1 rounded-full text-xs ${item.status === "Approved"
+            ? "bg-green-100 text-green-800"
+            : item.status === "Pending"
               ? "bg-yellow-100 text-yellow-800"
               : "bg-red-100 text-red-800"
-          }`}
+            }`}
         >
           {item.status}
         </span>
@@ -330,13 +336,12 @@ export function AdminDashboard() {
       label: "STATUS",
       key: "status",
       render: (request) => (
-        <span className={`px-2 py-1 rounded-full text-xs ${
-          request.status === "approved" 
-            ? "bg-green-100 text-green-800" 
-            : request.status === "rejected" 
-              ? "bg-red-100 text-red-800" 
-              : "bg-yellow-100 text-yellow-800"
-        }`}>
+        <span className={`px-2 py-1 rounded-full text-xs ${request.status === "approved"
+          ? "bg-green-100 text-green-800"
+          : request.status === "rejected"
+            ? "bg-red-100 text-red-800"
+            : "bg-yellow-100 text-yellow-800"
+          }`}>
           {request.status || "pending"}
         </span>
       )
@@ -353,16 +358,15 @@ export function AdminDashboard() {
   const handleDeleteRequestAction = async (requestId, action, reason = "") => {
     try {
       setLoading(true);
-      // Replace with actual API call
       const response = await axios.post("/api/routes/v1/authRoutes?action=processDeletionRequest", {
         userId: requestId,
         action,
         reason
       });
-      
+
       if (response.data.success) {
         toast.success(`Request ${action === "approve" ? "approved" : "rejected"} successfully`);
-        fetchDeletionRequest(); // Refresh the data
+        fetchDeletionRequest();
         return { success: true };
       } else {
         throw new Error(response.data.message || "Action failed");
@@ -413,6 +417,7 @@ export function AdminDashboard() {
             showHeaderAction
             compactLayout
             showHeaderProfile={false}
+            fetchConsumers={fetchConsumers}
           />
         </div>
 
@@ -425,6 +430,7 @@ export function AdminDashboard() {
             showHeaderAction
             compactLayout
             showHeaderProfile={false}
+            fetchAdvertiserUser={fetchAdvertiserUser}
           />
         </div>
 
@@ -465,10 +471,8 @@ export function AdminDashboard() {
         onSave={async ({ reason }) => {
           if (selectedItem) {
             if (selectedItem.campaignTitle) {
-              // It's a campaign
               await handleCampaignAction(selectedItem.id, "reject", reason);
             } else {
-              // It's a deletion request
               await handleDeleteRequestAction(selectedItem.id, "reject", reason);
             }
             setShowRejectDialog(false);

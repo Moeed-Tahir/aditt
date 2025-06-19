@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 
-const protectedPaths = [
-  /^\/campaign-dashboard$/,
-  /^\/create-campaign$/,
+const userProtectedPaths = [
+  /^\/campaign-dashboard(\/.*)?$/,
+  /^\/create-campaign(\/.*)?$/,
 ];
 
-const adminOnlyPaths = [
-  /^\/admin\/dashboard$/,
+const adminProtectedPaths = [
+  /^\/admin(\/.*)?$/, // This will match all admin paths
 ];
 
 export function middleware(request) {
@@ -17,35 +17,38 @@ export function middleware(request) {
   const role = request.cookies.get('Role')?.value;
   const isAuthenticated = userId && token;
   const isAdmin = role === 'Admin';
+  const isRegularUser = isAuthenticated && !isAdmin;
 
-  // Redirect from root to signin
   if (pathname === '/') {
     return NextResponse.redirect(new URL('/signin-user', request.url));
   }
 
-  // Redirect signed-in users away from login/signup pages
-  if (
-    (pathname === '/signin-user' || pathname === '/signup-user') &&
-    (isAuthenticated || isAdmin)
-  ) {
+  if ((pathname === '/signin-user' || pathname === '/signup-user') && (isAuthenticated || isAdmin)) {
     if (isAdmin) {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
-    return NextResponse.redirect(new URL(`/${userId}/campaign-dashboard`, request.url));
+    return NextResponse.redirect(new URL('/campaign-dashboard', request.url));
   }
 
-  // Protect regular user routes
-  const isProtected = protectedPaths.some((regex) => regex.test(pathname));
-  if (isProtected && !isAuthenticated) {
-    const loginUrl = new URL('/signin-user', request.url);
-    loginUrl.searchParams.set('from', pathname);
-    return NextResponse.redirect(loginUrl);
+  const isAdminPath = adminProtectedPaths.some(regex => regex.test(pathname));
+  if (isAdminPath) {
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL('/signin-user', request.url));
+    }
+    return NextResponse.next();
   }
 
-  // Protect admin-only routes
-  const isAdminProtected = adminOnlyPaths.some((regex) => regex.test(pathname));
-  if (isAdminProtected && !isAdmin) {
-    return NextResponse.redirect(new URL('/signin-user', request.url));
+  const isUserPath = userProtectedPaths.some(regex => regex.test(pathname));
+  if (isUserPath) {
+    if (!isAuthenticated) {
+      const loginUrl = new URL('/signin-user', request.url);
+      loginUrl.searchParams.set('from', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    if (isAdmin) {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+    return NextResponse.next();
   }
 
   return NextResponse.next();
@@ -56,8 +59,8 @@ export const config = {
     '/',
     '/signin-user',
     '/signup-user',
-    '/campaign-dashboard',
-    '/create-campaign',
-    '/admin/dashboard',
+    '/campaign-dashboard/:path*',
+    '/create-campaign/:path*',
+    '/admin/:path*',
   ],
 };

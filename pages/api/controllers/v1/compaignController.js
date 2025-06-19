@@ -1,4 +1,4 @@
-import connectToDatabase from '../../config/dbConnect';
+import {connectToDatabase} from '../../config/dbConnect';
 import Compaign from '../../models/Campaign.model';
 import CampaignFeedback from '../../models/CampaignFeedback';
 

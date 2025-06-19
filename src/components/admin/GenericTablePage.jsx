@@ -21,13 +21,14 @@ export function GenericTablePage({
   headerAction = null,
   showHeaderProfile,
   headerProfile = null,
-  fetchData,
   compactLayout = false,
   filterOptions = {
     date: true,
     status: true,
     customStatusOptions: [],
   },
+  fetchConsumers,
+  fetchAdvertiserUser
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState(null);
@@ -78,14 +79,13 @@ export function GenericTablePage({
 
   const deleteAccount = async () => {
     if (!itemToDelete) return;
-    console.log("itemToDelete", itemToDelete);
 
     setIsDeleting(true);
     try {
       const response = await axios.post(
-        "/api/routes/v1/authRoutes?action=deleteAccount",
+        "/api/routes/v1/authRoutes?action=deleteConsumerUser",
         {
-          userId: itemToDelete.userId,
+          id: itemToDelete.userId,
         }
       );
 
@@ -95,9 +95,42 @@ export function GenericTablePage({
           description: "Account deleted successfully",
           variant: "default",
         });
-        if (fetchData) {
-          await fetchData();
+        fetchConsumers();
+      }
+    } catch (error) {
+      console.error("Account deletion failed:", error);
+      toast({
+        title: "Error",
+        description:
+          error.response?.data?.message || "Failed to delete account",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
+    }
+  };
+
+  const deleteAdvertiserAccount = async () => {
+    if (!itemToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await axios.post(
+        "/api/routes/v1/authRoutes?action=deleteAdvertiserUser",
+        {
+          id: itemToDelete.id,
         }
+      );
+
+      if (response.status === 200) {
+        toast({
+          title: "Success",
+          description: "Account deleted successfully",
+          variant: "default",
+        });
+        fetchAdvertiserUser();
       }
     } catch (error) {
       console.error("Account deletion failed:", error);
@@ -116,15 +149,17 @@ export function GenericTablePage({
 
   const defaultRenderActions = (item) => (
     <div className="flex gap-2">
-      <Link
-        href={{
-          pathname: "/admin/advertisers-profile",
-          query: { id: item.userId },
-        }}
-        className="hover:underline"
-      >
-        <Eye className="w-4 h-4" />
-      </Link>
+      {title === "ADVERTISERS" && (
+        <Link
+          href={{
+            pathname: "/admin/advertisers-profile",
+            query: { id: item.userId },
+          }}
+          className="hover:underline"
+        >
+          <Eye className="w-4 h-4" />
+        </Link>
+      )}
       <button
         onClick={() => handleDeleteClick(item)}
         className="text-red-500 hover:text-red-700"
@@ -137,9 +172,8 @@ export function GenericTablePage({
 
   return (
     <main
-      className={`flex h-auto w-full flex-col ${
-        compactLayout ? "" : "bg-[var(--bg-color-off-white)]"
-      }`}
+      className={`flex h-auto w-full flex-col ${compactLayout ? "" : "bg-[var(--bg-color-off-white)]"
+        }`}
     >
       {" "}
       {!compactLayout && <Navbar mode="admin" />}
@@ -225,8 +259,8 @@ export function GenericTablePage({
                         {getActions
                           ? getActions(item)
                           : renderActions
-                          ? renderActions(item)
-                          : defaultRenderActions(item)}
+                            ? renderActions(item)
+                            : defaultRenderActions(item)}
                       </td>
                     </tr>
                   ))
@@ -297,7 +331,7 @@ export function GenericTablePage({
           setIsDeleteModalOpen(false);
           setItemToDelete(null);
         }}
-        onConfirm={deleteAccount}
+        onConfirm={title === "USERS" ? deleteAccount : deleteAdvertiserAccount}
         title="Confirm Deletion"
         description="Are you sure you want to delete this item? This action cannot be undone."
         confirmButtonText={isDeleting ? "Deleting..." : "Delete"}

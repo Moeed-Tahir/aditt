@@ -4,9 +4,9 @@ import { AdsOverview } from "@/components/admin/AdsOverviewPage";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
-export default function CampaignOverView() {
+function CampaignOverViewContent() {
   const searchParams = useSearchParams();
   const [campaignData, setCampaignData] = useState(null);
   
@@ -22,10 +22,16 @@ export default function CampaignOverView() {
     }
   }, [searchParams]);
 
+  return <AdsOverview campaignData={campaignData} />;
+}
+
+export default function CampaignOverView() {
   return (
     <SidebarProvider>
       <AppSidebar mode="admin" />
-      <AdsOverview campaignData={campaignData} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <CampaignOverViewContent />
+      </Suspense>
     </SidebarProvider>
   );
 }

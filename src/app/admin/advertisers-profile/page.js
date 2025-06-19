@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from 'react';
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage";
@@ -17,7 +18,8 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function AdversitersProfile() {
+// Wrap the component that uses useSearchParams in a Suspense boundary
+function AdvertisersProfileContent() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const [userData, setUserData] = useState({ user: null, campaigns: [] });
@@ -203,23 +205,31 @@ export default function AdversitersProfile() {
   );
 
   return (
+    <GenericTablePage
+      title="ALL CAMPAIGNS"
+      data={userData.campaigns || []}
+      columns={columns}
+      sortOptions={sortOptions}
+      filters={{
+        dateKey: "createdAt",
+        statusKey: "status",
+        searchKeys: ["campaignTitle", "brandName", "status"]
+      }}
+      getActions={getProfileActions}
+      showHeaderProfile={true}
+      headerProfile={headerProfile}
+      loading={loading}
+    />
+  );
+}
+
+export default function AdvertisersProfile() {
+  return (
     <SidebarProvider>
       <AppSidebar mode="admin" />
-      <GenericTablePage
-        title="ALL CAMPAIGNS"
-        data={userData.campaigns || []}
-        columns={columns}
-        sortOptions={sortOptions}
-        filters={{
-          dateKey: "createdAt",
-          statusKey: "status",
-          searchKeys: ["campaignTitle", "brandName", "status"]
-        }}
-        getActions={getProfileActions}
-        showHeaderProfile={true}
-        headerProfile={headerProfile}
-        loading={loading}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <AdvertisersProfileContent />
+      </Suspense>
     </SidebarProvider>
   );
 }
