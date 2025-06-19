@@ -9,7 +9,8 @@ import {
     updateCampaign,
     getPendingCampaign,
     activeOrRejectCampaign,
-    getAllCampaign
+    getAllCampaign,
+    getLatestPendingCampaign
 } from "../../controllers/v1/compaignController";
 
 export default async function handler(req, res) {
@@ -44,6 +45,8 @@ export default async function handler(req, res) {
                     return await activeOrRejectCampaign(req, res);
                 case "getAllCampaign":
                     return await getAllCampaign(req, res);
+                case "getLatestPendingCampaign":
+                    return await getLatestPendingCampaign(req, res);
                 default:
                     return res.status(400).json({ message: "Invalid action parameter" });
             }

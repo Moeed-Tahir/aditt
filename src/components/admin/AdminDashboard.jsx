@@ -3,133 +3,149 @@
 import Navbar from "../Navbar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RejectDialog from "@/components/RejectDialog";
 import { toast } from "sonner";
+import axios from "axios";
 
 export function AdminDashboard() {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [consumerUsers, setConsumerUsers] = useState([]);
+  const [advertiserUsers, setAdvertiserUsers] = useState([]);
+  const [deletionRequests, setDeletionRequests] = useState([]);
+  const [latestCampaigns, setLatestCampaigns] = useState([]);
 
-  // Dummy data for Ads Approval
-  const adsApprovalData = [
-    {
-      id: "ad1",
-      campaignTitle: "Summer Sale 2023",
-      websiteLink: "www.example.com/summer-sale",
-      status: "Pending",
-      genderType: "Female",
-      genderRatio: 70,
-      campaignBudget: 5000,
-      campaignStartDate: "2023-06-01",
-      campaignEndDate: "2023-08-31",
-      createdAt: "2023-05-15",
-    },
-    {
-      id: "ad2",
-      campaignTitle: "New Product Launch",
-      websiteLink: "www.techgadgets.com/new",
-      status: "Pending",
-      genderType: "All",
-      genderRatio: 100,
-      campaignBudget: 10000,
-      campaignStartDate: "2023-07-01",
-      campaignEndDate: "2023-09-30",
-      createdAt: "2023-05-20",
-    },
-    {
-      id: "ad3",
-      campaignTitle: "Back to School",
-      websiteLink: "www.education.com/back-to-school",
-      status: "Pending",
-      genderType: "Male",
-      genderRatio: 60,
-      campaignBudget: 7500,
-      campaignStartDate: "2023-08-15",
-      campaignEndDate: "2023-09-15",
-      createdAt: "2023-05-25",
-    },
-  ];
+  const fetchConsumers = async () => {
+    try {
+      const response = await axios.post("/api/routes/v1/authRoutes?action=getConsumerUser");
+      setConsumerUsers(response?.data?.latestUsers || []);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error fetching consumer users");
+      console.error('Error fetching consumer users:', error);
+    }
+  };
 
-  const adsApprovalColumns = [
-    {
-      label: "CAMPAIGN TITLE",
-      key: "campaignTitle",
-      render: (item) => (
-        <Link
-          href="#"
-          className="text-blue-600 hover:underline"
-        >
-          {item.campaignTitle}
-        </Link>
-      ),
-    },
-    {
-      label: "WEBSITE LINK",
-      key: "websiteLink",
-      render: (item) => (
-        <a
-          href={`https://${item.websiteLink}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:underline"
-        >
-          {item.websiteLink}
-        </a>
-      ),
-    },
-    {
-      label: "STATUS",
-      key: "status",
-      render: (item) => (
-        <span
-          className={`px-2 py-1 rounded-full text-xs ${
-            item.status === "Active"
-              ? "bg-green-100 text-green-800"
-              : item.status === "Pending"
-              ? "bg-yellow-100 text-yellow-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
-          {item.status}
-        </span>
-      ),
-    },
-    {
-      label: "GENDER TARGETING",
-      key: "genderType",
-      render: (item) => `${item.genderType} (${item.genderRatio}%)`,
-    },
-    {
-      label: "BUDGET",
-      key: "campaignBudget",
-      render: (item) => `$${item.campaignBudget.toLocaleString()}`,
-    },
-    {
-      label: "DATES",
-      key: "campaignStartDate",
-      render: (item) => (
-        <div className="flex flex-col">
-          <span>{new Date(item.campaignStartDate).toLocaleDateString()}</span>
-          <span>to</span>
-          <span>{new Date(item.campaignEndDate).toLocaleDateString()}</span>
-        </div>
-      ),
-    },
-  ];
+  const fetchAdvertiserUser = async () => {
+    try {
+      const response = await axios.post("/api/routes/v1/authRoutes?action=getLatestUsers");
+      setAdvertiserUsers(response?.data?.data || []);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error fetching advertiser users");
+      console.error('Error fetching advertiser users:', error);
+    }
+  };
 
+  const fetchDeletionRequest = async () => {
+    try {
+      const response = await axios.post("/api/routes/v1/authRoutes?action=getLatestPendingDeletionRequests");
+      setDeletionRequests(response?.data?.data || []);
+
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error fetching deletion requests");
+      console.error('Error fetching deletion requests:', error);
+    }
+  };
+
+  const fetchLatestCampaign = async () => {
+    try {
+      const response = await axios.post("/api/routes/v1/campaignRoutes?action=getLatestPendingCampaign");
+      setLatestCampaigns(response?.data?.data || []);
+
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error fetching latest campaigns");
+      console.error('Error fetching latest campaigns:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchConsumers();
+    fetchAdvertiserUser();
+    fetchDeletionRequest();
+    fetchLatestCampaign();
+  }, []);
+
+  const formatConsumerUsers = (users) => {
+    return users.map(user => ({
+      id: user._id,
+      userId: user._id,
+      name: user.name,
+      image: "User1.png",
+      gender: user.gender || "Not specified",
+      phone: user.phone,
+      dob: user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "Not specified",
+      earnings: "$0", 
+      withdraw: "$0",
+      isVerified: user.isVerified,
+      isOtpVerified: user.isOtpVerified,
+    }));
+  };
+
+  const formatAdvertiserUsers = (users) => {
+    return users.map(user => ({
+      id: user._id,
+      userId: user.userId,
+      name: user.name,
+      email: user.businessEmail,
+      website: user.businessWebsite,
+      ads: "0",
+      spent: "$0",
+      profileType: user.profileType || "Not specified",
+      companyName: user.companyName || "Not specified",
+      isOtpVerified: user.isOtpVerified,
+    }));
+  };
+
+  const formatDeletionRequests = (requests) => {
+    return requests.filter(req => req.deletionRequest?.requested).map(req => ({
+      id: req._id,
+      userId: req.userId,
+      name: req.name,
+      email: req.businessEmail,
+      userType: "Advertiser",
+      createdAt: req.deletionRequest?.requestedAt || req.createdAt,
+      reason: "Account deletion requested",
+      status: req.deletionRequest?.status || "Pending",
+    }));
+  };
+
+  const formatCampaigns = (campaigns) => {
+    return campaigns.map(campaign => ({
+      id: campaign._id,
+      campaignTitle: campaign.campaignTitle,
+      websiteLink: campaign.websiteLink,
+      status: campaign.status,
+      genderType: campaign.genderType,
+      genderRatio: campaign.genderRatio,
+      campaignBudget: parseFloat(campaign.campaignBudget) || 0,
+      campaignStartDate: campaign.campaignStartDate,
+      campaignEndDate: campaign.campaignEndDate,
+      createdAt: campaign.createdAt,
+      brandName: campaign.brandName,
+      quizQuestion: campaign.quizQuestion,
+      ageRange: campaign.ageRange,
+    }));
+  };
 
   const handleCampaignAction = async (campaignId, action, reason = "") => {
     try {
       setLoading(true);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await axios.post("/api/routes/v1/campaignRoutes?action=updateCampaignStatus", {
+        campaignId,
+        status: action === "accept" ? "Approved" : "Rejected",
+        reason
+      });
       
-      toast.success(`Campaign ${action === "accept" ? "approved" : "rejected"} successfully`);
-      return { success: true };
+      if (response.data.success) {
+        toast.success(`Campaign ${action === "accept" ? "approved" : "rejected"} successfully`);
+        fetchLatestCampaign();
+        return { success: true };
+      } else {
+        throw new Error(response.data.message || "Action failed");
+      }
     } catch (error) {
-      toast.error(`Failed to ${action === "accept" ? "approve" : "reject"} campaign`);
+      toast.error(`Failed to ${action === "accept" ? "approve" : "reject"} campaign: ${error.message}`);
       throw error;
     } finally {
       setLoading(false);
@@ -146,7 +162,7 @@ export function AdminDashboard() {
       </button>
       <button
         onClick={() => {
-          setSelectedCampaign(campaign);
+          setSelectedItem(campaign);
           setShowRejectDialog(true);
         }}
         className="text-xs font-medium px-3 py-1 rounded-full bg-red-100 text-red-700 hover:bg-red-200"
@@ -155,43 +171,6 @@ export function AdminDashboard() {
       </button>
     </div>
   );
-
-  // Dummy data for Users
-  const usersData = [
-    {
-      id: "u1",
-      userId: "u1",
-      name: "Marvin Ramos",
-      image: "User1.png",
-      gender: "Male",
-      phone: "+12 123 4567890",
-      dob: "05/22/2000",
-      earnings: "$500",
-      withdraw: "$150",
-    },
-    {
-      id: "u2",
-      userId: "u2",
-      name: "May Lloyd",
-      image: "User2.png",
-      gender: "Female",
-      phone: "+12 123 4567890",
-      dob: "05/22/2000",
-      earnings: "$800",
-      withdraw: "$250",
-    },
-    {
-      id: "u3",
-      userId: "u3",
-      name: "Julia Schuster",
-      image: "User2.png",
-      gender: "Female",
-      phone: "+12 123 4567890",
-      dob: "05/22/2000",
-      earnings: "$1000",
-      withdraw: "$500",
-    },
-  ];
 
   const userColumns = [
     {
@@ -206,7 +185,9 @@ export function AdminDashboard() {
           />
           <div>
             <div>{item.name}</div>
-            <div className="text-gray-500 text-xs">{item.gender}</div>
+            <div className="text-gray-500 text-xs">
+              {item.gender} {item.isVerified && "✓"}
+            </div>
           </div>
         </div>
       ),
@@ -217,74 +198,104 @@ export function AdminDashboard() {
     { label: "TOTAL WITHDRAW", key: "withdraw" },
   ];
 
-  // Dummy data for Advertisers
-  const advertisersData = [
-    {
-      id: "a1",
-      userId: "a1",
-      name: "Marvin Ramos",
-      email: "business@gmail.com",
-      website: "www.business.com",
-      ads: "03",
-      spent: "$150",
-    },
-    {
-      id: "a2",
-      userId: "a2",
-      name: "May Lloyd",
-      email: "business@gmail.com",
-      website: "www.business.com",
-      ads: "05",
-      spent: "$250",
-    },
-    {
-      id: "a3",
-      userId: "a3",
-      name: "Julia Schuster",
-      email: "business@gmail.com",
-      website: "www.business.com",
-      ads: "15",
-      spent: "$500",
-    },
-  ];
-
   const advertiserColumns = [
     { label: "ADVERTISER", key: "name" },
     { label: "BUSINESS EMAIL", key: "email" },
-    { label: "BUSINESS WEBSITE", key: "website" },
-    { label: "NUM OF ADS", key: "ads" },
-    { label: "TOTAL SPENT", key: "spent" },
+    { 
+      label: "BUSINESS WEBSITE", 
+      key: "website",
+      render: (item) => (
+        <a 
+          href={item.website.startsWith('http') ? item.website : `https://${item.website}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline"
+        >
+          {item.website}
+        </a>
+      )
+    },
+    { label: "COMPANY", key: "companyName" },
+    { label: "PROFILE TYPE", key: "profileType" },
   ];
 
-
-  // Dummy data for Account Delete Requests
-  const deleteRequestsData = [
+  const adsApprovalColumns = [
     {
-      id: "del1",
-      userId: "u1",
-      name: "Marvin Ramos",
-      email: "marvin@example.com",
-      userType: "Advertiser",
-      createdAt: "2023-05-10",
-      reason: "Closing my business",
+      label: "CAMPAIGN TITLE",
+      key: "campaignTitle",
+      render: (item) => (
+        <Link
+          href="#"
+          className="text-blue-600 hover:underline"
+        >
+          {item.campaignTitle}
+        </Link>
+      ),
     },
     {
-      id: "del2",
-      userId: "u2",
-      name: "May Lloyd",
-      email: "may@example.com",
-      userType: "User",
-      createdAt: "2023-05-15",
-      reason: "No longer using the platform",
+      label: "BRAND NAME",
+      key: "brandName",
     },
     {
-      id: "del3",
-      userId: "a1",
-      name: "Tech Gadgets Inc",
-      email: "contact@techgadgets.com",
-      userType: "Advertiser",
-      createdAt: "2023-05-20",
-      reason: "Switching to another platform",
+      label: "WEBSITE LINK",
+      key: "websiteLink",
+      render: (item) => (
+        <a
+          href={item.websiteLink.startsWith('http') ? item.websiteLink : `https://${item.websiteLink}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline"
+        >
+          {item.websiteLink}
+        </a>
+      ),
+    },
+    {
+      label: "STATUS",
+      key: "status",
+      render: (item) => (
+        <span
+          className={`px-2 py-1 rounded-full text-xs ${
+            item.status === "Approved"
+              ? "bg-green-100 text-green-800"
+              : item.status === "Pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {item.status}
+        </span>
+      ),
+    },
+    {
+      label: "GENDER TARGETING",
+      key: "genderType",
+      render: (item) => `${item.genderType} (${item.genderRatio}%)`,
+    },
+    {
+      label: "AGE RANGE",
+      key: "ageRange",
+      render: (item) => `${item.ageRange?.[0] || 'N/A'} - ${item.ageRange?.[1] || 'N/A'}`,
+    },
+    {
+      label: "BUDGET",
+      key: "campaignBudget",
+      render: (item) => `$${item.campaignBudget.toLocaleString()}`,
+    },
+    {
+      label: "DATES",
+      key: "campaignStartDate",
+      render: (item) => (
+        <div className="flex flex-col">
+          <span>{item.campaignStartDate ? new Date(item.campaignStartDate).toLocaleDateString() : 'Not set'}</span>
+          {item.campaignEndDate && (
+            <>
+              <span>to</span>
+              <span>{new Date(item.campaignEndDate).toLocaleDateString()}</span>
+            </>
+          )}
+        </div>
+      ),
     },
   ];
 
@@ -301,18 +312,33 @@ export function AdminDashboard() {
         </div>
       ),
     },
-    { 
-      label: "TYPE", 
+    {
+      label: "TYPE",
       key: "userType",
       render: (request) => (
         <span className="capitalize">{request.userType}</span>
       )
     },
-    { 
-      label: "REQUEST DATE", 
+    {
+      label: "REQUEST DATE",
       key: "createdAt",
       render: (request) => (
         <span>{new Date(request.createdAt).toLocaleDateString()}</span>
+      )
+    },
+    {
+      label: "STATUS",
+      key: "status",
+      render: (request) => (
+        <span className={`px-2 py-1 rounded-full text-xs ${
+          request.status === "approved" 
+            ? "bg-green-100 text-green-800" 
+            : request.status === "rejected" 
+              ? "bg-red-100 text-red-800" 
+              : "bg-yellow-100 text-yellow-800"
+        }`}>
+          {request.status || "pending"}
+        </span>
       )
     },
     {
@@ -327,13 +353,22 @@ export function AdminDashboard() {
   const handleDeleteRequestAction = async (requestId, action, reason = "") => {
     try {
       setLoading(true);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Replace with actual API call
+      const response = await axios.post("/api/routes/v1/authRoutes?action=processDeletionRequest", {
+        userId: requestId,
+        action,
+        reason
+      });
       
-      toast.success(`Request ${action === "approve" ? "approved" : "rejected"} successfully`);
-      return { success: true };
+      if (response.data.success) {
+        toast.success(`Request ${action === "approve" ? "approved" : "rejected"} successfully`);
+        fetchDeletionRequest(); // Refresh the data
+        return { success: true };
+      } else {
+        throw new Error(response.data.message || "Action failed");
+      }
     } catch (error) {
-      toast.error(`Failed to ${action === "approve" ? "approve" : "reject"} request`);
+      toast.error(`Failed to ${action === "approve" ? "approve" : "reject"} request: ${error.message}`);
       throw error;
     } finally {
       setLoading(false);
@@ -342,21 +377,25 @@ export function AdminDashboard() {
 
   const getDeleteRequestActions = (request) => (
     <div className="flex gap-2">
-      <button
-        onClick={() => handleDeleteRequestAction(request.id, "approve")}
-        className="text-xs font-medium px-3 py-1 rounded-full bg-green-100 text-green-700 hover:bg-green-200"
-      >
-        Approve
-      </button>
-      <button
-        onClick={() => {
-          setSelectedItem(request);
-          setShowRejectDialog(true);
-        }}
-        className="text-xs font-medium px-3 py-1 rounded-full bg-red-100 text-red-700 hover:bg-red-200"
-      >
-        Reject
-      </button>
+      {request.status !== "approved" && request.status !== "rejected" && (
+        <>
+          <button
+            onClick={() => handleDeleteRequestAction(request.id, "approve")}
+            className="text-xs font-medium px-3 py-1 rounded-full bg-green-100 text-green-700 hover:bg-green-200"
+          >
+            Approve
+          </button>
+          <button
+            onClick={() => {
+              setSelectedItem(request);
+              setShowRejectDialog(true);
+            }}
+            className="text-xs font-medium px-3 py-1 rounded-full bg-red-100 text-red-700 hover:bg-red-200"
+          >
+            Reject
+          </button>
+        </>
+      )}
     </div>
   );
 
@@ -369,7 +408,7 @@ export function AdminDashboard() {
         <div className="mb-4">
           <GenericTablePage
             title="USERS"
-            data={usersData}
+            data={formatConsumerUsers(consumerUsers)}
             columns={userColumns}
             showHeaderAction
             compactLayout
@@ -381,7 +420,7 @@ export function AdminDashboard() {
         <div className="mb-4">
           <GenericTablePage
             title="ADVERTISERS"
-            data={advertisersData}
+            data={formatAdvertiserUsers(advertiserUsers)}
             columns={advertiserColumns}
             showHeaderAction
             compactLayout
@@ -390,10 +429,10 @@ export function AdminDashboard() {
         </div>
 
         {/* ADS APPROVAL TABLE */}
-        <div>
+        <div className="mb-4">
           <GenericTablePage
             title="ADS FOR APPROVAL"
-            data={adsApprovalData}
+            data={formatCampaigns(latestCampaigns)}
             columns={adsApprovalColumns}
             getActions={getAdsApprovalActions}
             loading={loading}
@@ -406,7 +445,7 @@ export function AdminDashboard() {
         <div className="mb-4">
           <GenericTablePage
             title="ACCOUNT DELETE REQUESTS"
-            data={deleteRequestsData}
+            data={formatDeletionRequests(deletionRequests)}
             columns={deleteRequestColumns}
             getActions={getDeleteRequestActions}
             loading={loading}
@@ -415,18 +454,23 @@ export function AdminDashboard() {
             showHeaderProfile={false}
           />
         </div>
-
       </div>
 
       <RejectDialog
         open={showRejectDialog}
         onClose={() => {
           setShowRejectDialog(false);
-          setSelectedCampaign(null);
+          setSelectedItem(null);
         }}
         onSave={async ({ reason }) => {
-          if (selectedCampaign) {
-            await handleCampaignAction(selectedCampaign.id, "reject", reason);
+          if (selectedItem) {
+            if (selectedItem.campaignTitle) {
+              // It's a campaign
+              await handleCampaignAction(selectedItem.id, "reject", reason);
+            } else {
+              // It's a deletion request
+              await handleDeleteRequestAction(selectedItem.id, "reject", reason);
+            }
             setShowRejectDialog(false);
           }
         }}

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGO_URI;
+const MONGODB_URI = process.env.MONGO_URI || "mongodb+srv://abdullahk10204:tnTIx6WxvYZNPQ0y@aditt-dev.bmur94v.mongodb.net/";
 
 if (!MONGODB_URI) {
     throw new Error("Please define the MONGODB_URI environment variable in .env.local");
@@ -31,4 +31,13 @@ async function connectToDatabase() {
     return cached.conn;
 }
 
-module.exports = connectToDatabase;
+// Function to get the consumerusers collection
+async function getConsumerUsersCollection() {
+    const db = await connectToDatabase();
+    return db.connection.db.collection('consumerusers');
+}
+
+module.exports = {
+    connectToDatabase,
+    getConsumerUsersCollection
+};

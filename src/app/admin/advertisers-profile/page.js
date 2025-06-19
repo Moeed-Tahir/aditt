@@ -68,11 +68,6 @@ export default function AdversitersProfile() {
       ),
     },
     {
-      label: "Type",
-      key: "profileType",
-      render: () => userData.user?.profileType || "N/A"
-    },
-    {
       label: "Total Views",
       key: "totalViews",
       render: (campaign) => `${campaign.totalViews}`,

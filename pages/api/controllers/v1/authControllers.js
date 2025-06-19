@@ -1,10 +1,10 @@
 const bcrypt = require("bcrypt");
 import User from '../../models/User.model';
 import Campaign from '../../models/Campaign.model';
-
+import { ObjectId } from 'mongodb';
 const { generateOTP, sendOTP } = require("../../services/otpServices");
 const jwt = require("jsonwebtoken");
-const connectToDatabase = require("../../config/dbConnect");
+const { getConsumerUsersCollection, connectToDatabase } = require("../../config/dbConnect");
 
 export const signUp = async (req, res) => {
     try {
@@ -304,7 +304,7 @@ export const resetPassword = async (req, res) => {
         }
 
         const user = await User.findOne({ userId: userId });
-        
+
         if (!user) {
             return res.status(404).json({
                 message: "User not found",
@@ -389,8 +389,6 @@ export const updateProfile = async (req, res) => {
         res.status(500).json({ message: "Server error during update" });
     }
 };
-
-
 
 export const updatePassword = async (req, res) => {
     try {
@@ -548,7 +546,7 @@ export const getProfile = async (req, res) => {
 export const getAllUsers = async (req, res) => {
     try {
         const verifiedUsers = await User.find({ isOtpVerified: true });
-        
+
         res.status(200).json({
             success: true,
             message: "Verified users retrieved successfully",
@@ -568,13 +566,13 @@ export const requestAccountDeletion = async (req, res) => {
     try {
         await connectToDatabase();
 
-        const { userId } = req.body; 
-        
+        const { userId } = req.body;
+
         if (!userId) {
             return res.status(400).json({ message: 'User ID is required' });
         }
 
-        const user = await User.findOne({userId:userId});
+        const user = await User.findOne({ userId: userId });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -591,7 +589,7 @@ export const requestAccountDeletion = async (req, res) => {
 
         await user.save();
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: 'Account deletion request submitted. Waiting for admin approval.',
             requestStatus: 'pending'
         });
@@ -605,12 +603,12 @@ export const getPendingDeletionRequests = async (req, res) => {
     try {
         await connectToDatabase();
 
-        const pendingRequests = await User.find({ 
+        const pendingRequests = await User.find({
             'deletionRequest.requested': true,
             'deletionRequest.status': 'pending'
         }).select('-password -otp');
 
-        res.status(200).json({message:"Recieved Successfully Deletion Request",pendingRequests});
+        res.status(200).json({ message: "Recieved Successfully Deletion Request", pendingRequests });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
@@ -647,7 +645,7 @@ export const approveDeletionRequest = async (req, res) => {
 export const rejectDeletionRequest = async (req, res) => {
     try {
         await connectToDatabase();
-        const { reason,userId } = req.body; 
+        const { reason, userId } = req.body;
 
         const user = await User.findById(userId);
         if (!user) {
@@ -663,7 +661,7 @@ export const rejectDeletionRequest = async (req, res) => {
 
         await user.save();
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: 'Account deletion request rejected',
             reason: reason || 'No reason provided'
         });
@@ -675,8 +673,8 @@ export const rejectDeletionRequest = async (req, res) => {
 export const getAllUserDataAgainstId = async (req, res) => {
     try {
         const { userId } = req.body;
-        console.log("userId",userId);
-        
+        console.log("userId", userId);
+
         const user = await User.findOne({ userId });
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
@@ -692,10 +690,166 @@ export const getAllUserDataAgainstId = async (req, res) => {
         res.status(200).json({ success: true, data: userData });
     } catch (error) {
         console.error('Error fetching user data:', error);
-        res.status(500).json({ 
-            success: false, 
+        res.status(500).json({
+            success: false,
             message: 'Internal server error',
-            error: error.message 
+            error: error.message
         });
     }
 };
+
+export const getConsumerUser = async (req, res) => {
+    try {
+
+        await connectToDatabase();
+        const consumerUsers = await getConsumerUsersCollection();
+
+        const latestUsers = await consumerUsers.find()
+            .sort({ createdAt: -1 })
+            .limit(3)
+            .toArray();
+
+        if (latestUsers.length === 0) {
+            return res.status(404).json({ message: 'No users found' });
+        }
+
+        res.status(200).json({ message: "Consumer User Retrieved Successfully", latestUsers });
+    } catch (error) {
+        console.error('Error fetching latest consumer users:', error);
+        res.status(500).json({
+            message: 'Error fetching latest consumer users',
+            error: error.message
+        });
+    }
+}
+
+export const getAllConsumerUser = async (req, res) => {
+    try {
+
+        await connectToDatabase();
+        const consumerUsers = await getConsumerUsersCollection();
+
+        const latestUsers = await consumerUsers.find().toArray();
+
+        if (latestUsers.length === 0) {
+            return res.status(404).json({ message: 'No users found' });
+        }
+
+        res.status(200).json({ message: "Consumer User Retrieved Successfully", latestUsers });
+    } catch (error) {
+        console.error('Error fetching latest consumer users:', error);
+        res.status(500).json({
+            message: 'Error fetching latest consumer users',
+            error: error.message
+        });
+    }
+}
+
+export const getLatestUsers = async (req, res) => {
+    try {
+        await connectToDatabase();
+        const verifiedUsers = await User.find({ isOtpVerified: true })
+            .sort({ createdAt: -1 })
+            .limit(3);
+
+        res.status(200).json({
+            success: true,
+            message: "Latest 3 verified users retrieved successfully",
+            data: verifiedUsers
+        });
+    } catch (error) {
+        console.error("Error fetching verified users:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+};
+
+export const getLatestPendingDeletionRequests = async (req, res) => {
+    try {
+        await connectToDatabase();
+
+        const users = await User.find({
+            "deletionRequest.requested": true,
+            "deletionRequest.status": "pending"
+        })
+            .sort({ "deletionRequest.requestedAt": -1 })
+            .limit(3);
+
+        if (!users || users.length === 0) {
+            return res.status(404).json({ message: 'No pending deletion requests found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            count: users.length,
+            data: users
+        });
+
+    } catch (error) {
+        console.error('Error fetching pending deletion requests:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+export const deleteAdvertiserUser = async (req, res) => {
+    try {
+        await connectToDatabase();
+        const { id } = req.body;
+
+        const deletedUser = await User.findByIdAndDelete(id);
+
+        if (!deletedUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "User deleted successfully",
+            data: deletedUser
+        });
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+};
+
+export const deleteConsumerUser = async (req, res) => {
+    try {
+        await connectToDatabase();
+        const { id } = req.body;
+        console.log("id",req.body);
+
+        const consumerUsers = await getConsumerUsersCollection();
+
+        const result = await consumerUsers.deleteOne({ _id: new ObjectId(id) });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({
+                message: 'Consumer user not found'
+            });
+        }
+
+        res.status(200).json({
+            message: "Consumer user deleted successfully",
+            deletedCount: result.deletedCount
+        });
+    } catch (error) {
+        console.error('Error deleting consumer user:', error);
+        res.status(500).json({
+            message: 'Error deleting consumer user',
+            error: error.message
+        });
+    }
+}
+
+

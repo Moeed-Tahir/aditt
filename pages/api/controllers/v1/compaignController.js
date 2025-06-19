@@ -521,3 +521,32 @@ exports.getAllCampaign = async (req, res) => {
     }
 }
 
+exports.getLatestPendingCampaign = async (req, res) => {
+    try {
+        const pendingCampaigns = await Compaign.find({ status: "Pending" })
+            .sort({ createdAt: -1 }) 
+            .limit(3);
+        
+        if (!pendingCampaigns || pendingCampaigns.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No pending campaigns found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            count: pendingCampaigns.length,
+            data: pendingCampaigns
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error fetching pending campaigns",
+            error: error.message
+        });
+    }
+};
+
+

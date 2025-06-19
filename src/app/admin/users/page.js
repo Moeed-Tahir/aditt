@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage";
@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
+import { toast } from "sonner";
 
 export default function UsersPage() {
   const [activeTab, setActiveTab] = useState("active");
@@ -20,6 +22,25 @@ export default function UsersPage() {
   const [editedLimit, setEditedLimit] = useState(1000);
   const [editingTarget, setEditingTarget] = useState("active");
   const [showLimitModal, setShowLimitModal] = useState(false);
+  const [consumerUsers, setConsumerUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchConsumers = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/routes/v1/authRoutes?action=getAllConsumerUser");
+      setConsumerUsers(response?.data?.latestUsers || []);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error fetching consumer users");
+      console.error('Error fetching consumer users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchConsumers();
+  }, []);
 
   const handleSaveLimit = () => {
     if (editingTarget === "active") setActiveLimit(editedLimit);
@@ -27,51 +48,25 @@ export default function UsersPage() {
     setShowLimitModal(false);
   };
 
-  const activeUsers = [
-    {
-      _id: "1",
-      name: "John Doe",
-      image: "User1.png",
-      gender: "Male",
-      phoneNumber: "+123456789",
-      dob: "1990-05-01",
-      totalEarning: 1200,
-      totalWithdrawal: 800,
-    },
-    {
-      _id: "2",
-      name: "Jane Smith",
-      image: "User2.png",
-      gender: "Female",
-      phoneNumber: "+987654321",
-      dob: "1985-09-12",
-      totalEarning: 1500,
-      totalWithdrawal: 900,
-    },
-  ];
+  // Process users based on active/waitlist limits
+  const processUsers = () => {
+    if (!consumerUsers.length) return { activeUsers: [], waitlistUsers: [] };
 
-  const waitlistUsers = [
-    {
-      _id: "3",
-      name: "Alice Johnson",
-      image: "User2.png",
-      gender: "Female",
-      phoneNumber: "+1122334455",
-      dob: "1992-03-21",
-      totalEarning: 0,
-      totalWithdrawal: 0,
-    },
-    {
-      _id: "4",
-      name: "Bob Williams",
-      image: "User1.png",
-      gender: "Male",
-      phoneNumber: "+9988776655",
-      dob: "1988-07-10",
-      totalEarning: 0,
-      totalWithdrawal: 0,
-    },
-  ];
+    // Sort users by OTP expiration date (newest first)
+    const sortedUsers = [...consumerUsers].sort((a, b) => 
+      new Date(b.otpExpires) - new Date(a.otpExpires)
+    );
+
+    // Active users are the first N users up to activeLimit
+    const activeUsers = sortedUsers.slice(0, activeLimit);
+    
+    // Waitlist users are the next M users up to waitlistLimit
+    const waitlistUsers = sortedUsers.slice(activeLimit, activeLimit + waitlistLimit);
+
+    return { activeUsers, waitlistUsers };
+  };
+
+  const { activeUsers, waitlistUsers } = processUsers();
 
   const columns = [
     {
@@ -80,38 +75,73 @@ export default function UsersPage() {
       render: (user) => (
         <div className="flex items-center gap-2">
           <img
-            src={`/${user.image}`}
+            src="/user-placeholder.png" // Using placeholder since image isn't in your data
             alt={user.name}
             className="w-8 h-8 rounded-full"
           />
           <div>
-            <div>{user.name}</div>
-            <div className="text-xs text-gray-500">{user.gender}</div>
+            <div>{user.name || "No Name"}</div>
+            <div className="text-xs text-gray-500">{user.gender || "Not specified"}</div>
           </div>
         </div>
       ),
     },
-    { label: "PHONE NUMBER", key: "phoneNumber" },
+    { 
+      label: "PHONE NUMBER", 
+      key: "phone",
+      render: (user) => user.phone || "N/A"
+    },
     {
       label: "DOB",
-      key: "dob",
-      render: (user) => new Date(user.dob).toLocaleDateString("en-GB"),
+      key: "dateOfBirth",
+      render: (user) => user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString("en-GB") : "N/A",
     },
     {
-      label: "TOTAL EARNING",
-      key: "totalEarning",
-      render: (u) => `$${u.totalEarning}`,
+      label: "VERIFICATION",
+      key: "isVerified",
+      render: (user) => (
+        <span className={`px-2 py-1 rounded-full text-xs ${
+          user.isVerified 
+            ? "bg-green-100 text-green-800" 
+            : "bg-yellow-100 text-yellow-800"
+        }`}>
+          {user.isVerified ? "Verified" : "Not Verified"}
+        </span>
+      ),
     },
     {
-      label: "TOTAL WITHDRAWAL",
-      key: "totalWithdrawal",
-      render: (u) => `$${u.totalWithdrawal}`,
+      label: "OTP VERIFIED",
+      key: "isOtpVerified",
+      render: (user) => (
+        <span className={`px-2 py-1 rounded-full text-xs ${
+          user.isOtpVerified 
+            ? "bg-green-100 text-green-800" 
+            : "bg-yellow-100 text-yellow-800"
+        }`}>
+          {user.isOtpVerified ? "Verified" : "Pending"}
+        </span>
+      ),
+    },
+    {
+      label: "STATUS",
+      key: "status",
+      render: (u) => (
+        <span className={`px-2 py-1 rounded-full text-xs ${
+          activeUsers.some(au => au._id === u._id) 
+            ? "bg-green-100 text-green-800" 
+            : "bg-yellow-100 text-yellow-800"
+        }`}>
+          {activeUsers.some(au => au._id === u._id) ? "Active" : "Waitlist"}
+        </span>
+      ),
     },
   ];
 
   const sortOptions = [
-    { label: "A to Z", value: (a, b) => a.name.localeCompare(b.name) },
-    { label: "Z to A", value: (a, b) => b.name.localeCompare(a.name) },
+    { label: "A to Z", value: (a, b) => (a.name || "").localeCompare(b.name || "") },
+    { label: "Z to A", value: (a, b) => (b.name || "").localeCompare(a.name || "") },
+    { label: "Newest First", value: (a, b) => new Date(b.otpExpires) - new Date(a.otpExpires) },
+    { label: "Oldest First", value: (a, b) => new Date(a.otpExpires) - new Date(b.otpExpires) },
   ];
 
   const dataToShow = activeTab === "active" ? activeUsers : waitlistUsers;
@@ -121,55 +151,57 @@ export default function UsersPage() {
       {/* Tabs */}
       <div className="flex gap-2 rounded p-1 text-sm font-semibold w-full max-w-md">
         <button
-          className={`flex-1 py-2 px-4 rounded-full ${
-            activeTab === "active"
+          className={`flex-1 py-2 px-4 rounded-full ${activeTab === "active"
               ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
               : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
-          } transition flex items-center justify-center`}
+            } transition flex items-center justify-center`}
           onClick={() => setActiveTab("active")}
         >
-          Active Users
+          Active Users ({activeUsers.length})
         </button>
         <button
-          className={`flex-1 py-2 px-4 rounded-full ${
-            activeTab === "waitlist"
+          className={`flex-1 py-2 px-4 rounded-full ${activeTab === "waitlist"
               ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
               : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
-          } transition flex items-center justify-center`}
+            } transition flex items-center justify-center`}
           onClick={() => setActiveTab("waitlist")}
         >
-          Waitlist
+          Waitlist ({waitlistUsers.length})
         </button>
       </div>
 
       {/* Active tab info */}
-      {activeTab === "active" && (
-        <div className="bg-white shadow-sm rounded-xl px-6 py-4 w-full flex justify-between items-start flex-wrap gap-4">
+      <div className="bg-white shadow-sm rounded-xl px-6 py-4 w-full flex justify-between items-start flex-wrap gap-4">
+        <div>
           <p className="text-[22px] font-semibold text-gray-800">
-            Active Users Limit: {activeLimit}
+            {activeTab === "active" 
+              ? `Active Users Limit: ${activeLimit} (${activeUsers.length} active)` 
+              : `Waitlist Limit: ${waitlistLimit} (${waitlistUsers.length} in waitlist)`}
           </p>
-          <button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              setEditingTarget("active");
-              setEditedLimit(activeLimit);
-              setShowLimitModal(true);
-            }}
-            className="py-2 px-5 rounded-full bg-blue-600 text-white border border-blue-800 hover:bg-blue-800 transition flex items-center gap-2 justify-center"
-          >
-            Edit Limit
-          </button>
+          <p className="text-sm text-gray-500">
+            Total users: {consumerUsers.length}
+          </p>
         </div>
-      )}
+        <button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setEditingTarget(activeTab);
+            setEditedLimit(activeTab === "active" ? activeLimit : waitlistLimit);
+            setShowLimitModal(true);
+          }}
+          className="py-2 px-5 rounded-full bg-blue-600 text-white border border-blue-800 hover:bg-blue-800 transition flex items-center gap-2 justify-center"
+        >
+          Edit {activeTab === "active" ? "Active" : "Waitlist"} Limit
+        </button>
+      </div>
 
       {/* Limit edit modal */}
       <Dialog open={showLimitModal} onOpenChange={setShowLimitModal}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
             <DialogTitle>
-              Edit {editingTarget === "active" ? "Active Users" : "Waitlist"}{" "}
-              Limit
+              Edit {editingTarget === "active" ? "Active Users" : "Waitlist"} Limit
             </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-4">
@@ -179,6 +211,7 @@ export default function UsersPage() {
               value={editedLimit}
               onChange={(e) => setEditedLimit(Number(e.target.value))}
               className="w-full border border-input rounded-full px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              min={0}
             />
             <div className="flex justify-between gap-2 w-full">
               <button
@@ -203,8 +236,8 @@ export default function UsersPage() {
 
   const filterOptions = {
     date: true,
-    status: false, // Disable status filter for users
-    customStatusOptions: [], // No status options needed
+    status: false,
+    customStatusOptions: [],
   };
 
   return (
@@ -216,9 +249,10 @@ export default function UsersPage() {
         columns={columns}
         sortOptions={sortOptions}
         filterOptions={filterOptions}
-        filters={{ dateKey: "dob" }} // No statusKey needed
+        filters={{ dateKey: "otpExpires" }} // Using otpExpires as the date filter key
         headerAction={headerAction}
         showHeaderAction={true}
+        loading={loading}
       />
     </SidebarProvider>
   );
