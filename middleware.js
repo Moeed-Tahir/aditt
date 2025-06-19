@@ -27,7 +27,7 @@ export function middleware(request) {
     if (isAdmin) {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
-    return NextResponse.redirect(new URL('/campaign-dashboard', request.url));
+    return NextResponse.redirect(new URL(`/${userId}/campaign-dashboard`, request.url));
   }
 
   const isAdminPath = adminProtectedPaths.some(regex => regex.test(pathname));

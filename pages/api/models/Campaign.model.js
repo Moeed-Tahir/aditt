@@ -7,9 +7,11 @@ const QuestionSchema = new mongoose.Schema({
         trim: true
     },
     option1: {
-        type: String,
-        required: false,
-        trim: true,
+        optionValue: {
+            type: String,
+            required: false,
+            trim: true
+        },
         totalCount: {
             type: Number,
             required: false,
@@ -17,9 +19,11 @@ const QuestionSchema = new mongoose.Schema({
         },
     },
     option2: {
-        type: String,
-        required: false,
-        trim: true,
+        optionValue: {
+            type: String,
+            required: false,
+            trim: true
+        },
         totalCount: {
             type: Number,
             required: false,
@@ -27,9 +31,11 @@ const QuestionSchema = new mongoose.Schema({
         },
     },
     option3: {
-        type: String,
-        required: false,
-        trim: true,
+        optionValue: {
+            type: String,
+            required: false,
+            trim: true
+        },
         totalCount: {
             type: Number,
             required: false,
@@ -37,9 +43,11 @@ const QuestionSchema = new mongoose.Schema({
         },
     },
     option4: {
-        type: String,
-        required: false,
-        trim: true,
+       optionValue: {
+            type: String,
+            required: false,
+            trim: true
+        },
         totalCount: {
             type: Number,
             required: false,

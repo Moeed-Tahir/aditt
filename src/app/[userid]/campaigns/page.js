@@ -10,28 +10,25 @@ const Page = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const [campaignData, setCampaignData] = useState([]);
-  
-  console.log("campaignData", campaignData);
-
-  const fetchCampaign = async () => {
-    try {
-      const response = await axios.post("/api/routes/v1/campaignRoutes?action=getCampaignAgainstId", {
-        id: id
-      });
-
-      if(response.data.message === "Campaign Retrieved Successfully"){
-      setCampaignData(response.data.campaign);
-      }       
-    } catch (error) {
-      toast.error(error?.response?.data?.message || "Error is occur");
-
-      console.error('Error creating campaign:', error);
-    }
-  };
 
   useEffect(() => {
+    const fetchCampaign = async () => {
+      try {
+        const response = await axios.post("/api/routes/v1/campaignRoutes?action=getCampaignAgainstId", {
+          id: id
+        });
+
+        if (response.data.message === "Campaign Retrieved Successfully") {
+          setCampaignData(response.data.campaign);
+        }
+      } catch (error) {
+        toast.error(error?.response?.data?.message || "Error is occur");
+        console.error('Error creating campaign:', error);
+      }
+    };
+
     fetchCampaign();
-  }, [id]);
+  }, [id]); // Now we only need id as a dependency
 
   return (
     <>

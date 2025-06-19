@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import axios from "axios";
 import { toast } from "sonner";
+import Image from "next/image";
 
 export default function UsersPage() {
   const [activeTab, setActiveTab] = useState("active");
@@ -71,7 +72,9 @@ export default function UsersPage() {
       render: (user) => (
         <div className="flex items-center gap-2">
           {user.image ? (
-            <img
+            <Image
+              width={32}
+              height={32}
               src={user.image}
               alt={user.name}
               className="w-8 h-8 rounded-full"

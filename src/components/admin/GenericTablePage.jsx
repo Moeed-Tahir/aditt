@@ -5,7 +5,7 @@ import Navbar from "../Navbar";
 import { Button } from "@/components/ui/button";
 import { Eye, Trash } from "lucide-react";
 import Link from "next/link";
-import SortByAndFilters from "./SortByandFilters";
+import SortByAndFilters from "@/components/admin/SortByAndFilters";
 import ConfirmationModal from "../ConfirmationModal";
 import axios from "axios";
 

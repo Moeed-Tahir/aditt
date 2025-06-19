@@ -9,23 +9,23 @@ import { toast } from "sonner";
 
 export default function CampaignDashboard() {
   const [campaignData, setCampaignData] = useState()
-  const userId = Cookies.get("userId");
-  
-  const fetchCampaign = async () => {
-    try {
 
-      const response = await axios.post("/api/routes/v1/campaignRoutes?action=getCampaign", {
-        userId:userId
-      });
-
-      setCampaignData(response.data.campaign);
-    } catch (error) {
-      toast.error(error?.response?.data?.message || "Error is occur");
-      console.error('Error creating campaign:', error);
-    }
-  };
 
   useEffect(() => {
+    const userId = Cookies.get("userId");
+    const fetchCampaign = async () => {
+      try {
+
+        const response = await axios.post("/api/routes/v1/campaignRoutes?action=getCampaign", {
+          userId: userId
+        });
+
+        setCampaignData(response.data.campaign);
+      } catch (error) {
+        toast.error(error?.response?.data?.message || "Error is occur");
+        console.error('Error creating campaign:', error);
+      }
+    };
     fetchCampaign();
   }, [])
 

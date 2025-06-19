@@ -25,26 +25,26 @@ function AdvertisersProfileContent() {
   const [userData, setUserData] = useState({ user: null, campaigns: [] });
   const [loading, setLoading] = useState(false);
 
-  const fetchUserData = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        "/api/routes/v1/authRoutes?action=getAllUserDataAgainstId",
-        { userId: id }
-      );
-
-      if (response.data.success) {
-        setUserData(response.data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      toast.error("Failed to fetch user data");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.post(
+          "/api/routes/v1/authRoutes?action=getAllUserDataAgainstId",
+          { userId: id }
+        );
+
+        if (response.data.success) {
+          setUserData(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        toast.error("Failed to fetch user data");
+      } finally {
+        setLoading(false);
+      }
+    };
     if (id) {
       fetchUserData();
     }
@@ -85,12 +85,12 @@ function AdvertisersProfileContent() {
       render: (campaign) => (
         <span
           className={`text-xs font-medium px-3 py-1 rounded-full ${campaign.status === "Active"
-              ? "bg-blue-100 text-blue-700"
-              : campaign.status === "Pending"
-                ? "bg-yellow-100 text-yellow-700"
-                : campaign.status === "Rejected"
-                  ? "bg-red-100 text-red-700"
-                  : "bg-green-100 text-green-700"
+            ? "bg-blue-100 text-blue-700"
+            : campaign.status === "Pending"
+              ? "bg-yellow-100 text-yellow-700"
+              : campaign.status === "Rejected"
+                ? "bg-red-100 text-red-700"
+                : "bg-green-100 text-green-700"
             }`}
         >
           {campaign.status}
