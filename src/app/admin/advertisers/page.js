@@ -73,6 +73,13 @@ export default function Adversiters() {
     },
   ];
 
+  const filterOptions = {
+    date: true,
+    status: false,
+    customStatusOptions: []
+  };
+
+
   return (
     <SidebarProvider>
       <AppSidebar mode="admin" />
@@ -82,6 +89,7 @@ export default function Adversiters() {
         data={advertiserUser}
         columns={columns}
         sortOptions={sortOptions}
+        filterOptions={false}
         filters={{ dateKey: "dob", statusKey: "status" }}
       />
     </SidebarProvider>

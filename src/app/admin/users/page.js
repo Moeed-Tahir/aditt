@@ -119,23 +119,23 @@ export default function UsersPage() {
   const headerAction = (
     <div className="flex flex-col gap-4 w-full">
       {/* Tabs */}
-      <div className="flex gap-2 rounded bg-gray-100 p-1 text-sm font-semibold w-fit">
+      <div className="flex gap-2 rounded p-1 text-sm font-semibold w-full max-w-md">
         <button
-          className={`px-3 py-1 rounded ${
+          className={`flex-1 py-2 px-4 rounded-full ${
             activeTab === "active"
-              ? "bg-blue-600 py-2 px-5 rounded-full text-white"
-              : "text-gray-600  py-2 px-5 rounded-full  hover:bg-gray-200"
-          }`}
+              ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
+              : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
+          } transition flex items-center justify-center`}
           onClick={() => setActiveTab("active")}
         >
           Active Users
         </button>
         <button
-          className={`px-3 py-1 rounded ${
+          className={`flex-1 py-2 px-4 rounded-full ${
             activeTab === "waitlist"
-              ? "bg-blue-600 py-2 px-5 rounded-full text-white"
-              : "text-gray-600  py-2 px-5 rounded-full  hover:bg-gray-200"
-          }`}
+              ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
+              : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
+          } transition flex items-center justify-center`}
           onClick={() => setActiveTab("waitlist")}
         >
           Waitlist
@@ -148,7 +148,7 @@ export default function UsersPage() {
           <p className="text-[22px] font-semibold text-gray-800">
             Active Users Limit: {activeLimit}
           </p>
-          <Button
+          <button
             size="sm"
             variant="outline"
             onClick={() => {
@@ -156,32 +156,10 @@ export default function UsersPage() {
               setEditedLimit(activeLimit);
               setShowLimitModal(true);
             }}
-            className="rounded-full py-2 px-5 bg-blue-600 hover:bg-blue-700 text-white"
+            className="py-2 px-5 rounded-full bg-blue-600 text-white border border-blue-800 hover:bg-blue-800 transition flex items-center gap-2 justify-center"
           >
             Edit Limit
-          </Button>
-        </div>
-      )}
-
-      {/* Waitlist tab info */}
-      {activeTab === "waitlist" && (
-        <div className="bg-white shadow-sm rounded-xl px-6 py-4 w-full flex justify-between items-start flex-wrap gap-4">
-          <p className="text-[22px] font-semibold text-gray-800">
-            Waitlist Limit: {waitlistLimit}
-          </p>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              setEditingTarget("waitlist");
-              setEditedLimit(waitlistLimit);
-              setShowLimitModal(true);
-            }}
-            className="rounded-full py-2 px-5 bg-blue-600 hover:bg-blue-700 text-white"
-
-          >
-            Edit Limit
-          </Button>
+          </button>
         </div>
       )}
 
@@ -203,25 +181,31 @@ export default function UsersPage() {
               className="w-full border border-input rounded-full px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             />
             <div className="flex justify-between gap-2 w-full">
-              <Button
+              <button
                 variant="outline"
-                className="rounded-full px-8 py-2 w-1/2"
+                className="py-2 px-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2 w-1/2 justify-center"
                 onClick={() => setShowLimitModal(false)}
               >
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={handleSaveLimit}
-                className="rounded-full px-8 py-2 w-1/2 bg-blue-600 hover:bg-blue-700 text-white"
+                className="py-2 px-5 rounded-full bg-blue-600 text-white border border-blue-800 hover:bg-blue-800 transition flex items-center gap-2 w-1/2 justify-center"
               >
                 Save
-              </Button>
+              </button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
     </div>
   );
+
+  const filterOptions = {
+    date: true,
+    status: false, // Disable status filter for users
+    customStatusOptions: [], // No status options needed
+  };
 
   return (
     <SidebarProvider>
@@ -231,7 +215,8 @@ export default function UsersPage() {
         data={dataToShow}
         columns={columns}
         sortOptions={sortOptions}
-        filters={{ dateKey: "dob", statusKey: "status" }}
+        filterOptions={filterOptions}
+        filters={{ dateKey: "dob" }} // No statusKey needed
         headerAction={headerAction}
         showHeaderAction={true}
       />

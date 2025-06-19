@@ -14,13 +14,17 @@ import { cn } from "@/lib/utils";
 
 export default function SortByAndFilters({
   sortOptions = [],
+  filterOptions = {
+    date: true,
+    status: true,
+    customStatusOptions: ["Active", "Pending", "Paused"]
+  },
   onSortChange,
   onFilterChange,
 }) {
   const [statusFilter, setStatusFilter] = useState("All");
   const [dateFilter, setDateFilter] = useState({ from: "", to: "" });
   const [selectedSortLabel, setSelectedSortLabel] = useState(null);
-
 
   const handleStatusClick = (status) => {
     const newStatus = statusFilter === status ? "All" : status;
@@ -75,77 +79,83 @@ export default function SortByAndFilters({
           </DropdownMenuContent>
         </DropdownMenu>
       )}
-      {/* Filter Dropdown */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            className="flex items-center gap-1 text-blue-600 rounded-full"
-          >
-            <ListFilter className="w-4 h-4" /> Filter
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent   className="rounded-2xl w-[343px] p-5 gap-6 space-y-6 shadow-md translate-x-[-40px]"
-        >
-          {/* Date Filter */}
-          <div>
-            <p className="text-sm font-semibold mb-2">Date</p>
-            <div className="flex gap-2">
-              {["from", "to"].map((field) => (
-                <div
-                  key={field}
-                  className="relative flex items-center w-full bg-white border border-gray-300 rounded-full px-4 py-2"
-                >
-                  <Input
-                    type="date"
-                    value={dateFilter[field]}
-                    onChange={(e) => handleDateChange(field, e.target.value)}
-                    className="appearance-none bg-transparent outline-none border-none p-0 w-full text-sm"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Status Filter */}
-          <div>
-            <p className="text-sm font-semibold mb-2">Status</p>
-            <div className="flex gap-2 flex-wrap">
-              {["Active", "Pending", "Paused"].map((status) => (
-                <Button
-                  key={status}
-                  variant="outline"
-                  onClick={() => handleStatusClick(status)}
-                  className={cn(
-                    "rounded-full text-sm px-4 py-2",
-                    statusFilter === status &&
-                      "bg-blue-600 text-white hover:bg-blue-600"
-                  )}
-                >
-                  {status}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Footer Buttons */}
-          <div className="flex justify-between pt-2 gap-3">
+      
+      {/* Filter Dropdown - only show if any filter options are enabled */}
+      {(filterOptions.date || filterOptions.status) && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              onClick={clearAll}
-              className="rounded-full text-blue-600 border-blue-600 hover:bg-blue-50 w-1/2"
+              className="flex items-center gap-1 text-blue-600 rounded-full"
             >
-              Clear all
+              <ListFilter className="w-4 h-4" /> Filter
             </Button>
-            <Button
-              onClick={applyFilters}
-              className="rounded-full bg-blue-500 hover:bg-blue-600 text-white w-1/2"
-            >
-              Apply
-            </Button>
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="rounded-2xl w-[343px] p-5 gap-6 space-y-6 shadow-md translate-x-[-40px]">
+            {/* Date Filter - conditionally rendered */}
+            {filterOptions.date && (
+              <div>
+                <p className="text-sm font-semibold mb-2">Date</p>
+                <div className="flex gap-2">
+                  {["from", "to"].map((field) => (
+                    <div
+                      key={field}
+                      className="relative flex items-center w-full bg-white border border-gray-300 rounded-full px-4 py-2"
+                    >
+                      <Input
+                        type="date"
+                        value={dateFilter[field]}
+                        onChange={(e) => handleDateChange(field, e.target.value)}
+                        className="appearance-none bg-transparent outline-none border-none p-0 w-full text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Status Filter - conditionally rendered */}
+            {filterOptions.status && (
+              <div>
+                <p className="text-sm font-semibold mb-2">Status</p>
+                <div className="flex gap-2 flex-wrap">
+                  {filterOptions.customStatusOptions.map((status) => (
+                    <Button
+                      key={status}
+                      variant="outline"
+                      onClick={() => handleStatusClick(status)}
+                      className={cn(
+                        "rounded-full text-sm px-4 py-2",
+                        statusFilter === status &&
+                          "bg-blue-600 text-white hover:bg-blue-600"
+                      )}
+                    >
+                      {status}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Footer Buttons */}
+            <div className="flex justify-between pt-2 gap-3">
+              <Button
+                variant="outline"
+                onClick={clearAll}
+                className="rounded-full text-blue-600 border-blue-600 hover:bg-blue-50 w-1/2"
+              >
+                Clear all
+              </Button>
+              <Button
+                onClick={applyFilters}
+                className="rounded-full bg-blue-500 hover:bg-blue-600 text-white w-1/2"
+              >
+                Apply
+              </Button>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   );
 }

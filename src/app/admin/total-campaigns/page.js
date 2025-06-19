@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+
 export default function TotalCampaigns() {
   const [totalCampaign, setTotalCampaign] = useState([]);
 
@@ -35,7 +36,7 @@ export default function TotalCampaigns() {
 
   const columns = [
     {
-      label: "ALL CAMPAIGNS",
+      label: "ADVERTISERS",
       key: "userId",
       render: (campaign) => (
         <div className="flex items-center gap-2">
@@ -73,12 +74,13 @@ export default function TotalCampaigns() {
       key: "status",
       render: (c) => (
         <span
-          className={`text-xs font-medium px-3 py-1 rounded-full ${c.status === "Active"
-            ? "bg-green-100 text-green-700"
-            : c.status === "Paused"
+          className={`text-xs font-medium px-3 py-1 rounded-full ${
+            c.status === "Active"
+              ? "bg-green-100 text-green-700"
+              : c.status === "Paused"
               ? "bg-yellow-100 text-yellow-700"
               : "bg-blue-100 text-blue-700"
-            }`}
+          }`}
         >
           {c.status}
         </span>
@@ -91,17 +93,40 @@ export default function TotalCampaigns() {
       label: "A to Z", 
       value: (a, b) => {
         if (!a || !b) return 0;
-        return (a.name || '').localeCompare(b.name || '')
+        return (a.campaignTitle || '').localeCompare(b.campaignTitle || '');
       } 
     },
     { 
       label: "Z to A", 
       value: (a, b) => {
         if (!a || !b) return 0;
-        return (b.name || '').localeCompare(a.name || '')
+        return (b.campaignTitle || '').localeCompare(a.campaignTitle || '');
       } 
     },
+    {
+      label: "Highest Budget",
+      value: (a, b) => (b.campaignBudget || 0) - (a.campaignBudget || 0)
+    },
+    {
+      label: "Lowest Budget",
+      value: (a, b) => (a.campaignBudget || 0) - (b.campaignBudget || 0)
+    },
+    {
+      label: "Newest First",
+      value: (a, b) => new Date(b.campaignEndDate) - new Date(a.campaignEndDate)
+    },
+    {
+      label: "Oldest First",
+      value: (a, b) => new Date(a.campaignEndDate) - new Date(b.campaignEndDate)
+    }
   ];
+
+  // Custom filter options for this page
+  const filterOptions = {
+    date: true,
+    status: true,
+    customStatusOptions: ["Active", "Completed", "Paused"]
+  };
 
   const getCampaignsActions = (campaign) => {
     if (campaign.status === 'Completed') {
@@ -173,6 +198,7 @@ export default function TotalCampaigns() {
         data={totalCampaign}
         columns={columns}
         sortOptions={sortOptions}
+        filterOptions={filterOptions}
         filters={{ dateKey: "campaignEndDate", statusKey: "status" }}
         getActions={getCampaignsActions}
       />

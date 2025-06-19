@@ -23,6 +23,11 @@ export function GenericTablePage({
   headerProfile = null,
   fetchData,
   compactLayout = false,
+  filterOptions = {
+    date: true,
+    status: true,
+    customStatusOptions: [],
+  },
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState(null);
@@ -137,7 +142,7 @@ export function GenericTablePage({
       }`}
     >
       {" "}
-      {!compactLayout && <Navbar />}
+      {!compactLayout && <Navbar mode="admin" />}
       <div className={`${compactLayout ? "" : "p-4 sm:p-6"}`}>
         {showHeaderProfile && headerProfile && (
           <div className="max-w-[1440px] bg-white rounded-[15px] p-[0px] gap-[10px] mx-auto">
@@ -155,24 +160,35 @@ export function GenericTablePage({
             {showHeaderAction && headerAction}
           </div>
         </div>
-
         <div className="max-w-[1440px] bg-white rounded-[15px] p-[20px] gap-[10px] mx-auto">
           <div className="flex items-center mb-6 md:mb-10 justify-between flex-wrap gap-4">
             <div className="text-blue-600 font-md text-lg md:text-[24px]">
               {title}
             </div>
-
-            <SortByAndFilters
-              sortOptions={sortOptions}
-              onSortChange={(fn) => {
-                setSortBy(() => fn);
-              }}
-              onFilterChange={({ status, date }) => {
-                setStatusFilter(status);
-                setDateFilter(date);
-                setCurrentPage(1); // Reset to first page when filters change
-              }}
-            />
+            {!compactLayout && (
+              <SortByAndFilters
+                sortOptions={sortOptions}
+                filterOptions={filterOptions}
+                onSortChange={(fn) => {
+                  setSortBy(() => fn);
+                }}
+                onFilterChange={({ status, date }) => {
+                  setStatusFilter(status);
+                  setDateFilter(date);
+                  setCurrentPage(1); // Reset to first page when filters change
+                }}
+              />
+            )}
+            {compactLayout && (
+              <Link
+                href={{
+                  pathname: "/admin/dashboard",
+                }}
+                className="text-blue-600 cursor-pointer"
+              >
+                See All
+              </Link>
+            )}
           </div>
 
           {/* Table */}
@@ -229,47 +245,48 @@ export function GenericTablePage({
           </div>
 
           {/* Pagination */}
-          {filteredData.length > 0 && (
+          {!compactLayout && filteredData.length > 0 && (
             <div className="flex justify-between items-center mt-6">
               <p className="text-sm text-gray-500">
                 Showing {paginatedData.length} of {filteredData.length} results
               </p>
               <div className="flex gap-2">
-  <Button
-    size="sm"
-    variant="outline"
-    disabled={currentPage === 1}
-    onClick={() => setCurrentPage(currentPage - 1)}
-  >
-    Previous
-  </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                >
+                  Previous
+                </Button>
 
-  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-    <Button
-      key={page}
-      size="sm"
-      variant={page === currentPage ? "default" : "outline"}
-      onClick={() => setCurrentPage(page)}
-      className={
-        page === currentPage
-          ? "bg-blue-600 text-white hover:bg-blue-700"
-          : ""
-      }
-    >
-      {page}
-    </Button>
-  ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <Button
+                      key={page}
+                      size="sm"
+                      variant={page === currentPage ? "default" : "outline"}
+                      onClick={() => setCurrentPage(page)}
+                      className={
+                        page === currentPage
+                          ? "bg-blue-600 text-white hover:bg-blue-700"
+                          : ""
+                      }
+                    >
+                      {page}
+                    </Button>
+                  )
+                )}
 
-  <Button
-    size="sm"
-    variant="outline"
-    disabled={currentPage === totalPages}
-    onClick={() => setCurrentPage(currentPage + 1)}
-  >
-    Next
-  </Button>
-</div>
-
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                >
+                  Next
+                </Button>
+              </div>
             </div>
           )}
         </div>

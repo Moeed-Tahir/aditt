@@ -136,18 +136,34 @@ export default function AdsApproval() {
 
   const sortOptions = [
     {
-      label: "A to Z",
+      label: "A to Z (Title)",
       value: (a, b) => {
         if (!a || !b) return 0;
-        return (a.name || '').localeCompare(b.name || '');
+        return (a.campaignTitle || '').localeCompare(b.campaignTitle || '');
       },
     },
     {
-      label: "Z to A",
+      label: "Z to A (Title)",
       value: (a, b) => {
         if (!a || !b) return 0;
-        return (b.name || '').localeCompare(a.name || '');
+        return (b.campaignTitle || '').localeCompare(a.campaignTitle || '');
       },
+    },
+    {
+      label: "Newest First",
+      value: (a, b) => new Date(b.createdAt || b.campaignStartDate) - new Date(a.createdAt || a.campaignStartDate),
+    },
+    {
+      label: "Oldest First",
+      value: (a, b) => new Date(a.createdAt || a.campaignStartDate) - new Date(b.createdAt || b.campaignStartDate),
+    },
+    {
+      label: "Highest Budget",
+      value: (a, b) => (b.campaignBudget || 0) - (a.campaignBudget || 0),
+    },
+    {
+      label: "Lowest Budget",
+      value: (a, b) => (a.campaignBudget || 0) - (b.campaignBudget || 0),
     },
   ];
 
@@ -175,6 +191,14 @@ export default function AdsApproval() {
     fetchApprovalData();
   }, []);
 
+  const filterOptions = {
+    date: true,
+    status: false,
+    customStatusOptions: []
+  };
+
+
+
   return (
     <SidebarProvider>
       <AppSidebar mode="admin" />
@@ -183,6 +207,7 @@ export default function AdsApproval() {
         data={approvalData}
         columns={columns}
         sortOptions={sortOptions}
+        filterOptions={false}
         filters={{ dateKey: "dob", statusKey: "status" }}
         getActions={getAdsApprovalActions}
         loading={loading}

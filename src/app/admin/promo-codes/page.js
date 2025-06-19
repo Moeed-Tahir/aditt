@@ -167,6 +167,8 @@ export default function PromoCodes() {
     },
   ];
 
+  
+
   const getPromoActions = (promo) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -202,6 +204,12 @@ export default function PromoCodes() {
     </button>
   );
 
+  const filterOptions = {
+    date: true,
+    status: false,
+    customStatusOptions: []
+  };
+
   return (
     <SidebarProvider>
       <AppSidebar mode="admin" />
@@ -227,6 +235,7 @@ export default function PromoCodes() {
         data={promoData}
         columns={columns}
         sortOptions={sortOptions}
+        filterOptions={filterOptions}
         filters={{ dateKey: "dob", statusKey: "status" }}
         getActions={getPromoActions}
         showHeaderAction={true}
