@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage";
@@ -24,22 +24,22 @@ export default function UsersPage() {
   const [consumerUsers, setConsumerUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchConsumers = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.post("/api/routes/v1/authRoutes?action=getAllConsumerUser");
-      setConsumerUsers(response?.data?.latestUsers || []);
-    } catch (error) {
-      toast.error(error?.response?.data?.message || "Error fetching consumer users");
-      console.error('Error fetching consumer users:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchConsumers = useCallback(async () => {
+  try {
+    setLoading(true);
+    const response = await axios.post("/api/routes/v1/authRoutes?action=getAllConsumerUser");
+    setConsumerUsers(response?.data?.latestUsers || []);
+  } catch (error) {
+    toast.error(error?.response?.data?.message || "Error fetching consumer users");
+    console.error('Error fetching consumer users:', error);
+  } finally {
+    setLoading(false);
+  }
+}, [setConsumerUsers, setLoading]); 
 
-  useEffect(() => {
-    fetchConsumers();
-  }, []);
+useEffect(() => {
+  fetchConsumers();
+}, [fetchConsumers]); 
 
   const handleSaveLimit = () => {
     if (editingTarget === "active") setActiveLimit(editedLimit);

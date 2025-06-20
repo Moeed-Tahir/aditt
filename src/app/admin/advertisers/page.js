@@ -5,12 +5,12 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage";
 import Link from "next/link";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 export default function Adversiters() {
   const [advertiserUser, setAdvertiserUser] = useState([]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await axios.post("/api/routes/v1/authRoutes?action=getAllUsers");
       if (response.data.success) {
@@ -24,13 +24,13 @@ export default function Adversiters() {
         setAdvertiserUser(usersWithDefaults);
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Error is occur");
+      toast.error(error?.response?.data?.message || "Error occurred");
     }
-  }
+  }, [setAdvertiserUser]);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   const columns = [
     {

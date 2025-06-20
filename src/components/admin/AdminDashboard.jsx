@@ -3,7 +3,7 @@
 import Navbar from "../Navbar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import RejectDialog from "@/components/RejectDialog";
 import { toast } from "sonner";
 import axios from "axios";
@@ -17,7 +17,7 @@ export function AdminDashboard() {
   const [deletionRequests, setDeletionRequests] = useState([]);
   const [latestCampaigns, setLatestCampaigns] = useState([]);
 
-  const fetchConsumers = async () => {
+  const fetchConsumers = useCallback(async () => {
     try {
       const response = await axios.post("/api/routes/v1/authRoutes?action=getConsumerUser");
       setConsumerUsers(response?.data?.latestUsers || []);
@@ -25,9 +25,9 @@ export function AdminDashboard() {
       toast.error(error?.response?.data?.message || "Error fetching consumer users");
       console.error('Error fetching consumer users:', error);
     }
-  };
+  }, [setConsumerUsers]);
 
-  const fetchAdvertiserUser = async () => {
+  const fetchAdvertiserUser = useCallback(async () => {
     try {
       const response = await axios.post("/api/routes/v1/authRoutes?action=getLatestUsers");
       setAdvertiserUsers(response?.data?.data || []);
@@ -35,36 +35,34 @@ export function AdminDashboard() {
       toast.error(error?.response?.data?.message || "Error fetching advertiser users");
       console.error('Error fetching advertiser users:', error);
     }
-  };
+  }, [setAdvertiserUsers]);
 
-  const fetchDeletionRequest = async () => {
+  const fetchDeletionRequest = useCallback(async () => {
     try {
       const response = await axios.post("/api/routes/v1/authRoutes?action=getLatestPendingDeletionRequests");
       setDeletionRequests(response?.data?.data || []);
-
     } catch (error) {
       toast.error(error?.response?.data?.message || "Error fetching deletion requests");
       console.error('Error fetching deletion requests:', error);
     }
-  };
+  }, [setDeletionRequests]);
 
-  const fetchLatestCampaign = async () => {
+  const fetchLatestCampaign = useCallback(async () => {
     try {
       const response = await axios.post("/api/routes/v1/campaignRoutes?action=getLatestPendingCampaign");
       setLatestCampaigns(response?.data?.data || []);
-
     } catch (error) {
       toast.error(error?.response?.data?.message || "Error fetching latest campaigns");
       console.error('Error fetching latest campaigns:', error);
     }
-  };
+  }, [setLatestCampaigns]);
 
   useEffect(() => {
     fetchConsumers();
     fetchAdvertiserUser();
     fetchDeletionRequest();
     fetchLatestCampaign();
-  }, []);
+  }, [fetchConsumers, fetchAdvertiserUser, fetchDeletionRequest, fetchLatestCampaign]);
 
   const formatConsumerUsers = (users) => {
     return users.map(user => ({

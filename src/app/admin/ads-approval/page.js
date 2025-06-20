@@ -4,7 +4,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RejectDialog from "@/components/RejectDialog";
@@ -16,22 +16,6 @@ export default function AdsApproval() {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const router = useRouter();
-
-  const fetchApprovalData = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        "/api/routes/v1/campaignRoutes?action=getPendingCampaign"
-      );
-      setApprovalData(response.data.data);
-    } catch (error) {
-      console.error("Error fetching campaigns:", error);
-      toast.error("Failed to fetch campaigns");
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleCampaignAction = async (campaignId, action, reason = "") => {
     try {
@@ -187,9 +171,25 @@ export default function AdsApproval() {
     </div>
   );
 
-  useEffect(() => {
-    fetchApprovalData();
-  }, []);
+const fetchApprovalData = useCallback(async () => {
+  try {
+    setLoading(true);
+    const response = await axios.post(
+      "/api/routes/v1/campaignRoutes?action=getPendingCampaign"
+    );
+    setApprovalData(response.data.data);
+  } catch (error) {
+    console.error("Error fetching campaigns:", error);
+    toast.error("Failed to fetch campaigns");
+    return [];
+  } finally {
+    setLoading(false);
+  }
+}, []); 
+
+useEffect(() => {
+  fetchApprovalData();
+}, [fetchApprovalData]);
 
   const filterOptions = {
     date: true,

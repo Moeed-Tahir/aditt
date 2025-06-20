@@ -9,7 +9,7 @@ import { SurveyDetails } from "@/components/campaign/SurveyDetails";
 import { PerformanceSummary } from "@/components/campaign/PerformanceSummary";
 import EngagementChart from "@/components/AreaCharts";
 import CampaignFeedbackForm from "../CampaignFeedbackForm";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -17,13 +17,11 @@ export function OverViewPage({ id }) {
   const [campaignData, setCampaignData] = useState([]);
   const [feedbackData, setFeedbackData] = useState([]);
 
-  const fetchCampaign = async () => {
+  const fetchCampaign = useCallback(async () => {
     try {
       const response = await axios.post(
         "/api/routes/v1/campaignRoutes?action=getCampaignAgainstId",
-        {
-          id: id,
-        }
+        { id }
       );
       console.log("response", response);
       if (response.data.message === "Campaign Retrieved Successfully") {
@@ -31,15 +29,14 @@ export function OverViewPage({ id }) {
         setFeedbackData(response.data.feedback);
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Error is occur");
-
-      console.error("Error creating campaign:", error);
+      toast.error(error?.response?.data?.message || "Error occurred");
+      console.error("Error fetching campaign:", error);
     }
-  };
+  }, [id, setCampaignData, setFeedbackData]);
 
   useEffect(() => {
     fetchCampaign();
-  }, [id]);
+  }, [fetchCampaign, id]);
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">

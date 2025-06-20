@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage";
@@ -24,32 +24,14 @@ export default function PromoCodes() {
   const [currentPromo, setCurrentPromo] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchPromoData = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.post("/api/routes/v1/promoRoutes?action=getAllPromoCodes");
-      
-      if (response.data.message === "Successfully Get Promo Codes") {
-        setPromoData(response.data.promoCodes);
-      }
-    } catch (error) {
-      console.error("Error fetching promo codes:", error);
-      toast.error("Failed to fetch promo codes");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  
-
   const togglePromoStatus = async (id) => {
     try {
       const response = await axios.post("/api/routes/v1/promoRoutes?action=togglePromoCodeStatus", { id });
-      console.log("response",response);
+      console.log("response", response);
 
       if (response.data) {
-        setPromoData(prevData => 
-          prevData.map(promo => 
+        setPromoData(prevData =>
+          prevData.map(promo =>
             promo._id === id ? { ...promo, status: !promo.status } : promo
           )
         );
@@ -69,7 +51,7 @@ export default function PromoCodes() {
   const handleDeletePromo = async (id) => {
     try {
       const response = await axios.post("/api/routes/v1/promoRoutes?action=deletePromoCode", { id });
-      
+
       if (response.data) {
         toast.success("Promo code deleted successfully");
         fetchPromoData();
@@ -86,7 +68,7 @@ export default function PromoCodes() {
         id: currentPromo._id,
         ...updatedData
       });
-      
+
       if (response.data) {
         toast.success("Promo code updated successfully");
         fetchPromoData();
@@ -98,9 +80,25 @@ export default function PromoCodes() {
     }
   };
 
+  const fetchPromoData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/routes/v1/promoRoutes?action=getAllPromoCodes");
+
+      if (response.data.message === "Successfully Get Promo Codes") {
+        setPromoData(response.data.promoCodes);
+      }
+    } catch (error) {
+      console.error("Error fetching promo codes:", error);
+      toast.error("Failed to fetch promo codes");
+    } finally {
+      setLoading(false);
+    }
+  }, [setLoading, setPromoData]);
+
   useEffect(() => {
     fetchPromoData();
-  }, []);
+  }, [fetchPromoData]);
 
   const columns = [
     {
@@ -114,23 +112,23 @@ export default function PromoCodes() {
         </div>
       ),
     },
-    { 
-      label: "DISCOUNT TYPE", 
-      key: "discountType" 
+    {
+      label: "DISCOUNT TYPE",
+      key: "discountType"
     },
-    { 
-      label: "VALUE", 
-      key: "discountValue", 
-      render: (u) => `${u.discountType === 'Percentage' ? `${u.discountValue}%` : `$${u.discountValue}`}` 
+    {
+      label: "VALUE",
+      key: "discountValue",
+      render: (u) => `${u.discountType === 'Percentage' ? `${u.discountValue}%` : `$${u.discountValue}`}`
     },
     {
       label: "STATUS",
       key: "status",
       render: (promoCodes) => (
         <label className="relative inline-flex items-center cursor-pointer">
-          <input 
-            type="checkbox" 
-            className="sr-only peer" 
+          <input
+            type="checkbox"
+            className="sr-only peer"
             checked={promoCodes.status}
             onChange={() => togglePromoStatus(promoCodes._id)}
           />
@@ -151,23 +149,23 @@ export default function PromoCodes() {
   ];
 
   const sortOptions = [
-    { 
-      label: "A to Z", 
+    {
+      label: "A to Z",
       value: (a, b) => {
         if (!a || !b) return 0;
         return (a.name || '').localeCompare(b.name || '')
-      } 
+      }
     },
-    { 
-      label: "Z to A", 
+    {
+      label: "Z to A",
       value: (a, b) => {
         if (!a || !b) return 0;
         return (b.name || '').localeCompare(a.name || '')
-      } 
+      }
     },
   ];
 
-  
+
 
   const getPromoActions = (promo) => (
     <DropdownMenu>

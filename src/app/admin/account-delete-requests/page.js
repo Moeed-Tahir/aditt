@@ -3,7 +3,7 @@
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import RejectDialog from "@/components/RejectDialog";
@@ -13,8 +13,8 @@ export default function AccountDeleteRequests() {
   const [deletionData, setDeletionData] = useState([]);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
-  
-  const fetchDeletionRequest = async () => {
+
+  const fetchDeletionRequest = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.post(
@@ -30,11 +30,11 @@ export default function AccountDeleteRequests() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchDeletionRequest();
-  }, []);
+  }, [fetchDeletionRequest]);
 
   const handleApprove = async (userId) => {
     try {
@@ -43,7 +43,7 @@ export default function AccountDeleteRequests() {
         `/api/routes/v1/authRoutes?action=approveDeletionRequest`,
         { userId }
       );
-      
+
       if (response.data.message === "Account deletion approved and user account removed") {
         toast.success("Account deletion approved");
         fetchDeletionRequest();
@@ -70,7 +70,7 @@ export default function AccountDeleteRequests() {
         `/api/routes/v1/authRoutes?action=rejectDeletionRequest`,
         { reason, userId: selectedUserId }
       );
-      
+
       if (response.data.message === "Account deletion request rejected") {
         toast.success("Deletion request rejected");
         fetchDeletionRequest();
@@ -142,7 +142,7 @@ export default function AccountDeleteRequests() {
         filters={{ dateKey: "dob", statusKey: "status" }}
         getActions={getAdsApprovalActions}
       />
-      
+
       <RejectDialog
         open={isRejectDialogOpen}
         onClose={() => {

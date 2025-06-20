@@ -4,7 +4,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { EllipsisVertical, Play, Pause, CheckCheck } from "lucide-react";
@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 export default function TotalCampaigns() {
   const [totalCampaign, setTotalCampaign] = useState([]);
 
-  const fetchAllCampaign = async () => {
+  const fetchAllCampaign = useCallback(async () => {
     try {
       const response = await axios.post("/api/routes/v1/campaignRoutes?action=getAllCampaign");
       if (response.data.message === "Campaigns retrieved successfully") {
@@ -28,11 +28,11 @@ export default function TotalCampaigns() {
     } catch (error) {
       toast.error(error?.response?.data?.message || "Error occurred");
     }
-  };
+  }, [setTotalCampaign]);
 
   useEffect(() => {
     fetchAllCampaign();
-  }, []);
+  }, [fetchAllCampaign]);
 
   const columns = [
     {
@@ -74,13 +74,12 @@ export default function TotalCampaigns() {
       key: "status",
       render: (c) => (
         <span
-          className={`text-xs font-medium px-3 py-1 rounded-full ${
-            c.status === "Active"
+          className={`text-xs font-medium px-3 py-1 rounded-full ${c.status === "Active"
               ? "bg-green-100 text-green-700"
               : c.status === "Paused"
-              ? "bg-yellow-100 text-yellow-700"
-              : "bg-blue-100 text-blue-700"
-          }`}
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-blue-100 text-blue-700"
+            }`}
         >
           {c.status}
         </span>
@@ -89,19 +88,19 @@ export default function TotalCampaigns() {
   ];
 
   const sortOptions = [
-    { 
-      label: "A to Z", 
+    {
+      label: "A to Z",
       value: (a, b) => {
         if (!a || !b) return 0;
         return (a.campaignTitle || '').localeCompare(b.campaignTitle || '');
-      } 
+      }
     },
-    { 
-      label: "Z to A", 
+    {
+      label: "Z to A",
       value: (a, b) => {
         if (!a || !b) return 0;
         return (b.campaignTitle || '').localeCompare(a.campaignTitle || '');
-      } 
+      }
     },
     {
       label: "Highest Budget",
