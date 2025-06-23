@@ -19,9 +19,8 @@ import Step3 from "./create-campaign/Step3";
 import Step4 from "./create-campaign/Step4";
 import { toast } from "sonner";
 
-const supabaseUrl = "https://rixdrbokebnvidwyzvzo.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGRyYm9rZWJudmlkd3l6dnpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI2MjMzMzIsImV4cCI6MjA0ODE5OTMzMn0.Zhnz5rLRoIhtHyF52pFjzYijNdxgZBvEr9LtOxR2Lhw";
+const supabaseUrl = "https://pcgpvkvbbyafxhsjszow.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZ3B2a3ZiYnlhZnhoc2pzem93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwODQwNzAsImV4cCI6MjA2NTY2MDA3MH0.Atj4LdjM56PgRrIQiI0WRJuU5krmpTDaajpWdoDsTDQ";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export function CreateCampaigns({ userId }) {
@@ -117,11 +116,11 @@ export function CreateCampaigns({ userId }) {
     setIsUploading(true);
     const fileExt = file.name.split(".").pop();
     const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `addit-assets/${type}s/${fileName}`;
+    const filePath = `aditt-assets/${type}s/${fileName}`;
 
     try {
       const { data, error } = await supabase.storage
-        .from("new-project")
+        .from("aditt")
         .upload(filePath, file, {
           cacheControl: "3600",
           upsert: false,
@@ -132,7 +131,7 @@ export function CreateCampaigns({ userId }) {
 
       const {
         data: { publicUrl },
-      } = supabase.storage.from("new-project").getPublicUrl(filePath);
+      } = supabase.storage.from("aditt").getPublicUrl(filePath);
 
       let duration = "";
       if (type === "video") {

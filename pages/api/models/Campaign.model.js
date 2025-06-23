@@ -1,92 +1,56 @@
 import mongoose from 'mongoose';
 
+const OptionStatsSchema = new mongoose.Schema({
+    totalCount: {
+        type: Number,
+        default: 0
+    },
+    demographics: {
+        age18_24: { male: { type: Number, default: 0 }, female: { type: Number, default: 0 }, other: { type: Number, default: 0 } },
+        age25_33: { male: { type: Number, default: 0 }, female: { type: Number, default: 0 }, other: { type: Number, default: 0 } },
+        age35_44: { male: { type: Number, default: 0 }, female: { type: Number, default: 0 }, other: { type: Number, default: 0 } },
+        age45Plus: { male: { type: Number, default: 0 }, female: { type: Number, default: 0 }, other: { type: Number, default: 0 } }
+    }
+}, { _id: false });
+
 const QuestionSchema = new mongoose.Schema({
     questionText: {
         type: String,
-        required: false,
+        required: true,
         trim: true
     },
     option1: {
-        optionValue: {
-            type: String,
-            required: false,
-            trim: true
-        },
-        totalCount: {
-            type: Number,
-            required: false,
-            default: 0
-        },
+        type: String,
+        required: true,
+        trim: true
     },
     option2: {
-        optionValue: {
-            type: String,
-            required: false,
-            trim: true
-        },
-        totalCount: {
-            type: Number,
-            required: false,
-            default: 0
-        },
+        type: String,
+        required: true,
+        trim: true
     },
     option3: {
-        optionValue: {
-            type: String,
-            required: false,
-            trim: true
-        },
-        totalCount: {
-            type: Number,
-            required: false,
-            default: 0
-        },
+        type: String,
+        required: true,
+        trim: true
     },
     option4: {
-       optionValue: {
-            type: String,
-            required: false,
-            trim: true
-        },
-        totalCount: {
-            type: Number,
-            required: false,
-            default: 0
-        },
+        type: String,
+        required: true,
+        trim: true
     },
     answer: {
         type: String,
-        required: false,
+        required: true,
         trim: true
     },
-    demographicStats: {
-        type: {
-            ageGroups: {
-                age18_24: {
-                    male: { type: Number, default: 0 },
-                    female: { type: Number, default: 0 },
-                    other: { type: Number, default: 0 }
-                },
-                age25_33: {
-                    male: { type: Number, default: 0 },
-                    female: { type: Number, default: 0 },
-                    other: { type: Number, default: 0 }
-                },
-                age35_44: {
-                    male: { type: Number, default: 0 },
-                    female: { type: Number, default: 0 },
-                    other: { type: Number, default: 0 }
-                },
-                age45Plus: {
-                    male: { type: Number, default: 0 },
-                    female: { type: Number, default: 0 },
-                    other: { type: Number, default: 0 }
-                }
-            }
-        },
-        required: false
+    optionStats: {
+        option1: { type: OptionStatsSchema, default: () => ({}) },
+        option2: { type: OptionStatsSchema, default: () => ({}) },
+        option3: { type: OptionStatsSchema, default: () => ({}) },
+        option4: { type: OptionStatsSchema, default: () => ({}) }
     }
-});
+}, { _id: true });
 
 const SurveyQuestionSchema = new mongoose.Schema({
     questionText: {
@@ -97,240 +61,220 @@ const SurveyQuestionSchema = new mongoose.Schema({
     option1: {
         type: String,
         required: false,
-        trim: true,
-        totalCount: {
-            type: Number,
-            required: false,
-            default: 0
-        },
+        trim: true
     },
     option2: {
         type: String,
         required: false,
-        trim: true,
-        totalCount: {
-            type: Number,
-            required: false,
-            default: 0
-        },
+        trim: true
     },
     option3: {
         type: String,
         required: false,
-        trim: true,
-        totalCount: {
-            type: Number,
-            required: false,
-            default: 0
-        },
+        trim: true
     },
     option4: {
         type: String,
         required: false,
-        trim: true,
-        totalCount: {
-            type: Number,
-            required: false,
-            default: 0
-        },
+        trim: true
     },
-    countStats: {
-        // totalcount : {
-        //     [{
-        //         countmymaleofage1: Number,
-        //         countmyfemalemaleofage1: Number,
-        //         countmyotherofage1: Number,
-        //         countmymaleofage2: Number,
-        //         countmyfemalemaleofage2: Number,
-        //         countmyotherofage2: Number,
-        //         countmymaleofage3: Number,
-        //         countmyfemalemaleofage3: Number,
-        //         countmyotherofage3: Number,
-        //         countmymaleofage4: Number,
-        //         countmyfemalemaleofage4: Number,
-        //         countmyotherofage4: Number,
-        //     }]
-        // }
+    optionStats: {
+        option1: { type: OptionStatsSchema, default: () => ({}) },
+        option2: { type: OptionStatsSchema, default: () => ({}) },
+        option3: { type: OptionStatsSchema, default: () => ({}) },
+        option4: { type: OptionStatsSchema, default: () => ({}) }
     }
-});
-
-
-
-
+}, { _id: true });
 
 const CardDetailSchema = new mongoose.Schema({
     cardNumber: {
         type: String,
         required: false,
+        default: ""
     },
     cvc: {
         type: String,
         required: false,
+        default: ""
     },
     nameOnCard: {
         type: String,
         required: false,
+        default: "",
         trim: true
     },
     dateOnCard: {
         type: String,
         required: false,
+        default: "",
         trim: true
     },
     country: {
         type: String,
         required: false,
+        default: "",
         trim: true
     },
     zip: {
         type: String,
         required: false,
+        default: "",
         trim: true
     }
-});
+}, { _id: true });
 
 const BankDetailSchema = new mongoose.Schema({
     accountNumber: {
         type: String,
         required: false,
+        default: ""
     },
     routingNumber: {
         type: String,
         required: false,
+        default: ""
     },
     accountType: {
         type: String,
         required: false,
-    },
-});
+        default: ""
+    }
+}, { _id: true });
 
-const CompaignSchema = new mongoose.Schema({
+const EngagementSchema = new mongoose.Schema({
+    totalCount: {
+        type: Number,
+        default: 0
+    }
+}, { _id: false });
+
+const ClickCountSchema = new mongoose.Schema({
+    totalCount: {
+        type: Number,
+        default: 0
+    },
+    dailyCounts: {
+        type: [{
+            date: Date,
+            count: {
+                type: Number,
+                default: 0
+            }
+        }],
+        default: []
+    }
+}, { _id: false });
+
+const CampaignSchema = new mongoose.Schema({
     userId: {
         type: String,
-        required: true,
+        required: true
     },
     campaignTitle: {
         type: String,
-        required: true,
+        required: true
     },
     brandName: {
         type: String,
-        required: true,
+        required: true
     },
     status: {
         type: String,
-        required: false,
         default: "Pending"
     },
     reason: {
         type: String,
-        required: function () { return this.status === "Rejected"; }
+        required: function() { return this.status === "Rejected"; }
     },
     websiteLink: {
         type: String,
-        required: true,
+        required: true
     },
     campaignVideoUrl: {
         type: String,
         required: true,
-        unique: true,
+        unique: true
     },
     companyLogo: {
         type: String,
-        required: false,
+        required: false
     },
     quizQuestion: {
         type: QuestionSchema,
-        require: true,
+        required: true
     },
     surveyQuestion1: {
         type: SurveyQuestionSchema,
-        require: false,
-
+        required: false
     },
     surveyQuestion2: {
         type: SurveyQuestionSchema,
-        require: false,
-
+        required: false
     },
     genderType: {
         type: String,
-        required: true,
+        required: true
     },
     genderRatio: {
         type: String,
-        required: true,
+        required: true
     },
     ageRange: {
         type: [Number],
-        required: false,
+        required: true,
+        validate: {
+            validator: function(arr) {
+                return arr.length === 2 && arr[0] < arr[1];
+            },
+            message: props => `Age range must contain exactly 2 numbers (min and max)`
+        }
     },
     campaignStartDate: {
-        type: String,
-        required: true,
+        type: Date,
+        required: true
     },
     campaignEndDate: {
-        type: String,
+        type: Date,
+        required: false
     },
     cardDetail: {
         type: CardDetailSchema,
+        default: () => ({})
     },
     bankDetail: {
         type: BankDetailSchema,
+        default: () => ({})
     },
     couponCode: {
         type: String,
-        required: false,
+        default: ""
     },
     campaignBudget: {
-        type: String,
-        required: false,
+        type: Number,
+        default: 0
     },
     totalViews: {
         type: Number,
-        required: false,
         default: 0
     },
     impressions: {
         type: Number,
-        required: false,
         default: 0
     },
     engagements: {
-        totalCount: {
-            type: Number,
-            required: false,
-            default: 0
-        },
-        countData: {
-            type: String,
-            required: false
-        }
+        type: EngagementSchema,
+        default: () => ({})
     },
     videoWatchTime: {
         type: Number,
-        required: false,
+        default: 0
     },
     clickCount: {
-        totalCount: {
-            type: Number,
-            required: false,
-            default: 0
-        },
-        dailyCounts: [{
-            date: {
-                type: Date,
-                required: false
-            },
-            count: {
-                type: Number,
-                required: false,
-                default: 0
-            }
-        }]
+        type: ClickCountSchema,
+        default: () => ({})
     }
 }, { timestamps: true });
 
-const Compaign = mongoose.models.Compaign || mongoose.model('Compaign', CompaignSchema);
+const Campaign = mongoose.models.Campaign || mongoose.model('Campaign', CampaignSchema);
 
-export default Compaign;
+export default Campaign;
