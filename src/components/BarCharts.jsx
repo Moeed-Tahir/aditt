@@ -48,7 +48,6 @@ export default function BarCharts({ quizQuestion }) {
     },
   };
 
-  // Format data for the chart
   const chartData = [
     {
       month: "45+",
@@ -76,7 +75,6 @@ export default function BarCharts({ quizQuestion }) {
     },
   ];
 
-  // Calculate the maximum value for the XAxis domain
   const maxValue = Math.max(
     ...chartData.map((item) => item.male + item.female + item.preferNotToSay)
   );

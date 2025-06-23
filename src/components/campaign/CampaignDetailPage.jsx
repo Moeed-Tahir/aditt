@@ -18,7 +18,9 @@ export default function CampaignDetailPage({ campaignData, campaignId }) {
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [showExpiredAlert, setShowExpiredAlert] = useState(true);
   const userId = Cookies.get("userId");
-
+  
+  console.log("campaignData",campaignData);
+  
   const [dialogConfig, setDialogConfig] = useState({
     title: "",
     smallText: "",
@@ -56,7 +58,6 @@ export default function CampaignDetailPage({ campaignData, campaignId }) {
             <CampaignVideoInfo campaignData={campaignData} />
           </div>
 
-          {/* Add rejection reason display */}
           {campaignData.status === "Rejected" && campaignData.reason && (
             <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-[24px]">
               <div className="flex">
