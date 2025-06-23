@@ -13,6 +13,13 @@ const OptionStatsSchema = new mongoose.Schema({
     }
 }, { _id: false });
 
+const SurveyOptionStatsSchema = new mongoose.Schema({
+    totalCount: {
+        type: Number,
+        default: 0
+    },
+}, { _id: false });
+
 const QuestionSchema = new mongoose.Schema({
     questionText: {
         type: String,
@@ -79,10 +86,10 @@ const SurveyQuestionSchema = new mongoose.Schema({
         trim: true
     },
     optionStats: {
-        option1: { type: OptionStatsSchema, default: () => ({}) },
-        option2: { type: OptionStatsSchema, default: () => ({}) },
-        option3: { type: OptionStatsSchema, default: () => ({}) },
-        option4: { type: OptionStatsSchema, default: () => ({}) }
+        option1: { type: SurveyOptionStatsSchema, default: () => ({}) },
+        option2: { type: SurveyOptionStatsSchema, default: () => ({}) },
+        option3: { type: SurveyOptionStatsSchema, default: () => ({}) },
+        option4: { type: SurveyOptionStatsSchema, default: () => ({}) }
     }
 }, { _id: true });
 
