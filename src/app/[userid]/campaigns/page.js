@@ -28,7 +28,7 @@ const Page = () => {
     };
 
     fetchCampaign();
-  }, [id]); // Now we only need id as a dependency
+  }, [id]);
 
   return (
     <>

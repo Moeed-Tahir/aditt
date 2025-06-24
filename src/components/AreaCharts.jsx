@@ -1,7 +1,6 @@
 "use client";
 
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -27,9 +26,18 @@ const chartConfig = {
 };
 
 export default function EngagementChart({ clicks, videoWatchTime }) {
+  // Create engagement data based on daily counts if available
   const engagementData = [
-    { name: "current", videoWatchTime: videoWatchTime, clicks: clicks },
-    { name: "start", videoWatchTime: 0, clicks: 0 },
+    { 
+      name: "Day 1", 
+      videoWatchTime: 0, // Initial value
+      clicks: 0 
+    },
+    { 
+      name: "Current", 
+      videoWatchTime: videoWatchTime || 0, 
+      clicks: clicks || 0 
+    },
   ];
 
   const totalVideoWatchTime = engagementData.reduce((sum, item) => sum + item.videoWatchTime, 0);
@@ -95,7 +103,6 @@ export default function EngagementChart({ clicks, videoWatchTime }) {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              hide={true}
             />
 
             <ChartTooltip

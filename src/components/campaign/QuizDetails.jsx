@@ -1,8 +1,39 @@
-// components/campaign/QuizDetails.jsx
 import BarCharts from "@/components/BarCharts";
 
 export const QuizDetails = ({ quizQuestion, genderRatio }) => {
   if (!quizQuestion || !quizQuestion.questionText) return null;
+  
+  const totalResponses = Math.max(
+    quizQuestion.optionStats.option1.totalCount +
+    quizQuestion.optionStats.option2.totalCount +
+    quizQuestion.optionStats.option3.totalCount +
+    quizQuestion.optionStats.option4.totalCount
+  );
+
+  const demographicStats = {
+    ageGroups: {
+      age18_24: {
+        male: quizQuestion.optionStats.option3.demographics.age18_24.Male || 0,
+        female: quizQuestion.optionStats.option3.demographics.age18_24.female || 0,
+        other: quizQuestion.optionStats.option3.demographics.age18_24.other || 0
+      },
+      age25_33: {
+        male: quizQuestion.optionStats.option3.demographics.age25_33.male || 0,
+        female: quizQuestion.optionStats.option3.demographics.age25_33.female || 0,
+        other: quizQuestion.optionStats.option3.demographics.age25_33.other || 0
+      },
+      age35_44: {
+        male: quizQuestion.optionStats.option3.demographics.age35_44.male || 0,
+        female: quizQuestion.optionStats.option3.demographics.age35_44.female || 0,
+        other: quizQuestion.optionStats.option3.demographics.age35_44.other || 0
+      },
+      age45Plus: {
+        male: quizQuestion.optionStats.option3.demographics.age45Plus.male || 0,
+        female: quizQuestion.optionStats.option3.demographics.age45Plus.female || 0,
+        other: quizQuestion.optionStats.option3.demographics.age45Plus.other || 0
+      }
+    }
+  };
 
   return (
     <div className="bg-white p-6 rounded-xl">
@@ -20,25 +51,33 @@ export const QuizDetails = ({ quizQuestion, genderRatio }) => {
             {quizQuestion.option1 && (
               <li className="py-[12px]">
                 A. {quizQuestion.option1}
-                <span className="float-right">0%</span>
+                <span className="float-right">
+                  {Math.round((quizQuestion.optionStats.option1.totalCount / totalResponses) * 100)}%
+                </span>
               </li>
             )}
             {quizQuestion.option2 && (
               <li className="py-[12px]">
                 B. {quizQuestion.option2}
-                <span className="float-right">0%</span>
+                <span className="float-right">
+                  {Math.round((quizQuestion.optionStats.option2.totalCount / totalResponses) * 100)}%
+                </span>
               </li>
             )}
             {quizQuestion.option3 && (
               <li className="py-[12px]">
                 C. {quizQuestion.option3}
-                <span className="float-right">0%</span>
+                <span className="float-right">
+                  {Math.round((quizQuestion.optionStats.option3.totalCount / totalResponses) * 100)}%
+                </span>
               </li>
             )}
             {quizQuestion.option4 && (
               <li className="py-[12px]">
                 D. {quizQuestion.option4}
-                <span className="float-right">0%</span>
+                <span className="float-right">
+                  {Math.round((quizQuestion.optionStats.option4.totalCount / totalResponses) * 100)}%
+                </span>
               </li>
             )}
           </ul>
@@ -46,7 +85,13 @@ export const QuizDetails = ({ quizQuestion, genderRatio }) => {
       </div>
 
       <div>
-        <BarCharts quizQuestion={quizQuestion} genderRatio={genderRatio} />
+        <BarCharts 
+          quizQuestion={{ 
+            ...quizQuestion, 
+            demographicStats 
+          }} 
+          genderRatio={genderRatio} 
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-3 ml-4 sm:ml-20 text-sm text-gray-600 w-full max-w-md">
           <div className="mb-2 sm:mb-0">
