@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown,Edit } from "lucide-react";
 import { useState } from "react";
 import AlertBox from "../AlertBox";
 
@@ -131,7 +131,7 @@ function QuestionBox({ question, onChange, isQuiz, name }) {
                     <details className="bg-white rounded-xl w-full" open={false}>
                         <summary className="cursor-pointer font-medium text-gray-800 flex justify-between items-center w-full">
                             <span className="truncate mr-2">{currentQuestion.text}</span>
-                            <ChevronDown
+                            <Edit
                                 className="w-5 h-5 text-gray-500 flex-shrink-0"
                                 onClick={() => setIsExpanded(true)}
                             />

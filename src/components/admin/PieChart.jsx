@@ -41,7 +41,6 @@ export function PieChartBox() {
 
   return (
     <div className="p-4 bg-white rounded-2xl w-full h-full">
-      {/* Header */}
       <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
         <div>
           <h2 className="text-xl font-medium">Activity Tracker</h2>
@@ -57,9 +56,7 @@ export function PieChartBox() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex flex-col sm:flex-row justify-between gap-6 items-center">
-        {/* Left - Textual Data */}
         <div className="flex flex-col justify-between min-h-[300px] w-full sm:w-[45%]">
           <div className="pt-6">
             <div className="text-3xl font-md mb-2">{total}</div>

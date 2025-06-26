@@ -7,7 +7,6 @@ import { useCallback, useEffect, useState } from "react";
 import RejectDialog from "@/components/RejectDialog";
 import { toast } from "sonner";
 import axios from "axios";
-import BarCharts from "../BarCharts";
 import { LineChart } from "./LineChart";
 import { PieChartBox } from "./PieChart";
 
@@ -465,7 +464,6 @@ export function AdminDashboard() {
     <Navbar mode="admin" />
   
     <div className="p-4 sm:p-6 lg:p-8 space-y-4">
-      {/* Charts Row */}
       <div className="mb-4 flex flex-col lg:flex-row gap-4 lg:gap-6">
         <div className="w-full lg:w-1/2 p-4 bg-white rounded-2xl">
           <LineChart />
@@ -475,7 +473,6 @@ export function AdminDashboard() {
         </div>
       </div>
   
-      {/* USERS TABLE */}
       <div className="w-full p-4 bg-white rounded-2xl">
         <GenericTablePage
           title="USERS"
@@ -488,7 +485,6 @@ export function AdminDashboard() {
         />
       </div>
   
-      {/* ADVERTISERS TABLE */}
       <div className="w-full p-4 bg-white rounded-2xl">
         <GenericTablePage
           title="ADVERTISERS"
@@ -501,7 +497,6 @@ export function AdminDashboard() {
         />
       </div>
   
-      {/* ADS FOR APPROVAL TABLE */}
       <div className="w-full p-4 bg-white rounded-2xl">
         <GenericTablePage
           title="ADS FOR APPROVAL"
@@ -515,7 +510,6 @@ export function AdminDashboard() {
         />
       </div>
   
-      {/* ACCOUNT DELETE REQUESTS TABLE */}
       <div className="w-full p-4 bg-white rounded-2xl">
         <GenericTablePage
           title="ACCOUNT DELETE REQUESTS"

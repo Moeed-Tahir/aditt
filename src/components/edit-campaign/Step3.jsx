@@ -91,10 +91,10 @@ const Step3 = ({ handleQuestionChange, formData }) => {
                             </div>
                             <div className="relative flex-1">
                                 <QuestionBox
-                                    question={formData.surveyQuestion1}
+                                    question={formData.surveyQuestion2}
                                     onChange={(field, value, optionIndex) =>
                                         handleQuestionChange(
-                                            "surveyQuestion1",
+                                            "surveyQuestion2",
                                             field,
                                             value,
                                             optionIndex

@@ -30,7 +30,6 @@ const data = [
 export function LineChart() {
   return (
     <div className="p-4 bg-white rounded-2xl w-full h-full">
-      {/* Top Section: Title and Select */}
       <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
         <div>
           <h2 className="text-xl font-medium">Earning Reports</h2>
