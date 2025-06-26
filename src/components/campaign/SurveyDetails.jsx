@@ -44,25 +44,26 @@ export const SurveyDetails = ({
             {question.questionText}
           </span>
 
-          {['option1', 'option2', 'option3', 'option4'].map((optionKey) => {
-            if (!question[optionKey]) return null;
+{['option1', 'option2', 'option3', 'option4'].map((optionKey) => {
+  if (!question[optionKey]) return null;
 
-            const count = question.optionStats?.[optionKey]?.totalCount || 0;
-            const percentage = getPercentage(question, count);
+  const count = question.optionStats?.[optionKey]?.totalCount || 0;
+  const percentage = getPercentage(question, count); // already calculated here
 
-            return (
-              <div key={optionKey} className="p-1 relative">
-                <ProgressBar
-                  value={count}
-                  fill="bg-white rounded-xl"
-                  text={{
-                    left: question[optionKey],
-                    right: `${percentage}%`,
-                  }}
-                />
-              </div>
-            );
-          })}
+  return (
+    <div key={optionKey} className="p-1 relative">
+      <ProgressBar
+        value={percentage} // ✅ fixed line
+        fill="bg-white rounded-xl"
+        text={{
+          left: question[optionKey],
+          right: `${percentage}%`,
+        }}
+      />
+    </div>
+  );
+})}
+
         </div>
       </div>
     );
