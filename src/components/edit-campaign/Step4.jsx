@@ -7,6 +7,7 @@ import {
     Tag,
 } from "lucide-react";
 const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange }) => {
+    const isBudgetZero = parseFloat(formData.budget) === 0;
 
     return (
         <>
@@ -157,39 +158,43 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange }) => {
                                     Choose a payment method to fund your campaign.
                                 </span>
                             </div>
+                            {
+                                !isBudgetZero && (
+                                    <div className="relative flex-1">
+                                        <PaymentMethod
+                                            value={{
+                                                cardNumber: formData.cardNumber,
+                                                monthOnCard: formData.monthOnCard,
+                                                cvc: formData.cvc,
+                                                nameOnCard: formData.nameOnCard,
+                                                country: formData.country,
+                                                zipCode: formData.zipCode,
+                                                cardType: formData.cardType,
+                                                cardAdded: formData.cardAdded,
+                                                isFormOpen: formData.isFormOpen,
+                                            }}
+                                            onChange={(paymentData) =>
+                                                setFormData((prev) => ({ ...prev, ...paymentData }))
+                                            }
 
-                            <div className="relative flex-1">
-                                <PaymentMethod
-                                    value={{
-                                        cardNumber: formData.cardNumber,
-                                        monthOnCard: formData.monthOnCard,
-                                        cvc: formData.cvc,
-                                        nameOnCard: formData.nameOnCard,
-                                        country: formData.country,
-                                        zipCode: formData.zipCode,
-                                        cardType: formData.cardType,
-                                        cardAdded: formData.cardAdded,
-                                        isFormOpen: formData.isFormOpen,
-                                    }}
-                                    onChange={(paymentData) =>
-                                        setFormData((prev) => ({ ...prev, ...paymentData }))
-                                    }
 
+                                        />
+                                        <LinkBankAccount
+                                            value={{
+                                                bankAccountNumber: formData.bankAccountNumber,
+                                                routingNumber: formData.routingNumber,
+                                                accountType: formData.accountType,
+                                                bankAdded: formData.bankAdded,
+                                                isBankFormOpen: formData.isBankFormOpen,
+                                            }}
+                                            onChange={(bankData) =>
+                                                setFormData((prev) => ({ ...prev, ...bankData }))
+                                            }
+                                        />
+                                    </div>
+                                )
+                            }
 
-                                />
-                                <LinkBankAccount
-                                    value={{
-                                        bankAccountNumber: formData.bankAccountNumber,
-                                        routingNumber: formData.routingNumber,
-                                        accountType: formData.accountType,
-                                        bankAdded: formData.bankAdded,
-                                        isBankFormOpen: formData.isBankFormOpen,
-                                    }}
-                                    onChange={(bankData) =>
-                                        setFormData((prev) => ({ ...prev, ...bankData }))
-                                    }
-                                />
-                            </div>
                         </div>
                     </div>
                 </div>
