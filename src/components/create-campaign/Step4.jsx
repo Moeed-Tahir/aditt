@@ -47,12 +47,10 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                 let discountValue = parseFloat(response.data.discountValue);
                 const discountType = normalizeDiscountType(response.data.discountType);
 
-                // Validate discount values
                 if (isNaN(discountValue)) {
                     throw new Error('Invalid discount value');
                 }
 
-                // Calculate discounted budget
                 if (discountType === 'percentage') {
                     discountValue = Math.min(Math.max(0, discountValue), 100); // Clamp between 0-100%
                     discountedBudget = originalBudget * (1 - (discountValue / 100));
@@ -82,9 +80,9 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
             }
         } catch (error) {
             console.error('Error applying promo code:', error);
-            const errorMessage = error.response?.data?.error || 
-                              error.message || 
-                              'Failed to apply promo code';
+            const errorMessage = error.response?.data?.error ||
+                error.message ||
+                'Failed to apply promo code';
             setCouponError(errorMessage);
             setDiscountApplied(false);
 
@@ -120,6 +118,8 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
         setCouponError(null);
         toast.success('Coupon removed successfully!');
     };
+
+    const isBudgetZero = parseFloat(formData.budget) === 0;
 
     return (
         <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
@@ -256,52 +256,53 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                         </div>
 
                         <div className="relative w-full flex-1">
-                            <div className="flex items-center">
-                                <Tag className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center relative">
+                                    <Tag className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
 
-                                <input
-                                    type="text"
-                                    name="couponCode"
-                                    value={formData.couponCode}
-                                    onChange={handleInputChange}
-                                    placeholder="Enter Coupon Code"
-                                    className="w-full h-10 md:h-12 border border-gray-300 text-gray-600 rounded-l-full pl-10 pr-4 py-1 md:py-2"
-                                    disabled={discountApplied}
-                                />
+                                    <input
+                                        type="text"
+                                        name="couponCode"
+                                        value={formData.couponCode}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter Coupon Code"
+                                        className="w-full h-10 md:h-12 border border-gray-300 text-gray-600 rounded-l-full pl-10 pr-4 py-1 md:py-2"
+                                        disabled={discountApplied}
+                                    />
 
-                                {discountApplied ? (
-                                    <button
-                                        type="button"
-                                        onClick={handleRemoveCoupon}
-                                        className="h-10 md:h-12 px-4 md:px-6 bg-red-500 text-white rounded-r-full hover:bg-red-600 transition-colors"
-                                    >
-                                        Remove
-                                    </button>
-                                ) : (
-                                    <button
-                                        type="button"
-                                        onClick={handleApplyCoupon}
-                                        disabled={isApplying || !formData.couponCode}
-                                        className={`h-10 md:h-12 px-4 md:px-6 bg-blue-500 text-white rounded-r-full hover:bg-blue-600 transition-colors ${
-                                            isApplying ? 'opacity-70 cursor-not-allowed' : ''
-                                        }`}
-                                    >
-                                        {isApplying ? 'Applying...' : 'Apply'}
-                                    </button>
+                                    {discountApplied ? (
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveCoupon}
+                                            className="h-10 md:h-12 px-4 md:px-6 bg-red-500 text-white rounded-r-full hover:bg-red-600 transition-colors"
+                                        >
+                                            Remove
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={handleApplyCoupon}
+                                            disabled={isApplying || !formData.couponCode}
+                                            className={`h-10 md:h-12 px-4 md:px-6 bg-blue-500 text-white rounded-r-full hover:bg-blue-600 transition-colors ${isApplying ? 'opacity-70 cursor-not-allowed' : ''
+                                                }`}
+                                        >
+                                            {isApplying ? 'Applying...' : 'Apply'}
+                                        </button>
+                                    )}
+                                </div>
+
+                                {couponError && (
+                                    <div className="text-xs md:text-sm text-red-500">
+                                        {couponError}
+                                    </div>
+                                )}
+
+                                {discountApplied && (
+                                    <div className="text-xs md:text-sm text-green-600">
+                                        Coupon code applied successfully! Your discount has been applied to the budget.
+                                    </div>
                                 )}
                             </div>
-
-                            {couponError && (
-                                <div className="mt-2 text-xs md:text-sm text-red-500">
-                                    {couponError}
-                                </div>
-                            )}
-
-                            {discountApplied && (
-                                <div className="mt-2 text-xs md:text-sm text-green-600">
-                                    Coupon code applied successfully! Your discount has been applied to the budget.
-                                </div>
-                            )}
                         </div>
                     </div>
 
@@ -316,37 +317,41 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                 Choose a payment method to fund your campaign.
                             </span>
                         </div>
+                        {
+                            !isBudgetZero && (
+                                <div className="relative w-full flex-1">
+                                    <PaymentMethod
+                                        value={{
+                                            cardNumber: formData.cardNumber,
+                                            monthOnCard: formData.monthOnCard,
+                                            cvc: formData.cvc,
+                                            nameOnCard: formData.nameOnCard,
+                                            country: formData.country,
+                                            zipCode: formData.zipCode,
+                                            cardType: formData.cardType,
+                                            cardAdded: formData.cardAdded,
+                                            isFormOpen: formData.isFormOpen,
+                                        }}
+                                        onChange={(paymentData) =>
+                                            setFormData((prev) => ({ ...prev, ...paymentData }))
+                                        }
+                                    />
+                                    <LinkBankAccount
+                                        value={{
+                                            bankAccountNumber: formData.bankAccountNumber,
+                                            routingNumber: formData.routingNumber,
+                                            accountType: formData.accountType,
+                                            bankAdded: formData.bankAdded,
+                                            isBankFormOpen: formData.isBankFormOpen,
+                                        }}
+                                        onChange={(bankData) =>
+                                            setFormData((prev) => ({ ...prev, ...bankData }))
+                                        }
+                                    />
+                                </div>
+                            )
+                        }
 
-                        <div className="relative w-full flex-1">
-                            <PaymentMethod
-                                value={{
-                                    cardNumber: formData.cardNumber,
-                                    monthOnCard: formData.monthOnCard,
-                                    cvc: formData.cvc,
-                                    nameOnCard: formData.nameOnCard,
-                                    country: formData.country,
-                                    zipCode: formData.zipCode,
-                                    cardType: formData.cardType,
-                                    cardAdded: formData.cardAdded,
-                                    isFormOpen: formData.isFormOpen,
-                                }}
-                                onChange={(paymentData) =>
-                                    setFormData((prev) => ({ ...prev, ...paymentData }))
-                                }
-                            />
-                            <LinkBankAccount
-                                value={{
-                                    bankAccountNumber: formData.bankAccountNumber,
-                                    routingNumber: formData.routingNumber,
-                                    accountType: formData.accountType,
-                                    bankAdded: formData.bankAdded,
-                                    isBankFormOpen: formData.isBankFormOpen,
-                                }}
-                                onChange={(bankData) =>
-                                    setFormData((prev) => ({ ...prev, ...bankData }))
-                                }
-                            />
-                        </div>
                     </div>
                 </div>
             </div>

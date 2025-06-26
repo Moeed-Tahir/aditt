@@ -327,14 +327,12 @@ export function CreateCampaigns({ userId }) {
                         }`}
                     />
                   )}
-                  {/* Hide label on small screens, show on md+ */}
                   <span className="hidden md:inline whitespace-nowrap">
                     {step.label}
                   </span>
                 </Link>
               </div>
             ))}
-            {/* Progress bar behind steps */}
             <div className="absolute top-5 left-[5%] right-[5%] h-0.5 bg-gray-300 z-0">
               <div
                 className="h-full bg-blue-600 transition-all duration-700"
@@ -346,14 +344,12 @@ export function CreateCampaigns({ userId }) {
           </div>
         </div>
 
-        {/* Step 0: Campaign Info */}
         {currentStep === 0 && (
           <Step1 uploadProgress={uploadProgress} handleFileChange={handleFileChange} isUploading={isUploading} handleInputChange={handleInputChange} setFormData={setFormData} formData={formData} />
         )}
 
         {currentStep === 1 && (
           <Step2 setValues={setValues} values={values} setFormData={setFormData} formData={formData} />
-
         )}
 
         {currentStep === 2 && (
