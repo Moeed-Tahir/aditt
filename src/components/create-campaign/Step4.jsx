@@ -317,40 +317,38 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                 Choose a payment method to fund your campaign.
                             </span>
                         </div>
-                        {
-                            !isBudgetZero && (
-                                <div className="relative w-full flex-1">
-                                    <PaymentMethod
-                                        value={{
-                                            cardNumber: formData.cardNumber,
-                                            monthOnCard: formData.monthOnCard,
-                                            cvc: formData.cvc,
-                                            nameOnCard: formData.nameOnCard,
-                                            country: formData.country,
-                                            zipCode: formData.zipCode,
-                                            cardType: formData.cardType,
-                                            cardAdded: formData.cardAdded,
-                                            isFormOpen: formData.isFormOpen,
-                                        }}
-                                        onChange={(paymentData) =>
-                                            setFormData((prev) => ({ ...prev, ...paymentData }))
-                                        }
-                                    />
-                                    <LinkBankAccount
-                                        value={{
-                                            bankAccountNumber: formData.bankAccountNumber,
-                                            routingNumber: formData.routingNumber,
-                                            accountType: formData.accountType,
-                                            bankAdded: formData.bankAdded,
-                                            isBankFormOpen: formData.isBankFormOpen,
-                                        }}
-                                        onChange={(bankData) =>
-                                            setFormData((prev) => ({ ...prev, ...bankData }))
-                                        }
-                                    />
-                                </div>
-                            )
-                        }
+                        {!(discountApplied && parseFloat(formData.budget) === 0) && (
+                            <div className="relative w-full flex-1">
+                                <PaymentMethod
+                                    value={{
+                                        cardNumber: formData.cardNumber,
+                                        monthOnCard: formData.monthOnCard,
+                                        cvc: formData.cvc,
+                                        nameOnCard: formData.nameOnCard,
+                                        country: formData.country,
+                                        zipCode: formData.zipCode,
+                                        cardType: formData.cardType,
+                                        cardAdded: formData.cardAdded,
+                                        isFormOpen: formData.isFormOpen,
+                                    }}
+                                    onChange={(paymentData) =>
+                                        setFormData((prev) => ({ ...prev, ...paymentData }))
+                                    }
+                                />
+                                <LinkBankAccount
+                                    value={{
+                                        bankAccountNumber: formData.bankAccountNumber,
+                                        routingNumber: formData.routingNumber,
+                                        accountType: formData.accountType,
+                                        bankAdded: formData.bankAdded,
+                                        isBankFormOpen: formData.isBankFormOpen,
+                                    }}
+                                    onChange={(bankData) =>
+                                        setFormData((prev) => ({ ...prev, ...bankData }))
+                                    }
+                                />
+                            </div>
+                        )}
 
                     </div>
                 </div>
