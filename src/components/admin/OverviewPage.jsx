@@ -39,7 +39,7 @@ export function OverViewPage({ id }) {
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
-      <Navbar />
+      <Navbar mode="admin" />
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         <CampaignHeader campaignData={campaignData} />
 

@@ -50,7 +50,7 @@ export function AdsOverview({ campaignData }) {
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
-      <Navbar />
+      <Navbar mode="admin" />
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 p-4 sm:p-0">
           <Link
