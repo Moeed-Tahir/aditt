@@ -20,7 +20,6 @@ import { toast } from "sonner";
 
 export default function CampaignActionsDropdown({ campaignId, openDialog, customTrigger, campaignData, handleAction, fetchCampaign }) {
   const userId = Cookies.get("userId");
-  console.log("campaignData in CampaignActionsDropdown", campaignData);
 
   const updateCampaignStatus = async (status) => {
     try {

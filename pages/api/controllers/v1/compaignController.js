@@ -1,4 +1,4 @@
-import {connectToDatabase} from '../../config/dbConnect';
+import { connectToDatabase } from '../../config/dbConnect';
 import Compaign from '../../models/Campaign.model';
 import CampaignFeedback from '../../models/CampaignFeedback';
 
@@ -330,24 +330,41 @@ exports.addCountInCampaign = async (req, res) => {
 exports.updateCampaign = async (req, res) => {
     try {
         const { id, ...updateData } = req.body;
+        console.log(JSON.stringify(updateData), "updateData");
 
         const campaign = await Compaign.findById(id);
         if (!campaign) {
             return res.status(404).json({ message: 'Campaign not found.' });
         }
 
+        if (updateData.quizQuestion && updateData.quizQuestion.optionStats) {
+            for (const option of ['option1', 'option2', 'option3', 'option4']) {
+                if (updateData.quizQuestion.optionStats[option]) {
+                    if (campaign.quizQuestion.optionStats[option]?.demographics) {
+                        updateData.quizQuestion.optionStats[option].demographics = {
+                            ...campaign.quizQuestion.optionStats[option].demographics,
+                            ...(updateData.quizQuestion.optionStats[option].demographics || {})
+                        };
+                    }
+                }
+            }
+        }
+
         Object.assign(campaign, updateData);
+        
         const updatedCampaign = await campaign.save();
 
         res.status(200).json({
             message: 'Campaign updated successfully.',
             campaign: updatedCampaign
         });
+
     } catch (error) {
         console.error('Error updating campaign:', error);
         res.status(500).json({ message: 'Internal server error.' });
     }
 };
+
 exports.campaignStatusUpdate = async (req, res) => {
     try {
         const { status, id } = req.body;
@@ -409,7 +426,7 @@ exports.submitFeedback = async (req, res) => {
 exports.getPendingCampaign = async (req, res) => {
     try {
         const pendingCampaigns = await Compaign.find({ status: "Pending" });
-        
+
         if (!pendingCampaigns || pendingCampaigns.length === 0) {
             return res.status(404).json({
                 success: false,
@@ -469,14 +486,14 @@ exports.activeOrRejectCampaign = async (req, res) => {
         }
 
         const updatedCampaign = await Compaign.findOneAndUpdate(
-            { 
+            {
                 _id: id,
                 status: "Pending"
             },
-            { 
+            {
                 $set: updateFields
             },
-            { new: true } 
+            { new: true }
         );
 
         if (!updatedCampaign) {
@@ -506,7 +523,7 @@ exports.getAllCampaign = async (req, res) => {
         await connectToDatabase();
 
         const campaigns = await Compaign.find({ status: { $ne: "Pending" } });
-        
+
         res.status(200).json({
             success: true,
             data: campaigns,
@@ -524,9 +541,9 @@ exports.getAllCampaign = async (req, res) => {
 exports.getLatestPendingCampaign = async (req, res) => {
     try {
         const pendingCampaigns = await Compaign.find({ status: "Pending" })
-            .sort({ createdAt: -1 }) 
+            .sort({ createdAt: -1 })
             .limit(3);
-        
+
         if (!pendingCampaigns || pendingCampaigns.length === 0) {
             return res.status(404).json({
                 success: false,
@@ -548,5 +565,3 @@ exports.getLatestPendingCampaign = async (req, res) => {
         });
     }
 };
-
-

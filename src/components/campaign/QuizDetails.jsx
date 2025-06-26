@@ -13,7 +13,7 @@ export const QuizDetails = ({ quizQuestion, genderRatio }) => {
   const demographicStats = {
     ageGroups: {
       age18_24: {
-        male: quizQuestion.optionStats.option3.demographics.age18_24.Male || 0,
+        male: quizQuestion.optionStats.option3.demographics.age18_24.male || 0,
         female: quizQuestion.optionStats.option3.demographics.age18_24.female || 0,
         other: quizQuestion.optionStats.option3.demographics.age18_24.other || 0
       },

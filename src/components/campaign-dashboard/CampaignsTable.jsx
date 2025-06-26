@@ -31,7 +31,6 @@ const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAc
                 <TableBody>
                     {paginatedCampaigns.map((c) => {
                         const specificCampaignData = campaignData.find(data => data._id === c.id)
-                        console.log("Data c",c)
                         return (
                             <TableRow key={c.id} className="hover:bg-gray-50 transition">
                                 <TableCell className="text-gray-800 text-[14px] py-6">

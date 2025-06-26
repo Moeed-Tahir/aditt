@@ -12,13 +12,18 @@ export const CampaignVideoInfo = ({ campaignData }) => {
     }
   };
 
-  // Format date range
   const formatDateRange = () => {
     if (!campaignData?.campaignStartDate || !campaignData?.campaignEndDate) return "N/A";
     
     const startDate = new Date(campaignData.campaignStartDate).toLocaleDateString();
     const endDate = new Date(campaignData.campaignEndDate).toLocaleDateString();
     return `${startDate} - ${endDate}`;
+  };
+
+  // Format the age range for display
+  const formatAgeRange = () => {
+    if (!campaignData?.ageRange || !Array.isArray(campaignData.ageRange)) return "N/A";
+    return `${campaignData.ageRange[0]} - ${campaignData.ageRange[1]}`;
   };
 
   return (
@@ -71,7 +76,7 @@ export const CampaignVideoInfo = ({ campaignData }) => {
                 Target Audience Age:
               </span>
               <span>
-                {campaignData?.age || "N/A"} Years
+                {formatAgeRange()}
               </span>
             </div>
             <div className="flex flex-wrap">

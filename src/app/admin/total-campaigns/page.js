@@ -21,7 +21,10 @@ export default function TotalCampaigns() {
 
   const fetchAllCampaign = useCallback(async () => {
     try {
-      const response = await axios.post("/api/routes/v1/campaignRoutes?action=getAllCampaign");
+      const response = await axios.post("/api/routes/v1/campaignRoutes?action=getAllCampaign",{
+
+      });
+      
       if (response.data.message === "Campaigns retrieved successfully") {
         setTotalCampaign(response.data.data);
       }

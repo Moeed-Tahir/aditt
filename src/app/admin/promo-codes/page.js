@@ -27,7 +27,6 @@ export default function PromoCodes() {
   const togglePromoStatus = async (id) => {
     try {
       const response = await axios.post("/api/routes/v1/promoRoutes?action=togglePromoCodeStatus", { id });
-      console.log("response", response);
 
       if (response.data) {
         setPromoData(prevData =>

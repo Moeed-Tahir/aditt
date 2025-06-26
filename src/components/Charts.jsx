@@ -23,7 +23,6 @@ export default function BarChartComponent({ campaignData }) {
   const [formData, setFormData] = useState({
     startDate: null,
   }); 
-  console.log("campaignData in BarChartComponent",campaignData);
 
   const transformCampaignData = () => {
     if (!campaignData || campaignData.length === 0) return [];

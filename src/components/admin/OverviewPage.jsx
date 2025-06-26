@@ -23,7 +23,6 @@ export function OverViewPage({ id }) {
         "/api/routes/v1/campaignRoutes?action=getCampaignAgainstId",
         { id }
       );
-      console.log("response", response);
       if (response.data.message === "Campaign Retrieved Successfully") {
         setCampaignData(response.data.campaign);
         setFeedbackData(response.data.feedback);

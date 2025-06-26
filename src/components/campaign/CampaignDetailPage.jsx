@@ -18,9 +18,7 @@ export default function CampaignDetailPage({ campaignData, campaignId }) {
   const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
   const [showExpiredAlert, setShowExpiredAlert] = useState(true);
   const userId = Cookies.get("userId");
-  
-  console.log("campaignData",campaignData);
-  
+    
   const [dialogConfig, setDialogConfig] = useState({
     title: "",
     smallText: "",

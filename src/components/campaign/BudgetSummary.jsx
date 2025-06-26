@@ -1,6 +1,6 @@
 export const BudgetSummary = ({ campaignData }) => {
-  const budget = parseFloat(campaignData?.campaignBudget) || 0;
-  const spent = 0; // You might want to calculate this from your data
+  const budget = campaignData?.campaignBudget;
+  const spent = 0
   const remaining = budget - spent;
 
   return (
@@ -8,7 +8,7 @@ export const BudgetSummary = ({ campaignData }) => {
       <div className="flex-1 p-6">
         <h2 className="text-[16px] text-gray-400 mb-2">ALLOCATED BUDGET</h2>
         <p className="text-[30px] font-md text-gray-800">
-          ${budget.toFixed(2)}
+          ${budget}
         </p>
       </div>
 
@@ -24,7 +24,7 @@ export const BudgetSummary = ({ campaignData }) => {
       <div className="flex-1 bg-white rounded-xl p-6">
         <h2 className="text-[16px] text-gray-400 mb-2">REMAINING BUDGET</h2>
         <p className="text-[30px] font-md text-gray-800">
-          ${remaining.toFixed(2)}
+          ${remaining}
         </p>
       </div>
     </div>

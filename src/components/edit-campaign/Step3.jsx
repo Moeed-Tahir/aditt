@@ -3,6 +3,7 @@ import React from 'react'
 import QuestionBox from "./QuestionBox";
 
 const Step3 = ({ handleQuestionChange, formData }) => {
+    console.log("formData in Step3", formData);
 
     return (
         <>
@@ -73,7 +74,7 @@ const Step3 = ({ handleQuestionChange, formData }) => {
                                             optionIndex
                                         )
                                     }
-                                    isQuiz={true}
+                                    isQuiz={false}
                                     name="surveyQuestion1"
                                 />
                             </div>
@@ -90,16 +91,16 @@ const Step3 = ({ handleQuestionChange, formData }) => {
                             </div>
                             <div className="relative flex-1">
                                 <QuestionBox
-                                    question={formData.surveyQuestion2}
+                                    question={formData.surveyQuestion1}
                                     onChange={(field, value, optionIndex) =>
                                         handleQuestionChange(
-                                            "surveyQuestion2",
+                                            "surveyQuestion1",
                                             field,
                                             value,
                                             optionIndex
                                         )
                                     }
-                                    isQuiz={true}
+                                    isQuiz={false}
                                     name="surveyQuestion2"
                                 />
                             </div>

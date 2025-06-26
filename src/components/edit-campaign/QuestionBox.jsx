@@ -93,7 +93,8 @@ function QuestionBox({ question, onChange, isQuiz, name }) {
                             </p>
                             {currentQuestion.options.map((opt, i) => (
                                 <div key={i} className="flex items-center mb-2 gap-2">
-                                    <input
+                                    {isQuiz && (
+<input
                                         type="radio"
                                         name={`question-${name}`}
                                         className="flex-shrink-0"
@@ -102,6 +103,8 @@ function QuestionBox({ question, onChange, isQuiz, name }) {
                                             : currentQuestion.selectedAnswer === i}
                                         onChange={() => handleAnswerSelect(i)}
                                     />
+                                    )}
+                                    
                                     <input
                                         type="text"
                                         placeholder={`Enter an answer choice`}
