@@ -1,7 +1,8 @@
 import { connectToDatabase } from '../../config/dbConnect';
 import Compaign from '../../models/Campaign.model';
 import CampaignFeedback from '../../models/CampaignFeedback';
-
+import mongoose from 'mongoose';
+import AdminDashboard from '../../models/AdminDashboard.model';
 import Stripe from 'stripe';
 import { getVideoDurationFromUrl } from '../../services/campaignServices';
 const dotenv = require("dotenv");
@@ -9,89 +10,128 @@ dotenv.config();
 
 
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
+
 exports.createCampaign = async (req, res) => {
-    try {
-        await connectToDatabase();
+  try {
+    await connectToDatabase();
 
-        const {
-            campaignTitle,
-            websiteLink,
-            campaignVideoUrl,
-            companyLogo,
-            quizQuestion,
-            surveyQuestion1,
-            surveyQuestion2,
-            genderType,
-            genderRatio,
-            ageRange,
-            campaignStartDate,
-            campaignEndDate,
-            cardDetail,
-            bankDetail,
-            couponCode,
-            userId,
-            campaignBudget,
-            brandName
-        } = req.body;
+    const {
+      campaignTitle,
+      websiteLink,
+      campaignVideoUrl,
+      companyLogo,
+      quizQuestion,
+      surveyQuestion1,
+      surveyQuestion2,
+      genderType,
+      genderRatio,
+      ageRange,
+      campaignStartDate,
+      campaignEndDate,
+      cardDetail,
+      bankDetail,
+      couponCode,
+      userId,
+      campaignBudget,
+      brandName
+    } = req.body;
 
-        if (
-            !campaignTitle ||
-            !websiteLink ||
-            !campaignVideoUrl ||
-            !brandName ||
-            !genderType ||
-            !Array.isArray(ageRange) || !ageRange.length ||
-            !campaignStartDate ||
-            !userId
-        ) {
-            return res.status(400).json({ message: 'Missing required fields' });
-        }
-
-        if (!quizQuestion) {
-            return res.status(400).json({ message: 'Quiz Question Missing' });
-        }
-
-
-        const processedAgeRange = ageRange.map(age => {
-            const num = Number(age);
-            return isNaN(num) ? 0 : num;
-        });
-
-        const newCampaign = new Compaign({
-            campaignTitle,
-            websiteLink,
-            campaignVideoUrl,
-            companyLogo,
-            quizQuestion,
-            surveyQuestion1,
-            surveyQuestion2,
-            genderType,
-            genderRatio,
-            ageRange: processedAgeRange,
-            campaignStartDate,
-            campaignEndDate,
-            cardDetail,
-            bankDetail,
-            couponCode,
-            userId,
-            campaignBudget,
-            brandName
-        });
-
-        const savedCampaign = await newCampaign.save();
-
-        res.status(201).json({
-            message: 'Campaign created successfully',
-            campaign: savedCampaign
-        });
-
-    } catch (error) {
-        console.error('Error creating campaign:', error);
-        res.status(500).json({
-            message: 'Failed to create campaign',
-            error: error.message
-        });
+    if (!campaignTitle || !websiteLink || !campaignVideoUrl || !brandName || 
+        !genderType || !Array.isArray(ageRange) || ageRange.length !== 2 || 
+        !campaignStartDate || !userId) {
+      return res.status(400).json({ message: 'Missing required fields' });
     }
+
+    if (!quizQuestion || !quizQuestion.questionText || !quizQuestion.option1 || 
+        !quizQuestion.option2 || !quizQuestion.answer) {
+      return res.status(400).json({ message: 'Invalid quiz question data' });
+    }
+
+    const processedAgeRange = ageRange.map(age => {
+      const num = Number(age);
+      return isNaN(num) ? 18 : num; 
+    }).sort((a, b) => a - b); 
+
+    const newCampaign = new Compaign({
+      campaignTitle,
+      websiteLink,
+      campaignVideoUrl,
+      companyLogo: companyLogo || null,
+      quizQuestion: {
+        questionText: quizQuestion.questionText,
+        option1: quizQuestion.option1,
+        option2: quizQuestion.option2,
+        option3: quizQuestion.option3 || null,
+        option4: quizQuestion.option4 || null,
+        answer: quizQuestion.answer
+      },
+      surveyQuestion1: surveyQuestion1 || null,
+      surveyQuestion2: surveyQuestion2 || null,
+      genderType,
+      genderRatio: genderRatio || '50-50',
+      ageRange: processedAgeRange,
+      campaignStartDate: new Date(campaignStartDate),
+      campaignEndDate: campaignEndDate ? new Date(campaignEndDate) : null,
+      cardDetail: cardDetail || null,
+      bankDetail: bankDetail || null,
+      couponCode: couponCode || null,
+      userId,
+      campaignBudget: campaignBudget ? Number(campaignBudget) : 0,
+      brandName,
+      status: 'Pending'
+    });
+
+    const savedCampaign = await newCampaign.save();
+
+    try {
+      let dashboard = await AdminDashboard.findOne() || new AdminDashboard();
+      
+      dashboard.totalCampaigns += 1;
+      dashboard.activeCampaigns += 1;
+      
+      if (campaignBudget) {
+        const amount = Number(campaignBudget) || 0;
+        
+        dashboard.totalEarnings += amount;
+        dashboard.currentWeekEarnings += amount;
+        
+        const days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+        const today = new Date();
+        const dayOfWeek = days[today.getDay()];
+        
+        const dayIndex = dashboard.dailyEarnings.findIndex(e => e.day === dayOfWeek);
+        if (dayIndex >= 0) {
+          dashboard.dailyEarnings[dayIndex].amount += amount;
+          dashboard.dailyEarnings[dayIndex].date = today;
+        } else {
+          dashboard.dailyEarnings.push({
+            day: dayOfWeek,
+            amount,
+            date: today
+          });
+        }
+      }
+      
+      dashboard.lastUpdated = new Date();
+      await dashboard.save();
+    } catch (dashboardError) {
+      console.error('Dashboard update error:', dashboardError);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Campaign created successfully',
+      data: savedCampaign
+    });
+
+  } catch (error) {
+    console.error('Campaign creation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create campaign',
+      error: error.message
+    });
+  }
 };
 
 exports.getCampaign = async (req, res) => {

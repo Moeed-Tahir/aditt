@@ -131,13 +131,10 @@ export const verifyOTP = async (req, res) => {
             });
         }
 
-        // ✅ Mark user as verified
-        console.log('Before verification:', user.isOtpVerified);
         user.isOtpVerified = true;
         user.otp = null;
         user.otpExpires = null;
         await user.save();
-        console.log('After verification:', user.isOtpVerified);
 
         const token = jwt.sign(
             { userId: user.userId },

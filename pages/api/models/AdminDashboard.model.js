@@ -1,0 +1,63 @@
+import mongoose from 'mongoose';
+
+const AdminDashboardSchema = new mongoose.Schema({
+    // Pie Chart Data
+    totalCampaigns: {
+        type: Number,
+        default: 0
+    },
+    activeCampaigns: {
+        type: Number,
+        default: 0
+    },
+    pausedCampaigns: {
+        type: Number,
+        default: 0
+    },
+    completedCampaigns: {
+        type: Number,
+        default: 0
+    },
+
+    // Bar Chart Data - Last 7 days earnings
+    dailyEarnings: [{
+        day: {
+            type: String,
+            enum: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+            required: true
+        },
+        amount: {
+            type: Number,
+            default: 0
+        },
+        date: {
+            type: Date
+        }
+    }],
+
+    totalEarnings: {
+        type: Number,
+        default: 0
+    },
+    currentWeekEarnings: {
+        type: Number,
+        default: 0
+    },
+    lastWeekEarnings: {
+        type: Number,
+        default: 0
+    },
+
+    lastUpdated: {
+        type: Date,
+        default: Date.now
+    }
+}, { timestamps: true });
+
+
+
+
+const AdminDashboard = mongoose.models.AdminDashboard ||
+    mongoose.model('AdminDashboard', AdminDashboardSchema);
+
+export default AdminDashboard;

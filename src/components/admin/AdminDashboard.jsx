@@ -18,6 +18,7 @@ export function AdminDashboard() {
   const [advertiserUsers, setAdvertiserUsers] = useState([]);
   const [deletionRequests, setDeletionRequests] = useState([]);
   const [latestCampaigns, setLatestCampaigns] = useState([]);
+  const [adminDashboardData, setAdminDashboardData] = useState([]);
 
   const fetchConsumers = useCallback(async () => {
     try {
@@ -75,16 +76,32 @@ export function AdminDashboard() {
     }
   }, [setLatestCampaigns]);
 
+    const fetchAdminDashboardData = useCallback(async () => {
+    try {
+      const response = await axios.post(
+        "/api/routes/v1/adminDashboardRoutes?action=getAdminDashboardData"
+      );
+      setAdminDashboardData(response?.data?.dashboardData || []);
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Error fetching latest campaigns"
+      );
+      console.error("Error fetching latest campaigns:", error);
+    }
+  }, [setLatestCampaigns]);
+
   useEffect(() => {
     fetchConsumers();
     fetchAdvertiserUser();
     fetchDeletionRequest();
     fetchLatestCampaign();
+    fetchAdminDashboardData();
   }, [
     fetchConsumers,
     fetchAdvertiserUser,
     fetchDeletionRequest,
     fetchLatestCampaign,
+    fetchAdminDashboardData
   ]);
 
   const formatConsumerUsers = (users) => {
@@ -466,10 +483,10 @@ export function AdminDashboard() {
     <div className="p-4 sm:p-6 lg:p-8 space-y-4">
       <div className="mb-4 flex flex-col lg:flex-row gap-4 lg:gap-6">
         <div className="w-full lg:w-1/2 p-4 bg-white rounded-2xl">
-          <LineChart />
+          <LineChart adminDashboardData={adminDashboardData} />
         </div>
         <div className="w-full lg:w-1/2 p-4 bg-white rounded-2xl">
-          <PieChartBox />
+          <PieChartBox adminDashboardData={adminDashboardData} />
         </div>
       </div>
   

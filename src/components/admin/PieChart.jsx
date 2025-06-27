@@ -1,42 +1,37 @@
 "use client";
 
 import {
-  ChevronDown,
-  EllipsisVerticalIcon,
-  ChartPie,
-  BarChart2,
-  PauseCircle,
   Megaphone,
   CheckCircleIcon,
   Clock,
 } from "lucide-react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
-const data = [
-  {
-    name: "Total Ads",
-    value: 100,
-    color: "rgba(19, 91, 232, 1)",
-    icon: <Megaphone className="text-blue-600 w-6 h-6" />,
-    bgColor: "bg-blue-100",
-  },
-  {
-    name: "Active Ads",
-    value: 100,
-    color: "rgba(19, 91, 232, 0.6)",
-    icon: <CheckCircleIcon className="text-cyan-600 w-6 h-6" />,
-    bgColor: "bg-cyan-100",
-  },
-  {
-    name: "Paused Ads",
-    value: 100,
-    color: "rgba(19, 91, 232, 0.16)",
-    icon: <Clock className="text-orange-500 w-6 h-6" />,
-    bgColor: "bg-orange-200",
-  },
-];
+export function PieChartBox({ adminDashboardData }) {
+  const data = [
+    {
+      name: "Total Ads",
+      value: adminDashboardData?.totalCampaigns || 0,
+      color: "rgba(19, 91, 232, 1)",
+      icon: <Megaphone className="text-blue-600 w-6 h-6" />,
+      bgColor: "bg-blue-100",
+    },
+    {
+      name: "Active Ads",
+      value: adminDashboardData?.activeCampaigns || 0,
+      color: "rgba(19, 91, 232, 0.6)",
+      icon: <CheckCircleIcon className="text-cyan-600 w-6 h-6" />,
+      bgColor: "bg-cyan-100",
+    },
+    {
+      name: "Paused Ads",
+      value: adminDashboardData?.pausedCampaigns || 0,
+      color: "rgba(19, 91, 232, 0.16)",
+      icon: <Clock className="text-orange-500 w-6 h-6" />,
+      bgColor: "bg-orange-200",
+    },
+  ];
 
-export function PieChartBox() {
   const total = data.reduce((acc, item) => acc + item.value, 0);
 
   return (
@@ -45,14 +40,6 @@ export function PieChartBox() {
         <div>
           <h2 className="text-xl font-medium">Activity Tracker</h2>
           <p className="text-gray-500 text-sm">Last 7 Days</p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1 border px-2 py-1 text-sm rounded-md text-blue-600 border-blue-600">
-            Weekly
-            <ChevronDown className="w-4 h-4" />
-          </button>
-          <EllipsisVerticalIcon className="w-4 h-4 text-gray-600 cursor-pointer" />
         </div>
       </div>
 
@@ -78,7 +65,6 @@ export function PieChartBox() {
           </div>
         </div>
 
-        {/* Right - Pie Chart */}
         <div className="w-full sm:w-[50%] flex justify-center items-center">
           <PieChart width={250} height={250}>
             <Pie
@@ -98,8 +84,6 @@ export function PieChartBox() {
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-
-            {/* Centered Number */}
             <text
               x="50%"
               y="50%"
@@ -111,7 +95,6 @@ export function PieChartBox() {
               {total}
             </text>
 
-            {/* Centered Label */}
             <text
               x="50%"
               y="50%"

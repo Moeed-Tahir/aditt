@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Calendars from '../Calendars';
 import { CircleDollarSign, Tag } from 'lucide-react';
 import PaymentMethod from '../PaymentMethod';
@@ -17,10 +17,18 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
         originalBudget: 0
     });
     const [couponError, setCouponError] = useState(null);
+    const [showPaymentSection, setShowPaymentSection] = useState(true);
+
+    const currentBudget = parseFloat(formData.actualBudget || formData.budget || 0);
+    const isBudgetZero = currentBudget === 0;
+
+    useEffect(() => {
+        setShowPaymentSection(!(isBudgetZero && discountApplied));
+    }, [isBudgetZero, discountApplied]);
 
     const normalizeDiscountType = (type) => {
         if (!type) return null;
-        return type.toLowerCase().replace(/\s+/g, ''); // Remove spaces and lowercase
+        return type.toLowerCase().replace(/\s+/g, '');
     };
 
     const handleApplyCoupon = async () => {
@@ -52,16 +60,15 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                 }
 
                 if (discountType === 'percentage') {
-                    discountValue = Math.min(Math.max(0, discountValue), 100); // Clamp between 0-100%
+                    discountValue = Math.min(Math.max(0, discountValue), 100);
                     discountedBudget = originalBudget * (1 - (discountValue / 100));
                 } else if (discountType === 'fixedamount') {
-                    discountValue = Math.min(Math.max(0, discountValue), originalBudget); // Clamp between 0-originalBudget
+                    discountValue = Math.min(Math.max(0, discountValue), originalBudget);
                     discountedBudget = originalBudget - discountValue;
                 } else {
                     throw new Error('Unsupported discount type');
                 }
 
-                // Update state
                 setDiscountApplied(true);
                 setDiscountInfo({
                     type: discountType.includes('percentage') ? 'percentage' : 'fixed',
@@ -69,10 +76,9 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                     originalBudget: originalBudget
                 });
 
-                // Update form data
                 setFormData(prev => ({
                     ...prev,
-                    budget: discountedBudget.toFixed(2),
+                    actualBudget: discountedBudget.toFixed(2),
                     appliedCoupon: formData.couponCode.trim()
                 }));
 
@@ -86,7 +92,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
             setCouponError(errorMessage);
             setDiscountApplied(false);
 
-            // Reset coupon code field if error is specific to the code
             if (error.response?.data?.error?.toLowerCase().includes('invalid') ||
                 error.response?.data?.error?.toLowerCase().includes('expired') ||
                 error.message.toLowerCase().includes('invalid')) {
@@ -101,14 +106,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
     };
 
     const handleRemoveCoupon = () => {
-        if (discountInfo.originalBudget) {
-            setFormData(prev => ({
-                ...prev,
-                budget: discountInfo.originalBudget.toFixed(2),
-                couponCode: '',
-                appliedCoupon: ''
-            }));
-        }
         setDiscountApplied(false);
         setDiscountInfo({
             type: null,
@@ -116,10 +113,35 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
             originalBudget: 0
         });
         setCouponError(null);
+        setFormData(prev => ({
+            ...prev,
+            actualBudget: '',
+            couponCode: '',
+            appliedCoupon: ''
+        }));
         toast.success('Coupon removed successfully!');
     };
 
-    const isBudgetZero = parseFloat(formData.budget) === 0;
+    const isSubmitDisabled = () => {
+        if (!formData.startDate || !formData.endDate || !formData.budget) {
+            return true;
+        }
+
+        const budgetValue = parseFloat(formData.budget);
+        if (budgetValue <= 0) {
+            return true;
+        }
+
+        if (isBudgetZero && discountApplied) {
+            return false;
+        }
+
+        if (!isBudgetZero && formData.cards.length === 0 && formData.bankAccounts.length === 0) {
+            return true;
+        }
+
+        return false;
+    };
 
     return (
         <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
@@ -136,7 +158,9 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
 
                     <button
                         onClick={handleSubmit}
-                        className="bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700"
+                        disabled={isSubmitDisabled()}
+                        className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${isSubmitDisabled() ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                     >
                         Submit
                     </button>
@@ -151,8 +175,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                 Campaign start date (Required)
                             </label>
                             <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                                Choose when you want your campaign to go live and start
-                                reaching your audience.
+                                Choose when you want your campaign to go live.
                             </span>
                         </div>
                         <div className="relative w-full flex-1">
@@ -174,17 +197,16 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                     </div>
 
                     <hr className="border-t mb-4 border-gray-300" />
+
                     <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
                         <div className="w-full md:w-1/3">
                             <label className="block text-base md:text-[18px] text-gray-800 font-medium">
                                 Campaign end date (Optional)
                             </label>
                             <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                                Choose an end date for your campaign or leave it
-                                open-ended to run indefinitely.
+                                Choose an end date or leave it open-ended.
                             </span>
                         </div>
-
                         <div className="relative w-full flex-1">
                             <Calendars
                                 selected={formData.endDate}
@@ -210,7 +232,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                 Define the total budget for your campaign.
                             </span>
                         </div>
-
                         <div className="w-full flex-1">
                             <div className="relative w-full h-10 md:h-12">
                                 <CircleDollarSign className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
@@ -228,7 +249,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
 
                             {formData.budget && formData.videoDuration && (
                                 <div className="mt-2 text-xs md:text-sm text-gray-500">
-                                    With a ${formData.budget} budget for your{" "}
+                                    With a ${discountApplied ? formData.actualBudget : formData.budget} budget for your{" "}
                                     {formData.videoDuration}-second video, you will reach
                                     approximately {formData.campignBudget} unique users.
                                     {discountApplied && (
@@ -251,15 +272,13 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                 Coupon Code
                             </label>
                             <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                                Add Coupon code If you have.
+                                Add Coupon code if you have one.
                             </span>
                         </div>
-
                         <div className="relative w-full flex-1">
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center relative">
                                     <Tag className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
-
                                     <input
                                         type="text"
                                         name="couponCode"
@@ -269,7 +288,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                         className="w-full h-10 md:h-12 border border-gray-300 text-gray-600 rounded-l-full pl-10 pr-4 py-1 md:py-2"
                                         disabled={discountApplied}
                                     />
-
                                     {discountApplied ? (
                                         <button
                                             type="button"
@@ -290,16 +308,14 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                         </button>
                                     )}
                                 </div>
-
                                 {couponError && (
                                     <div className="text-xs md:text-sm text-red-500">
                                         {couponError}
                                     </div>
                                 )}
-
                                 {discountApplied && (
                                     <div className="text-xs md:text-sm text-green-600">
-                                        Coupon code applied successfully! Your discount has been applied to the budget.
+                                        Coupon code applied successfully!
                                     </div>
                                 )}
                             </div>
@@ -308,16 +324,16 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
 
                     <hr className="border-t mb-4 border-gray-300" />
 
-                    <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
-                        <div className="w-full md:w-1/3">
-                            <label className="block text-base md:text-[18px] text-gray-800 font-medium">
-                                Payment Info
-                            </label>
-                            <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                                Choose a payment method to fund your campaign.
-                            </span>
-                        </div>
-                        {!(discountApplied && parseFloat(formData.budget) === 0) && (
+                    {showPaymentSection && (
+                        <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                            <div className="w-full md:w-1/3">
+                                <label className="block text-base md:text-[18px] text-gray-800 font-medium">
+                                    Payment Info
+                                </label>
+                                <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
+                                    Choose a payment method to fund your campaign.
+                                </span>
+                            </div>
                             <div className="relative w-full flex-1">
                                 <PaymentMethod
                                     value={{
@@ -348,9 +364,8 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                     }
                                 />
                             </div>
-                        )}
-
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

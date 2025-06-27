@@ -48,36 +48,52 @@ export default function BarCharts({ quizQuestion }) {
     },
   };
 
+  const calculatePercentages = (ageGroup) => {
+    const total = ageGroup.male + ageGroup.female + ageGroup.other;
+    if (total === 0) {
+      return {
+        male: 0,
+        female: 0,
+        preferNotToSay: 0,
+      };
+    }
+    return {
+      male: (ageGroup.male / total) * 100,
+      female: (ageGroup.female / total) * 100,
+      preferNotToSay: (ageGroup.other / total) * 100,
+    };
+  };
+
   const chartData = [
     {
       month: "45+",
-      male: demographicStats.ageGroups.age45Plus.male,
-      female: demographicStats.ageGroups.age45Plus.female,
-      preferNotToSay: demographicStats.ageGroups.age45Plus.other,
+      ...calculatePercentages(demographicStats.ageGroups.age45Plus),
+      total: demographicStats.ageGroups.age45Plus.male + 
+            demographicStats.ageGroups.age45Plus.female + 
+            demographicStats.ageGroups.age45Plus.other
     },
     {
       month: "35-44",
-      male: demographicStats.ageGroups.age35_44.male,
-      female: demographicStats.ageGroups.age35_44.female,
-      preferNotToSay: demographicStats.ageGroups.age35_44.other,
+      ...calculatePercentages(demographicStats.ageGroups.age35_44),
+      total: demographicStats.ageGroups.age35_44.male + 
+            demographicStats.ageGroups.age35_44.female + 
+            demographicStats.ageGroups.age35_44.other
     },
     {
       month: "25-33",
-      male: demographicStats.ageGroups.age25_33.male,
-      female: demographicStats.ageGroups.age25_33.female,
-      preferNotToSay: demographicStats.ageGroups.age25_33.other,
+      ...calculatePercentages(demographicStats.ageGroups.age25_33),
+      total: demographicStats.ageGroups.age25_33.male + 
+            demographicStats.ageGroups.age25_33.female + 
+            demographicStats.ageGroups.age25_33.other
     },
     {
       month: "18-24",
-      male: demographicStats.ageGroups.age18_24.male,
-      female: demographicStats.ageGroups.age18_24.female,
-      preferNotToSay: demographicStats.ageGroups.age18_24.other,
+      ...calculatePercentages(demographicStats.ageGroups.age18_24),
+      total: demographicStats.ageGroups.age18_24.male + 
+            demographicStats.ageGroups.age18_24.female + 
+            demographicStats.ageGroups.age18_24.other
     },
   ];
-
-  const maxValue = Math.max(
-    ...chartData.map((item) => item.male + item.female + item.preferNotToSay)
-  );
 
   return (
     <Card className="border-none shadow-none">
@@ -86,7 +102,7 @@ export default function BarCharts({ quizQuestion }) {
           Demographic Insights
         </CardTitle>
         <CardDescription>
-          Audience demographics by Age and Gender.
+          Audience demographics by Age and Gender (percentage distribution).
         </CardDescription>
         <hr className="border-t border-gray-300" />
       </CardHeader>
@@ -102,8 +118,9 @@ export default function BarCharts({ quizQuestion }) {
               <CartesianGrid horizontal={false} />
               <XAxis
                 type="number"
-                domain={[0, Math.ceil(maxValue * 1.1)]} // Add 10% padding
+                domain={[0, 100]} 
                 tick={{ fontSize: 10 }}
+                tickFormatter={(value) => `${value}%`}
               />
               <YAxis
                 dataKey="month"
@@ -114,7 +131,23 @@ export default function BarCharts({ quizQuestion }) {
               />
               <ChartTooltip
                 cursor={false}
-                content={<ChartTooltipContent indicator="line" />}
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="bg-white p-2 border border-gray-200 rounded shadow">
+                        <p className="font-semibold">{data.month}</p>
+                        {payload.map((entry, index) => (
+                          <p key={index} style={{ color: entry.color }}>
+                            {`${chartConfig[entry.dataKey].label}: ${entry.value.toFixed(1)}% (${data[entry.dataKey] === 'male' ? data.male : entry.dataKey === 'female' ? data.female : data.preferNotToSay})`}
+                          </p>
+                        ))}
+                        <p>Total: {data.total}</p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
               />
 
               <Bar
@@ -129,7 +162,7 @@ export default function BarCharts({ quizQuestion }) {
                   offset={8}
                   fontSize={12}
                   className="fill-foreground"
-                  formatter={(value) => (value > 0 ? value : '')} // Only show label if value > 0
+                  formatter={(value) => (value > 0 ? `${Math.round(value)}%` : '')}
                 />
               </Bar>
               <Bar
@@ -143,7 +176,7 @@ export default function BarCharts({ quizQuestion }) {
                   offset={8}
                   fontSize={12}
                   className="fill-foreground"
-                  formatter={(value) => (value > 0 ? value : '')}
+                  formatter={(value) => (value > 0 ? `${Math.round(value)}%` : '')}
                 />
               </Bar>
               <Bar
@@ -158,7 +191,7 @@ export default function BarCharts({ quizQuestion }) {
                   offset={8}
                   fontSize={12}
                   className="fill-foreground"
-                  formatter={(value) => (value > 0 ? value : '')}
+                  formatter={(value) => (value > 0 ? `${Math.round(value)}%` : '')}
                 />
               </Bar>
             </BarChart>
