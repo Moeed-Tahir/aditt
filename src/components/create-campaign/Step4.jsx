@@ -247,7 +247,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                 />
                             </div>
 
-                            {formData.budget && formData.videoDuration && (
+                            {/* {formData.budget && formData.videoDuration && (
                                 <div className="mt-2 text-xs md:text-sm text-gray-500">
                                     With a ${discountApplied ? formData.actualBudget : formData.budget} budget for your{" "}
                                     {formData.videoDuration}-second video, you will reach
@@ -260,7 +260,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                         </span>
                                     )}
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
 
