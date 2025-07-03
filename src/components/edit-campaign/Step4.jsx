@@ -112,13 +112,13 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange }) => {
                                     placeholder="Enter campaign budget"
                                     className="w-full h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
                                 />
-                                {formData.budget && formData.videoDuration && (
+                                {/* {formData.budget && formData.videoDuration && (
                                     <div className="mt-2 text-sm text-gray-500">
                                         With a ${formData.budget} budget for your{" "}
                                         {formData.videoDuration}-second video, you will reach
                                         approximately {formData.campignBudget} unique users.
                                     </div>
-                                )}
+                                )} */}
                             </div>
                         </div>
                         <hr className="border-t mb-4 border-gray-300" />

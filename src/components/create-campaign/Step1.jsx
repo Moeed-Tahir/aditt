@@ -124,9 +124,9 @@ const Step1 = ({
                 </div>
 
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-sm md:text-[16px] text-green-600 select-all truncate">
-                    {formData.websiteLink || "https://www.example.com"}
-                  </p>
+                <p className="text-sm md:text-[16px] text-green-600 select-all truncate overflow-hidden whitespace-nowrap max-w-[250px]">
+  {formData.websiteLink || "https://www.example.com"}
+</p>
                   {formData.websiteLink && (
                     <button
                       onClick={() =>
