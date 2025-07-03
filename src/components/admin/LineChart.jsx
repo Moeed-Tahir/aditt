@@ -2,10 +2,8 @@
 
 import {
   ChartPie,
-  ChevronDown,
   CircleDollarSign,
   DollarSignIcon,
-  EllipsisVerticalIcon,
 } from "lucide-react";
 import {
   BarChart,
