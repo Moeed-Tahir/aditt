@@ -31,14 +31,14 @@ export default function EditPromoCodeDialog({ open, onClose, onSave, promoData }
 
   useEffect(() => {
     if (promoData) {
-      console.log("promoData",promoData);
+      console.log("promoData", promoData);
 
-      const isCustomUserLimit = promoData.appliesTo?.startsWith("First ") && 
-                               promoData.appliesTo?.endsWith(" Users");
-      
+      const isCustomUserLimit = promoData.appliesTo?.startsWith("First ") &&
+        promoData.appliesTo?.endsWith(" Users");
+
       let customUserLimit = "";
       let appliesTo = promoData.appliesTo;
-      
+
       if (isCustomUserLimit) {
         customUserLimit = promoData.appliesTo.replace("First ", "").replace(" Users", "");
         appliesTo = "";
@@ -83,7 +83,7 @@ export default function EditPromoCodeDialog({ open, onClose, onSave, promoData }
     }
   };
 
-const handleSubmit = async () => {
+  const handleSubmit = async () => {
     if (!formData.name) {
       toast.error("Code name is required");
       return;
@@ -130,7 +130,7 @@ const handleSubmit = async () => {
         customUserLimit: formData.appliesTo === "Custom" ? formData.customUserLimit : undefined,
         limitUsers: formData.limitUsers,
         status: formData.status,
-        fullWavier:formData.fullWavier
+        fullWavier: formData.fullWavier
       });
 
       if (response.data) {
@@ -192,6 +192,17 @@ const handleSubmit = async () => {
                   }
                 />
                 Fixed Amount
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="fullWaiver"
+                  checked={formData.fullWavier}
+                  onChange={() =>
+                    setFormData({ ...formData, fullWavier: !formData.fullWavier })
+                  }
+                />
+                Full Wavier
               </label>
             </div>
 
@@ -292,22 +303,6 @@ const handleSubmit = async () => {
                 checked={formData.status}
                 onChange={() =>
                   setFormData({ ...formData, status: !formData.status })
-                }
-              />
-              <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 transition-colors" />
-              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5" />
-            </label>
-          </div>
-
-                    <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Full Waiver</span>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={formData.fullWavier}
-                onChange={() =>
-                  setFormData({ ...formData, fullWavier: !formData.fullWavier })
                 }
               />
               <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 transition-colors" />

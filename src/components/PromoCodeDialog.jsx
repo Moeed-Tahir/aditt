@@ -174,6 +174,17 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                 />
                 Fixed Amount
               </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="fullWaiver"
+                  checked={formData.fullWaiver}
+                  onChange={() =>
+                    setFormData({ ...formData, fullWaiver: !formData.fullWaiver })
+                  }
+                />
+                Full Wavier
+              </label>
             </div>
 
             <div className="mt-2 relative">
@@ -273,22 +284,6 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                 checked={formData.status}
                 onChange={() =>
                   setFormData({ ...formData, status: !formData.status })
-                }
-              />
-              <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 transition-colors" />
-              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5" />
-            </label>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Full Waiver</span>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={formData.fullWaiver}
-                onChange={() =>
-                  setFormData({ ...formData, fullWaiver: !formData.fullWaiver })
                 }
               />
               <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 transition-colors" />

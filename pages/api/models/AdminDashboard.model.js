@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 const AdminDashboardSchema = new mongoose.Schema({
-    // Pie Chart Data
     totalCampaigns: {
         type: Number,
         default: 0
@@ -10,7 +9,7 @@ const AdminDashboardSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    pausedCampaigns: {
+    pendingCampaigns: {
         type: Number,
         default: 0
     },
@@ -19,7 +18,6 @@ const AdminDashboardSchema = new mongoose.Schema({
         default: 0
     },
 
-    // Bar Chart Data - Last 7 days earnings
     dailyEarnings: [{
         day: {
             type: String,

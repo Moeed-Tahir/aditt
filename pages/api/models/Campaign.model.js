@@ -153,6 +153,10 @@ const EngagementSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    totalEngagementValue: {
+        type: Number,
+        default: 0
+    },
     dailyCounts: {
         type: [{
             date: {
@@ -167,7 +171,6 @@ const EngagementSchema = new mongoose.Schema({
         default: []
     }
 }, { _id: false });
-
 
 const ClickCountSchema = new mongoose.Schema({
     totalCount: {
@@ -205,7 +208,7 @@ const CampaignSchema = new mongoose.Schema({
     },
     reason: {
         type: String,
-        required: function() { return this.status === "Rejected"; }
+        required: function () { return this.status === "Rejected"; }
     },
     websiteLink: {
         type: String,
@@ -244,7 +247,7 @@ const CampaignSchema = new mongoose.Schema({
         type: [Number],
         required: true,
         validate: {
-            validator: function(arr) {
+            validator: function (arr) {
                 return arr.length === 2 && arr[0] < arr[1];
             },
             message: props => `Age range must contain exactly 2 numbers (min and max)`

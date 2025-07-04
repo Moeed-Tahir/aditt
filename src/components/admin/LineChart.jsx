@@ -18,11 +18,14 @@ import {
 const daysOfWeek = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
 export function LineChart({ adminDashboardData }) {
+  console.log("adminDashboardData in LineChart", adminDashboardData);
+
+  // Create chart data for all days of the week
   const chartData = daysOfWeek.map(day => {
-    const dayData = adminDashboardData?.dailyEarnings?.find(d => d.day === day) || { amount: 0 };
+    const dayData = adminDashboardData?.dailyEarnings?.find(d => d.day === day);
     return {
       name: day,
-      earnings: dayData.amount,
+      earnings: dayData ? dayData.amount : 0,
       fill: day === "Fr" ? "#135BE8" : "rgba(19, 91, 232, 0.16)"
     };
   });
@@ -34,7 +37,6 @@ export function LineChart({ adminDashboardData }) {
           <h2 className="text-xl font-medium">Earning Reports</h2>
           <p className="text-gray-500 text-sm">Weekly Earnings Overview</p>
         </div>
-       
       </div>
 
       <div className="flex flex-wrap justify-between gap-6 items-center">
