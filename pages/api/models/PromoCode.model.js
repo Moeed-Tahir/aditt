@@ -55,6 +55,11 @@ const PromoCodeSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  fullWavier: {
+    type: Boolean,
+    default: false,
+    required: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

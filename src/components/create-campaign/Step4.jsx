@@ -14,7 +14,8 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
     const [discountInfo, setDiscountInfo] = useState({
         type: null,
         value: 0,
-        originalBudget: 0
+        originalBudget: 0,
+        fullWavier: false
     });
     const [couponError, setCouponError] = useState(null);
     const [showPaymentSection, setShowPaymentSection] = useState(true);
@@ -44,22 +45,28 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
             const response = await axios.post('/api/routes/v1/promoRoutes?action=applyPromoCode', {
                 code: formData.couponCode.trim()
             });
+            console.log("response", response);
+
 
             if (response.data.success) {
                 const originalBudget = parseFloat(formData.budget);
-                if (isNaN(originalBudget) || originalBudget <= 0) {
+
+                if (response.data.fullWavier !== true && (isNaN(originalBudget) || originalBudget <= 0)) {
                     throw new Error('Please set a valid budget before applying coupon');
                 }
 
                 let discountedBudget = originalBudget;
                 let discountValue = parseFloat(response.data.discountValue);
                 const discountType = normalizeDiscountType(response.data.discountType);
+                const fullWavier = response.data.fullWavier === true;
 
                 if (isNaN(discountValue)) {
                     throw new Error('Invalid discount value');
                 }
 
-                if (discountType === 'percentage') {
+                if (fullWavier) {
+                    discountedBudget = 0;
+                } else if (discountType === 'percentage') {
                     discountValue = Math.min(Math.max(0, discountValue), 100);
                     discountedBudget = originalBudget * (1 - (discountValue / 100));
                 } else if (discountType === 'fixedamount') {
@@ -73,7 +80,8 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                 setDiscountInfo({
                     type: discountType.includes('percentage') ? 'percentage' : 'fixed',
                     value: discountValue,
-                    originalBudget: originalBudget
+                    originalBudget: originalBudget,
+                    fullWavier: fullWavier
                 });
 
                 setFormData(prev => ({
@@ -110,7 +118,8 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
         setDiscountInfo({
             type: null,
             value: 0,
-            originalBudget: 0
+            originalBudget: 0,
+            fullWavier: false
         });
         setCouponError(null);
         setFormData(prev => ({
@@ -123,7 +132,15 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
     };
 
     const isSubmitDisabled = () => {
-        if (!formData.startDate || !formData.endDate || !formData.budget) {
+        if (!formData.startDate) {
+            return true;
+        }
+
+        if (discountInfo.fullWavier) {
+            return false;
+        }
+
+        if (!formData.budget) {
             return true;
         }
 
@@ -142,6 +159,22 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
 
         return false;
     };
+
+    const calculateWaiverUsers = () => {
+
+        if (!discountInfo.fullWavier || !formData.videoDuration) return 0;
+
+        const [minutes, seconds] = formData.videoDuration.split(':').map(Number);
+        const totalSeconds = (minutes * 60) + seconds;
+
+        if (isNaN(totalSeconds) || isNaN(discountInfo.value)) return 0;
+
+        const result = Math.floor(totalSeconds * discountInfo.value);
+
+        return result;
+    };
+
+
 
     return (
         <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
@@ -240,27 +273,40 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                     name="budget"
                                     value={formData.budget}
                                     onChange={handleInputChange}
-                                    placeholder="Enter campaign budget"
+                                    placeholder={discountInfo.fullWavier ? "Full wavier applied" : "Enter campaign budget"}
                                     className="w-full h-full border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-1 md:py-2"
                                     min="0"
                                     step="0.01"
+                                    disabled={discountInfo.fullWavier}
                                 />
                             </div>
 
-                            {/* {formData.budget && formData.videoDuration && (
+                            {formData.videoDuration && (
                                 <div className="mt-2 text-xs md:text-sm text-gray-500">
-                                    With a ${discountApplied ? formData.actualBudget : formData.budget} budget for your{" "}
-                                    {formData.videoDuration}-second video, you will reach
-                                    approximately {formData.campignBudget} unique users.
-                                    {discountApplied && (
-                                        <span className="text-green-600 ml-2">
-                                            (Discount applied: {discountInfo.type === 'percentage'
-                                                ? `${discountInfo.value}%`
-                                                : `$${discountInfo.value.toFixed(2)}`})
-                                        </span>
-                                    )}
+                                    {discountInfo.fullWavier ? (
+                                        <>
+                                            With your {formData.videoDuration}-second video, you will reach approximately {' '}
+                                            {calculateWaiverUsers().toLocaleString()} unique users.
+                                            <span className="text-green-600 ml-2">
+                                                (Full wavier rate: ${discountInfo.value.toFixed(2)} per second)
+                                            </span>
+                                        </>
+                                    ) : formData.budget ? (
+                                        <>
+                                            With a ${discountApplied ? formData.actualBudget : formData.budget} budget for your{' '}
+                                            {formData.videoDuration}-second video, you will reach
+                                            approximately {formData.campignBudget} unique users.
+                                            {discountApplied && (
+                                                <span className="text-green-600 ml-2">
+                                                    (Discount applied: {discountInfo.type === 'percentage'
+                                                        ? `${discountInfo.value}%`
+                                                        : `$${discountInfo.value.toFixed(2)}`})
+                                                </span>
+                                            )}
+                                        </>
+                                    ) : null}
                                 </div>
-                            )} */}
+                            )}
                         </div>
                     </div>
 
@@ -316,6 +362,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                 {discountApplied && (
                                     <div className="text-xs md:text-sm text-green-600">
                                         Coupon code applied successfully!
+                                        {discountInfo.fullWavier && " (Full wavier applied)"}
                                     </div>
                                 )}
                             </div>
@@ -324,7 +371,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
 
                     <hr className="border-t mb-4 border-gray-300" />
 
-                    {showPaymentSection && (
+                    {showPaymentSection && !discountInfo.fullWavier && (
                         <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
                             <div className="w-full md:w-1/3">
                                 <label className="block text-base md:text-[18px] text-gray-800 font-medium">

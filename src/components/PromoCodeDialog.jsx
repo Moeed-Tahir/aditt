@@ -22,6 +22,7 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
     customUserLimit: "",
     limitUsers: false,
     status: true,
+    fullWaiver: false,
   });
 
   const [loading, setLoading] = useState(false);
@@ -50,7 +51,6 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
   };
 
   const handleSubmit = async () => {
-    // Validate required fields
     if (!formData.name.trim()) {
       toast.error("Please enter a promo code name");
       return;
@@ -100,7 +100,8 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
           appliesTo: formData.appliesTo,
           customUserLimit: formData.customUserLimit ? Number(formData.customUserLimit) : undefined,
           limitUsers: formData.limitUsers,
-          status: formData.status
+          status: formData.status,
+          fullWaiver: formData.fullWaiver
         }),
       });
 
@@ -119,7 +120,7 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
       setFormData({});
       onClose();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(response?.data?.error?.message);
     } finally {
       setLoading(false);
     }
@@ -272,6 +273,22 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                 checked={formData.status}
                 onChange={() =>
                   setFormData({ ...formData, status: !formData.status })
+                }
+              />
+              <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 transition-colors" />
+              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5" />
+            </label>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Full Waiver</span>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={formData.fullWaiver}
+                onChange={() =>
+                  setFormData({ ...formData, fullWaiver: !formData.fullWaiver })
                 }
               />
               <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 transition-colors" />
