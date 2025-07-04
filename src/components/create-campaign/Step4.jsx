@@ -123,7 +123,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
     };
 
     const isSubmitDisabled = () => {
-        if (!formData.startDate || !formData.endDate || !formData.budget) {
+        if (!formData.startDate || !formData.budget) {
             return true;
         }
 
