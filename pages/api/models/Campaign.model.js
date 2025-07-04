@@ -152,8 +152,22 @@ const EngagementSchema = new mongoose.Schema({
     totalCount: {
         type: Number,
         default: 0
+    },
+    dailyCounts: {
+        type: [{
+            date: {
+                type: Date,
+                required: true
+            },
+            count: {
+                type: Number,
+                default: 0
+            }
+        }],
+        default: []
     }
 }, { _id: false });
+
 
 const ClickCountSchema = new mongoose.Schema({
     totalCount: {

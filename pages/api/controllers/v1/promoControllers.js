@@ -1,11 +1,12 @@
-import {connectToDatabase} from '../../config/dbConnect';
+import { connectToDatabase } from '../../config/dbConnect';
 import PromoCode from '../../models/PromoCode.model';
 
 export const createPromoCode = async (req, res) => {
   try {
     await connectToDatabase();
 
-    const { name, discountType, discountValue, startDate, endDate, appliesTo, customUserLimit, limitUsers, status } = req.body;
+    const { name, discountType, discountValue, startDate, endDate, appliesTo, customUserLimit, limitUsers, status, fullWaiver } = req.body;
+    console.log("Req body", req.body);
 
     if (discountType === 'Percentage' && (discountValue < 0 || discountValue > 100)) {
       return res.status(400).json({ error: 'Percentage discount must be between 0 and 100' });
@@ -34,7 +35,8 @@ export const createPromoCode = async (req, res) => {
       appliesTo: formattedAppliesTo,
       customUserLimit: appliesTo === 'Custom' ? customUserLimit : undefined,
       limitUsers,
-      status
+      status,
+      fullWavier: fullWaiver
     });
 
     await promoCode.save();
@@ -55,7 +57,7 @@ export const getAllPromoCodes = async (req, res) => {
     }
 
     const promoCodes = await PromoCode.find(query).sort({ createdAt: -1 });
-    res.json({message:"Successfully Get Promo Codes",promoCodes});
+    res.json({ message: "Successfully Get Promo Codes", promoCodes });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -90,14 +92,13 @@ export const updatePromoCode = async (req, res) => {
       appliesTo,
       customUserLimit,
       limitUsers,
-      status
+      status,
+      fullWavier
     } = req.body;
 
-    // Convert to Date objects for comparison
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    // Manual validation (bypasses schema validator issues)
     if (end <= start) {
       return res.status(400).json({ error: 'End date must be after start date' });
     }
@@ -118,9 +119,10 @@ export const updatePromoCode = async (req, res) => {
         appliesTo: formattedAppliesTo,
         customUserLimit: appliesTo === 'Custom' ? customUserLimit : undefined,
         limitUsers,
-        status
+        status,
+        fullWavier
       },
-      { new: true, runValidators: false } // Disable schema validators since we manually checked
+      { new: true, runValidators: false }
     );
 
     if (!updatedPromoCode) {
@@ -207,16 +209,16 @@ export const applyPromoCode = async (req, res) => {
   const { code } = req.body;
   try {
     const promo = await PromoCode.findOne({ name: code, status: true });
-    console.log("promo",promo);
+    console.log("promo", promo);
 
     if (!promo) {
       return res.status(404).json({ error: 'Promo code not found or inactive' });
     }
 
     const now = new Date();
-    console.log("now",now);
-    console.log("promo.startDate",promo.startDate);
-    console.log("promo.endDate",promo.endDate);
+    console.log("now", now);
+    console.log("promo.startDate", promo.startDate);
+    console.log("promo.endDate", promo.endDate);
 
     if (now > promo.endDate) {
       return res.status(400).json({ error: 'Promo code is not active currently' });
@@ -229,7 +231,7 @@ export const applyPromoCode = async (req, res) => {
     promo.appliedCount += 1;
     await promo.save();
 
-    return res.status(200).json({ success: true, discountType: promo.discountType, discountValue: promo.discountValue });
+    return res.status(200).json({ success: true, discountType: promo.discountType, discountValue: promo.discountValue, fullWavier: promo.fullWavier });
   } catch (error) {
     return res.status(500).json({ error: 'Server error' });
   }

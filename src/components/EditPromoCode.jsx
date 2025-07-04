@@ -23,6 +23,7 @@ export default function EditPromoCodeDialog({ open, onClose, onSave, promoData }
     customUserLimit: "",
     limitUsers: false,
     status: true,
+    fullWavier: true,
   });
 
   const [loading, setLoading] = useState(false);
@@ -30,7 +31,8 @@ export default function EditPromoCodeDialog({ open, onClose, onSave, promoData }
 
   useEffect(() => {
     if (promoData) {
-      // Check if appliesTo is a custom user limit (e.g., "First 50 Users")
+      console.log("promoData",promoData);
+
       const isCustomUserLimit = promoData.appliesTo?.startsWith("First ") && 
                                promoData.appliesTo?.endsWith(" Users");
       
@@ -52,6 +54,7 @@ export default function EditPromoCodeDialog({ open, onClose, onSave, promoData }
         customUserLimit: customUserLimit || "",
         limitUsers: promoData.limitUsers || false,
         status: promoData.status !== undefined ? promoData.status : true,
+        fullWavier: promoData.fullWavier,
       });
 
       setShowCustomUserInput(isCustomUserLimit);
@@ -126,7 +129,8 @@ const handleSubmit = async () => {
         appliesTo: formData.appliesTo,
         customUserLimit: formData.appliesTo === "Custom" ? formData.customUserLimit : undefined,
         limitUsers: formData.limitUsers,
-        status: formData.status
+        status: formData.status,
+        fullWavier:formData.fullWavier
       });
 
       if (response.data) {
@@ -288,6 +292,22 @@ const handleSubmit = async () => {
                 checked={formData.status}
                 onChange={() =>
                   setFormData({ ...formData, status: !formData.status })
+                }
+              />
+              <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 transition-colors" />
+              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5" />
+            </label>
+          </div>
+
+                    <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Full Waiver</span>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={formData.fullWavier}
+                onChange={() =>
+                  setFormData({ ...formData, fullWavier: !formData.fullWavier })
                 }
               />
               <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 transition-colors" />
