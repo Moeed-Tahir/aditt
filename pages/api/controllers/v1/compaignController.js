@@ -1,7 +1,6 @@
 import { connectToDatabase } from '../../config/dbConnect';
 import Compaign from '../../models/Campaign.model';
 import CampaignFeedback from '../../models/CampaignFeedback';
-import mongoose from 'mongoose';
 import AdminDashboard from '../../models/AdminDashboard.model';
 import Stripe from 'stripe';
 import { getVideoDurationFromUrl } from '../../services/campaignServices';
@@ -33,7 +32,8 @@ exports.createCampaign = async (req, res) => {
       couponCode,
       userId,
       campaignBudget,
-      brandName
+      brandName,
+      totalEngagementValue
     } = req.body;
 
     if (!campaignTitle || !websiteLink || !campaignVideoUrl || !brandName || 
@@ -50,7 +50,7 @@ exports.createCampaign = async (req, res) => {
     const processedAgeRange = ageRange.map(age => {
       const num = Number(age);
       return isNaN(num) ? 18 : num; 
-    }).sort((a, b) => a - b); 
+    }).sort((a, b) => a - b);
 
     const newCampaign = new Compaign({
       campaignTitle,
@@ -78,42 +78,63 @@ exports.createCampaign = async (req, res) => {
       userId,
       campaignBudget: campaignBudget ? Number(campaignBudget) : 0,
       brandName,
-      status: 'Pending'
+      status: 'Pending',
+      engagements: {
+        totalCount: 0,
+        totalEngagementValue: totalEngagementValue ? Number(totalEngagementValue) : 0,
+        dailyCounts: []
+      }
     });
 
     const savedCampaign = await newCampaign.save();
 
     try {
-      let dashboard = await AdminDashboard.findOne() || new AdminDashboard();
-      
-      dashboard.totalCampaigns += 1;
-      dashboard.activeCampaigns += 1;
-      
-      if (campaignBudget) {
-        const amount = Number(campaignBudget) || 0;
-        
-        dashboard.totalEarnings += amount;
-        dashboard.currentWeekEarnings += amount;
-        
-        const days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-        const today = new Date();
-        const dayOfWeek = days[today.getDay()];
-        
-        const dayIndex = dashboard.dailyEarnings.findIndex(e => e.day === dayOfWeek);
-        if (dayIndex >= 0) {
-          dashboard.dailyEarnings[dayIndex].amount += amount;
-          dashboard.dailyEarnings[dayIndex].date = today;
-        } else {
-          dashboard.dailyEarnings.push({
-            day: dayOfWeek,
-            amount,
-            date: today
-          });
+      const campaignStats = await Compaign.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalCampaigns: { $sum: 1 },
+            pendingCampaigns: {
+              $sum: { $cond: [{ $eq: ["$status", "Pending"] }, 1, 0] }
+            },
+            activeCampaigns: {
+              $sum: { $cond: [{ $eq: ["$status", "Active"] }, 1, 0] }
+            },
+            totalBudget: { $sum: "$campaignBudget" }
+          }
         }
+      ]);
+
+      if (campaignStats.length > 0) {
+        const stats = campaignStats[0];
+        
+        await AdminDashboard.findOneAndUpdate(
+          {},
+          {
+            $set: {
+              totalCampaigns: stats.totalCampaigns,
+              pendingCampaigns: stats.pendingCampaigns,
+              activeCampaigns: stats.activeCampaigns,
+              totalEarnings: stats.totalBudget,
+              lastUpdated: new Date()
+            },
+            $inc: {
+              currentWeekEarnings: campaignBudget ? Number(campaignBudget) : 0
+            },
+            $push: {
+              dailyEarnings: {
+                $each: [{
+                  day: new Date().toLocaleDateString('en-US', { weekday: 'short' }),
+                  amount: campaignBudget ? Number(campaignBudget) : 0,
+                  date: new Date()
+                }],
+                $slice: -7 
+              }
+            }
+          },
+          { upsert: true, new: true }
+        );
       }
-      
-      dashboard.lastUpdated = new Date();
-      await dashboard.save();
     } catch (dashboardError) {
       console.error('Dashboard update error:', dashboardError);
     }

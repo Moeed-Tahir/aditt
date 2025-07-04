@@ -45,7 +45,7 @@ export function CreateCampaigns({ userId }) {
     imageFile: null,
     imageUrl: "",
     videoDuration: "",
-
+    totalEngagementValue:"",
     genderRatio: 50,
     genderType: "male",
     ageRange: [18, 65],
@@ -244,6 +244,7 @@ export function CreateCampaigns({ userId }) {
           country: formData.country,
           zip: formData.zipCode,
         },
+        totalEngagementValue:formData.totalEngagementValue,
         bankDetail: {
           accountNumber: formData.bankAccountNumber,
           routingNumber: formData.routingNumber,

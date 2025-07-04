@@ -19,7 +19,7 @@ export function AdminDashboard() {
   const [deletionRequests, setDeletionRequests] = useState([]);
   const [latestCampaigns, setLatestCampaigns] = useState([]);
   const [adminDashboardData, setAdminDashboardData] = useState([]);
-
+  
   const fetchConsumers = useCallback(async () => {
     try {
       const response = await axios.post(

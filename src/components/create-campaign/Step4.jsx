@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Calendars from '../Calendars';
 import { CircleDollarSign, Tag } from 'lucide-react';
 import PaymentMethod from '../PaymentMethod';
@@ -9,6 +9,8 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
+    console.log("formData", formData);
+
     const [isApplying, setIsApplying] = useState(false);
     const [discountApplied, setDiscountApplied] = useState(false);
     const [discountInfo, setDiscountInfo] = useState({
@@ -32,6 +34,42 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
         return type.toLowerCase().replace(/\s+/g, '');
     };
 
+    const calculateWaiverUsers = useCallback(() => {
+        if (!discountInfo.fullWavier || !formData.videoDuration) return 0;
+
+        const [minutes, seconds] = formData.videoDuration.split(':').map(Number);
+        const totalSeconds = (minutes * 60) + seconds;
+
+        if (isNaN(totalSeconds) || isNaN(discountInfo.value)) return 0;
+
+        return Math.floor(totalSeconds * discountInfo.value);
+    }, [discountInfo.fullWavier, discountInfo.value, formData.videoDuration]);
+
+    const calculateAndSetEngagement = useCallback(() => {
+        if (!formData.videoDuration) return;
+
+        let engagementValue = 0;
+
+        if (discountInfo.fullWavier) {
+            engagementValue = calculateWaiverUsers();
+        } else if (formData.budget) {
+            engagementValue = formData.campignBudget || 0;
+        }
+
+        setFormData(prev => {
+            if (prev.totalEngagementValue === engagementValue) return prev;
+            return {
+                ...prev,
+                totalEngagementValue: engagementValue
+            };
+        });
+    }, [formData.videoDuration, formData.budget, formData.campignBudget, discountInfo.fullWavier, calculateWaiverUsers, setFormData]);
+
+    // Recalculate engagement when relevant values change
+    useEffect(() => {
+        calculateAndSetEngagement();
+    }, [calculateAndSetEngagement]);
+
     const handleApplyCoupon = async () => {
         if (!formData.couponCode?.trim()) {
             setCouponError('Please enter a coupon code');
@@ -45,8 +83,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
             const response = await axios.post('/api/routes/v1/promoRoutes?action=applyPromoCode', {
                 code: formData.couponCode.trim()
             });
-            console.log("response", response);
-
 
             if (response.data.success) {
                 const originalBudget = parseFloat(formData.budget);
@@ -54,6 +90,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                 if (response.data.fullWavier !== true && (isNaN(originalBudget) || originalBudget <= 0)) {
                     throw new Error('Please set a valid budget before applying coupon');
                 }
+
 
                 let discountedBudget = originalBudget;
                 let discountValue = parseFloat(response.data.discountValue);
@@ -76,13 +113,15 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                     throw new Error('Unsupported discount type');
                 }
 
-                setDiscountApplied(true);
+                // Update all related state in a sequence that ensures proper calculation
                 setDiscountInfo({
                     type: discountType.includes('percentage') ? 'percentage' : 'fixed',
                     value: discountValue,
                     originalBudget: originalBudget,
                     fullWavier: fullWavier
                 });
+
+                setDiscountApplied(true);
 
                 setFormData(prev => ({
                     ...prev,
@@ -126,7 +165,8 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
             ...prev,
             actualBudget: '',
             couponCode: '',
-            appliedCoupon: ''
+            appliedCoupon: '',
+            totalEngagementValue: ''
         }));
         toast.success('Coupon removed successfully!');
     };
@@ -159,22 +199,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
 
         return false;
     };
-
-    const calculateWaiverUsers = () => {
-
-        if (!discountInfo.fullWavier || !formData.videoDuration) return 0;
-
-        const [minutes, seconds] = formData.videoDuration.split(':').map(Number);
-        const totalSeconds = (minutes * 60) + seconds;
-
-        if (isNaN(totalSeconds) || isNaN(discountInfo.value)) return 0;
-
-        const result = Math.floor(totalSeconds * discountInfo.value);
-
-        return result;
-    };
-
-
 
     return (
         <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
@@ -272,7 +296,10 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                     type="number"
                                     name="budget"
                                     value={formData.budget}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => {
+                                        handleInputChange(e);
+                                        calculateAndSetEngagement();
+                                    }}
                                     placeholder={discountInfo.fullWavier ? "Full wavier applied" : "Enter campaign budget"}
                                     className="w-full h-full border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-1 md:py-2"
                                     min="0"
