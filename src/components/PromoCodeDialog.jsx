@@ -50,6 +50,16 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
     }
   };
 
+  const handleFullWaiverChange = () => {
+    const newFullWaiver = !formData.fullWaiver;
+    setFormData({ 
+      ...formData, 
+      fullWaiver: newFullWaiver,
+      discountType: newFullWaiver ? "Fixed Amount" : "Percentage",
+      discountValue: newFullWaiver ? "" : formData.discountValue
+    });
+  };
+
   const handleSubmit = async () => {
     if (!formData.name.trim()) {
       toast.error("Please enter a promo code name");
@@ -67,7 +77,7 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
     }
 
     // Validate discount value
-    if (formData.discountType === "Percentage" &&
+    if (!formData.fullWaiver && formData.discountType === "Percentage" &&
       (formData.discountValue < 0 || formData.discountValue > 100)) {
       toast.error("Percentage must be between 0 and 100");
       return;
@@ -93,7 +103,7 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
         },
         body: JSON.stringify({
           name: formData.name,
-          discountType: formData.discountType,
+          discountType: formData.fullWaiver ? "Full Waiver" : formData.discountType,
           discountValue: Number(formData.discountValue),
           startDate: formData.startDate,
           endDate: formData.endDate,
@@ -155,10 +165,11 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                   type="radio"
                   name="discountType"
                   value="Percentage"
-                  checked={formData.discountType === "Percentage"}
+                  checked={formData.discountType === "Percentage" && !formData.fullWaiver}
                   onChange={() =>
-                    setFormData({ ...formData, discountType: "Percentage", discountValue: "" })
+                    setFormData({ ...formData, discountType: "Percentage", fullWaiver: false })
                   }
+                  disabled={formData.fullWaiver}
                 />
                 Percentage
               </label>
@@ -167,41 +178,27 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                   type="radio"
                   name="discountType"
                   value="Fixed Amount"
-                  checked={formData.discountType === "Fixed Amount"}
+                  checked={(formData.discountType === "Fixed Amount" && !formData.fullWaiver) || formData.fullWaiver}
                   onChange={() =>
-                    setFormData({ ...formData, discountType: "Fixed Amount", discountValue: "" })
+                    setFormData({ ...formData, discountType: "Fixed Amount", fullWaiver: false })
                   }
+                  disabled={formData.fullWaiver}
                 />
                 Fixed Amount
               </label>
               <label className="flex items-center gap-2">
                 <input
-                  type="radio"
+                  type="checkbox"
                   name="fullWaiver"
                   checked={formData.fullWaiver}
-                  onChange={() =>
-                    setFormData({ ...formData, fullWaiver: !formData.fullWaiver })
-                  }
+                  onChange={handleFullWaiverChange}
                 />
-                Full Wavier
+                Full Waiver
               </label>
             </div>
 
-            <div className="mt-2 relative">
-              {formData.discountType === "Percentage" ? (
-                <div className="flex items-center">
-                  <input
-                    type="number"
-                    className="w-full border rounded px-3 py-2 pr-8"
-                    placeholder="0-100"
-                    value={formData.discountValue}
-                    onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
-                    min="0"
-                    max="100"
-                  />
-                  <span className="absolute right-3 text-gray-500">%</span>
-                </div>
-              ) : (
+            {formData.fullWaiver ? (
+              <div className="mt-2 relative">
                 <div className="flex items-center">
                   <span className="absolute left-3 text-gray-500">$</span>
                   <input
@@ -214,8 +211,38 @@ export default function PromoCodeDialog({ open, onClose, onSave }) {
                     step="0.01"
                   />
                 </div>
-              )}
-            </div>
+              </div>
+            ) : formData.discountType === "Percentage" ? (
+              <div className="mt-2 relative">
+                <div className="flex items-center">
+                  <input
+                    type="number"
+                    className="w-full border rounded px-3 py-2 pr-8"
+                    placeholder="0-100"
+                    value={formData.discountValue}
+                    onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
+                    min="0"
+                    max="100"
+                  />
+                  <span className="absolute right-3 text-gray-500">%</span>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-2 relative">
+                <div className="flex items-center">
+                  <span className="absolute left-3 text-gray-500">$</span>
+                  <input
+                    type="number"
+                    className="w-full border rounded px-3 py-2 pl-8"
+                    placeholder="Enter amount"
+                    value={formData.discountValue}
+                    onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-4">

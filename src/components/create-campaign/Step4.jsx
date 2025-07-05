@@ -295,7 +295,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                 <input
                                     type="number"
                                     name="budget"
-                                    value={formData.budget}
+                                    value={discountInfo.fullWavier ? "" : formData.budget}
                                     onChange={(e) => {
                                         handleInputChange(e);
                                         calculateAndSetEngagement();
@@ -308,7 +308,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                 />
                             </div>
 
-                            {formData.videoDuration && (
+                            {/* {formData.videoDuration && (
                                 <div className="mt-2 text-xs md:text-sm text-gray-500">
                                     {discountInfo.fullWavier ? (
                                         <>
@@ -333,7 +333,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                                         </>
                                     ) : null}
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
 

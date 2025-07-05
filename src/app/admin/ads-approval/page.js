@@ -24,7 +24,7 @@ export default function AdsApproval() {
         id: campaignId,
         status: action === "accept" ? "Active" : "Rejected",
       };
-      
+
       if (action === "reject" && reason) {
         payload.reason = reason;
       }
@@ -73,8 +73,11 @@ export default function AdsApproval() {
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline"
+          title={item.websiteLink}
         >
-          {item.websiteLink}
+          {item.websiteLink?.length > 20
+            ? `${item.websiteLink.substring(0, 20)}...`
+            : item.websiteLink}
         </a>
       ),
     },
@@ -87,8 +90,8 @@ export default function AdsApproval() {
             item.status === "Active"
               ? "bg-green-100 text-green-800"
               : item.status === "Pending"
-              ? "bg-yellow-100 text-yellow-800"
-              : "bg-red-100 text-red-800"
+                ? "bg-yellow-100 text-yellow-800"
+                : "bg-red-100 text-red-800"
           }`}
         >
           {item.status}
@@ -171,33 +174,31 @@ export default function AdsApproval() {
     </div>
   );
 
-const fetchApprovalData = useCallback(async () => {
-  try {
-    setLoading(true);
-    const response = await axios.post(
-      "/api/routes/v1/campaignRoutes?action=getPendingCampaign"
-    );
-    setApprovalData(response.data.data);
-  } catch (error) {
-    console.error("Error fetching campaigns:", error);
-    toast.error("Failed to fetch campaigns");
-    return [];
-  } finally {
-    setLoading(false);
-  }
-}, []); 
+  const fetchApprovalData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        "/api/routes/v1/campaignRoutes?action=getPendingCampaign"
+      );
+      setApprovalData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching campaigns:", error);
+      toast.error("Failed to fetch campaigns");
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-useEffect(() => {
-  fetchApprovalData();
-}, [fetchApprovalData]);
+  useEffect(() => {
+    fetchApprovalData();
+  }, [fetchApprovalData]);
 
   const filterOptions = {
     date: true,
     status: false,
     customStatusOptions: []
   };
-
-
 
   return (
     <SidebarProvider>
@@ -207,9 +208,9 @@ useEffect(() => {
         data={approvalData}
         columns={columns}
         sortOptions={sortOptions}
-        filterOptions={false}
-        filters={{ dateKey: "dob", statusKey: "status" }}
-        getActions={getAdsApprovalActions}
+        filterOptions={filterOptions}
+        filters={{ dateKey: "createdAt", statusKey: "status" }}
+        renderActions={getAdsApprovalActions}
         loading={loading}
       />
       <RejectDialog
