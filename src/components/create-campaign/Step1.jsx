@@ -10,6 +10,8 @@ const Step1 = ({
   isUploading,
   uploadProgress,
 }) => {
+  console.log("isUploading",isUploading,"uploadProgress",uploadProgress);
+  
   return (
     <>
       <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
@@ -124,9 +126,9 @@ const Step1 = ({
                 </div>
 
                 <div className="flex items-center gap-2 mt-1">
-                <p className="text-sm md:text-[16px] text-green-600 select-all truncate overflow-hidden whitespace-nowrap max-w-[250px]">
-  {formData.websiteLink || "https://www.example.com"}
-</p>
+                  <p className="text-sm md:text-[16px] text-green-600 select-all truncate overflow-hidden whitespace-nowrap max-w-[250px]">
+                    {formData.websiteLink || "https://www.example.com"}
+                  </p>
                   {formData.websiteLink && (
                     <button
                       onClick={() =>
@@ -204,11 +206,17 @@ const Step1 = ({
                 )}
 
                 {isUploading && uploadProgress.video > 0 && (
-                  <div className="w-full bg-gray-200 rounded-full h-2 md:h-2.5 mt-2">
-                    <div
-                      className="bg-blue-600 h-full rounded-full"
-                      style={{ width: `${uploadProgress.video}%` }}
-                    ></div>
+                  <div className="mt-2">
+                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                      <span>Uploading...</span>
+                      <span>{uploadProgress.video}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2 md:h-2.5">
+                      <div
+                        className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress.video}%` }}
+                      ></div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -276,11 +284,17 @@ const Step1 = ({
                 )}
 
                 {isUploading && uploadProgress.image > 0 && (
-                  <div className="w-full bg-gray-200 rounded-full h-2 md:h-2.5 mt-2">
-                    <div
-                      className="bg-blue-600 h-full rounded-full"
-                      style={{ width: `${uploadProgress.image}%` }}
-                    ></div>
+                  <div className="mt-2">
+                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                      <span>Uploading...</span>
+                      <span>{uploadProgress.image}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2 md:h-2.5">
+                      <div
+                        className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress.image}%` }}
+                      ></div>
+                    </div>
                   </div>
                 )}
               </div>

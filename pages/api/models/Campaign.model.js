@@ -296,6 +296,10 @@ const CampaignSchema = new mongoose.Schema({
     clickCount: {
         type: ClickCountSchema,
         default: () => ({})
+    },
+    videoVerified: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 

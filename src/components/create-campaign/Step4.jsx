@@ -265,16 +265,46 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                             </span>
                         </div>
                         <div className="relative w-full flex-1">
-                            <Calendars
-                                selected={formData.endDate}
-                                onSelect={(date) => {
-                                    setFormData(prev => ({
-                                        ...prev,
-                                        endDate: date,
-                                    }));
-                                }}
-                                fromDate={formData.startDate || new Date()}
-                            />
+                            <div className="relative">
+                                <Calendars
+                                    selected={formData.endDate}
+                                    onSelect={(date) => {
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            endDate: date,
+                                        }));
+                                    }}
+                                    fromDate={formData.startDate || new Date()}
+                                />
+                                {formData.endDate && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                endDate: null,
+                                            }));
+                                        }}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="text-gray-600"
+                                        >
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
 

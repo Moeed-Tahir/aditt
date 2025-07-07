@@ -6,8 +6,6 @@ import Stripe from 'stripe';
 import { getVideoDurationFromUrl } from '../../services/campaignServices';
 const dotenv = require("dotenv");
 dotenv.config();
-
-
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 exports.createCampaign = async (req, res) => {
