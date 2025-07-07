@@ -10,8 +10,6 @@ const PromoCodeSchema = new mongoose.Schema({
   discountType: {
     type: String,
     required: true,
-    enum: ['Percentage', 'Fixed Amount'],
-    default: 'Percentage'
   },
   discountValue: {
     type: Number,
@@ -70,16 +68,6 @@ const PromoCodeSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-PromoCodeSchema.index({ name: 1 });
-PromoCodeSchema.index({ status: 1 });
-PromoCodeSchema.index({ startDate: 1, endDate: 1 });
-
-PromoCodeSchema.pre('save', function (next) {
-  if (this.appliesTo === 'Custom' && this.customUserLimit) {
-    this.appliesTo = `First ${this.customUserLimit} Users`;
-  }
-  next();
-});
 
 const PromoCode = mongoose.models.PromoCode || mongoose.model('PromoCode', PromoCodeSchema);
 
