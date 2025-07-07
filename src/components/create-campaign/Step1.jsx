@@ -1,6 +1,6 @@
 import { Copy, Globe, House, Image, Trash, Upload, Video } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 
 const Step1 = ({
   handleFileChange,
@@ -10,6 +10,38 @@ const Step1 = ({
   isUploading,
   uploadProgress,
 }) => {
+  const [videoError, setVideoError] = useState("");
+  const [imageError, setImageError] = useState("");
+
+  const validateFileSize = (file, fileType) => {
+    const maxSize = fileType === "video" ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      if (fileType === "video") {
+        setVideoError(`File size too large. Maximum allowed size is 50MB.`);
+      } else {
+        setImageError(`File size too large. Maximum allowed size is 10MB.`);
+      }
+      return false;
+    }
+    if (fileType === "video") {
+      setVideoError("");
+    } else {
+      setImageError("");
+    }
+    return true;
+  };
+
+  const handleFileUpload = (e, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!validateFileSize(file, type)) {
+      e.target.value = ""; 
+      return;
+    }
+
+    handleFileChange(e, type);
+  };
 
   return (
     <>
@@ -46,13 +78,14 @@ const Step1 = ({
 
             <Link
               href="?step=1"
-              className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${!formData.campaignTitle ||
-                  !formData.brandName ||
-                  !formData.websiteLink ||
-                  !formData.videoFile
+              className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
+                !formData.campaignTitle ||
+                !formData.brandName ||
+                !formData.websiteLink ||
+                !formData.videoFile
                   ? "opacity-50 cursor-not-allowed"
                   : ""
-                }`}
+              }`}
               onClick={(e) => {
                 if (
                   !formData.campaignTitle ||
@@ -169,7 +202,7 @@ const Step1 = ({
                   Campaign Video
                 </label>
                 <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                  Upload your campaign video. For best results, we recommend
+                  Upload your campaign video (max 50MB). For best results, we recommend
                   using vertical videos.
                 </span>
               </div>
@@ -181,15 +214,19 @@ const Step1 = ({
                     <p className="text-xs md:text-sm text-gray-700 mb-1">
                       Upload video
                     </p>
-                    <p className="text-xs text-gray-500">Format: mp4</p>
+                    <p className="text-xs text-gray-500">Format: mp4 (max 50MB)</p>
                     <input
                       type="file"
                       accept="video/mp4"
-                      onChange={(e) => handleFileChange(e, "video")}
+                      onChange={(e) => handleFileUpload(e, "video")}
                       className="hidden"
                     />
                   </label>
                 </div>
+
+                {videoError && (
+                  <p className="text-red-500 text-sm mt-1">{videoError}</p>
+                )}
 
                 {formData.videoFile && (
                   <div className="mt-3 md:mt-4 flex items-center gap-3 md:gap-4 border bg-white text-blue-700 px-3 py-1 md:px-4 md:py-2 rounded-md">
@@ -231,7 +268,7 @@ const Step1 = ({
                   Brand Logo
                 </label>
                 <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                  This logo will be used as a company logo for your campaign.
+                  This logo will be used as a company logo for your campaign (max 10MB).
                 </span>
               </div>
 
@@ -243,16 +280,20 @@ const Step1 = ({
                       Upload image
                     </p>
                     <p className="text-xs text-gray-500">
-                      Format: jpeg, jpg, png
+                      Format: jpeg, jpg, png (max 10MB)
                     </p>
                     <input
                       type="file"
                       accept="image/jpeg, image/jpg, image/png"
-                      onChange={(e) => handleFileChange(e, "image")}
+                      onChange={(e) => handleFileUpload(e, "image")}
                       className="hidden"
                     />
                   </label>
                 </div>
+
+                {imageError && (
+                  <p className="text-red-500 text-sm mt-1">{imageError}</p>
+                )}
 
                 {formData.imageFile && (
                   <div className="mt-3 md:mt-4 flex items-center gap-3 md:gap-4 border bg-white text-blue-700 px-3 py-1 md:px-4 md:py-2 rounded-md">
