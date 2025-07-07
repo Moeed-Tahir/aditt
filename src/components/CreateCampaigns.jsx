@@ -45,7 +45,7 @@ export function CreateCampaigns({ userId }) {
     imageFile: null,
     imageUrl: "",
     videoDuration: "",
-    totalEngagementValue:"",
+    totalEngagementValue: "",
     genderRatio: 50,
     genderType: "male",
     ageRange: [18, 65],
@@ -119,19 +119,46 @@ export function CreateCampaigns({ userId }) {
     const filePath = `aditt-assets/${type}s/${fileName}`;
 
     try {
-      const { data, error } = await supabase.storage
-        .from("aditt")
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: type === "video" ? "video/mp4" : "image/jpeg",
-        });
+      // Create a FormData object
+      const formData = new FormData();
+      formData.append('file', file);
 
-      if (error) throw error;
+      // Create XMLHttpRequest for progress tracking
+      const xhr = new XMLHttpRequest();
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("aditt").getPublicUrl(filePath);
+      // Set up progress event
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progressPercentage = Math.round((event.loaded / event.total) * 100);
+          setUploadProgress((prev) => ({
+            ...prev,
+            [type]: progressPercentage,
+          }));
+        }
+      };
+
+      // Make the request to Supabase's upload endpoint
+      const promise = new Promise((resolve, reject) => {
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(xhr.response);
+          } else {
+            reject(new Error('Upload failed'));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Upload failed'));
+
+        xhr.open('POST', `${supabaseUrl}/storage/v1/object/aditt/${filePath}`);
+        xhr.setRequestHeader('Authorization', `Bearer ${supabaseKey}`);
+        xhr.setRequestHeader('Content-Type', file.type);
+        xhr.setRequestHeader('x-upsert', 'false');
+        xhr.send(formData);
+      });
+
+      await promise;
+
+      // Get public URL after upload
+      const { data: { publicUrl } } = supabase.storage.from("aditt").getPublicUrl(filePath);
 
       let duration = "";
       if (type === "video") {
@@ -150,7 +177,7 @@ export function CreateCampaigns({ userId }) {
       return null;
     } finally {
       setIsUploading(false);
-      setUploadProgress((prev) => ({ ...prev, [type]: 0 }));
+      // Don't reset progress to 0 here if you want to show completion
     }
   }, []);
 
@@ -219,7 +246,7 @@ export function CreateCampaigns({ userId }) {
           option2: formData.surveyQuestion1.options[1],
           option3: formData.surveyQuestion1.options[2],
           option4: formData.surveyQuestion1.options[3],
-          
+
         } : null,
         surveyQuestion2: formData.surveyQuestion2.text ? {
           questionText: formData.surveyQuestion2.text,
@@ -244,7 +271,7 @@ export function CreateCampaigns({ userId }) {
           country: formData.country,
           zip: formData.zipCode,
         },
-        totalEngagementValue:formData.totalEngagementValue,
+        totalEngagementValue: formData.totalEngagementValue,
         bankDetail: {
           accountNumber: formData.bankAccountNumber,
           routingNumber: formData.routingNumber,
@@ -346,7 +373,14 @@ export function CreateCampaigns({ userId }) {
         </div>
 
         {currentStep === 0 && (
-          <Step1 uploadProgress={uploadProgress} handleFileChange={handleFileChange} isUploading={isUploading} handleInputChange={handleInputChange} setFormData={setFormData} formData={formData} />
+          <Step1
+            uploadProgress={uploadProgress}
+            handleFileChange={handleFileChange}
+            isUploading={isUploading}
+            handleInputChange={handleInputChange}
+            setFormData={setFormData}
+            formData={formData}
+          />
         )}
 
         {currentStep === 1 && (
@@ -359,7 +393,6 @@ export function CreateCampaigns({ userId }) {
 
         {currentStep === 3 && (
           <Step4 handleInputChange={handleInputChange} setFormData={setFormData} handleSubmit={handleSubmit} formData={formData} />
-
         )}
 
         {alert.visible && (
