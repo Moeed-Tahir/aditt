@@ -10,12 +10,30 @@ const Step1 = ({
   isUploading,
   uploadProgress,
 }) => {
-  console.log("isUploading",isUploading,"uploadProgress",uploadProgress);
-  
+
   return (
     <>
       <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
         <div className="max-w-6xl mx-auto bg-white rounded-xl md:rounded-2xl shadow p-4 md:p-8 relative">
+          {(isUploading && (uploadProgress.video > 0 || uploadProgress.image > 0)) && (
+            <div className="bg-gray-100 rounded-t-xl md:rounded-t-2xl -mt-4 -mx-4 md:-mt-8 md:-mx-8 mb-4 md:mb-6 p-3">
+              {uploadProgress.video > 0 && (
+                <div className="mb-2">
+                  <div className="flex justify-between text-xs text-gray-700 mb-1">
+                    <span>Uploading video...</span>
+                    <span>{uploadProgress.video}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress.video}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-8 gap-4">
             <div className="w-full md:w-1/3">
               <label className="block text-lg md:text-[24px] font-medium">
@@ -28,14 +46,13 @@ const Step1 = ({
 
             <Link
               href="?step=1"
-              className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
-                !formData.campaignTitle ||
-                !formData.brandName ||
-                !formData.websiteLink ||
-                !formData.videoFile
+              className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${!formData.campaignTitle ||
+                  !formData.brandName ||
+                  !formData.websiteLink ||
+                  !formData.videoFile
                   ? "opacity-50 cursor-not-allowed"
                   : ""
-              }`}
+                }`}
               onClick={(e) => {
                 if (
                   !formData.campaignTitle ||
@@ -204,21 +221,6 @@ const Step1 = ({
                     </button>
                   </div>
                 )}
-
-                {isUploading && uploadProgress.video > 0 && (
-                  <div className="mt-2">
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
-                      <span>Uploading...</span>
-                      <span>{uploadProgress.video}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2 md:h-2.5">
-                      <div
-                        className="bg-blue-600 h-full rounded-full transition-all duration-300"
-                        style={{ width: `${uploadProgress.video}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -280,21 +282,6 @@ const Step1 = ({
                     >
                       <Trash className="w-4 h-4 md:w-5 md:h-5" />
                     </button>
-                  </div>
-                )}
-
-                {isUploading && uploadProgress.image > 0 && (
-                  <div className="mt-2">
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
-                      <span>Uploading...</span>
-                      <span>{uploadProgress.image}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2 md:h-2.5">
-                      <div
-                        className="bg-blue-600 h-full rounded-full transition-all duration-300"
-                        style={{ width: `${uploadProgress.image}%` }}
-                      ></div>
-                    </div>
                   </div>
                 )}
               </div>

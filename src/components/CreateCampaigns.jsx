@@ -384,15 +384,19 @@ export function CreateCampaigns({ userId }) {
         )}
 
         {currentStep === 1 && (
-          <Step2 setValues={setValues} values={values} setFormData={setFormData} formData={formData} />
+          <Step2 isUploading={isUploading}
+            uploadProgress={uploadProgress}
+            setValues={setValues} values={values} setFormData={setFormData} formData={formData} />
         )}
 
         {currentStep === 2 && (
-          <Step3 setFormData={setFormData} formData={formData} />
+          <Step3 isUploading={isUploading}
+            uploadProgress={uploadProgress} setFormData={setFormData} formData={formData} />
         )}
 
         {currentStep === 3 && (
-          <Step4 handleInputChange={handleInputChange} setFormData={setFormData} handleSubmit={handleSubmit} formData={formData} />
+          <Step4 isUploading={isUploading}
+            uploadProgress={uploadProgress} handleInputChange={handleInputChange} setFormData={setFormData} handleSubmit={handleSubmit} formData={formData} />
         )}
 
         {alert.visible && (
