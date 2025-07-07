@@ -8,7 +8,8 @@ import LinkBankAccount from '../LinkBankAccount';
 import axios from 'axios';
 import { toast } from 'sonner';
 
-const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
+const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploading,
+    uploadProgress, }) => {
     console.log("formData", formData);
 
     const [isApplying, setIsApplying] = useState(false);
@@ -65,7 +66,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
         });
     }, [formData.videoDuration, formData.budget, formData.campignBudget, discountInfo.fullWavier, calculateWaiverUsers, setFormData]);
 
-    // Recalculate engagement when relevant values change
     useEffect(() => {
         calculateAndSetEngagement();
     }, [calculateAndSetEngagement]);
@@ -113,7 +113,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
                     throw new Error('Unsupported discount type');
                 }
 
-                // Update all related state in a sequence that ensures proper calculation
                 setDiscountInfo({
                     type: discountType.includes('percentage') ? 'percentage' : 'fixed',
                     value: discountValue,
@@ -176,6 +175,10 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
             return true;
         }
 
+        if (isUploading && (uploadProgress.video < 100 || uploadProgress.image < 100)) {
+            return true;
+        }
+
         if (discountInfo.fullWavier) {
             return false;
         }
@@ -193,6 +196,8 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
             return false;
         }
 
+
+
         if (!isBudgetZero && formData.cards.length === 0 && formData.bankAccounts.length === 0) {
             return true;
         }
@@ -203,6 +208,24 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange }) => {
     return (
         <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
             <div className="max-w-6xl mx-auto bg-white rounded-xl md:rounded-2xl shadow p-4 md:p-8 relative">
+                {(isUploading && (uploadProgress.video > 0 || uploadProgress.image > 0)) && (
+                    <div className="bg-gray-100 rounded-t-xl md:rounded-t-2xl -mt-4 -mx-4 md:-mt-8 md:-mx-8 mb-4 md:mb-6 p-3">
+                        {uploadProgress.video > 0 && (
+                            <div className="mb-2">
+                                <div className="flex justify-between text-xs text-gray-700 mb-1">
+                                    <span>Uploading video...</span>
+                                    <span>{uploadProgress.video}%</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                    <div
+                                        className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                                        style={{ width: `${uploadProgress.video}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-8 gap-4">
                     <div className="w-full md:w-1/3">
                         <label className="block text-lg md:text-[24px] font-medium">
