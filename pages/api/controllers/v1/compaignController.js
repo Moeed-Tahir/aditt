@@ -4,153 +4,155 @@ import CampaignFeedback from '../../models/CampaignFeedback';
 import AdminDashboard from '../../models/AdminDashboard.model';
 import Stripe from 'stripe';
 import { getVideoDurationFromUrl } from '../../services/campaignServices';
+import {sendEmail} from '../../services/emailServices';
+import User from '../../models/User.model';
 const dotenv = require("dotenv");
 dotenv.config();
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 exports.createCampaign = async (req, res) => {
-  try {
-    await connectToDatabase();
-
-    const {
-      campaignTitle,
-      websiteLink,
-      campaignVideoUrl,
-      companyLogo,
-      quizQuestion,
-      surveyQuestion1,
-      surveyQuestion2,
-      genderType,
-      genderRatio,
-      ageRange,
-      campaignStartDate,
-      campaignEndDate,
-      cardDetail,
-      bankDetail,
-      couponCode,
-      userId,
-      campaignBudget,
-      brandName,
-      totalEngagementValue
-    } = req.body;
-
-    if (!campaignTitle || !websiteLink || !campaignVideoUrl || !brandName || 
-        !genderType || !Array.isArray(ageRange) || ageRange.length !== 2 || 
-        !campaignStartDate || !userId) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    if (!quizQuestion || !quizQuestion.questionText || !quizQuestion.option1 || 
-        !quizQuestion.option2 || !quizQuestion.answer) {
-      return res.status(400).json({ message: 'Invalid quiz question data' });
-    }
-
-    const processedAgeRange = ageRange.map(age => {
-      const num = Number(age);
-      return isNaN(num) ? 18 : num; 
-    }).sort((a, b) => a - b);
-
-    const newCampaign = new Compaign({
-      campaignTitle,
-      websiteLink,
-      campaignVideoUrl,
-      companyLogo: companyLogo || null,
-      quizQuestion: {
-        questionText: quizQuestion.questionText,
-        option1: quizQuestion.option1,
-        option2: quizQuestion.option2,
-        option3: quizQuestion.option3 || null,
-        option4: quizQuestion.option4 || null,
-        answer: quizQuestion.answer
-      },
-      surveyQuestion1: surveyQuestion1 || null,
-      surveyQuestion2: surveyQuestion2 || null,
-      genderType,
-      genderRatio: genderRatio || '50-50',
-      ageRange: processedAgeRange,
-      campaignStartDate: new Date(campaignStartDate),
-      campaignEndDate: campaignEndDate ? new Date(campaignEndDate) : null,
-      cardDetail: cardDetail || null,
-      bankDetail: bankDetail || null,
-      couponCode: couponCode || null,
-      userId,
-      campaignBudget: campaignBudget ? Number(campaignBudget) : 0,
-      brandName,
-      status: 'Pending',
-      engagements: {
-        totalCount: 0,
-        totalEngagementValue: totalEngagementValue ? Number(totalEngagementValue) : 0,
-        dailyCounts: []
-      }
-    });
-
-    const savedCampaign = await newCampaign.save();
-
     try {
-      const campaignStats = await Compaign.aggregate([
-        {
-          $group: {
-            _id: null,
-            totalCampaigns: { $sum: 1 },
-            pendingCampaigns: {
-              $sum: { $cond: [{ $eq: ["$status", "Pending"] }, 1, 0] }
-            },
-            activeCampaigns: {
-              $sum: { $cond: [{ $eq: ["$status", "Active"] }, 1, 0] }
-            },
-            totalBudget: { $sum: "$campaignBudget" }
-          }
+        await connectToDatabase();
+
+        const {
+            campaignTitle,
+            websiteLink,
+            campaignVideoUrl,
+            companyLogo,
+            quizQuestion,
+            surveyQuestion1,
+            surveyQuestion2,
+            genderType,
+            genderRatio,
+            ageRange,
+            campaignStartDate,
+            campaignEndDate,
+            cardDetail,
+            bankDetail,
+            couponCode,
+            userId,
+            campaignBudget,
+            brandName,
+            totalEngagementValue
+        } = req.body;
+
+        if (!campaignTitle || !websiteLink || !campaignVideoUrl || !brandName ||
+            !genderType || !Array.isArray(ageRange) || ageRange.length !== 2 ||
+            !campaignStartDate || !userId) {
+            return res.status(400).json({ message: 'Missing required fields' });
         }
-      ]);
 
-      if (campaignStats.length > 0) {
-        const stats = campaignStats[0];
-        
-        await AdminDashboard.findOneAndUpdate(
-          {},
-          {
-            $set: {
-              totalCampaigns: stats.totalCampaigns,
-              pendingCampaigns: stats.pendingCampaigns,
-              activeCampaigns: stats.activeCampaigns,
-              totalEarnings: stats.totalBudget,
-              lastUpdated: new Date()
+        if (!quizQuestion || !quizQuestion.questionText || !quizQuestion.option1 ||
+            !quizQuestion.option2 || !quizQuestion.answer) {
+            return res.status(400).json({ message: 'Invalid quiz question data' });
+        }
+
+        const processedAgeRange = ageRange.map(age => {
+            const num = Number(age);
+            return isNaN(num) ? 18 : num;
+        }).sort((a, b) => a - b);
+
+        const newCampaign = new Compaign({
+            campaignTitle,
+            websiteLink,
+            campaignVideoUrl,
+            companyLogo: companyLogo || null,
+            quizQuestion: {
+                questionText: quizQuestion.questionText,
+                option1: quizQuestion.option1,
+                option2: quizQuestion.option2,
+                option3: quizQuestion.option3 || null,
+                option4: quizQuestion.option4 || null,
+                answer: quizQuestion.answer
             },
-            $inc: {
-              currentWeekEarnings: campaignBudget ? Number(campaignBudget) : 0
-            },
-            $push: {
-              dailyEarnings: {
-                $each: [{
-                  day: new Date().toLocaleDateString('en-US', { weekday: 'short' }),
-                  amount: campaignBudget ? Number(campaignBudget) : 0,
-                  date: new Date()
-                }],
-                $slice: -7 
-              }
+            surveyQuestion1: surveyQuestion1 || null,
+            surveyQuestion2: surveyQuestion2 || null,
+            genderType,
+            genderRatio: genderRatio || '50-50',
+            ageRange: processedAgeRange,
+            campaignStartDate: new Date(campaignStartDate),
+            campaignEndDate: campaignEndDate ? new Date(campaignEndDate) : null,
+            cardDetail: cardDetail || null,
+            bankDetail: bankDetail || null,
+            couponCode: couponCode || null,
+            userId,
+            campaignBudget: campaignBudget ? Number(campaignBudget) : 0,
+            brandName,
+            status: 'Pending',
+            engagements: {
+                totalCount: 0,
+                totalEngagementValue: totalEngagementValue ? Number(totalEngagementValue) : 0,
+                dailyCounts: []
             }
-          },
-          { upsert: true, new: true }
-        );
-      }
-    } catch (dashboardError) {
-      console.error('Dashboard update error:', dashboardError);
+        });
+
+        const savedCampaign = await newCampaign.save();
+
+        try {
+            const campaignStats = await Compaign.aggregate([
+                {
+                    $group: {
+                        _id: null,
+                        totalCampaigns: { $sum: 1 },
+                        pendingCampaigns: {
+                            $sum: { $cond: [{ $eq: ["$status", "Pending"] }, 1, 0] }
+                        },
+                        activeCampaigns: {
+                            $sum: { $cond: [{ $eq: ["$status", "Active"] }, 1, 0] }
+                        },
+                        totalBudget: { $sum: "$campaignBudget" }
+                    }
+                }
+            ]);
+
+            if (campaignStats.length > 0) {
+                const stats = campaignStats[0];
+
+                await AdminDashboard.findOneAndUpdate(
+                    {},
+                    {
+                        $set: {
+                            totalCampaigns: stats.totalCampaigns,
+                            pendingCampaigns: stats.pendingCampaigns,
+                            activeCampaigns: stats.activeCampaigns,
+                            totalEarnings: stats.totalBudget,
+                            lastUpdated: new Date()
+                        },
+                        $inc: {
+                            currentWeekEarnings: campaignBudget ? Number(campaignBudget) : 0
+                        },
+                        $push: {
+                            dailyEarnings: {
+                                $each: [{
+                                    day: new Date().toLocaleDateString('en-US', { weekday: 'short' }),
+                                    amount: campaignBudget ? Number(campaignBudget) : 0,
+                                    date: new Date()
+                                }],
+                                $slice: -7
+                            }
+                        }
+                    },
+                    { upsert: true, new: true }
+                );
+            }
+        } catch (dashboardError) {
+            console.error('Dashboard update error:', dashboardError);
+        }
+
+        res.status(201).json({
+            success: true,
+            message: 'Campaign created successfully',
+            data: savedCampaign
+        });
+
+    } catch (error) {
+        console.error('Campaign creation error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to create campaign',
+            error: error.message
+        });
     }
-
-    res.status(201).json({
-      success: true,
-      message: 'Campaign created successfully',
-      data: savedCampaign
-    });
-
-  } catch (error) {
-    console.error('Campaign creation error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to create campaign',
-      error: error.message
-    });
-  }
 };
 
 exports.getCampaign = async (req, res) => {
@@ -410,7 +412,7 @@ exports.updateCampaign = async (req, res) => {
         }
 
         Object.assign(campaign, updateData);
-        
+
         const updatedCampaign = await campaign.save();
 
         res.status(200).json({
@@ -426,26 +428,238 @@ exports.updateCampaign = async (req, res) => {
 
 exports.campaignStatusUpdate = async (req, res) => {
     try {
-        const { status, id } = req.body;
+        const { status, id, rejectionReason, to } = req.body;
 
-        if (!status) {
-            return res.status(400).json({ message: 'Status is required.' });
+        if (!status || !id) {
+            return res.status(400).json({
+                success: false,
+                message: 'Status and campaign ID are required',
+                code: 'MISSING_REQUIRED_FIELDS'
+            });
+        }
+
+        const currentCampaign = await Compaign.findById(id);
+
+        if (!currentCampaign) {
+            return res.status(404).json({
+                success: false,
+                message: 'Campaign not found',
+                code: 'CAMPAIGN_NOT_FOUND'
+            });
+        }
+
+        if (currentCampaign.status === status) {
+            return res.status(200).json({
+                success: true,
+                message: 'No status change detected',
+                campaign: currentCampaign
+            });
+        }
+
+        const updateData = {
+            status,
+            updatedAt: new Date()
+        };
+
+        if (status === 'Rejected') {
+            updateData.reason = rejectionReason || 'Does not meet our guidelines';
         }
 
         const updatedCampaign = await Compaign.findByIdAndUpdate(
             id,
-            { status },
-            { new: true }
+            updateData,
+            { new: true, runValidators: true }
         );
 
-        if (!updatedCampaign) {
-            return res.status(404).json({ message: 'Campaign not found.' });
-        }
+        await sendStatusEmailNotification({
+            newStatus: status,
+            previousStatus: currentCampaign.status,
+            campaign: updatedCampaign,
+            userEmail: to,
+            rejectionReason: status === 'Rejected' ? rejectionReason : undefined
+        });
 
-        res.status(200).json({ message: 'Campaign status updated.', campaign: updatedCampaign });
+        return res.status(200).json({
+            success: true,
+            message: `Campaign status updated to ${status}`,
+            campaign: updatedCampaign
+        });
+
     } catch (error) {
         console.error('Error updating campaign status:', error);
-        res.status(500).json({ message: 'Internal server error.' });
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            code: 'INTERNAL_SERVER_ERROR',
+            ...(process.env.NODE_ENV === 'development' && { error: error.message })
+        });
+    }
+};
+
+exports.activeOrRejectCampaign = async (req, res) => {
+    try {
+        const { status, id, reason } = req.body;
+
+        if (!status || (status !== "Active" && status !== "Rejected")) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid status. Must be either 'Active' or 'Rejected'"
+            });
+        }
+
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide a campaign ID"
+            });
+        }
+
+        if (status === "Rejected" && !reason) {
+            return res.status(400).json({
+                success: false,
+                message: "Reason is required when rejecting a campaign"
+            });
+        }
+
+        const currentCampaign = await Compaign.findById(id);
+
+        if (!currentCampaign) {
+            return res.status(404).json({
+                success: false,
+                message: "Campaign not found"
+            });
+        }
+        console.log("currentCampaign.userId", currentCampaign.userId);
+
+        const user = await User.findOne({ userId: currentCampaign.userId });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        if (currentCampaign.status !== "Pending") {
+            return res.status(400).json({
+                success: false,
+                message: "Only Pending campaigns can be activated or rejected"
+            });
+        }
+
+        const updateFields = {
+            status: status,
+            updatedAt: new Date()
+        };
+
+        if (status === "Rejected") {
+            updateFields.rejectionReason = reason;
+        } else {
+            updateFields.rejectionReason = null;
+        }
+
+        const updatedCampaign = await Compaign.findByIdAndUpdate(
+            id,
+            { $set: updateFields },
+            { new: true, runValidators: true }
+        );
+
+        await sendStatusEmailNotification({
+            newStatus: status,
+            previousStatus: currentCampaign.status,
+            campaign: updatedCampaign,
+            userEmail: user.businessEmail,
+            rejectionReason: reason
+        });
+
+        res.status(200).json({
+            success: true,
+            message: `Campaign status successfully updated to ${status}`,
+            data: updatedCampaign
+        });
+
+    } catch (error) {
+        console.error('Error updating campaign status:', error);
+        res.status(500).json({
+            success: false,
+            message: "Error updating campaign status",
+            error: error.message
+        });
+    }
+}
+
+const sendStatusEmailNotification = async ({
+    newStatus,
+    previousStatus,
+    campaign,
+    userEmail,
+    rejectionReason
+}) => {
+    const emailTemplates = {
+        Active: {
+            subject: `Your Aditt Campaign Is Now Live 🎉`,
+            template: 'campaign-activated',
+            context: {
+                header: 'Your Campaign Is Now Live!',
+                body: `Great news — your campaign "${campaign.campaignTitle}" has been approved and is now live on Aditt!
+Users can now start engaging with your content and driving results.
+You can track performance and manage your campaign anytime in your dashboard.`,
+                footer: 'Thanks for advertising with us — we\'re excited to have you on board.'
+            }
+        },
+        Rejected: {
+            subject: `Action Needed: Campaign Not Approved`,
+            template: 'campaign-rejected',
+            context: {
+                header: 'Campaign Not Approved',
+                body: `Unfortunately, your campaign "${campaign.campaignTitle}" was not approved due to the following reason:
+${rejectionReason || 'Does not meet our guidelines'}
+
+Please review our Aditt guidelines and update your campaign accordingly. Once resubmitted, we'll review it again promptly.`,
+                footer: 'Need help? Reach out to us anytime — we\'re happy to assist.'
+            }
+        },
+        Paused: {
+            subject: `Your Aditt Campaign Has Been Paused`,
+            template: 'campaign-paused',
+            context: {
+                header: 'Campaign Paused',
+                body: `Your campaign "${campaign.campaignTitle}" has been paused.
+${previousStatus === 'Active' ?
+                        'You can resume it anytime from your dashboard.' :
+                        'The campaign has been automatically paused by our system.'}`,
+                footer: 'If you have any questions, we\'re just a message away.'
+            }
+        },
+        Completed: {
+            subject: `Your Aditt Campaign Has Ended`,
+            template: 'campaign-completed',
+            context: {
+                header: 'Campaign Completed',
+                body: `Your campaign "${campaign.campaignTitle}" has officially ended and is no longer active.
+You can view performance metrics and engagement data in your dashboard.`,
+                footer: 'Thanks for being part of the Aditt community!'
+            }
+        }
+    };
+
+    const templateConfig = emailTemplates[newStatus];
+    if (!templateConfig) return;
+
+    try {
+        await sendEmail({
+            to: userEmail,
+            subject: templateConfig.subject,
+            template: templateConfig.template,
+            context: {
+                ...templateConfig.context,
+                supportEmail: 'support@aditt.com',
+                companyName: 'Aditt',
+                currentYear: new Date().getFullYear()
+            }
+        });
+    } catch (emailError) {
+        console.error('Failed to send status email:', emailError);
     }
 };
 
@@ -503,75 +717,6 @@ exports.getPendingCampaign = async (req, res) => {
         res.status(500).json({
             success: false,
             message: "Error fetching pending campaigns",
-            error: error.message
-        });
-    }
-}
-
-exports.activeOrRejectCampaign = async (req, res) => {
-    try {
-        const { status, id, reason } = req.body;
-
-        if (!status || (status !== "Active" && status !== "Rejected")) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid status. Must be either 'Active' or 'Rejected'"
-            });
-        }
-
-        if (!id) {
-            return res.status(400).json({
-                success: false,
-                message: "Please provide a campaign ID"
-            });
-        }
-
-        if (status === "Rejected" && !reason) {
-            return res.status(400).json({
-                success: false,
-                message: "Reason is required when rejecting a campaign"
-            });
-        }
-
-        const updateFields = {
-            status: status,
-            updatedAt: new Date()
-        };
-
-        if (status === "Rejected") {
-            updateFields.reason = reason;
-        } else {
-            updateFields.reason = null;
-        }
-
-        const updatedCampaign = await Compaign.findOneAndUpdate(
-            {
-                _id: id,
-                status: "Pending"
-            },
-            {
-                $set: updateFields
-            },
-            { new: true }
-        );
-
-        if (!updatedCampaign) {
-            return res.status(404).json({
-                success: false,
-                message: "Campaign not found or not in Pending status"
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: `Campaign status successfully updated to ${status}`,
-            data: updatedCampaign
-        });
-
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error updating campaign status",
             error: error.message
         });
     }

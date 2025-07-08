@@ -16,52 +16,63 @@ import Image from "next/image";
 
 export default function UsersPage() {
   const [activeTab, setActiveTab] = useState("active");
-  const [activeLimit, setActiveLimit] = useState(1000);
-  const [waitlistLimit, setWaitlistLimit] = useState(500);
-  const [editedLimit, setEditedLimit] = useState(1000);
-  const [editingTarget, setEditingTarget] = useState("active");
+  const [activeLimit, setActiveLimit] = useState(0);
+  const [currentActiveCount, setCurrentActiveCount] = useState(0);
+  const [currentWaitlistCount, setCurrentWaitlistCount] = useState(0);
+  const [editedLimit, setEditedLimit] = useState(0);
   const [showLimitModal, setShowLimitModal] = useState(false);
-  const [consumerUsers, setConsumerUsers] = useState([]);
+  const [activeUsers, setActiveUsers] = useState([]);
+  const [waitlistUsers, setWaitlistUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchConsumers = useCallback(async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/routes/v1/authRoutes?action=getAllConsumerUser");
-      setConsumerUsers(response?.data?.latestUsers || []);
+      const response = await axios.post("/api/routes/v1/adminUserRoutes?action=getAllUsersController");
+      
+      const data = response.data.data;
+      
+      setActiveUsers(data.activeUsers || []);
+      setWaitlistUsers(data.waitlistUsers || []);
+      setActiveLimit(data.activeUserLimit || 0);
+      setCurrentActiveCount(data.currentActiveCount || 0);
+      setCurrentWaitlistCount(data.currentWaitlistCount || 0);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Error fetching consumer users");
-      console.error('Error fetching consumer users:', error);
+      toast.error(error?.response?.data?.message || "Error fetching users");
+      console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
     }
-  }, [setConsumerUsers, setLoading]);
+  }, []);
+
+  const updateUserLimit = async (newLimit) => {
+    try {
+      const response = await axios.post("/api/routes/v1/adminUserRoutes?action=updateActiveUserLimitController", { newLimit });
+      const data = response.data.data;
+      
+      setActiveUsers(data.activeUsers || []);
+      setWaitlistUsers(data.waitlistUsers || []);
+      setActiveLimit(data.activeUserLimit || 0);
+      setCurrentActiveCount(data.currentActiveCount || 0);
+      setCurrentWaitlistCount(data.currentWaitlistCount || 0);
+      
+      toast.success("Active user limit updated successfully");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to update limit");
+      console.error('Error updating limit:', error);
+    }
+  };
 
   useEffect(() => {
-    fetchConsumers();
-  }, [fetchConsumers]);
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleSaveLimit = () => {
-    if (editingTarget === "active") setActiveLimit(editedLimit);
-    else setWaitlistLimit(editedLimit);
+    updateUserLimit(editedLimit);
     setShowLimitModal(false);
   };
 
-  const processUsers = () => {
-    if (!consumerUsers.length) return { activeUsers: [], waitlistUsers: [] };
-
-    const sortedUsers = [...consumerUsers].sort((a, b) =>
-      new Date(b.otpExpires) - new Date(a.otpExpires)
-    );
-
-    const activeUsers = sortedUsers.slice(0, activeLimit);
-
-    const waitlistUsers = sortedUsers.slice(activeLimit, activeLimit + waitlistLimit);
-
-    return { activeUsers, waitlistUsers };
-  };
-
-  const { activeUsers, waitlistUsers } = processUsers();
+  const dataToShow = activeTab === "active" ? activeUsers : waitlistUsers;
 
   const columns = [
     {
@@ -84,36 +95,32 @@ export default function UsersPage() {
           )}
           <div>
             <div>{user.name || "No Name"}</div>
-            <div className="text-xs text-gray-500">{user.gender || "Not specified"}</div>
+            <div className="text-xs text-gray-500">{user.companyName || user.profileType || "Not specified"}</div>
           </div>
         </div>
       ),
     },
     {
-      label: "PHONE NUMBER",
-      key: "phone",
-      render: (user) => user.phone || "N/A"
+      label: "EMAIL",
+      key: "businessEmail",
+      render: (user) => user.businessEmail || "N/A"
     },
     {
-      label: "DOB",
-      key: "dateOfBirth",
-      render: (user) => user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString("en-GB") : "N/A",
+      label: "COMPANY",
+      key: "companyName",
+      render: (user) => user.companyName || "N/A",
     },
     {
-      label: "TOTAL EARNINGS",
-      key: "earnings",
+      label: "WEBSITE",
+      key: "businessWebsite",
+      render: (user) => user.businessWebsite || "N/A",
+    },
+    {
+      label: "TYPE",
+      key: "profileType",
       render: (user) => (
-        <span className="font-medium">
-          {typeof user.earnings === 'number' ? `$${user.earnings.toLocaleString()}` : "$0"}
-        </span>
-      ),
-    },
-    {
-      label: "TOTAL WITHDRAW",
-      key: "withdraw",
-      render: (user) => (
-        <span className="font-medium">
-          {typeof user.withdraw === 'number' ? `$${user.withdraw.toLocaleString()}` : "$0"}
+        <span className="font-medium capitalize">
+          {user.profileType || "N/A"}
         </span>
       ),
     },
@@ -122,11 +129,9 @@ export default function UsersPage() {
   const sortOptions = [
     { label: "A to Z", value: (a, b) => (a.name || "").localeCompare(b.name || "") },
     { label: "Z to A", value: (a, b) => (b.name || "").localeCompare(a.name || "") },
-    { label: "Newest First", value: (a, b) => new Date(b.otpExpires) - new Date(a.otpExpires) },
-    { label: "Oldest First", value: (a, b) => new Date(a.otpExpires) - new Date(b.otpExpires) },
+    { label: "Newest First", value: (a, b) => new Date(b.createdAt) - new Date(a.createdAt) },
+    { label: "Oldest First", value: (a, b) => new Date(a.createdAt) - new Date(b.createdAt) },
   ];
-
-  const dataToShow = activeTab === "active" ? activeUsers : waitlistUsers;
 
   const headerAction = (
     <div className="flex flex-col gap-4 w-full">
@@ -139,7 +144,7 @@ export default function UsersPage() {
             } transition flex items-center justify-center`}
           onClick={() => setActiveTab("active")}
         >
-          Active Users ({activeUsers.length})
+          Active Users ({currentActiveCount})
         </button>
         <button
           className={`flex-1 py-2 px-4 rounded-full ${activeTab === "waitlist"
@@ -148,7 +153,7 @@ export default function UsersPage() {
             } transition flex items-center justify-center`}
           onClick={() => setActiveTab("waitlist")}
         >
-          Waitlist ({waitlistUsers.length})
+          Waitlist ({currentWaitlistCount})
         </button>
       </div>
 
@@ -156,17 +161,16 @@ export default function UsersPage() {
         <div className="bg-white shadow-sm rounded-xl px-6 py-4 w-full flex justify-between items-start flex-wrap gap-4">
           <div>
             <p className="text-[22px] font-semibold text-gray-800">
-              Active Users Limit: {activeLimit} ({activeUsers.length} active)
+              Active Users Limit: {activeLimit} ({currentActiveCount} active)
             </p>
             <p className="text-sm text-gray-500">
-              Total users: {consumerUsers.length}
+              Total users: {currentActiveCount + currentWaitlistCount}
             </p>
           </div>
           <button
             size="sm"
             variant="outline"
             onClick={() => {
-              setEditingTarget("active");
               setEditedLimit(activeLimit);
               setShowLimitModal(true);
             }}
@@ -229,7 +233,7 @@ export default function UsersPage() {
         columns={columns}
         sortOptions={sortOptions}
         filterOptions={filterOptions}
-        filters={{ dateKey: "otpExpires" }}
+        filters={{ dateKey: "createdAt" }}
         headerAction={headerAction}
         showHeaderAction={true}
         loading={loading}

@@ -1,10 +1,43 @@
 const bcrypt = require("bcrypt");
 import User from '../../models/User.model';
+import AdminUser from '../../models/AdminUser.model';
 import Campaign from '../../models/Campaign.model';
 import { ObjectId } from 'mongodb';
+import { sendUserEmail } from '../../services/emailServices';
 const { generateOTP, sendOTP } = require("../../services/otpServices");
 const jwt = require("jsonwebtoken");
 const { getConsumerUsersCollection, connectToDatabase } = require("../../config/dbConnect");
+
+async function initializeAdminSettings() {
+    const allUsers = await User.find({}).select('_id').lean();
+
+    const adminSettings = new AdminUser({
+        activeUsers: allUsers.map(user => user._id),
+        waitlistUsers: [],
+        activeUserLimit: 1000
+    });
+
+    await adminSettings.save();
+    return adminSettings;
+}
+
+async function sendWaitlistNotificationEmail(user) {
+    const emailSubject = 'You\'re On Our Waitlist';
+    const emailBody = `
+        <h1>Welcome to Our Platform!</h1>
+        <p>Dear ${user.name || 'Valued User'},</p>
+        <p>Thank you for joining our platform. You're currently on our waitlist.</p>
+        <p>We'll notify you as soon as your account is activated and you can access all features.</p>
+        <p>In the meantime, feel free to explore our website.</p>
+        <p>Best regards,<br/>The Team</p>
+    `;
+
+    await sendUserEmail({
+        to: user.businessEmail,
+        subject: emailSubject,
+        html: emailBody
+    });
+}
 
 export const signUp = async (req, res) => {
     try {
@@ -20,7 +53,6 @@ export const signUp = async (req, res) => {
             });
         }
 
-        // Validate email format
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(businessEmail)) {
             return res.status(400).json({
                 message: "Please enter a valid email address",
@@ -28,7 +60,6 @@ export const signUp = async (req, res) => {
             });
         }
 
-        // Validate password strength
         if (password.length < 8) {
             return res.status(400).json({
                 message: "Password must be at least 8 characters",
@@ -37,7 +68,6 @@ export const signUp = async (req, res) => {
         }
 
         const existingUser = await User.findOne({ businessEmail });
-
         if (existingUser) {
             if (existingUser.isOtpVerified) {
                 return res.status(400).json({
@@ -48,7 +78,6 @@ export const signUp = async (req, res) => {
                 existingUser.otp = generateOTP();
                 existingUser.otpExpires = Date.now() + 5 * 60 * 1000;
                 await existingUser.save();
-
                 await sendOTP(businessEmail, existingUser.otp);
 
                 return res.status(200).json({
@@ -57,6 +86,11 @@ export const signUp = async (req, res) => {
                     code: "OTP_RESENT"
                 });
             }
+        }
+
+        let adminSettings = await AdminUser.findOne({});
+        if (!adminSettings) {
+            adminSettings = await initializeAdminSettings();
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -74,10 +108,21 @@ export const signUp = async (req, res) => {
 
         await newUser.save();
 
+        const isWaitlisted = adminSettings.activeUsers.length >= adminSettings.activeUserLimit;
+
+        if (isWaitlisted) {
+            adminSettings.waitlistUsers.push(newUser._id);
+            await sendWaitlistNotificationEmail(newUser);
+        } else {
+            adminSettings.activeUsers.push(newUser._id);
+        }
+
+        await adminSettings.save();
+
         await sendOTP(businessEmail, otp);
 
         const token = jwt.sign(
-            { userId: newUser.userId },
+            { userId: newUser._id },
             process.env.SECRET_KEY,
             { expiresIn: '1h' }
         );
@@ -85,12 +130,13 @@ export const signUp = async (req, res) => {
         res.status(201).json({
             message: "Account created successfully! Please check your email for the verification code.",
             user: {
-                userId: newUser.userId,
+                userId: newUser._id,
                 name: newUser.name,
                 email: newUser.businessEmail,
                 website: newUser.businessWebsite,
             },
-            token
+            token,
+            isWaitlisted
         });
 
     } catch (error) {
@@ -109,10 +155,10 @@ export const signUp = async (req, res) => {
 
 export const verifyOTP = async (req, res) => {
     try {
+        await connectToDatabase();
         const { userId, otp } = req.body;
 
-        const user = await User.findOne({ userId: userId });
-
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -136,8 +182,11 @@ export const verifyOTP = async (req, res) => {
         user.otpExpires = null;
         await user.save();
 
+        const adminSettings = await AdminUser.findOne({});
+        const isActiveUser = adminSettings?.activeUsers.some(id => id.equals(user._id));
+
         const token = jwt.sign(
-            { userId: user.userId },
+            { userId: user._id },
             process.env.SECRET_KEY,
             { expiresIn: '1h' }
         );
@@ -145,15 +194,16 @@ export const verifyOTP = async (req, res) => {
         res.status(200).json({
             message: "OTP verified successfully",
             user: {
-                userId: user.userId,
+                userId: user._id,
                 name: user.name,
                 email: user.businessEmail,
                 website: user.businessWebsite,
-                userId: user.userId,
                 role: user.role
             },
             token,
-            role: user.role
+            role: user.role,
+            isActiveUser,
+            isWaitlisted: !isActiveUser
         });
 
     } catch (error) {
@@ -161,7 +211,6 @@ export const verifyOTP = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
-
 
 export const signIn = async (req, res) => {
     try {
@@ -285,7 +334,6 @@ export const forgotPassword = async (req, res) => {
         });
     }
 };
-
 
 export const resetPassword = async (req, res) => {
     try {
@@ -824,7 +872,7 @@ export const deleteConsumerUser = async (req, res) => {
     try {
         await connectToDatabase();
         const { id } = req.body;
-        console.log("id",req.body);
+        console.log("id", req.body);
 
         const consumerUsers = await getConsumerUsersCollection();
 
@@ -848,5 +896,3 @@ export const deleteConsumerUser = async (req, res) => {
         });
     }
 }
-
-

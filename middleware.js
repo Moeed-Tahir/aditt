@@ -6,7 +6,7 @@ const userProtectedPaths = [
 ];
 
 const adminProtectedPaths = [
-  /^\/admin(\/.*)?$/, // This will match all admin paths
+  /^\/admin(\/.*)?$/,
 ];
 
 export function middleware(request) {

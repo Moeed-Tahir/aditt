@@ -139,7 +139,8 @@ export default function TotalCampaigns() {
       try {
         const response = await axios.post('/api/routes/v1/campaignRoutes?action=campaignStatusUpdate', {
           status,
-          id: id || campaign._id
+          id: id || campaign._id,
+          to:Cookies.get("userEmail")
         });
 
         if (response.status !== 200) {
