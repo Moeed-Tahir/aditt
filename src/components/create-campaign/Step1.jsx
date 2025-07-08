@@ -14,12 +14,12 @@ const Step1 = ({
   const [imageError, setImageError] = useState("");
 
   const validateFileSize = (file, fileType) => {
-    const maxSize = fileType === "video" ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+    const maxSize = fileType === "video" ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
     if (file.size > maxSize) {
       if (fileType === "video") {
-        setVideoError(`File size too large. Maximum allowed size is 50MB.`);
+        setVideoError(`File size too large. Maximum allowed size is ${fileType === "video" ? "100MB" : "10MB"}.`);
       } else {
-        setImageError(`File size too large. Maximum allowed size is 10MB.`);
+        setImageError(`File size too large. Maximum allowed size is ${fileType === "video" ? "100MB" : "10MB"}.`);
       }
       return false;
     }
@@ -31,13 +31,48 @@ const Step1 = ({
     return true;
   };
 
-  const handleFileUpload = (e, type) => {
+  const validateVideoDuration = (file) => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        const duration = video.duration;
+        if (duration > 30) {
+          setVideoError("Video duration too long. Maximum allowed duration is 30 seconds.");
+          resolve(false);
+        } else {
+          setVideoError("");
+          resolve(true);
+        }
+      };
+      
+      video.onerror = () => {
+        // If we can't get duration, we'll allow it but warn the user
+        console.warn("Could not determine video duration");
+        resolve(true);
+      };
+      
+      video.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
 
     if (!validateFileSize(file, type)) {
       e.target.value = ""; 
       return;
+    }
+
+    if (type === "video") {
+      const isValidDuration = await validateVideoDuration(file);
+      if (!isValidDuration) {
+        e.target.value = "";
+        return;
+      }
     }
 
     handleFileChange(e, type);
@@ -202,7 +237,7 @@ const Step1 = ({
                   Campaign Video
                 </label>
                 <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                  Upload your campaign video (max 50MB). For best results, we recommend
+                  Upload your campaign video (max 100MB, max 30 seconds). For best results, we recommend
                   using vertical videos.
                 </span>
               </div>
@@ -214,7 +249,7 @@ const Step1 = ({
                     <p className="text-xs md:text-sm text-gray-700 mb-1">
                       Upload video
                     </p>
-                    <p className="text-xs text-gray-500">Format: mp4 (max 50MB)</p>
+                    <p className="text-xs text-gray-500">Format: mp4 (max 100MB, max 30 seconds)</p>
                     <input
                       type="file"
                       accept="video/mp4"
