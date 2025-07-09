@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 import QuestionBox from "./QuestionBox";
 
-const Step3 = ({ handleQuestionChange, formData }) => {
+const Step3 = ({ handleQuestionChange, formData, handleStepChange }) => {
     console.log("formData in Step3", formData);
 
     return (
@@ -18,12 +18,12 @@ const Step3 = ({ handleQuestionChange, formData }) => {
                                 Add a quiz or survey for campaign insights.
                             </span>
                         </div>
-                        <Link
-                            href="?step=3"
+                        <button
+                            onClick={() => handleStepChange(3)}
                             className="bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700"
                         >
                             Next
-                        </Link>
+                        </button>
                     </div>
 
                     <hr className="border-t mb-4 border-gray-300" />

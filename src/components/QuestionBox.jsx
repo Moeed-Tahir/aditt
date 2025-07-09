@@ -6,11 +6,14 @@ import AlertBox from "./AlertBox";
 
 function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
   const [isExpanded, setIsExpanded] = useState(!question.text);
+  const MAX_OPTION_LENGTH = 25;
 
   const handleOptionChange = (optionIndex, value) => {
-    const newOptions = [...question.options];
-    newOptions[optionIndex] = value;
-    onChange({ ...question, options: newOptions });
+    if (value.length <= MAX_OPTION_LENGTH) {
+      const newOptions = [...question.options];
+      newOptions[optionIndex] = value;
+      onChange({ ...question, options: newOptions });
+    }
   };
 
   const [alert, setAlert] = useState({
@@ -33,6 +36,16 @@ function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
     if (emptyOptions.length > 0) {
       setAlert({
         message: "Please fill in all answer options",
+        type: "error",
+        visible: true,
+      });
+      return false;
+    }
+
+    const longOptions = question.options.filter(opt => opt.length > MAX_OPTION_LENGTH);
+    if (longOptions.length > 0) {
+      setAlert({
+        message: `Answer options cannot exceed ${MAX_OPTION_LENGTH} characters`,
         type: "error",
         visible: true,
       });
@@ -83,23 +96,29 @@ function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
                   : "Answer options"}
               </p>
               {question.options.map((opt, i) => (
-                <div key={i} className="flex items-center mb-2 gap-2">
-                  {isQuiz && (
+                <div key={i} className="mb-2">
+                  <div className="flex items-center gap-2">
+                    {isQuiz && (
+                      <input
+                        type="radio"
+                        name={`question-${name}`}
+                        className="flex-shrink-0"
+                        checked={question.correctAnswer === i}
+                        onChange={() => onChange({ ...question, correctAnswer: i })}
+                      />
+                    )}
                     <input
-                      type="radio"
-                      name={`question-${name}`}
-                      className="flex-shrink-0"
-                      checked={question.correctAnswer === i}
-                      onChange={() => onChange({ ...question, correctAnswer: i })}
+                      type="text"
+                      placeholder={`Enter an answer choice (max ${MAX_OPTION_LENGTH} chars)`}
+                      className="w-full text-gray-600 bg-white text-sm p-3 border rounded-full"
+                      value={opt}
+                      onChange={(e) => handleOptionChange(i, e.target.value)}
+                      maxLength={MAX_OPTION_LENGTH}
                     />
-                  )}
-                  <input
-                    type="text"
-                    placeholder={`Enter an answer choice`}
-                    className="w-full text-gray-600 bg-white text-sm p-3 border rounded-full"
-                    value={opt}
-                    onChange={(e) => handleOptionChange(i, e.target.value)}
-                  />
+                  </div>
+                  <div className="text-xs text-right text-gray-500 mt-1">
+                    {opt.length}/{MAX_OPTION_LENGTH}
+                  </div>
                 </div>
               ))}
             </div>

@@ -24,6 +24,137 @@ const supabaseUrl = "https://pcgpvkvbbyafxhsjszow.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZ3B2a3ZiYnlhZnhoc2pzem93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwODQwNzAsImV4cCI6MjA2NTY2MDA3MH0.Atj4LdjM56PgRrIQiI0WRJuU5krmpTDaajpWdoDsTDQ";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+const initialFormData = {
+  brandName: "",
+  engagements: { totalCount: 0 },
+  clickCount: { totalCount: 0, dailyCounts: [] },
+  _id: "",
+  userId: "",
+  campaignTitle: "",
+  status: "",
+  websiteLink: "",
+  videoFile: {},
+  videoUrl: "",
+  imageFile: {},
+  imageUrl: "",
+  videoDuration: "",
+  genderRatio: 50,
+  genderType: "",
+  ageRange: [15, 45],
+  categories: [],
+  quizQuestion: {
+    text: "",
+    options: ["", "", "", ""],
+    correctAnswer: null,
+    optionStats: {
+      option1: {
+        demographics: {
+          age18_24: { male: 0, female: 0, other: 0 },
+          age25_33: { male: 0, female: 0, other: 0 },
+          age35_44: { male: 0, female: 0, other: 0 },
+          age45Plus: { male: 0, female: 0, other: 0 }
+        },
+        totalCount: 0
+      },
+      option2: {
+        demographics: {
+          age18_24: { male: 0, female: 0, other: 0 },
+          age25_33: { male: 0, female: 0, other: 0 },
+          age35_44: { male: 0, female: 0, other: 0 },
+          age45Plus: { male: 0, female: 0, other: 0 }
+        },
+        totalCount: 0
+      },
+      option3: {
+        demographics: {
+          age18_24: { male: 0, female: 0, other: 0 },
+          age25_33: { male: 0, female: 0, other: 0 },
+          age35_44: { male: 0, female: 0, other: 0 },
+          age45Plus: { male: 0, female: 0, other: 0 }
+        },
+        totalCount: 0
+      },
+      option4: {
+        demographics: {
+          age18_24: { male: 0, female: 0, other: 0 },
+          age25_33: { male: 0, female: 0, other: 0 },
+          age35_44: { male: 0, female: 0, other: 0 },
+          age45Plus: { male: 0, female: 0, other: 0 }
+        },
+        totalCount: 0
+      }
+    },
+    _id: ""
+  },
+  surveyQuestion1: {
+    text: "",
+    options: ["", "", "", ""],
+    optionStats: {
+      option1: { totalCount: 0 },
+      option2: { totalCount: 0 },
+      option3: { totalCount: 0 },
+      option4: { totalCount: 0 }
+    },
+    _id: ""
+  },
+  surveyQuestion2: {
+    text: "",
+    options: ["", "", "", ""],
+    optionStats: {
+      option1: { totalCount: 0 },
+      option2: { totalCount: 0 },
+      option3: { totalCount: 0 },
+      option4: { totalCount: 0 }
+    },
+    _id: ""
+  },
+  startDate: new Date(),
+  endDate: new Date(),
+  budget: 0,
+  campignBudget: 0,
+  cardNumber: "",
+  monthOnCard: "",
+  cvc: "",
+  nameOnCard: "",
+  country: "",
+  zipCode: "",
+  bankAccountNumber: "",
+  routingNumber: "",
+  accountType: "",
+  couponCode: "",
+  totalViews: 0,
+  impressions: 0,
+  videoWatchTime: 0,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  __v: 0,
+  cardType: "",
+  cardAdded: false,
+  isFormOpen: false,
+  bankAdded: false,
+  isBankFormOpen: false,
+  campaignVideoUrl: "",
+  companyLogo: "",
+  campaignStartDate: new Date(),
+  campaignEndDate: new Date(),
+  cardDetail: {
+    cardNumber: "",
+    cvc: "",
+    nameOnCard: "",
+    dateOnCard: "",
+    country: "",
+    zip: "",
+    _id: ""
+  },
+  bankDetail: {
+    accountNumber: "",
+    routingNumber: "",
+    accountType: "",
+    _id: ""
+  },
+  campaignBudget: "0"
+};
+
 export default function EditCampaign() {
   const steps = [
     { label: "Campaign Info" },
@@ -33,7 +164,7 @@ export default function EditCampaign() {
   ];
 
   const searchParams = useSearchParams();
-  const currentStep = parseInt(searchParams.get("step") || "0");
+  const [currentStep, setCurrentStep] = useState(parseInt(searchParams.get("step") || "0"));
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const userId = Cookies.get("userId");
   const [alert, setAlert] = useState({
@@ -42,148 +173,19 @@ export default function EditCampaign() {
     visible: false,
   });
 
-  const [formData, setFormData] = useState({
-    brandName: "",
-    engagements: {
-      totalCount: 0
-    },
-    clickCount: {
-      totalCount: 0,
-      dailyCounts: []
-    },
-    _id: "",
-    userId: "",
-    campaignTitle: "",
-    status: "",
-    websiteLink: "",
-    videoFile: {},
-    videoUrl: "",
-    imageFile: {},
-    imageUrl: "",
-    videoDuration: "",
-    genderRatio: 50,
-    genderType: "",
-    ageRange: [15, 45],
-    categories: [],
-    quizQuestion: {
-      text: "",
-      options: ["", "", "", ""],
-      correctAnswer: null,
-      optionStats: {
-        option1: {
-          demographics: {
-            age18_24: { male: 0, female: 0, other: 0 },
-            age25_33: { male: 0, female: 0, other: 0 },
-            age35_44: { male: 0, female: 0, other: 0 },
-            age45Plus: { male: 0, female: 0, other: 0 }
-          },
-          totalCount: 0
-        },
-        option2: {
-          demographics: {
-            age18_24: { male: 0, female: 0, other: 0 },
-            age25_33: { male: 0, female: 0, other: 0 },
-            age35_44: { male: 0, female: 0, other: 0 },
-            age45Plus: { male: 0, female: 0, other: 0 }
-          },
-          totalCount: 0
-        },
-        option3: {
-          demographics: {
-            age18_24: { male: 0, female: 0, other: 0 },
-            age25_33: { male: 0, female: 0, other: 0 },
-            age35_44: { male: 0, female: 0, other: 0 },
-            age45Plus: { male: 0, female: 0, other: 0 }
-          },
-          totalCount: 0
-        },
-        option4: {
-          demographics: {
-            age18_24: { male: 0, female: 0, other: 0 },
-            age25_33: { male: 0, female: 0, other: 0 },
-            age35_44: { male: 0, female: 0, other: 0 },
-            age45Plus: { male: 0, female: 0, other: 0 }
-          },
-          totalCount: 0
-        }
-      },
-      _id: ""
-    },
-    surveyQuestion1: {
-      text: "",
-      options: ["", "", "", ""],
-      optionStats: {
-        option1: { totalCount: 0 },
-        option2: { totalCount: 0 },
-        option3: { totalCount: 0 },
-        option4: { totalCount: 0 }
-      },
-      _id: ""
-    },
-    surveyQuestion2: {
-      text: "",
-      options: ["", "", "", ""],
-      optionStats: {
-        option1: { totalCount: 0 },
-        option2: { totalCount: 0 },
-        option3: { totalCount: 0 },
-        option4: { totalCount: 0 }
-      },
-      _id: ""
-    },
-    startDate: new Date(),
-    endDate: new Date(),
-    budget: 0,
-    campignBudget: 0,
-    cardNumber: "",
-    monthOnCard: "",
-    cvc: "",
-    nameOnCard: "",
-    country: "",
-    zipCode: "",
-    bankAccountNumber: "",
-    routingNumber: "",
-    accountType: "",
-    couponCode: "",
-    totalViews: 0,
-    impressions: 0,
-    videoWatchTime: 0,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    __v: 0,
-    cardType: "",
-    cardAdded: false,
-    isFormOpen: false,
-    bankAdded: false,
-    isBankFormOpen: false,
-    campaignVideoUrl: "",
-    companyLogo: "",
-    campaignStartDate: new Date(),
-    campaignEndDate: new Date(),
-    cardDetail: {
-      cardNumber: "",
-      cvc: "",
-      nameOnCard: "",
-      dateOnCard: "",
-      country: "",
-      zip: "",
-      _id: ""
-    },
-    bankDetail: {
-      accountNumber: "",
-      routingNumber: "",
-      accountType: "",
-      _id: ""
-    },
-    campaignBudget: "0"
-  });
-
+  const [formData, setFormData] = useState(initialFormData);
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
     image: 0,
   });
-
   const [isUploading, setIsUploading] = useState(false);
+
+  const handleStepChange = (stepIndex) => {
+    setCurrentStep(stepIndex);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', `?step=${stepIndex}`);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -257,7 +259,6 @@ export default function EditCampaign() {
       setUploadProgress((prev) => ({ ...prev, [type]: 0 }));
     }
   }, []);
-
 
   const formatDuration = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -344,7 +345,7 @@ export default function EditCampaign() {
         ageRange: formData.ageRange,
         campaignStartDate: formData.startDate.toISOString(),
         campaignEndDate: formData.endDate ? formData.endDate.toISOString() : null,
-        status: formData.status || "Pending",
+        status: "Pending",
         cardDetail: {
           ...formData.cardDetail,
           cardNumber: formData.cardNumber,
@@ -434,7 +435,6 @@ export default function EditCampaign() {
       if (dataParam) {
         try {
           const parsedData = JSON.parse(decodeURIComponent(dataParam));
-          console.log("parsedData", parsedData);
           const transformedData = {
             ...parsedData,
             engagements: parsedData.engagements || { totalCount: 0 },
@@ -454,7 +454,6 @@ export default function EditCampaign() {
               ],
               correctAnswer: parsedData.quizQuestion?.correctAnswer ??
                 (parsedData.quizQuestion?.answer ?
-                  // Find the index of the answer in the options array we just created
                   [
                     parsedData.quizQuestion?.option1 || "",
                     parsedData.quizQuestion?.option2 || "",
@@ -625,13 +624,12 @@ export default function EditCampaign() {
               } : transformedData.quizQuestion.optionStats
             }
           }));
-
         } catch (error) {
           console.error("Error parsing campaign data:", error);
         }
       }
     }
-  }, [searchParams]);
+  }, []);
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
@@ -658,11 +656,11 @@ export default function EditCampaign() {
                 key={index}
                 className="relative z-10 flex flex-col items-center"
               >
-                <Link
-                  href={`?step=${index}`}
+                <button
+                  onClick={() => handleStepChange(index)}
                   className={`gap-2 h-10 flex items-center justify-start rounded-full text-xs font-medium px-4 ${index === currentStep
-                    ? "border-blue-600 border bg-white text-gray-600"
-                    : "bg-white text-gray-600"
+                      ? "border-blue-600 border bg-white text-gray-600"
+                      : "bg-white text-gray-600"
                     } hover:cursor-pointer transition`}
                 >
                   {index < currentStep ? (
@@ -674,7 +672,7 @@ export default function EditCampaign() {
                     />
                   )}
                   {step.label}
-                </Link>
+                </button>
               </div>
             ))}
             <div className="absolute top-5 left-[9%] right-[9%] h-0.5 bg-gray-300 z-0">
@@ -689,19 +687,39 @@ export default function EditCampaign() {
         </div>
 
         {currentStep === 0 && (
-          <Step1 uploadProgress={uploadProgress} handleInputChange={handleInputChange} formData={formData} isUploading={isUploading} handleFileChange={handleFileChange} />
+          <Step1
+            handleStepChange={handleStepChange}
+            uploadProgress={uploadProgress}
+            handleInputChange={handleInputChange}
+            formData={formData}
+            isUploading={isUploading}
+            handleFileChange={handleFileChange}
+          />
         )}
 
         {currentStep === 1 && (
-          <Step2 formData={formData} setFormData={setFormData} />
+          <Step2
+            handleStepChange={handleStepChange}
+            formData={formData}
+            setFormData={setFormData}
+          />
         )}
 
         {currentStep === 2 && (
-          <Step3 formData={formData} handleQuestionChange={handleQuestionChange} />
+          <Step3
+            handleStepChange={handleStepChange}
+            formData={formData}
+            handleQuestionChange={handleQuestionChange}
+          />
         )}
 
         {currentStep === 3 && (
-          <Step4 handleInputChange={handleInputChange} setFormData={setFormData} formData={formData} handleSubmit={handleSubmit} />
+          <Step4
+            handleInputChange={handleInputChange}
+            setFormData={setFormData}
+            formData={formData}
+            handleSubmit={handleSubmit}
+          />
         )}
       </div>
 
@@ -718,11 +736,9 @@ export default function EditCampaign() {
                 Congratulations
               </h3>
               <p className="text-gray-600 text-[16px] mb-6">
-                Your campaign is pending approval.Well notify you once its
-                active.
+                Your campaign is pending approval. We'll notify you once it's active.
               </p>
               <Link
-
                 href={`/${userId}/campaign-dashboard`}
                 className="bg-blue-600 w-full h-[45px] px-25 py-3 text-white rounded-full hover:bg-blue-700 transition"
               >
