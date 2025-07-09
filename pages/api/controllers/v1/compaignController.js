@@ -391,7 +391,6 @@ exports.addCountInCampaign = async (req, res) => {
 exports.updateCampaign = async (req, res) => {
     try {
         const { id, ...updateData } = req.body;
-        console.log(JSON.stringify(updateData), "updateData");
 
         const campaign = await Compaign.findById(id);
         if (!campaign) {
@@ -529,7 +528,6 @@ exports.activeOrRejectCampaign = async (req, res) => {
                 message: "Campaign not found"
             });
         }
-        console.log("currentCampaign.userId", currentCampaign.userId);
 
         const user = await User.findOne({ userId: currentCampaign.userId });
 

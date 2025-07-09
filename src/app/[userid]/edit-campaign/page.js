@@ -124,7 +124,6 @@ const initialFormData = {
   couponCode: "",
   totalViews: 0,
   impressions: 0,
-  videoWatchTime: 0,
   createdAt: new Date(),
   updatedAt: new Date(),
   __v: 0,
@@ -365,7 +364,6 @@ export default function EditCampaign() {
         clickCount: formData.clickCount || { totalCount: 0, dailyCounts: [] },
         totalViews: formData.totalViews || 0,
         impressions: formData.impressions || 0,
-        videoWatchTime: formData.videoWatchTime || 0,
         categories: formData.categories || [],
         videoDuration: formData.videoDuration || "0:00"
       };
@@ -379,7 +377,6 @@ export default function EditCampaign() {
       );
       setShowSuccessModal(true);
     } catch (error) {
-      console.log("Error occurred", error);
       toast.error(error?.response?.data?.message || "Error occurred");
     }
   };
@@ -580,7 +577,6 @@ export default function EditCampaign() {
             status: parsedData.status || "Pending",
             totalViews: parsedData.totalViews || 0,
             impressions: parsedData.impressions || 0,
-            videoWatchTime: parsedData.videoWatchTime || 0,
             couponCode: parsedData.couponCode || "",
             quizQuestion: {
               ...transformedData.quizQuestion,

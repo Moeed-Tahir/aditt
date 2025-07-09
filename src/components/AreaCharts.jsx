@@ -26,22 +26,39 @@ const chartConfig = {
 };
 
 export default function EngagementChart({ clicks, videoWatchTime }) {
-  // Create engagement data based on daily counts if available
+  // Process videoWatchTime data to calculate total watch time and view counts
+  const processedWatchTime = videoWatchTime?.reduce(
+    (acc, item) => {
+      return {
+        totalSeconds: acc.totalSeconds + (item.seconds * item.count),
+        totalViews: acc.totalViews + item.count
+      };
+    },
+    { totalSeconds: 0, totalViews: 0 }
+  );
+
+  // Calculate average watch time in seconds
+  const averageWatchTime = processedWatchTime?.totalViews > 0 
+    ? (processedWatchTime.totalSeconds / processedWatchTime.totalViews).toFixed(1)
+    : 0;
+
   const engagementData = [
     { 
       name: "Day 1", 
-      videoWatchTime: 0, // Initial value
-      clicks: 0 
+      videoWatchTime: 0,
+      clicks: 0,
+      views: 0
     },
     { 
       name: "Current", 
-      videoWatchTime: videoWatchTime || 0, 
-      clicks: clicks || 0 
+      videoWatchTime: processedWatchTime?.totalSeconds || 0,
+      clicks: clicks || 0,
+      views: processedWatchTime?.totalViews || 0
     },
   ];
 
-  const totalVideoWatchTime = engagementData.reduce((sum, item) => sum + item.videoWatchTime, 0);
   const currentClicks = engagementData[engagementData.length - 1].clicks;
+  const currentViews = engagementData[engagementData.length - 1].views;
 
   return (
     <Card className="shadow-none border-none">
@@ -52,7 +69,7 @@ export default function EngagementChart({ clicks, videoWatchTime }) {
               Retention Chart
             </CardDescription>
             <CardDescription className="text-[16px]">
-              The total number of views and clicks for your campaign over time.
+              The engagement metrics for your campaign over time.
             </CardDescription>
           </div>
 
@@ -67,9 +84,16 @@ export default function EngagementChart({ clicks, videoWatchTime }) {
             <div className="flex flex-col items-start sm:items-end">
               <span className="text-[16px] font-md">
                 <span className="w-3 h-3 rounded-full bg-blue-100 inline-block mr-2"></span>
-                Video Watch Time
+                Views
               </span>
-              <span className="text-[14px] text-gray-500">{totalVideoWatchTime}</span>
+              <span className="text-[14px] text-gray-500">{currentViews}</span>
+            </div>
+            <div className="flex flex-col items-start sm:items-end">
+              <span className="text-[16px] font-md">
+                <span className="w-3 h-3 rounded-full bg-blue-200 inline-block mr-2"></span>
+                Avg Watch Time
+              </span>
+              <span className="text-[14px] text-gray-500">{averageWatchTime}s</span>
             </div>
           </div>
         </div>

@@ -718,7 +718,6 @@ export const rejectDeletionRequest = async (req, res) => {
 export const getAllUserDataAgainstId = async (req, res) => {
     try {
         const { userId } = req.body;
-        console.log("userId", userId);
 
         const user = await User.findOne({ userId });
         if (!user) {
@@ -872,7 +871,6 @@ export const deleteConsumerUser = async (req, res) => {
     try {
         await connectToDatabase();
         const { id } = req.body;
-        console.log("id", req.body);
 
         const consumerUsers = await getConsumerUsersCollection();
 

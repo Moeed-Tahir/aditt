@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange }) => {
     const isBudgetZero = parseFloat(formData.budget) === 0;
-    console.log("formData",formData);
     
     return (
         <>

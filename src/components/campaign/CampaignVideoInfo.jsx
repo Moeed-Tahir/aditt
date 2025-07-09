@@ -14,7 +14,6 @@ export const CampaignVideoInfo = ({ campaignData }) => {
   };
 
   const formatDateRange = () => {
-    console.log("campaignData?.campaignStartDate", campaignData?.campaignStartDate, "!campaignData?.campaignEndDate", !campaignData?.campaignEndDate);
 
     if (!campaignData?.campaignStartDate) return "N/A";
 

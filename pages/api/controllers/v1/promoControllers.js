@@ -6,7 +6,6 @@ export const createPromoCode = async (req, res) => {
     await connectToDatabase();
 
     const { name, discountType, discountValue, startDate, endDate, appliesTo, customUserLimit, limitUsers, status, fullWaiver } = req.body;
-    console.log("Req body", req.body);
 
     if (discountType === 'Percentage' && (discountValue < 0 || discountValue > 100)) {
       return res.status(400).json({ error: 'Percentage discount must be between 0 and 100' });
@@ -207,11 +206,9 @@ export const validatePromoCode = async (req, res) => {
 
 export const applyPromoCode = async (req, res) => { 
   const { code } = req.body;
-  console.log("Code",code);
 
   try {
     const promo = await PromoCode.findOne({ name: code, status: true });
-    console.log("promo", promo);
 
     if (!promo) {
       return res.status(404).json({ error: 'Promo code not found or inactive' });

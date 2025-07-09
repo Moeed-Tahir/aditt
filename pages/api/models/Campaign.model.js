@@ -1,5 +1,16 @@
 import mongoose from 'mongoose';
 
+const VideoWatchTimeSchema = new mongoose.Schema({
+    seconds: {
+        type: Number,
+        required: true
+    },
+    count: {
+        type: Number,
+        default: 1
+    }
+}, { _id: false });
+
 const OptionStatsSchema = new mongoose.Schema({
     totalCount: {
         type: Number,
@@ -290,8 +301,8 @@ const CampaignSchema = new mongoose.Schema({
         default: () => ({})
     },
     videoWatchTime: {
-        type: Number,
-        default: 0
+        type: [VideoWatchTimeSchema],
+        default: []
     },
     clickCount: {
         type: ClickCountSchema,

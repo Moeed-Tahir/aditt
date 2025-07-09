@@ -35,10 +35,15 @@ export function DataTable({ campaignData, fetchCampaign }) {
     category: "No Category",
     views: campaign.totalViews || 0,
     date: campaign.campaignStartDate,
-    engagements:campaign.engagements?.totalCount ,
+    engagements: campaign.engagements?.totalCount,
     amount: parseFloat(campaign.campaignBudget) || 0,
     status: campaign.status || "Pending",
   }));
+  const totalEngagementsAcrossAllCampaigns = campaignData?.reduce(
+    (sum, campaign) => sum + (campaign.engagements?.totalCount || 0),
+    0
+  );
+
 
   const filteredCampaigns = (transformedCampaigns || [])
     .filter((c) => {
@@ -106,7 +111,7 @@ export function DataTable({ campaignData, fetchCampaign }) {
 
   const handleAction = (type, campaignId) => {
     setCurrentCampaignId(campaignId);
-    
+
     if (type === "complete") {
       setFeedbackDialogOpen(true);
     } else {
@@ -176,23 +181,23 @@ export function DataTable({ campaignData, fetchCampaign }) {
             </Link>
           </div>
 
-          <CampaignMetricsDashboard transformedCampaigns={transformedCampaigns} />
+          <CampaignMetricsDashboard totalEngagementsAcrossAllCampaigns={totalEngagementsAcrossAllCampaigns} transformedCampaigns={transformedCampaigns} />
 
-          <CampaignDataTable 
-            setDateFilter={setDateFilter} 
-            setStatusFilter={setStatusFilter} 
-            setCurrentPage={setCurrentPage} 
-            currentPage={currentPage} 
-            fetchCampaign={fetchCampaign} 
-            handleAction={handleAction} 
-            openDialog={openDialog} 
-            campaignData={campaignData} 
-            totalPages={totalPages} 
-            filteredCampaigns={filteredCampaigns} 
-            paginatedCampaigns={paginatedCampaigns} 
-            resetFilters={resetFilters} 
-            statusFilter={statusFilter} 
-            dateFilter={dateFilter} 
+          <CampaignDataTable
+            setDateFilter={setDateFilter}
+            setStatusFilter={setStatusFilter}
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+            fetchCampaign={fetchCampaign}
+            handleAction={handleAction}
+            openDialog={openDialog}
+            campaignData={campaignData}
+            totalPages={totalPages}
+            filteredCampaigns={filteredCampaigns}
+            paginatedCampaigns={paginatedCampaigns}
+            resetFilters={resetFilters}
+            statusFilter={statusFilter}
+            dateFilter={dateFilter}
           />
 
           <Charts campaignData={transformedCampaigns} />
