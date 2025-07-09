@@ -205,8 +205,10 @@ export const validatePromoCode = async (req, res) => {
   }
 };
 
-export const applyPromoCode = async (req, res) => {
+export const applyPromoCode = async (req, res) => { 
   const { code } = req.body;
+  console.log("Code",code);
+
   try {
     const promo = await PromoCode.findOne({ name: code, status: true });
     console.log("promo", promo);
@@ -216,9 +218,6 @@ export const applyPromoCode = async (req, res) => {
     }
 
     const now = new Date();
-    console.log("now", now);
-    console.log("promo.startDate", promo.startDate);
-    console.log("promo.endDate", promo.endDate);
 
     if (now > promo.endDate) {
       return res.status(400).json({ error: 'Promo code is not active currently' });

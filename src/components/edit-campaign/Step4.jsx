@@ -8,7 +8,8 @@ import {
 } from "lucide-react";
 const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange }) => {
     const isBudgetZero = parseFloat(formData.budget) === 0;
-
+    console.log("formData",formData);
+    
     return (
         <>
             <div className="min-h-screen px-4 py-8">

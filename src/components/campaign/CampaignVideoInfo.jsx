@@ -14,8 +14,14 @@ export const CampaignVideoInfo = ({ campaignData }) => {
   };
 
   const formatDateRange = () => {
-    if (!campaignData?.campaignStartDate || !campaignData?.campaignEndDate) return "N/A";
+    console.log("campaignData?.campaignStartDate", campaignData?.campaignStartDate, "!campaignData?.campaignEndDate", !campaignData?.campaignEndDate);
+
+    if (!campaignData?.campaignStartDate) return "N/A";
+
     const startDate = new Date(campaignData.campaignStartDate).toLocaleDateString();
+
+    if (!campaignData?.campaignEndDate) return `Starts on ${startDate}`;
+
     const endDate = new Date(campaignData.campaignEndDate).toLocaleDateString();
     return `${startDate} - ${endDate}`;
   };
@@ -92,12 +98,12 @@ export const CampaignVideoInfo = ({ campaignData }) => {
       {showModal && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/10 flex items-center justify-center z-50 p-4">
           <div className="relative bg-white rounded-lg shadow-lg overflow-hidden max-w-3xl w-full">
-          <button
-  onClick={() => setShowModal(false)}
-  className="absolute top-3 right-3 text-gray-700 hover:text-black z-10"
->
-  <X className="w-6 h-6" />
-</button>
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-3 right-3 text-gray-700 hover:text-black z-10"
+            >
+              <X className="w-6 h-6" />
+            </button>
 
             <video
               src={campaignData?.campaignVideoUrl}

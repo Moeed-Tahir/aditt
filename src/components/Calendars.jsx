@@ -12,9 +12,29 @@ export default function Calendars({ selected, onSelect, fromDate, className = ""
   const handleSelectDate = (selectedDate) => {
     if (selectedDate) {
       onSelect(selectedDate);
-      setIsCalendarOpen(false);
+    } else {
+      onSelect("");
+    }
+    setIsCalendarOpen(false);
+  };
+
+  const isValidDate = (date) => {
+    if (date === "" || date === null || date === undefined) return false;
+    const dateObj = date instanceof Date ? date : new Date(date);
+    return dateObj instanceof Date && !isNaN(dateObj);
+  };
+
+  const getSelectedDate = () => {
+    if (!isValidDate(selected)) return null;
+    if (selected instanceof Date) return selected;
+    try {
+      return new Date(selected);
+    } catch (e) {
+      return null;
     }
   };
+
+  const displayDate = getSelectedDate();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -57,7 +77,7 @@ export default function Calendars({ selected, onSelect, fromDate, className = ""
           className="flex items-center w-full h-12 text-gray-600 text-m p-3 border rounded-full cursor-pointer hover:bg-gray-50 transition-colors"
         >
           <CalendarIcon className="mr-2 text-gray-500 w-5 h-5" />
-          {selected ? selected.toLocaleDateString() : "Choose date"}
+          {displayDate ? displayDate.toLocaleDateString() : "Choose date"}
         </span>
       </div>
 
@@ -72,7 +92,7 @@ export default function Calendars({ selected, onSelect, fromDate, className = ""
         >
           <Calendar
             mode="single"
-            selected={selected}
+            selected={displayDate}
             onSelect={handleSelectDate}
             fromDate={fromDate}
             initialFocus
