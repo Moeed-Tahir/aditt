@@ -157,7 +157,6 @@ export function CreateCampaigns({ userId }) {
 
       await promise;
 
-      // Get public URL after upload
       const { data: { publicUrl } } = supabase.storage.from("aditt").getPublicUrl(filePath);
 
       let duration = "";
@@ -177,7 +176,6 @@ export function CreateCampaigns({ userId }) {
       return null;
     } finally {
       setIsUploading(false);
-      // Don't reset progress to 0 here if you want to show completion
     }
   }, []);
 

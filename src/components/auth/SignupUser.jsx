@@ -59,6 +59,7 @@ function SignupUser() {
         Cookies.set("token", data.token, { expires: 1 });
         Cookies.set("userId", data.user.userId, { expires: 1 });
         Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+        Cookies.set("userEmail", data.user.email, { expires: 1 });
 
         toast.success(response.data.message);
         router.push(`/verify-email`);

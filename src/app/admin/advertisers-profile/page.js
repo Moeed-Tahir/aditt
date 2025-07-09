@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Cookies from 'js-cookie';
 
 // Wrap the component that uses useSearchParams in a Suspense boundary
 function AdvertisersProfileContent() {
@@ -120,7 +121,8 @@ function AdvertisersProfileContent() {
       try {
         const response = await axios.post('/api/routes/v1/campaignRoutes?action=campaignStatusUpdate', {
           status,
-          id: id || campaign._id
+          id: id || campaign._id,
+          to:Cookies.get("userEmail")
         });
 
         if (response.status !== 200) {

@@ -25,7 +25,8 @@ export default function CampaignActionsDropdown({ campaignId, openDialog, custom
     try {
       const response = await axios.post('/api/routes/v1/campaignRoutes?action=campaignStatusUpdate', {
         status,
-        id: campaignId
+        id: campaignId,
+        to:Cookies.get("userEmail")
       });
 
       if (response.status !== 200) {
