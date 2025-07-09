@@ -258,8 +258,7 @@ export function CreateCampaigns({ userId }) {
         ageRange: formData.ageRange,
         categories: formData.categories.join(","),
         campaignStartDate: formData.startDate.toISOString(),
-        campaignEndDate:
-          formData.endDate?.toISOString() || null,
+        campaignEndDate: formData.endDate || null,
         cardDetails: formData.cards,
         cardDetail: {
           cardNumber: formData.cardNumber,

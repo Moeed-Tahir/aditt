@@ -83,6 +83,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
             const response = await axios.post('/api/routes/v1/promoRoutes?action=applyPromoCode', {
                 code: formData.couponCode.trim()
             });
+            
 
             if (response.data.success) {
                 const originalBudget = parseFloat(formData.budget);
