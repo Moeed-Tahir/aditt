@@ -3,7 +3,7 @@ import React from 'react'
 import Sliders from '../Sliders'
 import { DualRangeSlider } from '../DualSlider'
 
-const Step2 = ({ setFormData, formData }) => {
+const Step2 = ({ setFormData, formData,handleStepChange }) => {
 
     const handleAgeRangeChange = (newRange) => {
         setFormData(prev => ({
@@ -27,12 +27,12 @@ const Step2 = ({ setFormData, formData }) => {
                             </span>
                         </div>
 
-                        <Link
-                            href="?step=2"
+                        <button
+                            onClick={() => handleStepChange(2)}
                             className="bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700"
                         >
                             Next
-                        </Link>
+                        </button>
                     </div>
 
                     <hr className="border-t mb-4 border-gray-300" />

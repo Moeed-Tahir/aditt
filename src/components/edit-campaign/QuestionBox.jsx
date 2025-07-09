@@ -1,14 +1,17 @@
 "use client";
 
-import { Check, ChevronDown,Edit } from "lucide-react";
+import { Check, Edit } from "lucide-react";
 import { useState } from "react";
 import AlertBox from "../AlertBox";
 
 function QuestionBox({ question, onChange, isQuiz, name }) {
     const [isExpanded, setIsExpanded] = useState(!question?.text);
+    const MAX_OPTION_LENGTH = 25;
 
     const handleOptionChange = (optionIndex, value) => {
-        onChange("options", value, optionIndex);
+        if (value.length <= MAX_OPTION_LENGTH) {
+            onChange("options", value, optionIndex);
+        }
     };
 
     const handleAnswerSelect = (answerIndex) => {
@@ -92,26 +95,31 @@ function QuestionBox({ question, onChange, isQuiz, name }) {
                                     : "Answer options"}
                             </p>
                             {currentQuestion.options.map((opt, i) => (
-                                <div key={i} className="flex items-center mb-2 gap-2">
-                                    {isQuiz && (
-<input
-                                        type="radio"
-                                        name={`question-${name}`}
-                                        className="flex-shrink-0"
-                                        checked={isQuiz
-                                            ? currentQuestion.correctAnswer === i
-                                            : currentQuestion.selectedAnswer === i}
-                                        onChange={() => handleAnswerSelect(i)}
-                                    />
-                                    )}
-                                    
-                                    <input
-                                        type="text"
-                                        placeholder={`Enter an answer choice`}
-                                        className="w-full text-gray-600 bg-white text-sm p-3 border rounded-full"
-                                        value={opt}
-                                        onChange={(e) => handleOptionChange(i, e.target.value)}
-                                    />
+                                <div key={i} className="mb-2">
+                                    <div className="flex items-center gap-2">
+                                        {isQuiz && (
+                                            <input
+                                                type="radio"
+                                                name={`question-${name}`}
+                                                className="flex-shrink-0"
+                                                checked={isQuiz
+                                                    ? currentQuestion.correctAnswer === i
+                                                    : currentQuestion.selectedAnswer === i}
+                                                onChange={() => handleAnswerSelect(i)}
+                                            />
+                                        )}
+                                        <input
+                                            type="text"
+                                            placeholder={`Enter an answer choice (max ${MAX_OPTION_LENGTH} chars)`}
+                                            className="w-full text-gray-600 bg-white text-sm p-3 border rounded-full"
+                                            value={opt}
+                                            onChange={(e) => handleOptionChange(i, e.target.value)}
+                                            maxLength={MAX_OPTION_LENGTH}
+                                        />
+                                    </div>
+                                    <div className="text-xs text-right text-gray-500 mt-1">
+                                        {opt.length}/{MAX_OPTION_LENGTH}
+                                    </div>
                                 </div>
                             ))}
                         </div>

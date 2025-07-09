@@ -11,7 +11,7 @@ import {
     Video,
 } from "lucide-react";
 
-const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handleFileChange }) => {
+const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handleFileChange, handleStepChange }) => {
     return (
         <>
             <div className="min-h-screen px-4 py-8">
@@ -26,26 +26,30 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                             </span>
                         </div>
 
-                        <Link
-                            href="?step=1"
+                        <button
                             className={`bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${!formData.campaignTitle ||
-                                !formData.websiteLink ||
-                                (!formData.videoUrl && !formData.videoFile)
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                                }`}
-                            onClick={(e) => {
-                                if (
-                                    !formData.campaignTitle ||
                                     !formData.websiteLink ||
                                     (!formData.videoUrl && !formData.videoFile)
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : ""
+                                }`}
+                            onClick={() => {
+                                if (
+                                    formData.campaignTitle &&
+                                    formData.websiteLink &&
+                                    (formData.videoUrl || formData.videoFile)
                                 ) {
-                                    e.preventDefault();
+                                    handleStepChange(1); // Changed from handleStepChange(1) to increment properly
                                 }
                             }}
+                            disabled={
+                                !formData.campaignTitle ||
+                                !formData.websiteLink ||
+                                (!formData.videoUrl && !formData.videoFile)
+                            }
                         >
                             Next
-                        </Link>
+                        </button>
                     </div>
 
                     <hr className="border-t mb-4 border-gray-300" />
@@ -55,10 +59,10 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                         <div className="flex items-start gap-6">
                             <div className="w-1/3">
                                 <label className="block text-[18px] text-gray-800 font-medium">
-                                     Brand Name
+                                    Brand Name
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
-                                 This is the name of the business or product the campaign represents.
+                                    This is the name of the business or product the campaign represents.
                                 </span>
                             </div>
                             <div className="relative flex-1">
@@ -126,9 +130,9 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                 </div>
 
                                 <div className="flex items-center gap-2 mt-1">
-                                <p className="text-[16px] text-green-600 select-all truncate overflow-hidden whitespace-nowrap max-w-[250px]">
-  {formData.websiteLink || "https://www.example.com"}
-</p>
+                                    <p className="text-[16px] text-green-600 select-all truncate overflow-hidden whitespace-nowrap max-w-[250px]">
+                                        {formData.websiteLink || "https://www.example.com"}
+                                    </p>
 
                                     {formData.websiteLink && (
                                         <button
