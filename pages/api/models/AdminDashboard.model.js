@@ -22,7 +22,6 @@ const AdminDashboardSchema = new mongoose.Schema({
         day: {
             type: String,
             enum: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
-            required: true
         },
         amount: {
             type: Number,
@@ -49,11 +48,12 @@ const AdminDashboardSchema = new mongoose.Schema({
     lastUpdated: {
         type: Date,
         default: Date.now
+    },
+    userLimit: {
+        type: Number,
+        default: 1000
     }
 }, { timestamps: true });
-
-
-
 
 const AdminDashboard = mongoose.models.AdminDashboard ||
     mongoose.model('AdminDashboard', AdminDashboardSchema);

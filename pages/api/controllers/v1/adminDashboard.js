@@ -39,4 +39,41 @@ const getAdminDashboardData = async (req, res) => {
     }
 }
 
-module.exports = { getAdminDashboardData };
+const getUserLimit = async (req, res) => {
+    try {
+        const dashboard = await AdminDashboard.findOne();
+        if (!dashboard) {
+            return res.status(404).json({ message: 'Dashboard data not found' });
+        }
+        console.log("dashboard",dashboard);
+        
+        res.status(200).json({ userLimit: dashboard.userLimit });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+const updateUserLimit = async (req, res) => {
+    try {
+        const { newUserLimit } = req.body;
+
+        if (!newUserLimit || isNaN(newUserLimit)) {
+            return res.status(400).json({ message: 'Invalid user limit value' });
+        }
+
+        const dashboard = await AdminDashboard.findOne();
+        if (!dashboard) {
+            return res.status(404).json({ message: 'Dashboard data not found' });
+        }
+
+        dashboard.userLimit = newUserLimit;
+        await dashboard.save();
+
+        res.status(200).json({ message: 'User limit updated successfully', userLimit: dashboard.userLimit });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+
+module.exports = { getAdminDashboardData,getUserLimit,updateUserLimit };

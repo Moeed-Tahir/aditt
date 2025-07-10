@@ -1,5 +1,7 @@
 import {
-getAdminDashboardData
+  getAdminDashboardData,
+  updateUserLimit,
+  getUserLimit
 } from "../../controllers/v1/adminDashboard";
 
 export default async function handler(req, res) {
@@ -14,6 +16,10 @@ export default async function handler(req, res) {
       switch (action) {
         case "getAdminDashboardData":
           return await getAdminDashboardData(req, res);
+        case "updateUserLimit":
+          return await updateUserLimit(req, res);
+        case "getUserLimit":
+          return await getUserLimit(req, res);
         default:
           return res.status(400).json({ message: "Invalid action parameter" });
       }
