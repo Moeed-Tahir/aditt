@@ -68,7 +68,7 @@ export default function UsersPage() {
         if (a.status === b.status) {
           return new Date(a.createdAt) - new Date(b.createdAt);
         }
-        return a.status === "Active" ? -1 : 1;
+        return a.status === "active" ? -1 : 1;
       });
 
       const usersToUpdate = [];
@@ -76,13 +76,13 @@ export default function UsersPage() {
 
       for (const user of sortedUsers) {
         if (activeCount < updatedLimit) {
-          if (user.status !== "Active") {
-            usersToUpdate.push({ ...user, newStatus: "Active" });
+          if (user.status !== "active") {
+            usersToUpdate.push({ ...user, newStatus: "active" });
           }
           activeCount++;
         } else {
-          if (user.status !== "WaitList") {
-            usersToUpdate.push({ ...user, newStatus: "WaitList" });
+          if (user.status !== "waitlist") {
+            usersToUpdate.push({ ...user, newStatus: "waitlist" });
           }
         }
       }
@@ -113,13 +113,13 @@ export default function UsersPage() {
   };
 
   const activeUsers = users
-    .filter(user => user.status === "Active")
+    .filter(user => user.status === "active")
     .slice(0, userLimit);
 
   const waitlistUsers = [
-    ...users.filter(user => user.status === "WaitList"),
+    ...users.filter(user => user.status === "waitlist"),
     ...users
-      .filter(user => user.status === "Active")
+      .filter(user => user.status === "active")
       .slice(userLimit)
   ];
 
@@ -179,11 +179,11 @@ export default function UsersPage() {
       key: "status",
       render: (user) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          user.status === "Active" && activeUsers.includes(user)
+          user.status === "active" && activeUsers.includes(user)
             ? "bg-green-100 text-green-800" 
             : "bg-yellow-100 text-yellow-800"
         }`}>
-          {user.status === "Active" && activeUsers.includes(user) ? "Active" : "WaitList"}
+          {user.status === "active" && activeUsers.includes(user) ? "active" : "waitlist"}
         </span>
       ),
     }
