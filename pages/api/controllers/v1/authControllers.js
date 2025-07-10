@@ -537,6 +537,7 @@ export const getProfile = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
     try {
+        await connectToDatabase();
         const verifiedUsers = await User.find({ isOtpVerified: true });
 
         res.status(200).json({
@@ -664,6 +665,7 @@ export const rejectDeletionRequest = async (req, res) => {
 
 export const getAllUserDataAgainstId = async (req, res) => {
     try {
+        await connectToDatabase();
         const { userId } = req.body;
 
         const user = await User.findOne({ userId });
@@ -845,6 +847,7 @@ export const deleteConsumerUser = async (req, res) => {
 export const listAllConsumerUsers = async (req, res) => {
     let client;
     try {
+        await connectToDatabase();
         client = await MongoClient.connect(process.env.MONGO_URI);
         const db = client.db();
 
