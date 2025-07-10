@@ -1,43 +1,11 @@
 const bcrypt = require("bcrypt");
 import User from '../../models/User.model';
-import AdminUser from '../../models/AdminUser.model';
 import Campaign from '../../models/Campaign.model';
 import { ObjectId } from 'mongodb';
-import { sendUserEmail } from '../../services/emailServices';
 const { generateOTP, sendOTP } = require("../../services/otpServices");
 const jwt = require("jsonwebtoken");
 const { getConsumerUsersCollection, connectToDatabase } = require("../../config/dbConnect");
-
-async function initializeAdminSettings() {
-    const allUsers = await User.find({}).select('_id').lean();
-
-    const adminSettings = new AdminUser({
-        activeUsers: allUsers.map(user => user._id),
-        waitlistUsers: [],
-        activeUserLimit: 1000
-    });
-
-    await adminSettings.save();
-    return adminSettings;
-}
-
-async function sendWaitlistNotificationEmail(user) {
-    const emailSubject = 'You\'re On Our Waitlist';
-    const emailBody = `
-        <h1>Welcome to Our Platform!</h1>
-        <p>Dear ${user.name || 'Valued User'},</p>
-        <p>Thank you for joining our platform. You're currently on our waitlist.</p>
-        <p>We'll notify you as soon as your account is activated and you can access all features.</p>
-        <p>In the meantime, feel free to explore our website.</p>
-        <p>Best regards,<br/>The Team</p>
-    `;
-
-    await sendUserEmail({
-        to: user.businessEmail,
-        subject: emailSubject,
-        html: emailBody
-    });
-}
+const { MongoClient } = require('mongodb');
 
 export const signUp = async (req, res) => {
     try {
@@ -45,7 +13,6 @@ export const signUp = async (req, res) => {
 
         const { name, businessWebsite, businessEmail, password } = req.body;
 
-        // Validate input
         if (!name || !businessWebsite || !businessEmail || !password) {
             return res.status(400).json({
                 message: "All fields are required",
@@ -88,11 +55,6 @@ export const signUp = async (req, res) => {
             }
         }
 
-        let adminSettings = await AdminUser.findOne({});
-        if (!adminSettings) {
-            adminSettings = await initializeAdminSettings();
-        }
-
         const hashedPassword = await bcrypt.hash(password, 10);
         const otp = generateOTP();
 
@@ -107,18 +69,6 @@ export const signUp = async (req, res) => {
         });
 
         await newUser.save();
-
-        const isWaitlisted = adminSettings.activeUsers.length >= adminSettings.activeUserLimit;
-
-        if (isWaitlisted) {
-            adminSettings.waitlistUsers.push(newUser._id);
-            await sendWaitlistNotificationEmail(newUser);
-        } else {
-            adminSettings.activeUsers.push(newUser._id);
-        }
-
-        await adminSettings.save();
-
         await sendOTP(businessEmail, otp);
 
         const token = jwt.sign(
@@ -181,9 +131,6 @@ export const verifyOTP = async (req, res) => {
         user.otp = null;
         user.otpExpires = null;
         await user.save();
-
-        const adminSettings = await AdminUser.findOne({});
-        const isActiveUser = adminSettings?.activeUsers.some(id => id.equals(user._id));
 
         const token = jwt.sign(
             { userId: user._id },
@@ -894,3 +841,26 @@ export const deleteConsumerUser = async (req, res) => {
         });
     }
 }
+
+export const listAllConsumerUsers = async (req, res) => {
+    let client;
+    try {
+        client = await MongoClient.connect(process.env.MONGO_URI);
+        const db = client.db();
+
+        const userList = await db.collection('consumerusers').find().toArray();
+
+        res.status(200).json({
+            status: 'success',
+            results: userList.length,
+            data: userList
+        });
+    } catch (error) {
+        console.error('Error fetching consumer users:', error);
+        res.status(500).json({ status: 'error', message: 'Internal server error' });
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+};

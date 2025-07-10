@@ -16,47 +16,87 @@ import Image from "next/image";
 
 export default function UsersPage() {
   const [activeTab, setActiveTab] = useState("active");
-  const [activeLimit, setActiveLimit] = useState(0);
-  const [currentActiveCount, setCurrentActiveCount] = useState(0);
-  const [currentWaitlistCount, setCurrentWaitlistCount] = useState(0);
+  const [userLimit, setUserLimit] = useState(0);
   const [editedLimit, setEditedLimit] = useState(0);
   const [showLimitModal, setShowLimitModal] = useState(false);
-  const [activeUsers, setActiveUsers] = useState([]);
-  const [waitlistUsers, setWaitlistUsers] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchUsers = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/routes/v1/adminUserRoutes?action=getAllUsersController");
+      const limitResponse = await axios.post("/api/routes/v1/adminDashboardRoutes?action=getUserLimit");
+      setUserLimit(limitResponse.data.userLimit || 0);
+      setEditedLimit(limitResponse.data.userLimit || 0);
       
-      const data = response.data.data;
+      const usersResponse = await axios.post("/api/routes/v1/authRoutes?action=listAllConsumerUsers");
+      setUsers(usersResponse.data.data || []);
       
-      setActiveUsers(data.activeUsers || []);
-      setWaitlistUsers(data.waitlistUsers || []);
-      setActiveLimit(data.activeUserLimit || 0);
-      setCurrentActiveCount(data.currentActiveCount || 0);
-      setCurrentWaitlistCount(data.currentWaitlistCount || 0);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Error fetching users");
-      console.error('Error fetching users:', error);
+      toast.error(error?.response?.data?.message || "Error fetching data");
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   }, []);
 
+  const updateUserStatus = async (userId, newStatus) => {
+    try {
+      await axios.post("/api/routes/v1/authRoutes?action=updateUserStatus", {
+        userId,
+        status: newStatus
+      });
+      return true;
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      return false;
+    }
+  };
+
   const updateUserLimit = async (newLimit) => {
     try {
-      const response = await axios.post("/api/routes/v1/adminUserRoutes?action=updateActiveUserLimitController", { newLimit });
-      const data = response.data.data;
+      const limitResponse = await axios.post(
+        "/api/routes/v1/adminDashboardRoutes?action=updateUserLimit", 
+        { newUserLimit: newLimit }
+      );
       
-      setActiveUsers(data.activeUsers || []);
-      setWaitlistUsers(data.waitlistUsers || []);
-      setActiveLimit(data.activeUserLimit || 0);
-      setCurrentActiveCount(data.currentActiveCount || 0);
-      setCurrentWaitlistCount(data.currentWaitlistCount || 0);
-      
-      toast.success("Active user limit updated successfully");
+      const updatedLimit = limitResponse.data.userLimit;
+      setUserLimit(updatedLimit);
+      setEditedLimit(updatedLimit);
+
+      const sortedUsers = [...users].sort((a, b) => {
+        if (a.status === b.status) {
+          return new Date(a.createdAt) - new Date(b.createdAt);
+        }
+        return a.status === "Active" ? -1 : 1;
+      });
+
+      const usersToUpdate = [];
+      let activeCount = 0;
+
+      for (const user of sortedUsers) {
+        if (activeCount < updatedLimit) {
+          if (user.status !== "Active") {
+            usersToUpdate.push({ ...user, newStatus: "Active" });
+          }
+          activeCount++;
+        } else {
+          if (user.status !== "WaitList") {
+            usersToUpdate.push({ ...user, newStatus: "WaitList" });
+          }
+        }
+      }
+
+      if (usersToUpdate.length > 0) {
+        const updatePromises = usersToUpdate.map(user => 
+          updateUserStatus(user._id, user.newStatus)
+        );
+
+        await Promise.all(updatePromises);
+        await fetchData();
+      }
+
+      toast.success("User limit updated successfully");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to update limit");
       console.error('Error updating limit:', error);
@@ -64,13 +104,27 @@ export default function UsersPage() {
   };
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+    fetchData();
+  }, [fetchData]);
 
   const handleSaveLimit = () => {
     updateUserLimit(editedLimit);
     setShowLimitModal(false);
   };
+
+  const activeUsers = users
+    .filter(user => user.status === "Active")
+    .slice(0, userLimit);
+
+  const waitlistUsers = [
+    ...users.filter(user => user.status === "WaitList"),
+    ...users
+      .filter(user => user.status === "Active")
+      .slice(userLimit)
+  ];
+
+  const currentActiveCount = activeUsers.length;
+  const currentWaitlistCount = waitlistUsers.length;
 
   const dataToShow = activeTab === "active" ? activeUsers : waitlistUsers;
 
@@ -95,35 +149,44 @@ export default function UsersPage() {
           )}
           <div>
             <div>{user.name || "No Name"}</div>
-            <div className="text-xs text-gray-500">{user.companyName || user.profileType || "Not specified"}</div>
+            <div className="text-xs text-gray-500">{user.email || "No email"}</div>
           </div>
         </div>
       ),
     },
     {
-      label: "EMAIL",
-      key: "businessEmail",
-      render: (user) => user.businessEmail || "N/A"
+      label: "PHONE NUMBER",
+      key: "phone",
+      render: (user) => user.phone || "N/A"
     },
     {
-      label: "COMPANY",
-      key: "companyName",
-      render: (user) => user.companyName || "N/A",
+      label: "DATE OF BIRTH",
+      key: "dateOfBirth",
+      render: (user) => user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "N/A",
     },
     {
-      label: "WEBSITE",
-      key: "businessWebsite",
-      render: (user) => user.businessWebsite || "N/A",
+      label: "TOTAL EARNINGS",
+      key: "totalBalance",
+      render: (user) => `$${(user.totalBalance || 0).toFixed(2)}`,
     },
     {
-      label: "TYPE",
-      key: "profileType",
+      label: "TOTAL WITHDRAW",
+      key: "totalWithdraw",
+      render: (user) => `$${(user.totalWithdraw || 0).toFixed(2)}`,
+    },
+    {
+      label: "STATUS",
+      key: "status",
       render: (user) => (
-        <span className="font-medium capitalize">
-          {user.profileType || "N/A"}
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          user.status === "Active" && activeUsers.includes(user)
+            ? "bg-green-100 text-green-800" 
+            : "bg-yellow-100 text-yellow-800"
+        }`}>
+          {user.status === "Active" && activeUsers.includes(user) ? "Active" : "WaitList"}
         </span>
       ),
-    },
+    }
   ];
 
   const sortOptions = [
@@ -131,11 +194,12 @@ export default function UsersPage() {
     { label: "Z to A", value: (a, b) => (b.name || "").localeCompare(a.name || "") },
     { label: "Newest First", value: (a, b) => new Date(b.createdAt) - new Date(a.createdAt) },
     { label: "Oldest First", value: (a, b) => new Date(a.createdAt) - new Date(b.createdAt) },
+    { label: "Highest Earnings", value: (a, b) => (b.totalBalance || 0) - (a.totalBalance || 0) },
+    { label: "Highest Withdrawals", value: (a, b) => (b.totalWithdraw || 0) - (a.totalWithdraw || 0) },
   ];
 
   const headerAction = (
     <div className="flex flex-col gap-4 w-full">
-      {/* Tabs */}
       <div className="flex gap-2 rounded p-1 text-sm font-semibold w-full max-w-md">
         <button
           className={`flex-1 py-2 px-4 rounded-full ${activeTab === "active"
@@ -161,17 +225,17 @@ export default function UsersPage() {
         <div className="bg-white shadow-sm rounded-xl px-6 py-4 w-full flex justify-between items-start flex-wrap gap-4">
           <div>
             <p className="text-[22px] font-semibold text-gray-800">
-              Active Users Limit: {activeLimit} ({currentActiveCount} active)
+              Active Users Limit: {userLimit} ({currentActiveCount} active)
             </p>
             <p className="text-sm text-gray-500">
-              Total users: {currentActiveCount + currentWaitlistCount}
+              Total users: {users.length}
             </p>
           </div>
           <button
             size="sm"
             variant="outline"
             onClick={() => {
-              setEditedLimit(activeLimit);
+              setEditedLimit(userLimit);
               setShowLimitModal(true);
             }}
             className="py-2 px-5 rounded-full bg-blue-600 text-white border border-blue-800 hover:bg-blue-800 transition flex items-center gap-2 justify-center"
@@ -221,7 +285,6 @@ export default function UsersPage() {
   const filterOptions = {
     date: true,
     status: false,
-    customStatusOptions: [],
   };
 
   return (

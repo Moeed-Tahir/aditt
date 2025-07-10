@@ -20,7 +20,8 @@ import {
   getLatestPendingDeletionRequests,
   getAllConsumerUser,
   deleteAdvertiserUser,
-  deleteConsumerUser
+  deleteConsumerUser,
+  listAllConsumerUsers
 } from "../../controllers/v1/authControllers";
 
 export default async function handler(req, res) {
@@ -75,6 +76,8 @@ export default async function handler(req, res) {
           return await deleteAdvertiserUser(req, res);
         case "deleteConsumerUser":
           return await deleteConsumerUser(req, res);
+        case "listAllConsumerUsers":
+          return await listAllConsumerUsers(req, res);
         default:
           return res.status(400).json({ message: "Invalid action parameter" });
       }
