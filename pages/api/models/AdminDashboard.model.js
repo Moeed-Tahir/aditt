@@ -21,7 +21,6 @@ const AdminDashboardSchema = new mongoose.Schema({
     dailyEarnings: [{
         day: {
             type: String,
-            enum: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
         },
         amount: {
             type: Number,
@@ -44,7 +43,6 @@ const AdminDashboardSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-
     lastUpdated: {
         type: Date,
         default: Date.now

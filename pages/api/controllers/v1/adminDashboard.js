@@ -1,5 +1,8 @@
 import { connectToDatabase } from '../../config/dbConnect';
 import AdminDashboard from '../../models/AdminDashboard.model';
+const { MongoClient } = require('mongodb');
+const dotenv = require("dotenv");
+dotenv.config();
 
 const getAdminDashboardData = async (req, res) => {
     try {
@@ -41,6 +44,8 @@ const getAdminDashboardData = async (req, res) => {
 
 const getUserLimit = async (req, res) => {
     try {
+        await connectToDatabase();
+
         const dashboard = await AdminDashboard.findOne();
         if (!dashboard) {
             return res.status(404).json({ message: 'Dashboard data not found' });
@@ -54,26 +59,79 @@ const getUserLimit = async (req, res) => {
 };
 
 const updateUserLimit = async (req, res) => {
+    let client;
     try {
         const { newUserLimit } = req.body;
 
-        if (!newUserLimit || isNaN(newUserLimit)) {
+        if (typeof newUserLimit !== 'number' || newUserLimit < 0) {
             return res.status(400).json({ message: 'Invalid user limit value' });
         }
 
-        const dashboard = await AdminDashboard.findOne();
+        const dashboard = await AdminDashboard.findOneAndUpdate(
+            {},
+            { $set: { userLimit: newUserLimit } },
+            { new: true }
+        );
+
         if (!dashboard) {
-            return res.status(404).json({ message: 'Dashboard data not found' });
+            return res.status(404).json({ message: 'Dashboard not found' });
         }
 
-        dashboard.userLimit = newUserLimit;
-        await dashboard.save();
+        client = await MongoClient.connect(process.env.MONGO_URI);
+        const db = client.db();
 
-        res.status(200).json({ message: 'User limit updated successfully', userLimit: dashboard.userLimit });
+        const [activeCount, waitlistCount] = await Promise.all([
+            db.collection('consumerusers').countDocuments({ status: 'active' }),
+            db.collection('consumerusers').countDocuments({ status: 'waitlist' })
+        ]);
+
+        if (activeCount > newUserLimit) {
+            const excess = activeCount - newUserLimit;
+            const activeUsers = await db.collection('consumerusers')
+                .find({ status: 'active' })
+                .sort({ createdAt: -1 })
+                .limit(excess)
+                .toArray();
+
+            await db.collection('consumerusers').updateMany(
+                { _id: { $in: activeUsers.map(u => u._id) } },
+                { $set: { status: 'waitlist' } }
+            );
+        } else if (activeCount < newUserLimit) {
+            const needed = newUserLimit - activeCount;
+            const waitlistUsers = await db.collection('consumerusers')
+                .find({ status: 'waitlist' })
+                .sort({ createdAt: 1 }) 
+                .limit(needed)
+                .toArray();
+
+            await db.collection('consumerusers').updateMany(
+                { _id: { $in: waitlistUsers.map(u => u._id) } },
+                { $set: { status: 'active' } }
+            );
+        }
+
+        const [finalActive, finalWaitlist] = await Promise.all([
+            db.collection('consumerusers').countDocuments({ status: 'active' }),
+            db.collection('consumerusers').countDocuments({ status: 'waitlist' })
+        ]);
+
+        res.status(200).json({
+            message: 'User statuses updated successfully',
+            userLimit: newUserLimit,
+            activeUsers: finalActive,
+            waitlistUsers: finalWaitlist
+        });
+
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        console.error('Update error:', error);
+        res.status(500).json({ 
+            message: 'Server error',
+            error: error.message
+        });
+    } finally {
+        if (client) await client.close();
     }
 };
 
-
-module.exports = { getAdminDashboardData,getUserLimit,updateUserLimit };
+module.exports = {getAdminDashboardData,getUserLimit,updateUserLimit};
