@@ -57,7 +57,6 @@ function SigninUser() {
         const data = response.data;
 
         if (data.token && data.user) {
-          console.log("data.user",data.user);
 
           Cookies.set("token", data.token, { expires: 1 });
           Cookies.set("userId", data.user.userId, { expires: 1 });

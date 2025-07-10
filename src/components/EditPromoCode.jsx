@@ -31,7 +31,6 @@ export default function EditPromoCodeDialog({ open, onClose, onSave, promoData }
 
   useEffect(() => {
     if (promoData) {
-      console.log("promoData", promoData);
 
       const isCustomUserLimit = promoData.appliesTo?.startsWith("First ") &&
         promoData.appliesTo?.endsWith(" Users");

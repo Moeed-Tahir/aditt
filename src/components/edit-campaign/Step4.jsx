@@ -4,22 +4,21 @@ import PaymentMethod from "./PaymentMethod";
 import LinkBankAccount from "./LinkBankAccount";
 import { CircleDollarSign, Tag } from "lucide-react";
 const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange }) => {
-  const isBudgetZero = parseFloat(formData.budget) === 0;
-  console.log("formData", formData);
-
-  return (
-    <>
-      <div className="min-h-screen px-4 py-8">
-        <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-          <div className="flex items-center justify-between mb-8">
-            <div className="w-1/3">
-              <label className="block text-[24px] font-medium">
-                Campaign budget
-              </label>
-              <span className="block text-[16px] text-gray-500 mt-1">
-                Define your budget to maximize reach and performance.
-              </span>
-            </div>
+    const isBudgetZero = parseFloat(formData.budget) === 0;
+    
+    return (
+        <>
+            <div className="min-h-screen px-4 py-8">
+                <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="w-1/3">
+                            <label className="block text-[24px] font-medium">
+                                Campaign budget
+                            </label>
+                            <span className="block text-[16px] text-gray-500 mt-1">
+                                Define your budget to maximize reach and performance.
+                            </span>
+                        </div>
 
             <button
               onClick={handleSubmit}

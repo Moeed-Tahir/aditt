@@ -1,6 +1,6 @@
 import React from 'react'
 
-const CampaignMetricsDashboard = ({ transformedCampaigns }) => {
+const CampaignMetricsDashboard = ({ transformedCampaigns,totalEngagementsAcrossAllCampaigns }) => {
   
   return (
     <>
@@ -35,9 +35,7 @@ const CampaignMetricsDashboard = ({ transformedCampaigns }) => {
             🎉 TOTAL ATTENTIVE ENGAGEMENTS
           </h2>
           <p className="font-md text-[30px]">
-            {transformedCampaigns
-              ?.reduce((sum, c) => sum + c.views, 0)
-              .toLocaleString()}
+            {totalEngagementsAcrossAllCampaigns}
           </p>
         </div>
       </div>

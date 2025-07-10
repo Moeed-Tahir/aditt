@@ -8,7 +8,6 @@ import {
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
 export function PieChartBox({ adminDashboardData }) {
-  console.log("adminDashboardData in PieChartBox", adminDashboardData);
   
   const pieData = [
     {

@@ -3,8 +3,7 @@ import React from 'react'
 import QuestionBox from "./QuestionBox";
 
 const Step3 = ({ handleQuestionChange, formData, handleStepChange }) => {
-    console.log("formData in Step3", formData);
-
+    
     return (
         <>
             <div className="min-h-screen px-4 py-8">
