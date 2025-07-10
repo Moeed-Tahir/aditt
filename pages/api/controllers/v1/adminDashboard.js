@@ -1,8 +1,17 @@
 import { connectToDatabase } from '../../config/dbConnect';
 import AdminDashboard from '../../models/AdminDashboard.model';
 const { MongoClient } = require('mongodb');
+const nodemailer = require('nodemailer');
 const dotenv = require("dotenv");
 dotenv.config();
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
 
 const getAdminDashboardData = async (req, res) => {
     try {
@@ -50,8 +59,8 @@ const getUserLimit = async (req, res) => {
         if (!dashboard) {
             return res.status(404).json({ message: 'Dashboard data not found' });
         }
-        console.log("dashboard",dashboard);
-        
+        console.log("dashboard", dashboard);
+
         res.status(200).json({ userLimit: dashboard.userLimit });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
@@ -101,14 +110,37 @@ const updateUserLimit = async (req, res) => {
             const needed = newUserLimit - activeCount;
             const waitlistUsers = await db.collection('consumerusers')
                 .find({ status: 'waitlist' })
-                .sort({ createdAt: 1 }) 
+                .sort({ createdAt: 1 })
                 .limit(needed)
                 .toArray();
+
+            const usersWithEmails = waitlistUsers.filter(user => user.email);
 
             await db.collection('consumerusers').updateMany(
                 { _id: { $in: waitlistUsers.map(u => u._id) } },
                 { $set: { status: 'active' } }
             );
+
+            const welcomeEmailPromises = usersWithEmails.map(user => {
+                const mailOptions = {
+                    from: process.env.EMAIL_USER,
+                    to: user.email,
+                    subject: "You're In — Welcome to Aditt 🚀",
+                    html: `
+                        <p>Hello ${user.name || 'there'},</p>
+                        <p>The wait is over — your Aditt account is now live!</p>
+                        <p>Start earning real money for watching ads and helping brands grow.</p>
+                        <p>Best regards,<br/>The Aditt Team</p>
+                    `
+                };
+
+                return transporter.sendMail(mailOptions)
+                    .catch(error => {
+                        console.error(`Failed to send welcome email to ${user.email}:`, error);
+                    });
+            });
+
+            await Promise.all(welcomeEmailPromises);
         }
 
         const [finalActive, finalWaitlist] = await Promise.all([
@@ -125,7 +157,7 @@ const updateUserLimit = async (req, res) => {
 
     } catch (error) {
         console.error('Update error:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: 'Server error',
             error: error.message
         });
@@ -134,4 +166,4 @@ const updateUserLimit = async (req, res) => {
     }
 };
 
-module.exports = {getAdminDashboardData,getUserLimit,updateUserLimit};
+module.exports = { getAdminDashboardData, getUserLimit, updateUserLimit };
