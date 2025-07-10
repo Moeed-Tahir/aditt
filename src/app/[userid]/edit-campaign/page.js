@@ -109,7 +109,7 @@ const initialFormData = {
     _id: ""
   },
   startDate: new Date(),
-  endDate: new Date(),
+  endDate: null,
   budget: 0,
   campignBudget: 0,
   cardNumber: "",
@@ -136,7 +136,7 @@ const initialFormData = {
   campaignVideoUrl: "",
   companyLogo: "",
   campaignStartDate: new Date(),
-  campaignEndDate: new Date(),
+  campaignEndDate: null,
   cardDetail: {
     cardNumber: "",
     cvc: "",
@@ -435,8 +435,16 @@ export default function EditCampaign() {
       if (dataParam) {
         try {
           const parsedData = JSON.parse(decodeURIComponent(dataParam));
+          console.log("Parsed campaign data:", parsedData);
+          const endDate = parsedData.campaignEndDate ?
+            new Date(parsedData.campaignEndDate) :
+            parsedData.endDate ?
+              new Date(parsedData.endDate) :
+              null;
           const transformedData = {
             ...parsedData,
+            endDate: endDate,
+            campaignEndDate: endDate,
             engagements: parsedData.engagements || { totalCount: 0 },
             clickCount: parsedData.clickCount || { totalCount: 0, dailyCounts: [] },
             brandName: parsedData.brandName || parsedData.campaignTitle || "",
@@ -568,9 +576,11 @@ export default function EditCampaign() {
             budget: parseFloat(parsedData.campaignBudget) || parseFloat(parsedData.budget) || 0,
             campignBudget: parseFloat(parsedData.campaignBudget) || 0,
             startDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
-            endDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || new Date(),
+            // endDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || null,
             campaignStartDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
-            campaignEndDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || new Date(),
+            // campaignEndDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || new Date(),
+            endDate: endDate || null,
+            campaignEndDate: endDate || null,
             createdAt: parsedData.createdAt ? new Date(parsedData.createdAt) : new Date(),
             updatedAt: parsedData.updatedAt ? new Date(parsedData.updatedAt) : new Date(),
             cardAdded: !!parsedData.cardDetail,
@@ -659,8 +669,8 @@ export default function EditCampaign() {
                 <button
                   onClick={() => handleStepChange(index)}
                   className={`gap-2 h-10 flex items-center justify-start rounded-full text-xs font-medium px-4 ${index === currentStep
-                      ? "border-blue-600 border bg-white text-gray-600"
-                      : "bg-white text-gray-600"
+                    ? "border-blue-600 border bg-white text-gray-600"
+                    : "bg-white text-gray-600"
                     } hover:cursor-pointer transition`}
                 >
                   {index < currentStep ? (
@@ -736,7 +746,7 @@ export default function EditCampaign() {
                 Congratulations
               </h3>
               <p className="text-gray-600 text-[16px] mb-6">
-                Your campaign is pending approval. We'll notify you once it's active.
+                Your campaign is pending approval. We&#39;ll notify you once it&#39;s active.
               </p>
               <Link
                 href={`/${userId}/campaign-dashboard`}

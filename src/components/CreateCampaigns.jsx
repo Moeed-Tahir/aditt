@@ -4,12 +4,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useState, useCallback } from "react";
 import Navbar2 from "@/components/Navbar2";
-import {
-  ArrowLeft,
-  Check,
-  CircleCheck,
-  CircleDot,
-} from "lucide-react";
+import { ArrowLeft, Check, CircleCheck, CircleDot } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
 import AlertBox from "./AlertBox";
@@ -20,7 +15,8 @@ import Step4 from "./create-campaign/Step4";
 import { toast } from "sonner";
 
 const supabaseUrl = "https://pcgpvkvbbyafxhsjszow.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZ3B2a3ZiYnlhZnhoc2pzem93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwODQwNzAsImV4cCI6MjA2NTY2MDA3MH0.Atj4LdjM56PgRrIQiI0WRJuU5krmpTDaajpWdoDsTDQ";
+const supabaseKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZ3B2a3ZiYnlhZnhoc2pzem93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwODQwNzAsImV4cCI6MjA2NTY2MDA3MH0.Atj4LdjM56PgRrIQiI0WRJuU5krmpTDaajpWdoDsTDQ";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export function CreateCampaigns({ userId }) {
@@ -110,73 +106,132 @@ export function CreateCampaigns({ userId }) {
     });
   };
 
+  // const handleFileUpload = useCallback(async (file, type) => {
+  //   if (!file || !type) return;
+
+  //   setIsUploading(true);
+  //   const fileExt = file.name.split(".").pop();
+  //   const fileName = `${Math.random()}.${fileExt}`;
+  //   const filePath = `aditt-assets/${type}s/${fileName}`;
+
+  //   try {
+  //     // Create a FormData object
+  //     const formData = new FormData();
+  //     formData.append('file', file);
+
+  //     // Create XMLHttpRequest for progress tracking
+  //     const xhr = new XMLHttpRequest();
+
+  //     // Set up progress event
+  //     xhr.upload.onprogress = (event) => {
+  //       if (event.lengthComputable) {
+  //         const progressPercentage = Math.round((event.loaded / event.total) * 100);
+  //         setUploadProgress((prev) => ({
+  //           ...prev,
+  //           [type]: progressPercentage,
+  //         }));
+  //       }
+  //     };
+
+  //     // Make the request to Supabase's upload endpoint
+  //     const promise = new Promise((resolve, reject) => {
+  //       xhr.onload = () => {
+  //         if (xhr.status >= 200 && xhr.status < 300) {
+  //           resolve(xhr.response);
+  //         } else {
+  //           reject(new Error('Upload failed'));
+  //         }
+  //       };
+  //       xhr.onerror = () => reject(new Error('Upload failed'));
+
+  //       xhr.open('POST', `${supabaseUrl}/storage/v1/object/aditt/${filePath}`);
+  //       xhr.setRequestHeader('Authorization', `Bearer ${supabaseKey}`);
+  //       xhr.setRequestHeader('Content-Type', file.type);
+  //       xhr.setRequestHeader('x-upsert', 'false');
+  //       xhr.send(formData);
+  //     });
+
+  //     await promise;
+
+  //     const { data: { publicUrl } } = supabase.storage.from("aditt").getPublicUrl(filePath);
+
+  //     let duration = "";
+  //     if (type === "video") {
+  //       duration = await getVideoDuration(file);
+  //     }
+
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       [`${type}Url`]: publicUrl,
+  //       ...(type === "video" && { videoDuration: duration }),
+  //     }));
+
+  //     return publicUrl;
+  //   } catch (error) {
+  //     console.error(`Error uploading ${type}:`, error);
+  //     return null;
+  //   } finally {
+  //     setIsUploading(false);
+  //   }
+  // }, []);
+
   const handleFileUpload = useCallback(async (file, type) => {
     if (!file || !type) return;
 
     setIsUploading(true);
     const fileExt = file.name.split(".").pop();
-    const fileName = `${Math.random()}.${fileExt}`;
+    const fileName = `${Date.now()}.${fileExt}`;
     const filePath = `aditt-assets/${type}s/${fileName}`;
 
-    try {
-      // Create a FormData object
-      const formData = new FormData();
-      formData.append('file', file);
-
-      // Create XMLHttpRequest for progress tracking
+    return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
 
-      // Set up progress event
+      // Track upload progress
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
-          const progressPercentage = Math.round((event.loaded / event.total) * 100);
-          setUploadProgress((prev) => ({
-            ...prev,
-            [type]: progressPercentage,
-          }));
+          const percent = Math.round((event.loaded / event.total) * 100);
+          setUploadProgress((prev) => ({ ...prev, [type]: percent }));
         }
       };
 
-      // Make the request to Supabase's upload endpoint
-      const promise = new Promise((resolve, reject) => {
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve(xhr.response);
-          } else {
-            reject(new Error('Upload failed'));
+      xhr.onload = async () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const {
+            data: { publicUrl },
+          } = supabase.storage.from("aditt").getPublicUrl(filePath);
+
+          let duration = "";
+          if (type === "video") {
+            duration = await getVideoDuration(file);
           }
-        };
-        xhr.onerror = () => reject(new Error('Upload failed'));
 
-        xhr.open('POST', `${supabaseUrl}/storage/v1/object/aditt/${filePath}`);
-        xhr.setRequestHeader('Authorization', `Bearer ${supabaseKey}`);
-        xhr.setRequestHeader('Content-Type', file.type);
-        xhr.setRequestHeader('x-upsert', 'false');
-        xhr.send(formData);
-      });
+          setFormData((prev) => ({
+            ...prev,
+            [`${type}Url`]: publicUrl,
+            ...(type === "video" && { videoDuration: duration }),
+          }));
 
-      await promise;
+          setIsUploading(false);
+          resolve(publicUrl);
+        } else {
+          setIsUploading(false);
+          toast.error("Upload failed. Please try again.");
+          reject(new Error("Upload failed"));
+        }
+      };
 
-      const { data: { publicUrl } } = supabase.storage.from("aditt").getPublicUrl(filePath);
+      xhr.onerror = () => {
+        setIsUploading(false);
+        toast.error("Upload failed. Network error.");
+        reject(new Error("Network error"));
+      };
 
-      let duration = "";
-      if (type === "video") {
-        duration = await getVideoDuration(file);
-      }
-
-      setFormData((prev) => ({
-        ...prev,
-        [`${type}Url`]: publicUrl,
-        ...(type === "video" && { videoDuration: duration }),
-      }));
-
-      return publicUrl;
-    } catch (error) {
-      console.error(`Error uploading ${type}:`, error);
-      return null;
-    } finally {
-      setIsUploading(false);
-    }
+      xhr.open("PUT", `${supabaseUrl}/storage/v1/object/aditt/${filePath}`);
+      xhr.setRequestHeader("Authorization", `Bearer ${supabaseKey}`);
+      xhr.setRequestHeader("x-upsert", "false");
+      xhr.setRequestHeader("Content-Type", file.type);
+      xhr.send(file); // Send RAW FILE (not FormData)
+    });
   }, []);
 
   const getVideoDuration = (file) => {
@@ -228,31 +283,39 @@ export function CreateCampaigns({ userId }) {
         companyLogo: formData.imageUrl,
         userId: userId,
         couponCode: formData.couponCode,
-        quizQuestion: formData.quizQuestion.text ? {
-          questionText: formData.quizQuestion.text,
-          option1: formData.quizQuestion.options[0],
-          option2: formData.quizQuestion.options[1],
-          option3: formData.quizQuestion.options[2],
-          option4: formData.quizQuestion.options[3],
-          answer: formData.quizQuestion.correctAnswer !== null
-            ? formData.quizQuestion.options[formData.quizQuestion.correctAnswer]
-            : "",
-        } : null,
-        surveyQuestion1: formData.surveyQuestion1.text ? {
-          questionText: formData.surveyQuestion1.text,
-          option1: formData.surveyQuestion1.options[0],
-          option2: formData.surveyQuestion1.options[1],
-          option3: formData.surveyQuestion1.options[2],
-          option4: formData.surveyQuestion1.options[3],
-
-        } : null,
-        surveyQuestion2: formData.surveyQuestion2.text ? {
-          questionText: formData.surveyQuestion2.text,
-          option1: formData.surveyQuestion2.options[0],
-          option2: formData.surveyQuestion2.options[1],
-          option3: formData.surveyQuestion2.options[2],
-          option4: formData.surveyQuestion2.options[3],
-        } : null,
+        quizQuestion: formData.quizQuestion.text
+          ? {
+              questionText: formData.quizQuestion.text,
+              option1: formData.quizQuestion.options[0],
+              option2: formData.quizQuestion.options[1],
+              option3: formData.quizQuestion.options[2],
+              option4: formData.quizQuestion.options[3],
+              answer:
+                formData.quizQuestion.correctAnswer !== null
+                  ? formData.quizQuestion.options[
+                      formData.quizQuestion.correctAnswer
+                    ]
+                  : "",
+            }
+          : null,
+        surveyQuestion1: formData.surveyQuestion1.text
+          ? {
+              questionText: formData.surveyQuestion1.text,
+              option1: formData.surveyQuestion1.options[0],
+              option2: formData.surveyQuestion1.options[1],
+              option3: formData.surveyQuestion1.options[2],
+              option4: formData.surveyQuestion1.options[3],
+            }
+          : null,
+        surveyQuestion2: formData.surveyQuestion2.text
+          ? {
+              questionText: formData.surveyQuestion2.text,
+              option1: formData.surveyQuestion2.options[0],
+              option2: formData.surveyQuestion2.options[1],
+              option3: formData.surveyQuestion2.options[2],
+              option4: formData.surveyQuestion2.options[3],
+            }
+          : null,
         genderType: formData.genderType,
         genderRatio: formData.genderRatio.toString(),
         ageRange: formData.ageRange,
@@ -306,7 +369,6 @@ export function CreateCampaigns({ userId }) {
     return (budget / duration) * 1000;
   }, [formData.budget, formData.videoDuration]);
 
-
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">
       <Navbar2 userId={userId} />
@@ -336,20 +398,22 @@ export function CreateCampaigns({ userId }) {
                 <Link
                   href={`?step=${index}`}
                   className={`gap-1 md:gap-2 h-10 flex items-center justify-center md:justify-start rounded-full text-xs font-medium px-2 md:px-4
-          ${index === currentStep
-                      ? "border-blue-600 border bg-white text-gray-600"
-                      : "bg-white text-gray-600"
-                    }
+          ${
+            index === currentStep
+              ? "border-blue-600 border bg-white text-gray-600"
+              : "bg-white text-gray-600"
+          }
           hover:cursor-pointer transition`}
                 >
                   {index < currentStep ? (
                     <CircleCheck className="w-5 h-5 md:w-6 md:h-6 text-blue-600 shrink-0" />
                   ) : (
                     <CircleDot
-                      className={`w-5 h-5 md:w-6 md:h-6 shrink-0 ${index === currentStep
-                        ? "text-blue-600"
-                        : "text-gray-300"
-                        }`}
+                      className={`w-5 h-5 md:w-6 md:h-6 shrink-0 ${
+                        index === currentStep
+                          ? "text-blue-600"
+                          : "text-gray-300"
+                      }`}
                     />
                   )}
                   <span className="hidden md:inline whitespace-nowrap">
@@ -381,19 +445,34 @@ export function CreateCampaigns({ userId }) {
         )}
 
         {currentStep === 1 && (
-          <Step2 isUploading={isUploading}
+          <Step2
+            isUploading={isUploading}
             uploadProgress={uploadProgress}
-            setValues={setValues} values={values} setFormData={setFormData} formData={formData} />
+            setValues={setValues}
+            values={values}
+            setFormData={setFormData}
+            formData={formData}
+          />
         )}
 
         {currentStep === 2 && (
-          <Step3 isUploading={isUploading}
-            uploadProgress={uploadProgress} setFormData={setFormData} formData={formData} />
+          <Step3
+            isUploading={isUploading}
+            uploadProgress={uploadProgress}
+            setFormData={setFormData}
+            formData={formData}
+          />
         )}
 
         {currentStep === 3 && (
-          <Step4 isUploading={isUploading}
-            uploadProgress={uploadProgress} handleInputChange={handleInputChange} setFormData={setFormData} handleSubmit={handleSubmit} formData={formData} />
+          <Step4
+            isUploading={isUploading}
+            uploadProgress={uploadProgress}
+            handleInputChange={handleInputChange}
+            setFormData={setFormData}
+            handleSubmit={handleSubmit}
+            formData={formData}
+          />
         )}
 
         {alert.visible && (
