@@ -18,9 +18,6 @@ import {
 const daysOfWeek = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
 export function LineChart({ adminDashboardData }) {
-  console.log("adminDashboardData in LineChart", adminDashboardData);
-
-  // Create chart data for all days of the week
   const chartData = daysOfWeek.map(day => {
     const dayData = adminDashboardData?.dailyEarnings?.find(d => d.day === day);
     return {

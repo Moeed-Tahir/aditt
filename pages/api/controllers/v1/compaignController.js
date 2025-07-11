@@ -33,12 +33,14 @@ exports.createCampaign = async (req, res) => {
             userId,
             campaignBudget,
             brandName,
-            totalEngagementValue
+            totalEngagementValue,
+            videoUrlId,
+            videoUrlIntelligenceStatus
         } = req.body;
 
         if (!campaignTitle || !websiteLink || !campaignVideoUrl || !brandName ||
             !genderType || !Array.isArray(ageRange) || ageRange.length !== 2 ||
-            !campaignStartDate || !userId) {
+            !campaignStartDate || !userId || !videoUrlIntelligenceStatus || !videoUrlId) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
@@ -56,6 +58,8 @@ exports.createCampaign = async (req, res) => {
             campaignTitle,
             websiteLink,
             campaignVideoUrl,
+            videoUrlId,
+            videoUrlIntelligenceStatus,
             companyLogo: companyLogo || null,
             quizQuestion: {
                 questionText: quizQuestion.questionText,

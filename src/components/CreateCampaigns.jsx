@@ -47,7 +47,8 @@ export function CreateCampaigns({ userId }) {
     ageRange: [18, 65],
     genderAge: "12",
     categories: [],
-
+    videoUrlId: "",
+    videoUrlIntelligenceStatus: "",
     quizQuestion: {
       text: "",
       options: ["", "", "", ""],
@@ -179,59 +180,125 @@ export function CreateCampaigns({ userId }) {
     if (!file || !type) return;
 
     setIsUploading(true);
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `aditt-assets/${type}s/${fileName}`;
+    setUploadProgress(prev => ({ ...prev, [type]: 0 }));
 
-    return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
+    if (type === "video") {
+      try {
+        
+        const formData = new FormData();
+        formData.append('file', file);
 
-      // Track upload progress
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percent = Math.round((event.loaded / event.total) * 100);
-          setUploadProgress((prev) => ({ ...prev, [type]: percent }));
-        }
-      };
+        const intelUploadPromise = new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/api/routes/v1/videoUploadRoutes?action=upload');
 
-      xhr.onload = async () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          const {
-            data: { publicUrl },
-          } = supabase.storage.from("aditt").getPublicUrl(filePath);
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percent = Math.round((event.loaded / event.total) * 50);
+              setUploadProgress(prev => ({ ...prev, [type]: percent }));
+            }
+          };
 
-          let duration = "";
-          if (type === "video") {
-            duration = await getVideoDuration(file);
-          }
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                const data = JSON.parse(xhr.responseText);
+                resolve(data);
+              } catch (e) {
+                reject(new Error('Failed to parse response'));
+              }
+            } else {
+              reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
+          };
 
-          setFormData((prev) => ({
-            ...prev,
-            [`${type}Url`]: publicUrl,
-            ...(type === "video" && { videoDuration: duration }),
-          }));
+          xhr.onerror = () => reject(new Error('Network error'));
+          xhr.send(formData);
+        });
 
+        const intelligenceData = await intelUploadPromise;
+
+        setFormData(prev => ({
+          ...prev,
+          videoUrlIntelligenceStatus: intelligenceData.status,
+          videoUrlId: intelligenceData.videoId,
+        }));
+
+        if (intelligenceData.status !== "PASSED") {
           setIsUploading(false);
-          resolve(publicUrl);
-        } else {
-          setIsUploading(false);
-          toast.error("Upload failed. Please try again.");
-          reject(new Error("Upload failed"));
+          toast.error(intelligenceData.message || "Video analysis failed");
+          return null;
         }
-      };
-
-      xhr.onerror = () => {
+      } catch (error) {
+        console.error("Video intelligence error:", error);
         setIsUploading(false);
-        toast.error("Upload failed. Network error.");
-        reject(new Error("Network error"));
-      };
+        toast.error(error.message || "Video processing failed");
+        return null;
+      }
+    }
 
-      xhr.open("PUT", `${supabaseUrl}/storage/v1/object/aditt/${filePath}`);
-      xhr.setRequestHeader("Authorization", `Bearer ${supabaseKey}`);
-      xhr.setRequestHeader("x-upsert", "false");
-      xhr.setRequestHeader("Content-Type", file.type);
-      xhr.send(file); // Send RAW FILE (not FormData)
-    });
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `aditt-assets/${type}s/${fileName}`;
+
+      const supabaseUploadPromise = new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', `${supabaseUrl}/storage/v1/object/aditt/${filePath}`);
+
+        xhr.setRequestHeader("Authorization", `Bearer ${supabaseKey}`);
+        xhr.setRequestHeader("x-upsert", "false");
+        xhr.setRequestHeader("Content-Type", file.type);
+
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = 50 + Math.round((event.loaded / event.total) * 50);
+            setUploadProgress(prev => ({ ...prev, [type]: percent }));
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response);
+            } catch (e) {
+              reject(new Error('Failed to parse Supabase response'));
+            }
+          } else {
+            reject(new Error('Supabase upload failed'));
+          }
+        };
+
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.send(file);
+      });
+
+      await supabaseUploadPromise;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("aditt")
+        .getPublicUrl(filePath);
+
+      let duration = "";
+      if (type === "video") {
+        duration = await getVideoDuration(file);
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        [`${type}Url`]: publicUrl,
+        ...(type === "video" && { videoDuration: duration }),
+      }));
+
+      setIsUploading(false);
+      return publicUrl;
+    } catch (error) {
+      console.error("Upload error:", error);
+      setIsUploading(false);
+      toast.error(error.message || "Upload failed");
+      return null;
+    }
   }, []);
 
   const getVideoDuration = (file) => {
@@ -283,38 +350,40 @@ export function CreateCampaigns({ userId }) {
         companyLogo: formData.imageUrl,
         userId: userId,
         couponCode: formData.couponCode,
+        videoUrlIntelligenceStatus: formData.videoUrlIntelligenceStatus,
+        videoUrlId: formData.videoUrlId,
         quizQuestion: formData.quizQuestion.text
           ? {
-              questionText: formData.quizQuestion.text,
-              option1: formData.quizQuestion.options[0],
-              option2: formData.quizQuestion.options[1],
-              option3: formData.quizQuestion.options[2],
-              option4: formData.quizQuestion.options[3],
-              answer:
-                formData.quizQuestion.correctAnswer !== null
-                  ? formData.quizQuestion.options[
-                      formData.quizQuestion.correctAnswer
-                    ]
-                  : "",
-            }
+            questionText: formData.quizQuestion.text,
+            option1: formData.quizQuestion.options[0],
+            option2: formData.quizQuestion.options[1],
+            option3: formData.quizQuestion.options[2],
+            option4: formData.quizQuestion.options[3],
+            answer:
+              formData.quizQuestion.correctAnswer !== null
+                ? formData.quizQuestion.options[
+                formData.quizQuestion.correctAnswer
+                ]
+                : "",
+          }
           : null,
         surveyQuestion1: formData.surveyQuestion1.text
           ? {
-              questionText: formData.surveyQuestion1.text,
-              option1: formData.surveyQuestion1.options[0],
-              option2: formData.surveyQuestion1.options[1],
-              option3: formData.surveyQuestion1.options[2],
-              option4: formData.surveyQuestion1.options[3],
-            }
+            questionText: formData.surveyQuestion1.text,
+            option1: formData.surveyQuestion1.options[0],
+            option2: formData.surveyQuestion1.options[1],
+            option3: formData.surveyQuestion1.options[2],
+            option4: formData.surveyQuestion1.options[3],
+          }
           : null,
         surveyQuestion2: formData.surveyQuestion2.text
           ? {
-              questionText: formData.surveyQuestion2.text,
-              option1: formData.surveyQuestion2.options[0],
-              option2: formData.surveyQuestion2.options[1],
-              option3: formData.surveyQuestion2.options[2],
-              option4: formData.surveyQuestion2.options[3],
-            }
+            questionText: formData.surveyQuestion2.text,
+            option1: formData.surveyQuestion2.options[0],
+            option2: formData.surveyQuestion2.options[1],
+            option3: formData.surveyQuestion2.options[2],
+            option4: formData.surveyQuestion2.options[3],
+          }
           : null,
         genderType: formData.genderType,
         genderRatio: formData.genderRatio.toString(),
@@ -398,22 +467,20 @@ export function CreateCampaigns({ userId }) {
                 <Link
                   href={`?step=${index}`}
                   className={`gap-1 md:gap-2 h-10 flex items-center justify-center md:justify-start rounded-full text-xs font-medium px-2 md:px-4
-          ${
-            index === currentStep
-              ? "border-blue-600 border bg-white text-gray-600"
-              : "bg-white text-gray-600"
-          }
+          ${index === currentStep
+                      ? "border-blue-600 border bg-white text-gray-600"
+                      : "bg-white text-gray-600"
+                    }
           hover:cursor-pointer transition`}
                 >
                   {index < currentStep ? (
                     <CircleCheck className="w-5 h-5 md:w-6 md:h-6 text-blue-600 shrink-0" />
                   ) : (
                     <CircleDot
-                      className={`w-5 h-5 md:w-6 md:h-6 shrink-0 ${
-                        index === currentStep
-                          ? "text-blue-600"
-                          : "text-gray-300"
-                      }`}
+                      className={`w-5 h-5 md:w-6 md:h-6 shrink-0 ${index === currentStep
+                        ? "text-blue-600"
+                        : "text-gray-300"
+                        }`}
                     />
                   )}
                   <span className="hidden md:inline whitespace-nowrap">

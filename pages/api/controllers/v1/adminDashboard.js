@@ -59,7 +59,6 @@ const getUserLimit = async (req, res) => {
         if (!dashboard) {
             return res.status(404).json({ message: 'Dashboard data not found' });
         }
-        console.log("dashboard", dashboard);
 
         res.status(200).json({ userLimit: dashboard.userLimit });
     } catch (error) {
