@@ -42,6 +42,8 @@ const initialFormData = {
   genderType: "",
   ageRange: [15, 45],
   categories: [],
+  videoUrlId: "",
+  videoUrlIntelligenceStatus: "",
   quizQuestion: {
     text: "",
     options: ["", "", "", ""],
@@ -205,38 +207,101 @@ export default function EditCampaign() {
   const handleFileUpload = useCallback(async (file, type) => {
     if (!file || !type) return;
 
-    const getVideoDuration = (file) => {
-      return new Promise((resolve) => {
-        const video = document.createElement("video");
-        video.preload = "metadata";
-
-        video.onloadedmetadata = function () {
-          window.URL.revokeObjectURL(video.src);
-          const duration = video.duration;
-          resolve(formatDuration(duration));
-        };
-
-        video.src = URL.createObjectURL(file);
-      });
-    };
-
     setIsUploading(true);
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Math.random()}.${fileExt}`;
-    const filePath = `aditt-assets/${type}s/${fileName}`;
+    setUploadProgress(prev => ({ ...prev, [type]: 0 }));
 
-    try {
-      const { data, error } = await supabase.storage
-        .from("aditt")
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: type === "video" ? "video/mp4" : "image/jpeg",
+    if (type === "video") {
+      try {
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const intelUploadPromise = new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/api/routes/v1/videoUploadRoutes?action=upload');
+
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percent = Math.round((event.loaded / event.total) * 50);
+              setUploadProgress(prev => ({ ...prev, [type]: percent }));
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                const data = JSON.parse(xhr.responseText);
+                resolve(data);
+              } catch (e) {
+                reject(new Error('Failed to parse response'));
+              }
+            } else {
+              reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
+          };
+
+          xhr.onerror = () => reject(new Error('Network error'));
+          xhr.send(formData);
         });
 
-      if (error) throw error;
+        const intelligenceData = await intelUploadPromise;
 
-      const { data: { publicUrl } } = supabase.storage.from("aditt").getPublicUrl(filePath);
+        setFormData(prev => ({
+          ...prev,
+          videoUrlIntelligenceStatus: intelligenceData.status,
+          videoUrlId: intelligenceData.videoId,
+        }));
+
+      } catch (error) {
+        console.error("Video intelligence error:", error);
+        setIsUploading(false);
+        toast.error(error.message || "Video processing failed");
+        return null;
+      }
+    }
+
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `aditt-assets/${type}s/${fileName}`;
+
+      const supabaseUploadPromise = new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', `${supabaseUrl}/storage/v1/object/aditt/${filePath}`);
+
+        xhr.setRequestHeader("Authorization", `Bearer ${supabaseKey}`);
+        xhr.setRequestHeader("x-upsert", "false");
+        xhr.setRequestHeader("Content-Type", file.type);
+
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = 50 + Math.round((event.loaded / event.total) * 50);
+            setUploadProgress(prev => ({ ...prev, [type]: percent }));
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const response = JSON.parse(xhr.responseText);
+              resolve(response);
+            } catch (e) {
+              reject(new Error('Failed to parse Supabase response'));
+            }
+          } else {
+            reject(new Error('Supabase upload failed'));
+          }
+        };
+
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.send(file);
+      });
+
+      await supabaseUploadPromise;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("aditt")
+        .getPublicUrl(filePath);
 
       let duration = "";
       if (type === "video") {
@@ -249,15 +314,30 @@ export default function EditCampaign() {
         ...(type === "video" && { videoDuration: duration }),
       }));
 
+      setIsUploading(false);
       return publicUrl;
     } catch (error) {
-      console.error(`Error uploading ${type}:`, error);
-      return null;
-    } finally {
+      console.error("Upload error:", error);
       setIsUploading(false);
-      setUploadProgress((prev) => ({ ...prev, [type]: 0 }));
+      toast.error(error.message || "Upload failed");
+      return null;
     }
   }, []);
+
+    const getVideoDuration = (file) => {
+    return new Promise((resolve) => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+
+      video.onloadedmetadata = function () {
+        window.URL.revokeObjectURL(video.src);
+        const duration = video.duration;
+        resolve(formatDuration(duration));
+      };
+
+      video.src = URL.createObjectURL(file);
+    });
+  };
 
   const formatDuration = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -708,6 +788,8 @@ export default function EditCampaign() {
             handleStepChange={handleStepChange}
             formData={formData}
             setFormData={setFormData}
+            isUploading={isUploading}
+            uploadProgress={uploadProgress}
           />
         )}
 
@@ -716,6 +798,8 @@ export default function EditCampaign() {
             handleStepChange={handleStepChange}
             formData={formData}
             handleQuestionChange={handleQuestionChange}
+            isUploading={isUploading}
+            uploadProgress={uploadProgress}
           />
         )}
 
@@ -725,6 +809,8 @@ export default function EditCampaign() {
             setFormData={setFormData}
             formData={formData}
             handleSubmit={handleSubmit}
+            isUploading={isUploading}
+            uploadProgress={uploadProgress}
           />
         )}
       </div>

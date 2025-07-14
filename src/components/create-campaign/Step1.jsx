@@ -49,7 +49,6 @@ const Step1 = ({
       };
       
       video.onerror = () => {
-        // If we can't get duration, we'll allow it but warn the user
         console.warn("Could not determine video duration");
         resolve(true);
       };

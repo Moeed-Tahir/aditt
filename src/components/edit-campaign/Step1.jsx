@@ -16,6 +16,24 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
         <>
             <div className="min-h-screen px-4 py-8">
                 <div className="max-w-[1200px] w-full mx-auto bg-white rounded-2xl shadow p-8 relative">
+                    {(isUploading && (uploadProgress.video > 0 || uploadProgress.image > 0)) && (
+                        <div className="bg-gray-100 rounded-t-xl md:rounded-t-2xl -mt-4 -mx-4 md:-mt-8 md:-mx-8 mb-4 md:mb-6 p-3">
+                            {uploadProgress.video > 0 && (
+                                <div className="mb-2">
+                                    <div className="flex justify-between text-xs text-gray-700 mb-1">
+                                        <span>Uploading video...</span>
+                                        <span>{uploadProgress.video}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div
+                                            className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                                            style={{ width: `${uploadProgress.video}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                     <div className="flex items-center justify-between mb-8">
                         <div className="w-1/3">
                             <label className="block text-[24px] font-medium">
@@ -39,7 +57,7 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                     formData.websiteLink &&
                                     (formData.videoUrl || formData.videoFile)
                                 ) {
-                                    handleStepChange(1); // Changed from handleStepChange(1) to increment properly
+                                    handleStepChange(1); 
                                 }
                             }}
                             disabled={
@@ -196,15 +214,6 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                                 <Trash />
                                             </button>
                                         </div>
-
-                                        {isUploading && uploadProgress.video > 0 && (
-                                            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                                                <div
-                                                    className="bg-blue-600 h-2.5 rounded-full"
-                                                    style={{ width: `${uploadProgress.video}%` }}
-                                                ></div>
-                                            </div>
-                                        )}
                                     </>
                                 ) : formData.videoUrl ? (
                                     <>
