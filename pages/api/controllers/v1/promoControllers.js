@@ -205,6 +205,7 @@ export const validatePromoCode = async (req, res) => {
 };
 
 export const applyPromoCode = async (req, res) => { 
+  await connectToDatabase();
   const { code } = req.body;
 
   try {
