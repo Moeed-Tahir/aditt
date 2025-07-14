@@ -204,11 +204,12 @@ export const validatePromoCode = async (req, res) => {
   }
 };
 
-export const applyPromoCode = async (req, res) => { 
-  await connectToDatabase();
-  const { code } = req.body;
+export const applyPromoCode = async (req, res) => {
+
 
   try {
+    await connectToDatabase();
+    const { code } = req.body;
     const promo = await PromoCode.findOne({ name: code, status: true });
 
     if (!promo) {

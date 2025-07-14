@@ -224,11 +224,6 @@ export function CreateCampaigns({ userId }) {
           videoUrlId: intelligenceData.videoId,
         }));
 
-        if (intelligenceData.status !== "PASSED") {
-          setIsUploading(false);
-          toast.error(intelligenceData.message || "Video analysis failed");
-          return null;
-        }
       } catch (error) {
         console.error("Video intelligence error:", error);
         setIsUploading(false);
