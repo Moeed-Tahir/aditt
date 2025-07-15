@@ -51,7 +51,7 @@ export default function CampaignActionsDropdown({ campaignId, openDialog, custom
         "Unpause",
         async () => {
           try {
-            await updateCampaignStatus('Pending');
+            await updateCampaignStatus('Active');
             fetchCampaign();
           } catch (error) {
             console.error("Failed to unpause campaign:", error);

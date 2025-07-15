@@ -501,7 +501,8 @@ exports.updateCampaign = async (req, res) => {
 exports.campaignStatusUpdate = async (req, res) => {
     try {
         const { status, id, rejectionReason, to } = req.body;
-
+        console.log("status",status);
+        
         if (!status || !id) {
             return res.status(400).json({
                 success: false,

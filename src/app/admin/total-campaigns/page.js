@@ -21,10 +21,10 @@ export default function TotalCampaigns() {
 
   const fetchAllCampaign = useCallback(async () => {
     try {
-      const response = await axios.post("/api/routes/v1/campaignRoutes?action=getAllCampaign",{
+      const response = await axios.post("/api/routes/v1/campaignRoutes?action=getAllCampaign", {
 
       });
-      
+
       if (response.data.message === "Campaigns retrieved successfully") {
         setTotalCampaign(response.data.data);
       }
@@ -78,10 +78,10 @@ export default function TotalCampaigns() {
       render: (c) => (
         <span
           className={`text-xs font-medium px-3 py-1 rounded-full ${c.status === "Active"
-              ? "bg-green-100 text-green-700"
-              : c.status === "Paused"
-                ? "bg-yellow-100 text-yellow-700"
-                : "bg-blue-100 text-blue-700"
+            ? "bg-green-100 text-green-700"
+            : c.status === "Paused"
+              ? "bg-yellow-100 text-yellow-700"
+              : "bg-blue-100 text-blue-700"
             }`}
         >
           {c.status}
@@ -140,7 +140,7 @@ export default function TotalCampaigns() {
         const response = await axios.post('/api/routes/v1/campaignRoutes?action=campaignStatusUpdate', {
           status,
           id: id || campaign._id,
-          to:Cookies.get("userEmail")
+          to: Cookies.get("userEmail")
         });
 
         if (response.status !== 200) {
@@ -164,37 +164,36 @@ export default function TotalCampaigns() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-  <DropdownMenuItem
-    onClick={() => updateCampaignStatus(
-      campaign.status === 'Active' ? 'Paused' : 
-      campaign.status === 'Paused' ? 'Pending' : 'Active',
-      campaign._id
-    )}
-  >
-    {campaign.status === 'Active' ? (
-      <>
-        <Pause className="h-4 w-4 mr-2" />
-        Pause
-      </>
-    ) : campaign.status === 'Paused' ? (
-      <>
-        <Play className="h-4 w-4 mr-2" />
-        Unpause (Send for Approval)
-      </>
-    ) : (
-      <>
-        <Play className="h-4 w-4 mr-2" />
-        Activate
-      </>
-    )}
-  </DropdownMenuItem>
-  <DropdownMenuItem
-    onClick={() => updateCampaignStatus('Completed', campaign._id)}
-  >
-    <CheckCheck className="h-4 w-4 mr-2" />
-    Mark as Completed
-  </DropdownMenuItem>
-</DropdownMenuContent>
+          <DropdownMenuItem
+            onClick={() => updateCampaignStatus(
+              campaign.status === 'Active' ? 'Paused' : 'Active',
+              campaign._id
+            )}
+          >
+            {campaign.status === 'Active' ? (
+              <>
+                <Pause className="h-4 w-4 mr-2" />
+                Pause
+              </>
+            ) : campaign.status === 'Paused' ? (
+              <>
+                <Play className="h-4 w-4 mr-2" />
+                Unpause
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4 mr-2" />
+                Activate
+              </>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => updateCampaignStatus('Completed', campaign._id)}
+          >
+            <CheckCheck className="h-4 w-4 mr-2" />
+            Mark as Completed
+          </DropdownMenuItem>
+        </DropdownMenuContent>
       </DropdownMenu>
     );
   };

@@ -122,7 +122,7 @@ function AdvertisersProfileContent() {
         const response = await axios.post('/api/routes/v1/campaignRoutes?action=campaignStatusUpdate', {
           status,
           id: id || campaign._id,
-          to:Cookies.get("userEmail")
+          to: Cookies.get("userEmail")
         });
 
         if (response.status !== 200) {
@@ -146,37 +146,36 @@ function AdvertisersProfileContent() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-  <DropdownMenuItem
-    onClick={() => updateCampaignStatus(
-      campaign.status === 'Active' ? 'Paused' : 
-      campaign.status === 'Paused' ? 'Pending' : 'Active',
-      campaign._id
-    )}
-  >
-    {campaign.status === 'Active' ? (
-      <>
-        <Pause className="h-4 w-4 mr-2" />
-        Pause
-      </>
-    ) : campaign.status === 'Paused' ? (
-      <>
-        <Play className="h-4 w-4 mr-2" />
-        Unpause (Send for Approval)
-      </>
-    ) : (
-      <>
-        <Play className="h-4 w-4 mr-2" />
-        Activate
-      </>
-    )}
-  </DropdownMenuItem>
-  <DropdownMenuItem
-    onClick={() => updateCampaignStatus('Completed', campaign._id)}
-  >
-    <CheckCheck className="h-4 w-4 mr-2" />
-    Mark as Completed
-  </DropdownMenuItem>
-</DropdownMenuContent>
+          <DropdownMenuItem
+            onClick={() => updateCampaignStatus(
+              campaign.status === 'Active' ? 'Paused' : 'Active',
+              campaign._id
+            )}
+          >
+            {campaign.status === 'Active' ? (
+              <>
+                <Pause className="h-4 w-4 mr-2" />
+                Pause
+              </>
+            ) : campaign.status === 'Paused' ? (
+              <>
+                <Play className="h-4 w-4 mr-2" />
+                Unpause
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4 mr-2" />
+                Activate
+              </>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => updateCampaignStatus('Completed', campaign._id)}
+          >
+            <CheckCheck className="h-4 w-4 mr-2" />
+            Mark as Completed
+          </DropdownMenuItem>
+        </DropdownMenuContent>
       </DropdownMenu>
     );
   };
