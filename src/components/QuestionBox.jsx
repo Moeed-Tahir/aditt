@@ -9,11 +9,9 @@ function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
   const MAX_OPTION_LENGTH = 25;
 
   const handleOptionChange = (optionIndex, value) => {
-    if (value.length <= MAX_OPTION_LENGTH) {
-      const newOptions = [...question.options];
-      newOptions[optionIndex] = value;
-      onChange({ ...question, options: newOptions });
-    }
+    const newOptions = [...question.options];
+    newOptions[optionIndex] = value;
+    onChange({ ...question, options: newOptions });
   };
 
   const [alert, setAlert] = useState({
@@ -113,11 +111,17 @@ function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
                       className="w-full text-gray-600 bg-white text-sm p-3 border rounded-full"
                       value={opt}
                       onChange={(e) => handleOptionChange(i, e.target.value)}
-                      maxLength={MAX_OPTION_LENGTH}
                     />
                   </div>
-                  <div className="text-xs text-right text-gray-500 mt-1">
+                  <div className={`text-xs text-right mt-1 ${
+                    opt.length > MAX_OPTION_LENGTH ? 'text-red-500' : 'text-gray-500'
+                  }`}>
                     {opt.length}/{MAX_OPTION_LENGTH}
+                    {opt.length > MAX_OPTION_LENGTH && (
+                      <div className="text-red-500 text-xs text-left mt-1">
+                        Answers must be {MAX_OPTION_LENGTH} or less characters
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

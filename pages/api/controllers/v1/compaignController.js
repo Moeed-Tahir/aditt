@@ -520,6 +520,14 @@ exports.campaignStatusUpdate = async (req, res) => {
             });
         }
 
+        if (currentCampaign.videoUrlIntelligenceStatus !== "PASSED") {
+            return res.status(400).json({
+                success: false,
+                message: 'Cannot update status - video not passed',
+                code: 'VIDEO_INTELLIGENCE_CHECK_NOT_PASSED'
+            });
+        }
+
         if (currentCampaign.status === status) {
             return res.status(200).json({
                 success: true,

@@ -9,9 +9,7 @@ function QuestionBox({ question, onChange, isQuiz, name }) {
     const MAX_OPTION_LENGTH = 25;
 
     const handleOptionChange = (optionIndex, value) => {
-        if (value.length <= MAX_OPTION_LENGTH) {
-            onChange("options", value, optionIndex);
-        }
+        onChange("options", value, optionIndex);
     };
 
     const handleAnswerSelect = (answerIndex) => {
@@ -38,6 +36,16 @@ function QuestionBox({ question, onChange, isQuiz, name }) {
         if (emptyOptions.length > 0) {
             setAlert({
                 message: "Please fill in all answer options",
+                type: "error",
+                visible: true,
+            });
+            return false;
+        }
+
+        const longOptions = question.options.filter(opt => opt.length > MAX_OPTION_LENGTH);
+        if (longOptions.length > 0) {
+            setAlert({
+                message: `Answer options cannot exceed ${MAX_OPTION_LENGTH} characters`,
                 type: "error",
                 visible: true,
             });
@@ -114,11 +122,16 @@ function QuestionBox({ question, onChange, isQuiz, name }) {
                                             className="w-full text-gray-600 bg-white text-sm p-3 border rounded-full"
                                             value={opt}
                                             onChange={(e) => handleOptionChange(i, e.target.value)}
-                                            maxLength={MAX_OPTION_LENGTH}
                                         />
                                     </div>
-                                    <div className="text-xs text-right text-gray-500 mt-1">
+                                    <div className={`text-xs text-right mt-1 ${opt.length > MAX_OPTION_LENGTH ? 'text-red-500' : 'text-gray-500'
+                                        }`}>
                                         {opt.length}/{MAX_OPTION_LENGTH}
+                                        {opt.length > MAX_OPTION_LENGTH && (
+                                            <div className="text-red-500 text-xs text-left mt-1">
+                                                Answers must be {MAX_OPTION_LENGTH} or less characters
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             ))}
