@@ -4,11 +4,13 @@ import CampaignFeedback from '../../models/CampaignFeedback';
 import AdminDashboard from '../../models/AdminDashboard.model';
 import Stripe from 'stripe';
 import { getVideoDurationFromUrl } from '../../services/campaignServices';
-import {sendEmail} from '../../services/emailServices';
+import { sendEmail } from '../../services/emailServices';
 import User from '../../models/User.model';
 const dotenv = require("dotenv");
 dotenv.config();
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
+const { Storage } = require('@google-cloud/storage');
+const { MongoClient } = require('mongodb');
 
 exports.createCampaign = async (req, res) => {
     try {
@@ -149,6 +151,14 @@ exports.createCampaign = async (req, res) => {
             data: savedCampaign
         });
 
+        setTimeout(async () => {
+            try {
+                await verifyCampaignVideos();
+            } catch (error) {
+                console.error('Error in scheduled video verification:', error);
+            }
+        }, 10000);
+
     } catch (error) {
         console.error('Campaign creation error:', error);
         res.status(500).json({
@@ -158,6 +168,65 @@ exports.createCampaign = async (req, res) => {
         });
     }
 };
+
+async function verifyCampaignVideos() {
+    let client;
+    try {
+        console.log("---Call----");
+        const storage = new Storage({
+            projectId: 'aditt-app',
+            credentials: {
+                client_email: process.env.GOOGLE_CLIENT_EMAIL || 'aditt-video-chacker@aditt-app.iam.gserviceaccount.com',
+                private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            }
+        });
+        const bucketName = 'aditt-video-tester';
+        const bucket = storage.bucket(bucketName);
+
+        client = await MongoClient.connect(process.env.MONGO_URI);
+        const db = client.db();
+
+        const unverifiedCampaigns = await db.collection('campaigns').find({
+            videoUrlIntelligenceStatus: "FAILED",
+            status: { $ne: "Rejected" }
+        }).toArray();
+
+        for (const campaign of unverifiedCampaigns) {
+            try {
+                await db.collection('campaigns').updateOne(
+                    { _id: campaign._id },
+                    {
+                        $set: {
+                            status: "Rejected",
+                            reason: "Video is Rejected due to not passed by intelligence",
+                            updatedAt: new Date()
+                        }
+                    }
+                );
+
+                if (campaign.videoUrlId) {
+                    try {
+                        const file = bucket.file(campaign.videoUrlId);
+                        const [exists] = await file.exists();
+
+                        if (exists) {
+                            await file.delete();
+                            console.log(`Deleted video ${campaign.videoUrlId} for campaign ${campaign._id}`);
+                        }
+                    } catch (storageError) {
+                        console.error(`Error deleting video ${campaign.videoUrlId} for campaign ${campaign._id}:`, storageError);
+                    }
+                }
+            } catch (campaignError) {
+                console.error(`Error processing campaign ${campaign._id}:`, campaignError);
+            }
+        }
+    } catch (error) {
+        console.error('Error in video verification:', error);
+    } finally {
+        if (client) await client.close();
+    }
+}
 
 exports.getCampaign = async (req, res) => {
     try {
