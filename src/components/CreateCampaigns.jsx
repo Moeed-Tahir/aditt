@@ -43,7 +43,7 @@ export function CreateCampaigns({ userId }) {
     videoDuration: "",
     totalEngagementValue: "",
     genderRatio: 50,
-    genderType: "male",
+    genderType: "Male",
     ageRange: [18, 65],
     genderAge: "12",
     categories: [],
