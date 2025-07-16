@@ -82,8 +82,8 @@ const Step2 = ({ formData, setFormData, values, setValues, isUploading,
                   showRadio={true}
                   labelUnit="%"
                   radioOptions={[
-                    { value: "male", label: "Male" },
-                    { value: "female", label: "Female" },
+                    { value: "Male", label: "Male" },
+                    { value: "Female", label: "Female" },
                   ]}
                   selectedRadio={formData.genderType}
                 />
