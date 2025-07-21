@@ -2,7 +2,7 @@ import React from 'react'
 import Sliders from '../Sliders'
 import { DualRangeSlider } from '../DualSlider'
 
-const Step2 = ({ setFormData, formData,handleStepChange,isUploading, uploadProgress }) => {
+const Step2 = ({ setFormData, formData, handleStepChange, isUploading, uploadProgress }) => {
 
     const handleAgeRangeChange = (newRange) => {
         setFormData(prev => ({
@@ -15,24 +15,40 @@ const Step2 = ({ setFormData, formData,handleStepChange,isUploading, uploadProgr
         <>
             <div className="min-h-screen px-4 py-8">
                 <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-                              {(isUploading && (uploadProgress.video > 0 || uploadProgress.image > 0)) && (
-            <div className="bg-gray-100 rounded-t-xl md:rounded-t-2xl -mt-4 -mx-4 md:-mt-8 md:-mx-8 mb-4 md:mb-6 p-3">
-              {uploadProgress.video > 0 && (
-                <div className="mb-2">
-                  <div className="flex justify-between text-xs text-gray-700 mb-1">
-                    <span>Uploading video...</span>
-                    <span>{uploadProgress.video}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-full rounded-full transition-all duration-300"
-                      style={{ width: `${uploadProgress.video}%` }}
-                    ></div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+                    {(uploadProgress.video > 0 && uploadProgress.video < 100) ||
+                        (uploadProgress.image > 0 && uploadProgress.image < 100) ? (
+                        <div className="bg-gray-100 rounded-t-xl md:rounded-t-2xl -mt-4 -mx-4 md:-mt-8 md:-mx-8 mb-4 md:mb-6 p-3">
+                            {uploadProgress.video > 0 && uploadProgress.video < 100 && (
+                                <div className="mb-2">
+                                    <div className="flex justify-between text-xs text-gray-700 mb-1">
+                                        <span>Uploading video...</span>
+                                        <span>{uploadProgress.video}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div
+                                            className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                                            style={{ width: `${uploadProgress.video}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {uploadProgress.image > 0 && uploadProgress.image < 100 && (
+                                <div className="mb-2">
+                                    <div className="flex justify-between text-xs text-gray-700 mb-1">
+                                        <span>Uploading image...</span>
+                                        <span>{uploadProgress.image}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div
+                                            className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                                            style={{ width: `${uploadProgress.image}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : null}
                     <div className="flex items-center justify-between mb-8">
                         <div className="w-1/3">
                             <label className="block text-[24px] font-medium">

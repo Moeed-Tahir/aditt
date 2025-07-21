@@ -31,11 +31,10 @@ export default function PersonalSettings({
           </p>
         </div>
         <button
-          className={`w-full md:w-[218px] h-[48px] md:h-[56px] text-[14px] md:text-[16px] rounded-full  cursor-pointer hover:bg-blue-700 ${
-            personalEditMode
+          className={`w-full md:w-[218px] h-[48px] md:h-[56px] text-[14px] md:text-[16px] rounded-full  cursor-pointer hover:bg-blue-700 ${personalEditMode
               ? "bg-blue-600 text-white"
               : "bg-gray-200 text-gray-700 hover:text-white"
-          }`}
+            }`}
           onClick={() => {
             if (personalEditMode) updateUserData(false);
             setPersonalEditMode(!personalEditMode);
@@ -82,18 +81,24 @@ export default function PersonalSettings({
                   className="bg-transparent text-sm pl-4 pr-8 py-2 outline-none appearance-none"
                   disabled={!personalEditMode}
                 >
-                  {allCountries.map((country) => {
-                    const flag = country.iso2
-                      .toUpperCase()
-                      .replace(/./g, (char) =>
-                        String.fromCodePoint(127397 + char.charCodeAt(0))
+                  {[...allCountries]
+                    .sort((a, b) => {
+                      if (a.dialCode === "1") return -1; // US/Canada first
+                      if (b.dialCode === "1") return 1;
+                      return 0;
+                    })
+                    .map((country) => {
+                      const flag = country.iso2
+                        .toUpperCase()
+                        .replace(/./g, (char) =>
+                          String.fromCodePoint(127397 + char.charCodeAt(0))
+                        );
+                      return (
+                        <option key={country.iso2} value={country.dialCode}>
+                          {flag} +{country.dialCode}
+                        </option>
                       );
-                    return (
-                      <option key={country.iso2} value={country.dialCode}>
-                        {flag} +{country.dialCode}
-                      </option>
-                    );
-                  })}
+                    })}
                 </select>
                 <ChevronDown className="w-4 h-4 text-gray-500 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />
               </div>

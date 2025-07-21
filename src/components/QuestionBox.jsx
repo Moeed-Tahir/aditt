@@ -7,6 +7,7 @@ import AlertBox from "./AlertBox";
 function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
   const [isExpanded, setIsExpanded] = useState(!question.text);
   const MAX_OPTION_LENGTH = 25;
+  const MAX_QUESTION_LENGTH = 70;
 
   const handleOptionChange = (optionIndex, value) => {
     const newOptions = [...question.options];
@@ -24,6 +25,15 @@ function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
     if (!question.text || !question.text.trim()) {
       setAlert({
         message: "Please enter a question title",
+        type: "error",
+        visible: true,
+      });
+      return false;
+    }
+
+    if (question.text.length > MAX_QUESTION_LENGTH) {
+      setAlert({
+        message: `Question title cannot exceed ${MAX_QUESTION_LENGTH} characters`,
         type: "error",
         visible: true,
       });
@@ -77,14 +87,32 @@ function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
       <div className="bg-white p-3 md:p-4 rounded-[16px] border-1 mb-2 w-full">
         {isExpanded && (
           <>
-            <p className="text-[14px] font-md">Question Title</p>
-            <input
-              type="text"
-              placeholder="Question Title"
-              className="w-full mb-3 p-3 border text-gray-600 text-sm rounded-full"
-              value={question.text}
-              onChange={(e) => onChange({ ...question, text: e.target.value })}
-            />
+            <div className="mb-3">
+              <p className="text-[14px] font-md">Question Title</p>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Question Title"
+                  className="w-full mb-1 p-3 border text-gray-600 text-sm rounded-full"
+                  value={question.text}
+                  onChange={(e) => onChange({ ...question, text: e.target.value })}
+                />
+                <div className="flex justify-between items-end">
+                  <div className="min-h-[20px]">
+                    {question.text.length > MAX_QUESTION_LENGTH && (
+                      <div className="text-red-500 text-xs text-left">
+                        Question must be {MAX_QUESTION_LENGTH} or less characters
+                      </div>
+                    )}
+                  </div>
+                  <div className={`text-xs ${question.text.length > MAX_QUESTION_LENGTH ? 'text-red-500' : 'text-gray-500'
+                    }`}>
+                    {question.text.length}/{MAX_QUESTION_LENGTH}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <p className="text-[14px]">Question Answer</p>
 
             <div className="bg-[var(--bg-color-off-white)] rounded-[16px] p-3 mt-2">
@@ -113,15 +141,18 @@ function QuestionBox({ question, onChange, isQuiz, name, buttonLabel }) {
                       onChange={(e) => handleOptionChange(i, e.target.value)}
                     />
                   </div>
-                  <div className={`text-xs text-right mt-1 ${
-                    opt.length > MAX_OPTION_LENGTH ? 'text-red-500' : 'text-gray-500'
-                  }`}>
-                    {opt.length}/{MAX_OPTION_LENGTH}
-                    {opt.length > MAX_OPTION_LENGTH && (
-                      <div className="text-red-500 text-xs text-left mt-1">
-                        Answers must be {MAX_OPTION_LENGTH} or less characters
-                      </div>
-                    )}
+                  <div className="flex justify-between items-end">
+                    <div className="min-h-[20px]">
+                      {opt.length > MAX_OPTION_LENGTH && (
+                        <div className="text-red-500 text-xs mt-1">
+                          Answer must be {MAX_OPTION_LENGTH} or less characters
+                        </div>
+                      )}
+                    </div>
+                    <div className={`text-xs ${opt.length > MAX_OPTION_LENGTH ? 'text-red-500' : 'text-gray-500'
+                      }`}>
+                      {opt.length}/{MAX_OPTION_LENGTH}
+                    </div>
                   </div>
                 </div>
               ))}

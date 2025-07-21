@@ -1,4 +1,3 @@
-// components/VerifyOTP.jsx
 "use client";
 import React, { useState } from "react";
 import { toast } from "sonner";

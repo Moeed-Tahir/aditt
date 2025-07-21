@@ -7,6 +7,8 @@ export default function LogoutSection() {
   const handleLogout = async () => {
     Cookies.remove("userId");
     Cookies.remove("token");
+    Cookies.remove("userEmail");
+    Cookies.remove("user");
     router.push("/signin-user");
   };
 
