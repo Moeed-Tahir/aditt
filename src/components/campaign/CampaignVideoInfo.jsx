@@ -38,7 +38,7 @@ export const CampaignVideoInfo = ({ campaignData }) => {
           <video
             ref={videoRef}
             src={campaignData?.campaignVideoUrl}
-            controls
+            
             onClick={() => setShowModal(true)} // open modal on click
             className="rounded-lg object-cover w-full md:w-[170px] h-[200px] cursor-pointer"
             onLoadedMetadata={handleLoadedMetadata}
@@ -99,7 +99,7 @@ export const CampaignVideoInfo = ({ campaignData }) => {
           <div className="relative bg-white rounded-lg shadow-lg overflow-hidden max-w-3xl w-full">
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-3 right-3 text-gray-700 hover:text-black z-10"
+              className="absolute top-3 right-3 text-gray-700 hover:text-black z-10 cursor-pointer"
             >
               <X className="w-6 h-6" />
             </button>

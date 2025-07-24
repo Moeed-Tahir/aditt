@@ -81,7 +81,9 @@ export function SignupSidebar() {
         <span className="text-sm text-gray-800">aditt@2025</span>
         <div className="flex items-center gap-2">
           <Mail className="w-4 h-4 text-gray-800" />
-          <span className="text-sm text-gray-800">support@aditt.com</span>
+          <span className="text-sm text-gray-800">
+            supportadvertiser@aditt.app
+          </span>
         </div>
       </div>
     </div>

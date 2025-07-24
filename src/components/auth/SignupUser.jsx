@@ -46,7 +46,7 @@ function SignupUser() {
           password: formData.password,
         }
       );
-            
+
       const data = response.data;
 
       if (response.status === 200 && response.data.code === "OTP_RESENT") {
@@ -139,6 +139,7 @@ function SignupUser() {
               error={errors.website}
               touched={touched.website}
               submitAttempted={submitAttempted}
+              note="Paste business website URL (e.g., https://www.example.com)"
             />
 
             <FormField
