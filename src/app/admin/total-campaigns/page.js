@@ -123,7 +123,6 @@ export default function TotalCampaigns() {
     }
   ];
 
-  // Custom filter options for this page
   const filterOptions = {
     date: true,
     status: true,

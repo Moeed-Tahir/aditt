@@ -9,9 +9,41 @@ import {
 } from "@/components/ui/table"
 import CampaignActionsDropdown from '../campaign/CampaignActionsDropdown'
 import Link from 'next/link'
+import axios from 'axios'
+import { toast } from "sonner";
 
 const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAction, fetchCampaign }) => {
     const showActionColumn = paginatedCampaigns.some(c => c.status !== "Completed")
+
+    const statusBadgeClasses = {
+        Active: "bg-green-100 text-green-700",
+        Pending: "bg-yellow-100 text-yellow-700",
+        Paused: "bg-orange-100 text-orange-700",
+        Completed: "bg-blue-100 text-blue-700",
+        Rejected: "bg-red-100 text-red-700",
+        Draft: "bg-gray-100 text-gray-700",
+        Cancelled: "bg-purple-100 text-purple-700",
+    }
+
+const handleDeleteCampaign = async (campaignId) => {
+        try {
+            const response = await axios.post('/api/routes/v1/campaignRoutes?action=deleteCampaignAgainstId', {
+                campaignId:campaignId
+            });
+            console.log("response",response);
+
+            if (response.status === 200) {
+                toast.success('Campaign deleted successfully');
+                fetchCampaign();
+            } else {
+                throw new Error(response.data.message || 'Failed to delete campaign');
+            }
+        } catch (error) {
+            console.error('Error deleting campaign:', error);
+            toast.error(error?.response?.data?.message || "Error occurred while deleting campaign");
+        }
+    };
+
 
     return (
         <div className="overflow-x-auto">
@@ -52,9 +84,7 @@ const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAc
                                 </TableCell>
                                 <TableCell>
                                     <span className={`text-xs font-medium px-3 py-1 rounded-full ${
-                                        c.status === "Active" ? "bg-green-100 text-green-700" :
-                                        c.status === "Pending" ? "bg-yellow-100 text-yellow-700" :
-                                        "bg-blue-100 text-blue-700"
+                                        statusBadgeClasses[c.status] || "bg-gray-100 text-gray-700"
                                     }`}>
                                         {c.status}
                                     </span>
@@ -67,6 +97,8 @@ const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAc
                                             openDialog={openDialog}
                                             handleAction={handleAction}
                                             fetchCampaign={fetchCampaign}
+                                            status={c.status}
+                                            handleDeleteCampaign={handleDeleteCampaign}
                                         />
                                     </TableCell>
                                 )}

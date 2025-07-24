@@ -71,8 +71,7 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                   Campaign start date (Required)
                 </label>
                 <span className="block text-[16px] text-gray-400 mt-1">
-                  Choose when you want your campaign to go live and start
-                  reaching your audience.
+                  Choose when you want your campaign to go live.
                 </span>
               </div>
               <div className="relative flex-1">
@@ -101,8 +100,7 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                   Campaign end date (Optional)
                 </label>
                 <span className="block text-[16px] text-gray-400 mt-1">
-                  Choose an end date for your campaign or leave it open-ended to
-                  run indefinitely.
+                  Choose an end date or leave it open-ended.
                 </span>
               </div>
 
@@ -155,7 +153,7 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                   Coupon Code
                 </label>
                 <span className="block text-[16px] text-gray-400 mt-1">
-                  Add Coupon code If you have.
+                                Add Coupon code if you have one.
                 </span>
               </div>
 

@@ -147,6 +147,41 @@ export function DataTable({ campaignData, fetchCampaign }) {
     currentPage * itemsPerPage
   );
 
+const getStatusActions = (status) => {
+  switch (status) {
+    case "Active":
+      return [
+        { label: "Edit", action: "edit" },
+        { label: "Pause", action: "pause" },
+        { label: "Mark as Completed", action: "complete" },
+        { label: "Delete", action: "delete" }
+      ];
+    case "Pending":
+      return [
+        { label: "Edit", action: "edit" },
+        { label: "Pause", action: "pause" },
+        { label: "Mark as Completed", action: "complete" },
+        { label: "Delete", action: "delete" }
+      ];
+    case "Paused":
+      return [
+        { label: "Edit", action: "edit" },
+        { label: "Resume", action: "resume" },
+        { label: "Mark as Completed", action: "complete" },
+        { label: "Delete", action: "delete" }
+      ];
+    case "Rejected":
+      return [
+        { label: "Edit", action: "edit" },
+        { label: "Delete", action: "delete" }
+      ];
+    default:
+      return [];
+  }
+};
+
+
+
   const applyFilters = () => {
     setCurrentPage(1);
     setShowFilters(false);

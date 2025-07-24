@@ -1,5 +1,4 @@
 "use client"
-import Link from 'next/link';
 import React from 'react'
 import {
     Copy,
@@ -119,8 +118,7 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                     Campaign Title
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
-                                    Choose a clear and recognizable title to help identify
-                                    your campaign.
+                                    Choose a clear and recognizable title to help identify your campaign.
                                 </span>
                             </div>
                             <div className="relative flex-1">
@@ -143,8 +141,7 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                     Website/Product Link
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
-                                    Add your website or product link. A UTM link will be
-                                    auto-generated for tracking.
+                                    What is your call to action (CTA)? Add your website or product link.
                                 </span>
                             </div>
 
@@ -188,8 +185,8 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                     Campaign Video
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
-                                    Upload your campaign video. For best results, we recommend
-                                    using vertical videos.
+                                    Upload your campaign video (max 100MB, max 30 seconds).
+                                    For best results, we recommend using vertical videos.
                                 </span>
                             </div>
 
@@ -301,10 +298,10 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                         <div className="flex items-start gap-6">
                             <div className="w-1/3">
                                 <label className="block text-[18px] text-gray-800 font-medium">
-                                    Campaign Image (optional)
+                                    Brand Logo
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
-                                    This image will be used as a thumbnail for your campaign.
+                                    This logo will be used as a company logo for your campaign (max 10MB).
                                 </span>
                             </div>
 

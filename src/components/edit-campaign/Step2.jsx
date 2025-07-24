@@ -110,7 +110,7 @@ const Step2 = ({ setFormData, formData, handleStepChange, isUploading, uploadPro
                         <div className="flex items-start gap-6">
                             <div className="w-1/3">
                                 <label className="block text-[18px] text-gray-800 font-medium">
-                                    Age Range
+                                    Age
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
                                     Select the age range of your target audience.

@@ -445,7 +445,8 @@ export default function EditCampaign() {
         totalViews: formData.totalViews || 0,
         impressions: formData.impressions || 0,
         categories: formData.categories || [],
-        videoDuration: formData.videoDuration || "0:00"
+        videoDuration: formData.videoDuration || "0:00",
+        videoUrlIntelligenceStatus:formData.videoUrlIntelligenceStatus
       };
 
       const response = await axios.post(

@@ -212,7 +212,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
             <div className="max-w-6xl mx-auto bg-white rounded-xl md:rounded-2xl shadow p-4 md:p-8 relative">
                 {showProgressSection && (
                     <div className="bg-gray-100 rounded-t-xl md:rounded-t-2xl -mt-4 -mx-4 md:-mt-8 md:-mx-8 mb-4 md:mb-6 p-3">
-                        {/* Video Upload Progress - now shows even if image is complete */}
                         {uploadProgress.video > 0 && (
                             <div className="mb-2">
                                 <div className="flex justify-between text-xs text-gray-700 mb-1">
@@ -231,7 +230,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                             </div>
                         )}
 
-                        {/* Image Upload Progress - now shows even if video is complete */}
                         {uploadProgress.image > 0 && (
                             <div className="mb-2">
                                 <div className="flex justify-between text-xs text-gray-700 mb-1">

@@ -14,12 +14,21 @@ import {
   Pause,
   Play,
   CheckCheck,
+  Trash2,
 } from "lucide-react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { toast } from "sonner";
 
-export default function CampaignActionsDropdown({ campaignId, openDialog, customTrigger, campaignData, handleAction, fetchCampaign }) {
+export default function CampaignActionsDropdown({ 
+  campaignId, 
+  openDialog, 
+  customTrigger, 
+  campaignData, 
+  handleAction, 
+  fetchCampaign,
+  handleDeleteCampaign
+}) {
   const userId = Cookies.get("userId");
   const currentStatus = campaignData?.status;
 
@@ -92,6 +101,27 @@ export default function CampaignActionsDropdown({ campaignId, openDialog, custom
     );
   };
 
+  const handleDelete = () => {
+    openDialog(
+      "Are you sure you want to delete this campaign?",
+      "This action cannot be undone.",
+      "Delete",
+      async () => {
+        try {
+          await handleDeleteCampaign(campaignId);
+          fetchCampaign();
+        } catch (error) {
+          console.error("Failed to delete campaign:", error);
+        }
+      }
+    );
+  };
+
+  const showEdit = ['Active', 'Pending', 'Paused', 'Rejected'].includes(currentStatus);
+  const showPauseUnpause = currentStatus === 'Paused' || currentStatus === 'Active';
+  const showComplete = currentStatus === 'Paused' || currentStatus === 'Active';
+  const showDelete = ['Active', 'Pending', 'Paused', 'Rejected'].includes(currentStatus);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -104,23 +134,25 @@ export default function CampaignActionsDropdown({ campaignId, openDialog, custom
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <Link
-          href={{
-            pathname: `/${userId}/edit-campaign`,
-            query: {
-              id: campaignId,
-              data: JSON.stringify(campaignData)
-            }
-          }}
-          className="w-full"
-        >
-          <DropdownMenuItem>
-            <Pencil className="h-4 w-4 mr-2" />
-            Edit
-          </DropdownMenuItem>
-        </Link>
+        {showEdit && (
+          <Link
+            href={{
+              pathname: `/${userId}/edit-campaign`,
+              query: {
+                id: campaignId,
+                data: JSON.stringify(campaignData)
+              }
+            }}
+            className="w-full"
+          >
+            <DropdownMenuItem>
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit
+            </DropdownMenuItem>
+          </Link>
+        )}
 
-        {currentStatus !== 'Completed' && (
+        {showPauseUnpause && (
           <DropdownMenuItem onClick={handlePauseUnpause}>
             {currentStatus === 'Paused' ? (
               <>
@@ -136,10 +168,19 @@ export default function CampaignActionsDropdown({ campaignId, openDialog, custom
           </DropdownMenuItem>
         )}
 
-        <DropdownMenuItem onClick={handleComplete}>
-          <CheckCheck className="h-4 w-4 mr-2 text-green-600" />
-          Mark as Completed
-        </DropdownMenuItem>
+        {showComplete && (
+          <DropdownMenuItem onClick={handleComplete}>
+            <CheckCheck className="h-4 w-4 mr-2 text-green-600" />
+            Mark as Completed
+          </DropdownMenuItem>
+        )}
+
+        {showDelete && (
+          <DropdownMenuItem onClick={handleDelete}>
+            <Trash2 className="h-4 w-4 mr-2 text-red-600" />
+            Delete
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

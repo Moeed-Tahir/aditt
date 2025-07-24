@@ -849,3 +849,48 @@ exports.getLatestPendingCampaign = async (req, res) => {
         });
     }
 };
+
+exports.deleteCampaignAgainstId = async (req, res) => {
+    try {
+        const { campaignId } = req.body;
+        console.log("req.body",req.body);
+        
+        if (!campaignId) {
+            return res.status(400).json({
+                success: false,
+                message: "Campaign ID is required"
+            });
+        }
+
+        const existingCampaign = await Compaign.findById(campaignId);
+        if (!existingCampaign) {
+            return res.status(404).json({
+                success: false,
+                message: "Campaign not found"
+            });
+        }
+
+        const deletedCampaign = await Compaign.findByIdAndDelete(campaignId);
+
+        if (!deletedCampaign) {
+            return res.status(500).json({
+                success: false,
+                message: "Failed to delete campaign"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Campaign deleted successfully",
+            data: deletedCampaign
+        });
+
+    } catch (error) {
+        console.error("Error deleting campaign:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+}

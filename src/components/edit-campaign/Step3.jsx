@@ -66,7 +66,7 @@ const Step3 = ({ handleQuestionChange, formData, handleStepChange, isUploading, 
                                     Quiz Question
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
-                                    Adit will create if you dont
+                                    This question should confirm the viewer paid attention to your video.
                                 </span>
                             </div>
                             <div className="relative flex-1">
@@ -92,7 +92,7 @@ const Step3 = ({ handleQuestionChange, formData, handleStepChange, isUploading, 
                                     Survey Question 1 (optional)
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
-                                    Adit will NOT create if you dont
+                                    This is a space for you to gather customizable feedback
                                 </span>
                             </div>
                             <div className="relative flex-1">
@@ -118,7 +118,7 @@ const Step3 = ({ handleQuestionChange, formData, handleStepChange, isUploading, 
                                     Survey Question 2 (optional)
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
-                                    Adit will NOT create if you dont
+                                    This is a space for you to gather customizable feedback 
                                 </span>
                             </div>
                             <div className="relative flex-1">
