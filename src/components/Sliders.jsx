@@ -11,7 +11,7 @@ const Sliders = ({
   showRadio,
   labelUnit,
   radioOptions = [],
-  selectedRadio: externalSelectedRadio, // receives "male" or "female"
+  selectedRadio: externalSelectedRadio,
 }) => {
   const [value, setValue] = useState(defaultValue);
   const [selectedRadio, setSelectedRadio] = useState(externalSelectedRadio || "");
@@ -22,7 +22,7 @@ const Sliders = ({
 
   useEffect(() => {
     if (onChange) {
-      onChange(value, selectedRadio); // sync on load too
+      onChange(value, selectedRadio);
     }
   }, [value, selectedRadio]);
 
