@@ -463,6 +463,7 @@ exports.addCountInCampaign = async (req, res) => {
 
 exports.updateCampaign = async (req, res) => {
     try {
+        await connectToDatabase();
         const { id, ...updateData } = req.body;
 
         const campaign = await Compaign.findById(id);
@@ -854,7 +855,7 @@ exports.deleteCampaignAgainstId = async (req, res) => {
     try {
         const { campaignId } = req.body;
         console.log("req.body",req.body);
-        
+
         if (!campaignId) {
             return res.status(400).json({
                 success: false,
