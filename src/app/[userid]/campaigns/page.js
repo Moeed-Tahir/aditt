@@ -17,7 +17,6 @@ const Page = () => {
         const response = await axios.post("/api/routes/v1/campaignRoutes?action=getCampaignAgainstId", {
           id: id
         });
-
         if (response.data.message === "Campaign Retrieved Successfully") {
           setCampaignData(response.data.campaign);
         }

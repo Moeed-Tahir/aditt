@@ -471,6 +471,83 @@ exports.updateCampaign = async (req, res) => {
             return res.status(404).json({ message: 'Campaign not found.' });
         }
 
+        const editableFields = [
+            'genderType',
+            'genderRatio',
+            'ageRange',
+            'campaignTitle',
+            'cardDetail',
+            'bankDetail',
+            'campaignBudget',
+            'campaignStartDate',
+            'campaignEndDate'
+        ];
+
+        const hasNonEditableChanges = (original, updated) => {
+            for (const key in updated) {
+                if (editableFields.includes(key)) continue;
+                
+                if (typeof updated[key] === 'object' && updated[key] !== null && !(updated[key] instanceof Date)) {
+                    if (hasNonEditableChanges(original[key] || {}, updated[key])) {
+                        return true;
+                    }
+                } else if (JSON.stringify(original[key]) !== JSON.stringify(updated[key])) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        const currentDate = new Date();
+        if (updateData.campaignStartDate) {
+            const newStartDate = new Date(updateData.campaignStartDate);
+            if (newStartDate < currentDate && newStartDate.toISOString() !== campaign.campaignStartDate.toISOString()) {
+                return res.status(400).json({ 
+                    message: 'Cannot change start date after campaign has begun.' 
+                });
+            }
+        }
+
+        if (updateData.campaignEndDate) {
+            const newEndDate = new Date(updateData.campaignEndDate);
+            if (newEndDate < currentDate) {
+                return res.status(400).json({ 
+                    message: 'Cannot set end date in the past.' 
+                });
+            }
+        }
+
+        if (updateData.campaignBudget) {
+            if (updateData.campaignBudget < campaign.amountSpent) {
+                return res.status(400).json({ 
+                    message: 'Budget cannot be reduced below the amount already spent.' 
+                });
+            }
+        }
+
+        const logChanges = (original, updated, prefix = '') => {
+            for (const key in updated) {
+                const fullPath = prefix ? `${prefix}.${key}` : key;
+                
+                if (typeof updated[key] === 'object' && updated[key] !== null && !(updated[key] instanceof Date)) {
+                    if (original[key] !== undefined) {
+                        logChanges(original[key], updated[key], fullPath);
+                    } else {
+                        console.log(`New field added: ${fullPath}`, updated[key]);
+                    }
+                } else {
+                    if (original[key] === undefined) {
+                        console.log(`New field added: ${fullPath}`, updated[key]);
+                    } else if (JSON.stringify(original[key]) !== JSON.stringify(updated[key])) {
+                        console.log(`Field changed: ${fullPath}`);
+                        console.log(`- Old value:`, original[key]);
+                        console.log(`- New value:`, updated[key]);
+                    }
+                }
+            }
+        };
+        logChanges(campaign.toObject(), updateData);
+
         if (updateData.quizQuestion && updateData.quizQuestion.optionStats) {
             for (const option of ['option1', 'option2', 'option3', 'option4']) {
                 if (updateData.quizQuestion.optionStats[option]) {
@@ -484,13 +561,20 @@ exports.updateCampaign = async (req, res) => {
             }
         }
 
+        const requiresReapproval = hasNonEditableChanges(campaign.toObject(), updateData);
+
         Object.assign(campaign, updateData);
+
+        if (requiresReapproval) {
+            campaign.status = 'Pending';
+        }
 
         const updatedCampaign = await campaign.save();
 
         res.status(200).json({
             message: 'Campaign updated successfully.',
-            campaign: updatedCampaign
+            campaign: updatedCampaign,
+            requiresReapproval: requiresReapproval
         });
 
     } catch (error) {

@@ -175,6 +175,8 @@ export default function EditCampaign() {
   });
 
   const [formData, setFormData] = useState(initialFormData);
+  console.log("formData",formData);
+
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
     image: 0,
@@ -324,7 +326,7 @@ export default function EditCampaign() {
     }
   }, []);
 
-    const getVideoDuration = (file) => {
+  const getVideoDuration = (file) => {
     return new Promise((resolve) => {
       const video = document.createElement("video");
       video.preload = "metadata";
@@ -374,24 +376,7 @@ export default function EditCampaign() {
           option3: formData.quizQuestion.options[2],
           option4: formData.quizQuestion.options[3],
           answer: formData.quizQuestion.options[formData.quizQuestion.correctAnswer],
-          optionStats: formData.quizQuestion.optionStats || {
-            option1: {
-              demographics: formData.quizQuestion.optionStats?.option1?.demographics,
-              totalCount: formData.quizQuestion.optionStats?.option1?.totalCount
-            },
-            option2: {
-              demographics: formData.quizQuestion.optionStats?.option2?.demographics,
-              totalCount: formData.quizQuestion.optionStats?.option2?.totalCount
-            },
-            option3: {
-              demographics: formData.quizQuestion.optionStats?.option3?.demographics,
-              totalCount: formData.quizQuestion.optionStats?.option3?.totalCount
-            },
-            option4: {
-              demographics: formData.quizQuestion.optionStats?.option4?.demographics,
-              totalCount: formData.quizQuestion.optionStats?.option4?.totalCount
-            }
-          }
+          optionStats: formData.quizQuestion.optionStats
         },
         surveyQuestion1: {
           questionText: formData.surveyQuestion1.text,
@@ -399,12 +384,7 @@ export default function EditCampaign() {
           option2: formData.surveyQuestion1.options[1],
           option3: formData.surveyQuestion1.options[2],
           option4: formData.surveyQuestion1.options[3],
-          optionStats: formData.surveyQuestion1.optionStats || {
-            option1: { totalCount: formData.surveyQuestion1.optionStats?.option1?.totalCount },
-            option2: { totalCount: formData.surveyQuestion1.optionStats?.option2?.totalCount },
-            option3: { totalCount: formData.surveyQuestion1.optionStats?.option3?.totalCount },
-            option4: { totalCount: formData.surveyQuestion1.optionStats?.option4?.totalCount }
-          }
+          optionStats: formData.surveyQuestion1.optionStats
         },
         surveyQuestion2: {
           questionText: formData.surveyQuestion2.text,
@@ -412,19 +392,13 @@ export default function EditCampaign() {
           option2: formData.surveyQuestion2.options[1],
           option3: formData.surveyQuestion2.options[2],
           option4: formData.surveyQuestion2.options[3],
-          optionStats: formData.surveyQuestion2.optionStats || {
-            option1: { totalCount: formData.surveyQuestion2.optionStats?.option1?.totalCount },
-            option2: { totalCount: formData.surveyQuestion2.optionStats?.option2?.totalCount },
-            option3: { totalCount: formData.surveyQuestion2.optionStats?.option3?.totalCount },
-            option4: { totalCount: formData.surveyQuestion2.optionStats?.option4?.totalCount }
-          }
+          optionStats: formData.surveyQuestion2.optionStats
         },
         genderType: formData.genderType,
         genderRatio: formData.genderRatio.toString(),
         ageRange: formData.ageRange,
         campaignStartDate: formData.startDate.toISOString(),
         campaignEndDate: formData.endDate ? formData.endDate.toISOString() : null,
-        status: "Pending",
         cardDetail: {
           ...formData.cardDetail,
           cardNumber: formData.cardNumber,
@@ -440,13 +414,14 @@ export default function EditCampaign() {
           routingNumber: formData.routingNumber,
           accountType: formData.accountType,
         },
-        engagements: formData.engagements || { totalCount: 0 },
-        clickCount: formData.clickCount || { totalCount: 0, dailyCounts: [] },
-        totalViews: formData.totalViews || 0,
-        impressions: formData.impressions || 0,
-        categories: formData.categories || [],
-        videoDuration: formData.videoDuration || "0:00",
-        videoUrlIntelligenceStatus:formData.videoUrlIntelligenceStatus
+        engagements: formData.engagements,
+        clickCount: formData.clickCount ,
+        totalViews: formData.totalViews,
+        impressions: formData.impressions,
+        // categories: formData.categories,
+        // videoDuration: formData.videoDuration,
+        videoUrlIntelligenceStatus: formData.videoUrlIntelligenceStatus,
+        videoUrlId:formData.videoUrlId
       };
 
       const response = await axios.post(
@@ -529,6 +504,8 @@ export default function EditCampaign() {
             videoFile: parsedData.videoFile || {},
             imageFile: parsedData.imageFile || {},
             videoUrl: parsedData.campaignVideoUrl || parsedData.videoUrl || "",
+            videoUrlId: parsedData.videoUrlId || "",
+            videoUrlIntelligenceStatus: parsedData.videoUrlIntelligenceStatus || "",
             imageUrl: parsedData.companyLogo || parsedData.imageUrl || "",
             quizQuestion: {
               text: parsedData.quizQuestion?.text || parsedData.quizQuestion?.questionText || "",
@@ -648,15 +625,15 @@ export default function EditCampaign() {
           setFormData(prev => ({
             ...prev,
             ...transformedData,
+            videoUrlId: parsedData.videoUrlId || "",
+            videoUrlIntelligenceStatus: parsedData.videoUrlIntelligenceStatus || "",
             genderRatio: parseInt(parsedData.genderRatio) || 50,
             genderType: parsedData.genderType || "",
             ageRange: Array.isArray(parsedData.ageRange) ? parsedData.ageRange : [18, 65],
             budget: parseFloat(parsedData.campaignBudget) || parseFloat(parsedData.budget) || 0,
             campignBudget: parseFloat(parsedData.campaignBudget) || 0,
             startDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
-            // endDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || null,
             campaignStartDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
-            // campaignEndDate: parsedData.campaignEndDate ? new Date(parsedData.campaignEndDate) : new Date(parsedData.endDate) || new Date(),
             endDate: endDate || null,
             campaignEndDate: endDate || null,
             createdAt: parsedData.createdAt ? new Date(parsedData.createdAt) : new Date(),
