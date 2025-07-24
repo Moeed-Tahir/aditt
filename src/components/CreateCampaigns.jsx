@@ -217,6 +217,7 @@ export function CreateCampaigns({ userId }) {
         });
 
         const intelligenceData = await intelUploadPromise;
+        console.log("Video intelligence data:", intelligenceData);
 
         setFormData(prev => ({
           ...prev,
