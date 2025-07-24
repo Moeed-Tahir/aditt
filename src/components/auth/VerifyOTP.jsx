@@ -1,6 +1,5 @@
-// components/VerifyOTP.jsx
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { toast } from "sonner";
 import AuthButton from "./AuthButton";
 import IconWithHeading from "./IconWithHeading";
@@ -16,6 +15,7 @@ const VerifyOTP = ({
 }) => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [otpError, setOtpError] = useState(false);
+  const otpInputRefs = useRef([]);
 
   const handleOtpChange = (index, value) => {
     if (!/^\d?$/.test(value)) return;
@@ -23,8 +23,30 @@ const VerifyOTP = ({
     newOtp[index] = value;
     setOtp(newOtp);
     if (value && index < 3) {
-      const nextInput = document.getElementById(`otp-${index + 1}`);
+      const nextInput = otpInputRefs.current[index + 1];
       if (nextInput) nextInput.focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text/plain').replace(/\D/g, '');
+
+    if (pastedData.length > 0 && pastedData.length <= 4) {
+      const newOtp = [...otp];
+
+      for (let i = 0; i < pastedData.length; i++) {
+        if (i < 4) {
+          newOtp[i] = pastedData[i];
+        }
+      }
+
+      setOtp(newOtp);
+
+      const focusIndex = Math.min(pastedData.length - 1, 3);
+      if (otpInputRefs.current[focusIndex]) {
+        otpInputRefs.current[focusIndex].focus();
+      }
     }
   };
 
@@ -63,11 +85,12 @@ const VerifyOTP = ({
                 placeholder="0"
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onFocus={(e) => e.target.select()}
-                className={`w-18 h-18 text-center bg-white border rounded-2xl text-4xl placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary-color)] ${
-                  otpError || error
+                onPaste={handlePaste}
+                ref={(el) => (otpInputRefs.current[index] = el)}
+                className={`w-18 h-18 text-center bg-white border rounded-2xl text-4xl placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary-color)] ${otpError || error
                     ? "border-red-500"
                     : "border-[var(--border-color)]"
-                } ${otpError || otpError ? "text-red-500" : "text-gray-800"}`}
+                  } ${otpError || otpError ? "text-red-500" : "text-gray-800"}`}
                 autoComplete="off"
               />
             ))}

@@ -6,6 +6,8 @@ const { generateOTP, sendOTP } = require("../../services/otpServices");
 const jwt = require("jsonwebtoken");
 const { getConsumerUsersCollection, connectToDatabase } = require("../../config/dbConnect");
 const { MongoClient } = require('mongodb');
+const dotenv = require("dotenv");
+dotenv.config();
 
 export const signUp = async (req, res) => {
     try {
@@ -86,7 +88,6 @@ export const signUp = async (req, res) => {
                 website: newUser.businessWebsite,
             },
             token,
-            isWaitlisted
         });
 
     } catch (error) {
@@ -108,7 +109,7 @@ export const verifyOTP = async (req, res) => {
         await connectToDatabase();
         const { userId, otp } = req.body;
 
-        const user = await User.findById(userId);
+        const user = await User.findOne({ userId });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -149,8 +150,6 @@ export const verifyOTP = async (req, res) => {
             },
             token,
             role: user.role,
-            isActiveUser,
-            isWaitlisted: !isActiveUser
         });
 
     } catch (error) {
@@ -471,12 +470,10 @@ export const resendOTP = async (req, res) => {
             });
         }
 
-        // Generate new OTP
         user.otp = generateOTP();
-        user.otpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
+        user.otpExpires = Date.now() + 5 * 60 * 1000; 
         await user.save();
 
-        // Send OTP to email
         await sendOTP(user.businessEmail, user.otp);
 
         res.status(200).json({

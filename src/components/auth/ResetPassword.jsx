@@ -21,7 +21,7 @@ function ResetPassword() {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
-  const [currentStep, setCurrentStep] = useState("email"); // 'email', 'otp', 'password'
+  const [currentStep, setCurrentStep] = useState("email");
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);

@@ -10,9 +10,10 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
     <>
       <div className="min-h-screen px-4 py-8">
         <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-          {(isUploading && (uploadProgress.video > 0 || uploadProgress.image > 0)) && (
+          {(uploadProgress.video > 0 && uploadProgress.video < 100) ||
+            (uploadProgress.image > 0 && uploadProgress.image < 100) ? (
             <div className="bg-gray-100 rounded-t-xl md:rounded-t-2xl -mt-4 -mx-4 md:-mt-8 md:-mx-8 mb-4 md:mb-6 p-3">
-              {uploadProgress.video > 0 && (
+              {uploadProgress.video > 0 && uploadProgress.video < 100 && (
                 <div className="mb-2">
                   <div className="flex justify-between text-xs text-gray-700 mb-1">
                     <span>Uploading video...</span>
@@ -20,14 +21,29 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                      className="h-full rounded-full bg-blue-600 transition-all duration-300"
                       style={{ width: `${uploadProgress.video}%` }}
                     ></div>
                   </div>
                 </div>
               )}
+
+              {uploadProgress.image > 0 && uploadProgress.image < 100 && (
+                <div className="mb-2">
+                  <div className="flex justify-between text-xs text-gray-700 mb-1">
+                    <span>Uploading image...</span>
+                    <span>{uploadProgress.image}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="h-full rounded-full bg-blue-600 transition-all duration-300"
+                      style={{ width: `${uploadProgress.image}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          ) : null}
           <div className="flex items-center justify-between mb-8">
             <div className="w-1/3">
               <label className="block text-[24px] font-medium">
@@ -94,7 +110,6 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                 <Calendars
                   selected={formData.endDate}
                   onSelect={(date) => {
-                    // Always set to null if date is not selected
                     setFormData((prev) => ({
                       ...prev,
                       endDate: date || null,
@@ -130,13 +145,6 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                   placeholder="Enter campaign budget"
                   className="w-full h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
                 />
-                {/* {formData.budget && formData.videoDuration && (
-                                    <div className="mt-2 text-sm text-gray-500">
-                                        With a ${formData.budget} budget for your{" "}
-                                        {formData.videoDuration}-second video, you will reach
-                                        approximately {formData.campignBudget} unique users.
-                                    </div>
-                                )} */}
               </div>
             </div>
             <hr className="border-t mb-4 border-gray-300" />

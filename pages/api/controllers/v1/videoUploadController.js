@@ -39,7 +39,8 @@ export const uploadAndAnalyzeVideo = async (req, res) => {
     const [result] = await operation.promise();
 
     const passed = evaluateVideo(result);
-
+    console.log("Passed", passed);
+    
     return res.status(200).json({
       status: passed ? "PASSED" : "FAILED",
       videoId: fileName,
@@ -47,6 +48,7 @@ export const uploadAndAnalyzeVideo = async (req, res) => {
         duration: `${result.annotationResults[0].segment.endTimeOffset.seconds}s`,
         labels: extractTopLabels(result),
         explicitContent: checkExplicitContent(result),
+        violentContent: checkForViolentContent(result),
         shots: result.annotationResults[0].shotAnnotations.length
       },
       rawData: result
@@ -63,33 +65,42 @@ export const uploadAndAnalyzeVideo = async (req, res) => {
 };
 
 function evaluateVideo(analysisResult) {
-  const { safe } = checkExplicitContent(analysisResult);
-  if (!safe) return false;
+  const { safe: isExplicitContentSafe } = checkExplicitContent(analysisResult);
+  if (!isExplicitContentSafe) return false;
 
-  const hasRequiredLabels = analysisResult.annotationResults[0].segmentLabelAnnotations.some(
-    label => label.entity.description.toLowerCase() === 'tutorial' &&
-      label.segments[0].confidence > 0.5
-  );
+  const { hasViolentContent } = checkForViolentContent(analysisResult);
+  if (hasViolentContent) return false;
 
-  const duration = parseFloat(analysisResult.annotationResults[0].segment.endTimeOffset.seconds);
-  const meetsDuration = duration >= 10;
-
-  return hasRequiredLabels && meetsDuration;
+  return true;
 }
 
-function extractTopLabels(analysisResult, count = 5) {
-  return analysisResult.annotationResults[0].segmentLabelAnnotations
-    .sort((a, b) => b.segments[0].confidence - a.segments[0].confidence)
-    .slice(0, count)
-    .map(label => ({
+function checkForViolentContent(analysisResult) {
+  const violentKeywords = [
+    'blood', 'gore', 'violence', 'wound', 'injury', 'bleeding',
+    'bloody', 'bloodshed', 'hemorrhage', 'gun', 'weapon', 'fight',
+    'stab', 'shoot', 'murder', 'death', 'corpse'
+  ];
+
+  const violentLabels = analysisResult.annotationResults[0]?.segmentLabelAnnotations?.filter(
+    label => {
+      const description = label.entity.description.toLowerCase();
+      return violentKeywords.some(keyword => description.includes(keyword)) && 
+             label.segments[0].confidence > 0.5;
+    }
+  ) || [];
+
+  return {
+    hasViolentContent: violentLabels.length > 0,
+    detectedLabels: violentLabels.map(label => ({
       label: label.entity.description,
       confidence: label.segments[0].confidence
-    }));
+    }))
+  };
 }
 
 function checkExplicitContent(analysisResult) {
   if (!analysisResult.annotationResults[0]?.explicitAnnotation?.frames) {
-    return { safe: false, worstCase: 'UNKNOWN' };
+    return { safe: true, worstCase: 'UNKNOWN' }; 
   }
 
   const frames = analysisResult.annotationResults[0].explicitAnnotation.frames;
@@ -104,4 +115,14 @@ function checkExplicitContent(analysisResult) {
     safe: worstCase === 'VERY_UNLIKELY' || worstCase === 'UNLIKELY',
     worstCase
   };
+}
+
+function extractTopLabels(analysisResult, count = 5) {
+  return analysisResult.annotationResults[0].segmentLabelAnnotations
+    ?.sort((a, b) => b.segments[0].confidence - a.segments[0].confidence)
+    ?.slice(0, count)
+    ?.map(label => ({
+      label: label.entity.description,
+      confidence: label.segments[0].confidence
+    })) || [];
 }
