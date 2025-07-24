@@ -160,7 +160,7 @@ export function CreateCampaigns({ userId }) {
       } catch (error) {
         console.error("Video intelligence error:", error);
         setIsUploading(false);
-        toast.error(error.message || "Video processing failed");
+        toast.error("Failed to Upload Video Kindly Try Again");
         return null;
       }
     }
@@ -222,9 +222,8 @@ export function CreateCampaigns({ userId }) {
       setIsUploading(false);
       return publicUrl;
     } catch (error) {
-      console.error("Upload error:", error);
       setIsUploading(false);
-      toast.error(error.message || "Upload failed");
+      toast.error("Failed to Upload Video Kindly Try Again");
       return null;
     }
   }, []);
