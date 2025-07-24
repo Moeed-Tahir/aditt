@@ -31,6 +31,7 @@ export function CreateCampaigns({ userId }) {
   const currentStep = parseInt(searchParams.get("step") || "0");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [values, setValues] = useState([13, 25]);
+  const [showBackConfirmation, setShowBackConfirmation] = useState(false);
 
   const [formData, setFormData] = useState({
     brandName: "",
@@ -107,75 +108,6 @@ export function CreateCampaigns({ userId }) {
     });
   };
 
-  // const handleFileUpload = useCallback(async (file, type) => {
-  //   if (!file || !type) return;
-
-  //   setIsUploading(true);
-  //   const fileExt = file.name.split(".").pop();
-  //   const fileName = `${Math.random()}.${fileExt}`;
-  //   const filePath = `aditt-assets/${type}s/${fileName}`;
-
-  //   try {
-  //     // Create a FormData object
-  //     const formData = new FormData();
-  //     formData.append('file', file);
-
-  //     // Create XMLHttpRequest for progress tracking
-  //     const xhr = new XMLHttpRequest();
-
-  //     // Set up progress event
-  //     xhr.upload.onprogress = (event) => {
-  //       if (event.lengthComputable) {
-  //         const progressPercentage = Math.round((event.loaded / event.total) * 100);
-  //         setUploadProgress((prev) => ({
-  //           ...prev,
-  //           [type]: progressPercentage,
-  //         }));
-  //       }
-  //     };
-
-  //     // Make the request to Supabase's upload endpoint
-  //     const promise = new Promise((resolve, reject) => {
-  //       xhr.onload = () => {
-  //         if (xhr.status >= 200 && xhr.status < 300) {
-  //           resolve(xhr.response);
-  //         } else {
-  //           reject(new Error('Upload failed'));
-  //         }
-  //       };
-  //       xhr.onerror = () => reject(new Error('Upload failed'));
-
-  //       xhr.open('POST', `${supabaseUrl}/storage/v1/object/aditt/${filePath}`);
-  //       xhr.setRequestHeader('Authorization', `Bearer ${supabaseKey}`);
-  //       xhr.setRequestHeader('Content-Type', file.type);
-  //       xhr.setRequestHeader('x-upsert', 'false');
-  //       xhr.send(formData);
-  //     });
-
-  //     await promise;
-
-  //     const { data: { publicUrl } } = supabase.storage.from("aditt").getPublicUrl(filePath);
-
-  //     let duration = "";
-  //     if (type === "video") {
-  //       duration = await getVideoDuration(file);
-  //     }
-
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       [`${type}Url`]: publicUrl,
-  //       ...(type === "video" && { videoDuration: duration }),
-  //     }));
-
-  //     return publicUrl;
-  //   } catch (error) {
-  //     console.error(`Error uploading ${type}:`, error);
-  //     return null;
-  //   } finally {
-  //     setIsUploading(false);
-  //   }
-  // }, []);
-
   const handleFileUpload = useCallback(async (file, type) => {
     if (!file || !type) return;
 
@@ -184,7 +116,7 @@ export function CreateCampaigns({ userId }) {
 
     if (type === "video") {
       try {
-        
+
         const formData = new FormData();
         formData.append('file', file);
 
@@ -441,13 +373,13 @@ export function CreateCampaigns({ userId }) {
         {/* Stepper */}
         <div className="max-w-6xl mx-auto">
           <div className="relative flex items-center mb-6 md:mb-10 justify-between">
-            <Link
-              href={`/${userId}/campaign-dashboard`}
+            <button
+              onClick={() => setShowBackConfirmation(true)}
               className="py-2 px-4 md:px-5 md:ml-5 rounded-full bg-white text-gray-700 hover:bg-blue-600 hover:text-white transition flex items-center gap-2 text-sm md:text-base"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden md:inline">Back</span>
-            </Link>
+            </button>
             <div className="absolute left-1/2 transform -translate-x-1/2 text-center text-gray-800 font-md text-lg md:text-[24px]">
               Create Campaigns
             </div>
@@ -559,6 +491,50 @@ export function CreateCampaigns({ userId }) {
                 >
                   Back to campaigns
                 </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showBackConfirmation && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-6 max-w-md w-full mx-4">
+              <div className="text-center">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                  <svg
+                    className="h-6 w-6 text-red-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Unsaved Changes
+                </h3>
+                <p className="text-gray-500 text-sm mb-6">
+                  Your campaign data will be lost if you leave this page. Are you sure you want to continue?
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowBackConfirmation(false)}
+                    className="flex-1 py-2 px-4 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Cancel
+                  </button>
+                  <Link
+                    href={`/${userId}/campaign-dashboard`}
+                    className="flex-1 py-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  >
+                    Leave Page
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

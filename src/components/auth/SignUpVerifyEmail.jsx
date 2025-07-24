@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -23,12 +23,14 @@ function SignUpVerifyEmail() {
   const [otpError, setOtpError] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const [loading, setLoading] = useState(false);
+  const otpInputRefs = useRef([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (otp.some((digit) => !digit)) {
       toast.error("Please enter all 4 digits of the OTP.");
+      setOtpError(true);
       return;
     }
 
@@ -67,9 +69,27 @@ function SignUpVerifyEmail() {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
+    setOtpError(false);
     if (value && index < 3) {
-      const nextInput = document.getElementById(`otp-${index + 1}`);
+      const nextInput = otpInputRefs.current[index + 1];
       if (nextInput) nextInput.focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text/plain').replace(/\D/g, '');
+    
+    if (pastedData.length === 4) {
+      const newOtp = pastedData.split('').slice(0, 4);
+      setOtp(newOtp);
+      setOtpError(false);
+      
+      const lastInput = otpInputRefs.current[3];
+      if (lastInput) lastInput.focus();
+    } else if (pastedData.length > 0) {
+      toast.error("Please paste exactly 4 digits");
+      setOtpError(true);
     }
   };
 
@@ -90,7 +110,7 @@ function SignUpVerifyEmail() {
 
       if (response.data.message === "OTP resent successfully") {
         toast.success("New OTP has been sent to your email.");
-        setResendTimer(30); // Set timer for 30 seconds
+        setResendTimer(30);
       } else {
         toast.error("Failed to resend OTP. Please try again.");
       }
@@ -136,7 +156,7 @@ function SignUpVerifyEmail() {
             />
 
             <form
-              className="flex flex-col gap-6 text-center"
+              className="flex flex-col gap-6 text-center w-full"
               onSubmit={handleSubmit}
             >
               <div className="flex flex-col gap-2">
@@ -153,12 +173,13 @@ function SignUpVerifyEmail() {
                       placeholder="0"
                       onChange={(e) => handleOtpChange(index, e.target.value)}
                       onFocus={(e) => e.target.select()}
+                      onPaste={handlePaste}
+                      ref={(el) => (otpInputRefs.current[index] = el)}
                       className={`w-18 h-18 text-center bg-white border rounded-2xl text-4xl placeholder:text-gray-400 focus:outline-none focus:border-[var(--primary-color)] ${
                         otpError
                           ? "border-red-500"
                           : "border-[var(--border-color)]"
                       }
-                      
                       ${otpError ? "text-red-500" : "text-gray-800"}`}
                       autoComplete="off"
                     />

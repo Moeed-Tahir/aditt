@@ -22,57 +22,6 @@ const CampaignDataTable = ({ setDateFilter,setStatusFilter,currentPage, fetchCam
             ALL CAMPAIGNS
           </h2>
           <div className="flex flex-col sm:flex-row gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex rounded-full hover:text-white hover:bg-blue-600 text-blue-600 font-md text-[16px] items-center gap-1 w-full sm:w-auto"
-                >
-                  Sort by
-                  <div>
-                    <ChevronsUpDown className="w-4 h-4" />
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuItem onSelect={() => setSortBy("a_z")}>
-                  A to Z
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setSortBy("z_a")}>
-                  Z to A
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => setSortBy("views_high_low")}
-                >
-                  Views (Highest to Lowest)
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => setSortBy("views_low_high")}
-                >
-                  Views (Lowest to Highest)
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => setSortBy("amount_high_low")}
-                >
-                  Amount (Highest to Lowest)
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => setSortBy("amount_low_high")}
-                >
-                  Amount (Lowest to Highest)
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => setSortBy("date_new_old")}
-                >
-                  Date (Newest to Oldest)
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => setSortBy("date_old_new")}
-                >
-                  Date (Oldest to Newest)
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
