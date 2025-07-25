@@ -37,6 +37,18 @@ export default function TotalCampaigns() {
     fetchAllCampaign();
   }, [fetchAllCampaign]);
 
+  const formatWebsiteLink = (url) => {
+    if (!url) return "";
+    
+    let formatted = url
+      .replace(/^(https?:\/\/)?(www\.)?/, "")
+      .replace(/\/$/, ""); 
+      
+    return formatted.length > 20 
+      ? `${formatted.substring(0, 20)}...` 
+      : formatted;
+  };
+
   const columns = [
     {
       label: "ADVERTISERS",
@@ -53,7 +65,7 @@ export default function TotalCampaigns() {
               {campaign.campaignTitle}
             </Link>
             <div className="text-xs text-gray-500">
-              {campaign.websiteLink}
+              {formatWebsiteLink(campaign.websiteLink)}
             </div>
           </div>
         </div>
@@ -63,6 +75,16 @@ export default function TotalCampaigns() {
     {
       label: "LINK",
       key: "websiteLink",
+      render: (campaign) => (
+        <a 
+          href={campaign.websiteLink?.startsWith('http') ? campaign.websiteLink : `https://${campaign.websiteLink}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline"
+        >
+          {formatWebsiteLink(campaign.websiteLink)}
+        </a>
+      ),
     },
     { label: "VIEWS", key: "totalViews", render: (u) => `${u.totalViews}` },
     {
