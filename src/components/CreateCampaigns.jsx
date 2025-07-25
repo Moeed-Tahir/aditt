@@ -375,7 +375,7 @@ export function CreateCampaigns({ userId }) {
           <div className="relative flex items-center mb-6 md:mb-10 justify-between">
             <button
               onClick={() => setShowBackConfirmation(true)}
-              className="py-2 px-4 md:px-5 md:ml-5 rounded-full bg-white text-gray-700 hover:bg-blue-600 hover:text-white transition flex items-center gap-2 text-sm md:text-base"
+              className="py-2 px-4 md:px-5 md:ml-5 rounded-full bg-white text-gray-700 hover:bg-blue-600 hover:text-white transition flex items-center gap-2 text-sm md:text-base  cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden md:inline">Back</span>
@@ -521,16 +521,16 @@ export function CreateCampaigns({ userId }) {
                 <p className="text-gray-500 text-sm mb-6">
                   Your campaign data will be lost if you leave this page. Are you sure you want to continue?
                 </p>
-                <div className="flex gap-3">
+                <div className="flex gap-3 items-center justify-center">
                   <button
                     onClick={() => setShowBackConfirmation(false)}
-                    className="flex-1 py-2 px-4 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="bg-gray-50 text-gray-700 rounded-full hover:bg-gray-100 transition text-sm w-full text-nowrap h-[52px] flex items-center justify-center  cursor-pointer"
                   >
                     Cancel
                   </button>
                   <Link
                     href={`/${userId}/campaign-dashboard`}
-                    className="flex-1 py-2 px-4 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    className="bg-red-600 text-white rounded-full hover:bg-red-700 transition text-sm w-full text-nowrap h-[52px] flex items-center justify-center cursor-pointer"
                   >
                     Leave Page
                   </Link>
