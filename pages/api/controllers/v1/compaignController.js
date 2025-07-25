@@ -14,7 +14,7 @@ const { MongoClient } = require('mongodb');
 
 exports.createCampaign = async (req, res) => {
     try {
-        
+
         await connectToDatabase();
 
         const {
@@ -486,7 +486,7 @@ exports.updateCampaign = async (req, res) => {
         const hasNonEditableChanges = (original, updated) => {
             for (const key in updated) {
                 if (editableFields.includes(key)) continue;
-                
+
                 if (typeof updated[key] === 'object' && updated[key] !== null && !(updated[key] instanceof Date)) {
                     if (hasNonEditableChanges(original[key] || {}, updated[key])) {
                         return true;
@@ -502,8 +502,8 @@ exports.updateCampaign = async (req, res) => {
         if (updateData.campaignStartDate) {
             const newStartDate = new Date(updateData.campaignStartDate);
             if (newStartDate < currentDate && newStartDate.toISOString() !== campaign.campaignStartDate.toISOString()) {
-                return res.status(400).json({ 
-                    message: 'Cannot change start date after campaign has begun.' 
+                return res.status(400).json({
+                    message: 'Cannot change start date after campaign has begun.'
                 });
             }
         }
@@ -511,16 +511,16 @@ exports.updateCampaign = async (req, res) => {
         if (updateData.campaignEndDate) {
             const newEndDate = new Date(updateData.campaignEndDate);
             if (newEndDate < currentDate) {
-                return res.status(400).json({ 
-                    message: 'Cannot set end date in the past.' 
+                return res.status(400).json({
+                    message: 'Cannot set end date in the past.'
                 });
             }
         }
 
         if (updateData.campaignBudget) {
             if (updateData.campaignBudget < campaign.amountSpent) {
-                return res.status(400).json({ 
-                    message: 'Budget cannot be reduced below the amount already spent.' 
+                return res.status(400).json({
+                    message: 'Budget cannot be reduced below the amount already spent.'
                 });
             }
         }
@@ -528,15 +528,15 @@ exports.updateCampaign = async (req, res) => {
         const logChanges = (original, updated, prefix = '') => {
             for (const key in updated) {
                 const fullPath = prefix ? `${prefix}.${key}` : key;
-                
+
                 if (typeof updated[key] === 'object' && updated[key] !== null && !(updated[key] instanceof Date)) {
-                    if (original[key] !== undefined) {
+                    if (original && original[key] !== undefined && original[key] !== null) {
                         logChanges(original[key], updated[key], fullPath);
                     } else {
                         console.log(`New field added: ${fullPath}`, updated[key]);
                     }
                 } else {
-                    if (original[key] === undefined) {
+                    if (original === null || original[key] === undefined) {
                         console.log(`New field added: ${fullPath}`, updated[key]);
                     } else if (JSON.stringify(original[key]) !== JSON.stringify(updated[key])) {
                         console.log(`Field changed: ${fullPath}`);
@@ -546,6 +546,7 @@ exports.updateCampaign = async (req, res) => {
                 }
             }
         };
+
         logChanges(campaign.toObject(), updateData);
 
         if (updateData.quizQuestion && updateData.quizQuestion.optionStats) {
@@ -566,7 +567,9 @@ exports.updateCampaign = async (req, res) => {
         Object.assign(campaign, updateData);
 
         if (requiresReapproval) {
-            campaign.status = 'Pending';
+            if (!['Active', 'Paused'].includes(campaign.status)) {
+                campaign.status = 'Pending';
+            }
         }
 
         const updatedCampaign = await campaign.save();
@@ -586,7 +589,7 @@ exports.updateCampaign = async (req, res) => {
 exports.campaignStatusUpdate = async (req, res) => {
     try {
         const { status, id, rejectionReason, to } = req.body;
-        
+
         if (!status || !id) {
             return res.status(400).json({
                 success: false,

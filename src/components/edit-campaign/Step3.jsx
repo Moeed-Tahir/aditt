@@ -2,6 +2,7 @@ import React from 'react'
 import QuestionBox from "./QuestionBox";
 
 const Step3 = ({ handleQuestionChange, formData, handleStepChange, isUploading, uploadProgress }) => {
+    const isDisabled = formData.status === "Active" || formData.status === "Paused";
 
     return (
         <>
@@ -73,7 +74,7 @@ const Step3 = ({ handleQuestionChange, formData, handleStepChange, isUploading, 
                                 <QuestionBox
                                     question={formData.quizQuestion}
                                     onChange={(field, value, optionIndex) =>
-                                        handleQuestionChange(
+                                        !isDisabled && handleQuestionChange(
                                             "quizQuestion",
                                             field,
                                             value,
@@ -82,6 +83,7 @@ const Step3 = ({ handleQuestionChange, formData, handleStepChange, isUploading, 
                                     }
                                     isQuiz={true}
                                     name="quizQuestion"
+                                    disabled={isDisabled}
                                 />
                             </div>
                         </div>
@@ -99,7 +101,7 @@ const Step3 = ({ handleQuestionChange, formData, handleStepChange, isUploading, 
                                 <QuestionBox
                                     question={formData.surveyQuestion1}
                                     onChange={(field, value, optionIndex) =>
-                                        handleQuestionChange(
+                                        !isDisabled && handleQuestionChange(
                                             "surveyQuestion1",
                                             field,
                                             value,
@@ -108,6 +110,7 @@ const Step3 = ({ handleQuestionChange, formData, handleStepChange, isUploading, 
                                     }
                                     isQuiz={false}
                                     name="surveyQuestion1"
+                                    disabled={isDisabled}
                                 />
                             </div>
                         </div>
@@ -118,14 +121,14 @@ const Step3 = ({ handleQuestionChange, formData, handleStepChange, isUploading, 
                                     Survey Question 2 (optional)
                                 </label>
                                 <span className="block text-[16px] text-gray-400 mt-1">
-                                    This is a space for you to gather customizable feedback 
+                                    This is a space for you to gather customizable feedback
                                 </span>
                             </div>
                             <div className="relative flex-1">
                                 <QuestionBox
                                     question={formData.surveyQuestion2}
                                     onChange={(field, value, optionIndex) =>
-                                        handleQuestionChange(
+                                        !isDisabled && handleQuestionChange(
                                             "surveyQuestion2",
                                             field,
                                             value,
@@ -134,6 +137,7 @@ const Step3 = ({ handleQuestionChange, formData, handleStepChange, isUploading, 
                                     }
                                     isQuiz={false}
                                     name="surveyQuestion2"
+                                    disabled={isDisabled}
                                 />
                             </div>
                         </div>

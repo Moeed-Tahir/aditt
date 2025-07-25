@@ -368,7 +368,7 @@ export default function EditCampaign() {
         campaignVideoUrl: formData.videoUrl,
         companyLogo: formData.imageUrl,
         userId: userId,
-        couponCode: formData.couponCode,
+        couponCode: formData.couponCode || null,
         quizQuestion: {
           questionText: formData.quizQuestion.text,
           option1: formData.quizQuestion.options[0],

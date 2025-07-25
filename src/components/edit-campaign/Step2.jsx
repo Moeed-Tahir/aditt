@@ -2,8 +2,8 @@ import React from 'react'
 import Sliders from '../Sliders'
 import { DualRangeSlider } from '../DualSlider'
 
-const Step2 = ({ setFormData, formData, handleStepChange, isUploading, uploadProgress }) => {
-    console.log("formData",formData);
+const Step2 = ({ setFormData, formData, handleStepChange, uploadProgress }) => {
+    console.log("formData", formData);
 
     const handleAgeRangeChange = (newRange) => {
         setFormData(prev => ({
@@ -99,8 +99,8 @@ const Step2 = ({ setFormData, formData, handleStepChange, isUploading, uploadPro
                                     showRadio={true}
                                     labelUnit="%"
                                     radioOptions={[
-                                        { value: "male", label: "Male" },
-                                        { value: "female", label: "Female" },
+                                        { value: "Male", label: "Male" },
+                                        { value: "Female", label: "Female" },
                                     ]}
                                 />
                             </div>
@@ -123,7 +123,7 @@ const Step2 = ({ setFormData, formData, handleStepChange, isUploading, uploadPro
                                     <DualRangeSlider
                                         min={0}
                                         max={100}
-                                        value={formData.ageRange || [18, 65]}
+                                        value={formData.ageRange}
                                         onValueChange={handleAgeRangeChange}
                                         label={(value) => `${value}`}
                                         labelPosition="top"

@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 
 const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handleFileChange, handleStepChange }) => {
+    const isDisabled = formData.status === "Active" || formData.status === "Paused";
+
     return (
         <>
             <div className="min-h-screen px-4 py-8">
@@ -62,25 +64,19 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
 
                         <button
                             className={`bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${!formData.campaignTitle ||
-                                !formData.websiteLink ||
-                                (!formData.videoUrl && !formData.videoFile)
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
+                                    !formData.websiteLink ||
+                                    (!formData.videoUrl && !formData.videoFile)
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : ""
                                 }`}
                             onClick={() => {
                                 if (
                                     formData.campaignTitle &&
                                     formData.websiteLink &&
-                                    (formData.videoUrl || formData.videoFile)
-                                ) {
+                                    (formData.videoUrl || formData.videoFile)                                ) {
                                     handleStepChange(1);
                                 }
                             }}
-                            disabled={
-                                !formData.campaignTitle ||
-                                !formData.websiteLink ||
-                                (!formData.videoUrl && !formData.videoFile)
-                            }
                         >
                             Next
                         </button>
@@ -106,7 +102,8 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                     value={formData.brandName}
                                     onChange={handleInputChange}
                                     placeholder="Reebok promotion"
-                                    className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
+                                    className={`w-full border border-gray-300 rounded-full pl-10 pr-4 py-2 ${isDisabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                                    disabled={isDisabled}
                                 />
                             </div>
                         </div>
@@ -154,7 +151,8 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                         value={formData.websiteLink}
                                         onChange={handleInputChange}
                                         placeholder="https://shop.app/"
-                                        className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2"
+                                        className={`w-full border border-gray-300 rounded-full pl-10 pr-4 py-2 ${isDisabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                                        disabled={isDisabled}
                                     />
                                 </div>
 
@@ -163,7 +161,7 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                         {formData.websiteLink || "https://www.example.com"}
                                     </p>
 
-                                    {formData.websiteLink && (
+                                    {formData.websiteLink && !isDisabled && (
                                         <button
                                             onClick={() =>
                                                 navigator.clipboard.writeText(formData.websiteLink)
@@ -210,19 +208,21 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                                 </span>
                                             </div>
 
-                                            <button
-                                                onClick={() =>
-                                                    handleInputChange({
-                                                        target: {
-                                                            name: "videoFile",
-                                                            value: null
-                                                        }
-                                                    })
-                                                }
-                                                className="text-red-500 ml-auto"
-                                            >
-                                                <Trash />
-                                            </button>
+                                            {!isDisabled && (
+                                                <button
+                                                    onClick={() =>
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: "videoFile",
+                                                                value: null
+                                                            }
+                                                        })
+                                                    }
+                                                    className="text-red-500 ml-auto"
+                                                >
+                                                    <Trash />
+                                                </button>
+                                            )}
                                         </div>
                                     </>
                                 ) : formData.videoUrl ? (
@@ -244,37 +244,41 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                                     View Video
                                                 </a>
                                             </div>
-                                            <button
-                                                onClick={() => {
-                                                    handleInputChange({
-                                                        target: {
-                                                            name: "videoUrl",
-                                                            value: ""
-                                                        }
-                                                    });
-                                                }}
-                                                className="text-red-500 ml-auto"
-                                            >
-                                                <Trash />
-                                            </button>
+                                            {!isDisabled && (
+                                                <button
+                                                    onClick={() => {
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: "videoUrl",
+                                                                value: ""
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="text-red-500 ml-auto"
+                                                >
+                                                    <Trash />
+                                                </button>
+                                            )}
                                         </div>
-                                        <div className="mt-4 border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
-                                            <label className="cursor-pointer">
-                                                <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
-                                                <p className="text-sm text-gray-700 mb-1">
-                                                    Upload new video
-                                                </p>
-                                                <p className="text-xs text-gray-500">Format: mp4, mov</p>
-                                                <input
-                                                    type="file"
-                                                    accept="video/mp4,video/quicktime"
-                                                    onChange={(e) => handleFileChange(e, "video")}
-                                                    className="hidden"
-                                                />
-                                            </label>
-                                        </div>
+                                        {!isDisabled && (
+                                            <div className="mt-4 border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
+                                                <label className="cursor-pointer">
+                                                    <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
+                                                    <p className="text-sm text-gray-700 mb-1">
+                                                        Upload new video
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">Format: mp4, mov</p>
+                                                    <input
+                                                        type="file"
+                                                        accept="video/mp4,video/quicktime"
+                                                        onChange={(e) => handleFileChange(e, "video")}
+                                                        className="hidden"
+                                                    />
+                                                </label>
+                                            </div>
+                                        )}
                                     </>
-                                ) : (
+                                ) : !isDisabled ? (
                                     <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
                                         <label className="cursor-pointer">
                                             <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
@@ -289,6 +293,12 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                                 className="hidden"
                                             />
                                         </label>
+                                    </div>
+                                ) : (
+                                    <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
+                                        <p className="text-sm text-gray-700 mb-1">
+                                            Video upload disabled for active/paused campaigns
+                                        </p>
                                     </div>
                                 )}
                             </div>
@@ -325,19 +335,21 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                                 </span>
                                             </div>
 
-                                            <button
-                                                onClick={() =>
-                                                    handleInputChange({
-                                                        target: {
-                                                            name: "imageFile",
-                                                            value: null
-                                                        }
-                                                    })
-                                                }
-                                                className="text-red-500 ml-auto"
-                                            >
-                                                <Trash />
-                                            </button>
+                                            {!isDisabled && (
+                                                <button
+                                                    onClick={() =>
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: "imageFile",
+                                                                value: null
+                                                            }
+                                                        })
+                                                    }
+                                                    className="text-red-500 ml-auto"
+                                                >
+                                                    <Trash />
+                                                </button>
+                                            )}
                                         </div>
                                     </>
                                 ) : formData.imageUrl ? (
@@ -359,39 +371,43 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                                     View Image
                                                 </a>
                                             </div>
-                                            <button
-                                                onClick={() => {
-                                                    handleInputChange({
-                                                        target: {
-                                                            name: "imageUrl",
-                                                            value: ""
-                                                        }
-                                                    });
-                                                }}
-                                                className="text-red-500 ml-auto"
-                                            >
-                                                <Trash />
-                                            </button>
+                                            {!isDisabled && (
+                                                <button
+                                                    onClick={() => {
+                                                        handleInputChange({
+                                                            target: {
+                                                                name: "imageUrl",
+                                                                value: ""
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="text-red-500 ml-auto"
+                                                >
+                                                    <Trash />
+                                                </button>
+                                            )}
                                         </div>
-                                        <div className="mt-4 border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
-                                            <label className="cursor-pointer">
-                                                <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
-                                                <p className="text-sm text-gray-700 mb-1">
-                                                    Upload new image
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    Format: jpeg, jpg, png
-                                                </p>
-                                                <input
-                                                    type="file"
-                                                    accept="image/jpeg, image/jpg, image/png"
-                                                    onChange={(e) => handleFileChange(e, "image")}
-                                                    className="hidden"
-                                                />
-                                            </label>
-                                        </div>
+                                        {!isDisabled && (
+                                            <div className="mt-4 border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
+                                                <label className="cursor-pointer">
+                                                    <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
+                                                    <p className="text-sm text-gray-700 mb-1">
+                                                        Upload new image
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">
+                                                        Format: jpeg, jpg, png
+                                                    </p>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/jpeg, image/jpg, image/png"
+                                                        onChange={(e) => handleFileChange(e, "image")}
+                                                        className="hidden"
+                                                    />
+                                                </label>
+                                            </div>
+                                        )}
                                     </>
-                                ) : (
+                                ) : !isDisabled ? (
                                     <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
                                         <label className="cursor-pointer">
                                             <Upload className="mx-auto mb-2 text-gray-500 w-6 h-6" />
@@ -408,6 +424,12 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                                 className="hidden"
                                             />
                                         </label>
+                                    </div>
+                                ) : (
+                                    <div className="border bg-[var(--bg-color-off-white)] rounded-lg p-6 text-center">
+                                        <p className="text-sm text-gray-700 mb-1">
+                                            Image upload disabled for active/paused campaigns
+                                        </p>
                                     </div>
                                 )}
                             </div>

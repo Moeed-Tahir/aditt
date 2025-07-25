@@ -3,8 +3,10 @@ import Calendars from "../Calendars";
 import PaymentMethod from "./PaymentMethod";
 import LinkBankAccount from "./LinkBankAccount";
 import { CircleDollarSign, Tag } from "lucide-react";
+
 const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploading, uploadProgress }) => {
   const isBudgetZero = parseFloat(formData.budget) === 0;
+  const isDisabled = formData.status === "Active" || formData.status === "Paused";
 
   return (
     <>
@@ -77,7 +79,7 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
               <div className="relative flex-1">
                 <Calendars
                   selected={formData.startDate}
-                  onSelect={(date) => {
+                  onSelect={!isDisabled ? (date) => {
                     setFormData((prev) => ({
                       ...prev,
                       startDate: date,
@@ -86,8 +88,9 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                           ? null
                           : prev.endDate,
                     }));
-                  }}
+                  } : undefined}
                   fromDate={new Date()}
+                  disabled={isDisabled}
                 />
               </div>
             </div>
@@ -107,16 +110,17 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
               <div className="relative flex-1">
                 <Calendars
                   selected={formData.endDate}
-                  onSelect={(date) => {
+                  onSelect={!isDisabled ? (date) => {
                     setFormData((prev) => ({
                       ...prev,
                       endDate: date || null,
                     }));
-                  }}
+                  } : undefined}
                   fromDate={
                     formData.startDate ? formData.startDate : new Date()
                   }
                   isClearable={true}
+                  disabled={isDisabled}
                 />
               </div>
             </div>
@@ -133,16 +137,18 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                 </span>
               </div>
 
-              <div className="relative h-10 md:h-12">
-                <CircleDollarSign className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="number"
-                  name="budget"
-                  value={formData.budget}
-                  onChange={handleInputChange}
-                  placeholder="Enter campaign budget"
-                  className="w-full h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
-                />
+              <div className="w-full flex-1">
+                <div className="relative w-full h-10 md:h-12">
+                  <CircleDollarSign className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="number"
+                    name="budget"
+                    value={formData.budget}
+                    onChange={handleInputChange}
+                    placeholder="Enter campaign budget"
+                    className={`w-full h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2`}
+                  />
+                </div>
               </div>
             </div>
             <hr className="border-t mb-4 border-gray-300" />
@@ -153,7 +159,7 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                   Coupon Code
                 </label>
                 <span className="block text-[16px] text-gray-400 mt-1">
-                                Add Coupon code if you have one.
+                  Add Coupon code if you have one.
                 </span>
               </div>
 
@@ -164,9 +170,11 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                   type="text"
                   name="couponCode"
                   value={formData.couponCode}
-                  onChange={handleInputChange}
+                  onChange={!isDisabled ? handleInputChange : undefined}
                   placeholder="Enter Coupon Code"
-                  className="w-full h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2"
+                  className={`w-full h-12 border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-2 ${isDisabled ? "bg-gray-100 cursor-not-allowed" : ""
+                    }`}
+                  disabled={isDisabled}
                 />
               </div>
             </div>
@@ -196,9 +204,11 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                       cardAdded: formData.cardAdded,
                       isFormOpen: formData.isFormOpen,
                     }}
-                    onChange={(paymentData) =>
+                    onChange={!isDisabled ? (paymentData) =>
                       setFormData((prev) => ({ ...prev, ...paymentData }))
+                      : undefined
                     }
+                    disabled={isDisabled}
                   />
                   <LinkBankAccount
                     value={{
@@ -208,9 +218,11 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
                       bankAdded: formData.bankAdded,
                       isBankFormOpen: formData.isBankFormOpen,
                     }}
-                    onChange={(bankData) =>
+                    onChange={!isDisabled ? (bankData) =>
                       setFormData((prev) => ({ ...prev, ...bankData }))
+                      : undefined
                     }
+                    disabled={isDisabled}
                   />
                 </div>
               )}
