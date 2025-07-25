@@ -14,6 +14,7 @@ const { MongoClient } = require('mongodb');
 
 exports.createCampaign = async (req, res) => {
     try {
+        
         await connectToDatabase();
 
         const {
@@ -172,7 +173,6 @@ exports.createCampaign = async (req, res) => {
 async function verifyCampaignVideos() {
     let client;
     try {
-        console.log("---Call----");
         const storage = new Storage({
             projectId: 'aditt-app',
             credentials: {
@@ -937,7 +937,6 @@ exports.getLatestPendingCampaign = async (req, res) => {
 exports.deleteCampaignAgainstId = async (req, res) => {
     try {
         const { campaignId } = req.body;
-        console.log("req.body",req.body);
 
         if (!campaignId) {
             return res.status(400).json({
