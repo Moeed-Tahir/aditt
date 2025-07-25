@@ -1,20 +1,36 @@
-"use client"
+"use client";
 
 import { Coffee } from "lucide-react";
 import React, { useState } from "react";
 
-const FeedbackDialog = ({
-  open,
-  onClose,
-  onSubmit,
-  campaignId,
-}) => {
+const FeedbackDialog = ({ open, onClose, onSubmit, campaignId }) => {
   const [conversion, setConversion] = useState("");
   const [conversionType, setConversionType] = useState("");
   const [rating, setRating] = useState(5);
   const [feedback, setFeedback] = useState("");
+  const [errors, setErrors] = useState({
+    conversion: false,
+    conversionType: false,
+    feedback: false,
+    feedbackLength: false,
+  });
+
+  const validateForm = () => {
+    const newErrors = {
+      conversion: !conversion.trim(),
+      conversionType: !conversionType.trim(),
+      feedback: !feedback.trim(),
+      feedbackLength: feedback.trim().length < 50,
+    };
+    setErrors(newErrors);
+    return !Object.values(newErrors).some((error) => error);
+  };
 
   const handleSubmit = () => {
+    if (!validateForm()) {
+      return;
+    }
+
     onSubmit({
       campaignId,
       conversion,
@@ -26,14 +42,22 @@ const FeedbackDialog = ({
     setConversionType("");
     setRating(5);
     setFeedback("");
+    setErrors({
+      conversion: false,
+      conversionType: false,
+      feedback: false,
+      feedbackLength: false,
+    });
   };
 
   return (
     <div
-      className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${open ? "" : "hidden"
-        }`}
+      className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 ${
+        open ? "" : "hidden"
+      }`}
     >
-   <div className="bg-white h-[95vh] border rounded-[20px] p-[18px] flex flex-col mx-4 w-[calc(100%-32px)] max-w-[679px] overflow-y-auto scrollbar-hide">        <div className="flex items-center p-[12px] justify-center">
+      <div className="bg-white h-[95vh] border rounded-[20px] p-[18px] flex flex-col mx-4 w-[calc(100%-32px)] max-w-[679px] overflow-y-auto scrollbar-hide">
+        <div className="flex items-center p-[12px] justify-center">
           <Coffee className="w-[54px] h-[54px] text-blue-300 text-center flex items-center justify-center" />
         </div>
 
@@ -54,10 +78,20 @@ const FeedbackDialog = ({
             <input
               type="text"
               value={conversion}
-              onChange={(e) => setConversion(e.target.value)}
+              onChange={(e) => {
+                setConversion(e.target.value);
+                setErrors((prev) => ({ ...prev, conversion: false }));
+              }}
               placeholder="Enter details..."
-              className="w-full p-[16px] border border-gray-300 rounded-full"
+              className={`w-full p-[16px] border ${
+                errors.conversion ? "border-red-500" : "border-gray-300"
+              } rounded-full`}
             />
+            {errors.conversion && (
+              <p className="text-red-500 text-xs mt-1">
+                This field is required
+              </p>
+            )}
           </div>
 
           <div>
@@ -67,10 +101,20 @@ const FeedbackDialog = ({
             <input
               type="text"
               value={conversionType}
-              onChange={(e) => setConversionType(e.target.value)}
+              onChange={(e) => {
+                setConversionType(e.target.value);
+                setErrors((prev) => ({ ...prev, conversionType: false }));
+              }}
               placeholder="Enter details..."
-              className="w-full p-[16px] border border-gray-300 rounded-full"
+              className={`w-full p-[16px] border ${
+                errors.conversionType ? "border-red-500" : "border-gray-300"
+              } rounded-full`}
             />
+            {errors.conversionType && (
+              <p className="text-red-500 text-xs mt-1">
+                This field is required
+              </p>
+            )}
           </div>
 
           <div>
@@ -96,11 +140,32 @@ const FeedbackDialog = ({
             <p className="text-[14px] font-md mb-2">Feedback</p>
             <textarea
               value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-[20px] resize-none"
+              onChange={(e) => {
+                setFeedback(e.target.value);
+                setErrors((prev) => ({
+                  ...prev,
+                  feedback: false,
+                  feedbackLength: false,
+                }));
+              }}
+              className={`w-full p-3 border ${
+                errors.feedback || errors.feedbackLength
+                  ? "border-red-500"
+                  : "border-gray-300"
+              } rounded-[20px] resize-none`}
               rows={4}
-              placeholder="Enter details..."
+              placeholder="Enter details (minimum 50 characters)..."
             />
+            {errors.feedback && (
+              <p className="text-red-500 text-xs mt-1">
+                This field is required
+              </p>
+            )}
+            {errors.feedbackLength && !errors.feedback && (
+              <p className="text-red-500 text-xs mt-1">
+                Feedback must be at least 50 characters
+              </p>
+            )}
           </div>
         </div>
 
