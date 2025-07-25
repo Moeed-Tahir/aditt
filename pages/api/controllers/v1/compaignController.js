@@ -198,7 +198,7 @@ async function verifyCampaignVideos() {
                     {
                         $set: {
                             status: "Rejected",
-                            reason: "Video is Rejected due to not passed by intelligence",
+                            rejectionReason: "Video is Rejected due to not passed by intelligence",
                             updatedAt: new Date()
                         }
                     }
@@ -586,7 +586,6 @@ exports.updateCampaign = async (req, res) => {
 exports.campaignStatusUpdate = async (req, res) => {
     try {
         const { status, id, rejectionReason, to } = req.body;
-        console.log("status",status);
         
         if (!status || !id) {
             return res.status(400).json({

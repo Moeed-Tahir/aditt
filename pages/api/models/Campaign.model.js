@@ -217,9 +217,9 @@ const CampaignSchema = new mongoose.Schema({
         type: String,
         default: "Pending"
     },
-    reason: {
+    rejectionReason: {
         type: String,
-        required: function () { return this.status === "Rejected"; }
+        default:"",
     },
     websiteLink: {
         type: String,

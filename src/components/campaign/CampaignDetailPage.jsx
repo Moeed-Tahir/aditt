@@ -56,7 +56,7 @@ export default function CampaignDetailPage({ campaignData, campaignId }) {
             <CampaignVideoInfo campaignData={campaignData} />
           </div>
 
-          {campaignData.status === "Rejected" && campaignData.reason && (
+          {campaignData.status === "Rejected" && campaignData.rejectionReason && (
             <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-[24px]">
               <div className="flex">
                 <div className="flex-shrink-0">
@@ -67,7 +67,7 @@ export default function CampaignDetailPage({ campaignData, campaignId }) {
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-red-800">Campaign Rejected</h3>
                   <div className="mt-2 text-sm text-red-700">
-                    <p>Reason : {campaignData.reason}</p>
+                    <p>Reason : {campaignData.rejectionReason}</p>
                   </div>
                 </div>
               </div>
