@@ -38,7 +38,9 @@ export function DataTable({ campaignData, fetchCampaign }) {
     engagements: campaign.engagements?.totalCount,
     amount: parseFloat(campaign.campaignBudget) || 0,
     status: campaign.status || "Pending",
+    clicks: campaign.clickCount.totalCount || 0,
   }));
+
   const totalEngagementsAcrossAllCampaigns = campaignData?.reduce(
     (sum, campaign) => sum + (campaign.engagements?.totalCount || 0),
     0

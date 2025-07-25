@@ -50,7 +50,7 @@ export default function BarChartComponent({ campaignData }) {
       })
       .map((campaign) => ({
         name: campaign.title || "Untitled Campaign",
-        clicks: campaign.views,
+        clicks: campaign.clicks,
       }))
       .sort((a, b) => b.clicks - a.clicks);
   };
