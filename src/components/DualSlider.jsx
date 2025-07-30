@@ -17,7 +17,6 @@ const DualRangeSlider = React.forwardRef((props, ref) => {
 
   const initialValue = Array.isArray(value) ? value : [min, max];
 
-  // Custom label formatter
   const formatLabel = (val) => {
     if (val === max) return '65+';
     return val === min ? '13' : val;

@@ -17,7 +17,7 @@ function ChatWithSupportSection({ userId }) {
             href={`/${userId}/chat-support`}
             className="bg-blue-600 text-white md:text-[16px] md:leading-6 text-[14px] leading-4 px-8 py-4 rounded-[80px] hover:bg-blue-700"
           >
-            Chat with Support
+            Contact Support
           </Link>
         </div>
       </div>

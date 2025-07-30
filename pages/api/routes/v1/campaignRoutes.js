@@ -11,7 +11,8 @@ import {
     activeOrRejectCampaign,
     getAllCampaign,
     getLatestPendingCampaign,
-    deleteCampaignAgainstId
+    deleteCampaignAgainstId,
+    verifyCardDetail
 } from "../../controllers/v1/compaignController";
 
 export default async function handler(req, res) {
@@ -50,6 +51,8 @@ export default async function handler(req, res) {
                     return await getLatestPendingCampaign(req, res);
                 case "deleteCampaignAgainstId":
                     return await deleteCampaignAgainstId(req, res);
+                case "verifyCardDetail":
+                    return await verifyCardDetail(req, res);
                 default:
                     return res.status(400).json({ message: "Invalid action parameter" });
             }

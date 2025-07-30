@@ -39,7 +39,6 @@ export const uploadAndAnalyzeVideo = async (req, res) => {
     const [result] = await operation.promise();
 
     const passed = evaluateVideo(result);
-    console.log("Passed", passed);
     
     return res.status(200).json({
       status: passed ? "PASSED" : "FAILED",

@@ -3,10 +3,136 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Calendars from '../Calendars';
 import { CircleDollarSign, Tag } from 'lucide-react';
-import PaymentMethod from '../PaymentMethod';
-import LinkBankAccount from '../LinkBankAccount';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+
+
+let stripePromise;
+
+const getStripe = () => {
+    if (!stripePromise) {
+        const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+        if (!key) {
+            console.error('Stripe publishable key is missing!');
+            throw new Error('Stripe publishable key is not configured');
+        }
+
+        if (!key.startsWith('pk_test_') && !key.startsWith('pk_live_')) {
+            throw new Error('Invalid Stripe key format');
+        }
+
+        stripePromise = loadStripe(key.trim());
+    }
+    return stripePromise;
+};
+
+const StripePaymentForm = ({ onSuccess, onError }) => {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        if (!stripe || !elements) {
+            return;
+        }
+
+        setLoading(true);
+        setError('');
+
+        try {
+            console.log('Creating payment method...');
+            const { error: stripeError, paymentMethod } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: elements.getElement(CardElement),
+            });
+
+            if (stripeError) {
+                console.error('Stripe error details:', stripeError);
+                throw new Error(stripeError.message);
+            }
+
+            console.log('Payment method created:', paymentMethod);
+
+            const response = await fetch('/api/routes/v1/campaignRoutes?action=verifyCardDetail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ paymentMethodId: paymentMethod.id }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Payment verification failed');
+            }
+
+            console.log("data",data);
+            
+
+            onSuccess({
+                paymentMethodId: data.paymentMethodId,
+                cardDetails: {
+                    brand: data.cardDetails.brand,
+                    last4: data.cardDetails.last4,
+                    exp_month: data.cardDetails.exp_month,
+                    exp_year: data.cardDetails.exp_year
+                },
+                fingerprint: data.fingerprint,
+                customerId:data.customerId
+            });
+
+        } catch (err) {
+            setError(err.message);
+            onError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="border rounded-lg p-3 bg-white">
+                <CardElement
+                    options={{
+                        style: {
+                            base: {
+                                fontSize: '16px',
+                                color: '#424770',
+                                '::placeholder': {
+                                    color: '#aab7c4',
+                                },
+                            },
+                            invalid: {
+                                color: '#9e2146',
+                            },
+                        },
+                    }}
+                />
+            </div>
+
+            {error && (
+                <div className="text-red-500 text-sm p-2 bg-red-50 rounded-lg">
+                    {error}
+                </div>
+            )}
+
+            <button
+                type="submit"
+                disabled={!stripe || loading}
+                className={`w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors ${(!stripe || loading) ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+            >
+                {loading ? 'Processing...' : 'Add Payment Method'}
+            </button>
+        </form>
+    );
+};
 
 const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploading,
     uploadProgress, }) => {
@@ -196,9 +322,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
             return false;
         }
 
-
-
-        if (!isBudgetZero && formData.cards.length === 0 && formData.bankAccounts.length === 0) {
+        if (!isBudgetZero && !formData.paymentMethodId) {
             return true;
         }
 
@@ -258,15 +382,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                             Define your budget to maximize reach and performance.
                         </span>
                     </div>
-
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isSubmitDisabled()}
-                        className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${isSubmitDisabled() ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
-                    >
-                        Submit
-                    </button>
                 </div>
 
                 <hr className="border-t mb-4 border-gray-300" />
@@ -485,37 +600,67 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                                 </span>
                             </div>
                             <div className="relative w-full flex-1">
-                                <PaymentMethod
-                                    value={{
-                                        cardNumber: formData.cardNumber,
-                                        monthOnCard: formData.monthOnCard,
-                                        cvc: formData.cvc,
-                                        nameOnCard: formData.nameOnCard,
-                                        country: formData.country,
-                                        zipCode: formData.zipCode,
-                                        cardType: formData.cardType,
-                                        cardAdded: formData.cardAdded,
-                                        isFormOpen: formData.isFormOpen,
-                                    }}
-                                    onChange={(paymentData) =>
-                                        setFormData((prev) => ({ ...prev, ...paymentData }))
-                                    }
-                                />
-                                <LinkBankAccount
-                                    value={{
-                                        bankAccountNumber: formData.bankAccountNumber,
-                                        routingNumber: formData.routingNumber,
-                                        accountType: formData.accountType,
-                                        bankAdded: formData.bankAdded,
-                                        isBankFormOpen: formData.isBankFormOpen,
-                                    }}
-                                    onChange={(bankData) =>
-                                        setFormData((prev) => ({ ...prev, ...bankData }))
-                                    }
-                                />
+                                {formData.paymentMethodId ? (
+                                    <div className="border rounded-lg p-4 bg-gray-50">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="font-medium">
+                                                    {formData.cardDetails.brand} ending in {formData.cardDetails.last4}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    Expires {formData.cardDetails.exp_month}/{formData.cardDetails.exp_year}
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        paymentMethodId: "",
+                                                        card: {
+                                                            brand: "",
+                                                            last4: "",
+                                                            exp_month: "",
+                                                            exp_year: ""
+                                                        }
+                                                    }));
+                                                }}
+                                                className="text-red-500 hover:text-red-700"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <Elements stripe={getStripe()}>
+                                        <StripePaymentForm
+                                            onSuccess={(paymentData) => {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    ...paymentData,
+                                                    paymentMethodAdded: true
+                                                }));
+                                                toast.success('Payment method added successfully');
+                                            }}
+                                            onError={(error) => {
+                                                toast.error(error);
+                                            }}
+                                        />
+                                    </Elements>
+                                )}
                             </div>
                         </div>
                     )}
+                </div>
+                <div className="mt-8 flex justify-end">
+                    <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitDisabled()}
+                        className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
+                            isSubmitDisabled() ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                    >
+                        Submit
+                    </button>
                 </div>
             </div>
         </div>

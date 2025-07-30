@@ -25,12 +25,11 @@ const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAc
         Cancelled: "bg-purple-100 text-purple-700",
     }
 
-const handleDeleteCampaign = async (campaignId) => {
+    const handleDeleteCampaign = async (campaignId) => {
         try {
             const response = await axios.post('/api/routes/v1/campaignRoutes?action=deleteCampaignAgainstId', {
-                campaignId:campaignId
+                campaignId: campaignId
             });
-            console.log("response",response);
 
             if (response.status === 200) {
                 toast.success('Campaign deleted successfully');
@@ -68,7 +67,7 @@ const handleDeleteCampaign = async (campaignId) => {
                                 <TableCell className="text-gray-800 text-[14px] py-6">
                                     <Link
                                         href={`campaigns?id=${c.id}`}
-                                        className="text-gray-800 hover:underline"
+                                        className="text-gray-800 hover:text-blue-600 hover:underline"
                                     >
                                         {c.title}
                                     </Link>
@@ -83,9 +82,8 @@ const handleDeleteCampaign = async (campaignId) => {
                                     ${c.amount.toFixed(2)}
                                 </TableCell>
                                 <TableCell>
-                                    <span className={`text-xs font-medium px-3 py-1 rounded-full ${
-                                        statusBadgeClasses[c.status] || "bg-gray-100 text-gray-700"
-                                    }`}>
+                                    <span className={`text-xs font-medium px-3 py-1 rounded-full ${statusBadgeClasses[c.status] || "bg-gray-100 text-gray-700"
+                                        }`}>
                                         {c.status}
                                     </span>
                                 </TableCell>

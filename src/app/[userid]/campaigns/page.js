@@ -10,7 +10,7 @@ const Page = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const [campaignData, setCampaignData] = useState([]);
-
+  
   useEffect(() => {
     const fetchCampaign = async () => {
       try {

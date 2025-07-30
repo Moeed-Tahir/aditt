@@ -105,35 +105,45 @@ const SurveyQuestionSchema = new mongoose.Schema({
 }, { _id: true });
 
 const CardDetailSchema = new mongoose.Schema({
-    cardNumber: {
-        type: String,
-        required: false,
-        default: ""
-    },
-    cvc: {
-        type: String,
-        required: false,
-        default: ""
-    },
-    nameOnCard: {
+    paymentMethodId: {
         type: String,
         required: false,
         default: "",
         trim: true
     },
-    dateOnCard: {
+    customerId: {
         type: String,
         required: false,
         default: "",
         trim: true
     },
-    country: {
-        type: String,
-        required: false,
-        default: "",
-        trim: true
+    cardDetails: {
+        brand: {
+            type: String,
+            required: false,
+            default: "",
+            trim: true
+        },
+        last4: {
+            type: String,
+            required: false,
+            default: "",
+            trim: true
+        },
+        exp_month: {
+            type: String,
+            required: false,
+            default: "",
+            trim: true
+        },
+        exp_year: {
+            type: String,
+            required: false,
+            default: "",
+            trim: true
+        }
     },
-    zip: {
+    fingerprint: {
         type: String,
         required: false,
         default: "",
@@ -219,7 +229,7 @@ const CampaignSchema = new mongoose.Schema({
     },
     rejectionReason: {
         type: String,
-        default:"",
+        default: "",
     },
     websiteLink: {
         type: String,
@@ -234,7 +244,7 @@ const CampaignSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    videoUrlId:{
+    videoUrlId: {
         type: String,
         required: true,
     },
@@ -282,10 +292,6 @@ const CampaignSchema = new mongoose.Schema({
     },
     cardDetail: {
         type: CardDetailSchema,
-        default: () => ({})
-    },
-    bankDetail: {
-        type: BankDetailSchema,
         default: () => ({})
     },
     couponCode: {

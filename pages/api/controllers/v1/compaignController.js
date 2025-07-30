@@ -11,6 +11,7 @@ dotenv.config();
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 const { Storage } = require('@google-cloud/storage');
 const { MongoClient } = require('mongodb');
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 exports.createCampaign = async (req, res) => {
     try {
@@ -31,7 +32,6 @@ exports.createCampaign = async (req, res) => {
             campaignStartDate,
             campaignEndDate,
             cardDetail,
-            bankDetail,
             couponCode,
             userId,
             campaignBudget,
@@ -80,7 +80,6 @@ exports.createCampaign = async (req, res) => {
             campaignStartDate: new Date(campaignStartDate),
             campaignEndDate: campaignEndDate ? new Date(campaignEndDate) : null,
             cardDetail: cardDetail || null,
-            bankDetail: bankDetail || null,
             couponCode: couponCode || null,
             userId,
             campaignBudget: campaignBudget ? Number(campaignBudget) : 0,
@@ -980,3 +979,64 @@ exports.deleteCampaignAgainstId = async (req, res) => {
         });
     }
 }
+
+exports.verifyCardDetail = async (req, res) => {
+    try {
+        const { paymentMethodId } = req.body;
+
+        const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+        
+        if (!paymentMethod) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Invalid payment method' 
+            });
+        }
+
+        let customerId = paymentMethod.customer;
+        
+        if (!customerId) {
+            const customer = await stripe.customers.create({
+                payment_method: paymentMethodId,
+                invoice_settings: {
+                    default_payment_method: paymentMethodId
+                }
+            });
+            
+            customerId = customer.id;
+            
+            await stripe.paymentMethods.attach(paymentMethodId, {
+                customer: customerId
+            });
+        }
+
+        return res.status(200).json({ 
+            success: true,
+            paymentMethodId: paymentMethod.id,
+            customerId: customerId,
+            cardDetails: {
+                brand: paymentMethod.card.brand,
+                last4: paymentMethod.card.last4,
+                exp_month: paymentMethod.card.exp_month,
+                exp_year: paymentMethod.card.exp_year
+            },
+            fingerprint: paymentMethod.card.fingerprint
+        });
+
+    } catch (error) {
+        console.error('Payment verification error:', error);
+        
+        if (error.type === 'StripeCardError') {
+            return res.status(400).json({
+                success: false,
+                message: 'Card verification failed',
+                error: error.message
+            });
+        }
+        
+        return res.status(500).json({ 
+            success: false,
+            message: error.message || 'Payment verification failed' 
+        });
+    }
+};

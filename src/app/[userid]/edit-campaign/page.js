@@ -139,19 +139,14 @@ const initialFormData = {
   campaignStartDate: new Date(),
   campaignEndDate: null,
   cardDetail: {
-    cardNumber: "",
-    cvc: "",
-    nameOnCard: "",
-    dateOnCard: "",
-    country: "",
-    zip: "",
-    _id: ""
-  },
-  bankDetail: {
-    accountNumber: "",
-    routingNumber: "",
-    accountType: "",
-    _id: ""
+    paymentMethodId: "",
+    cardDetails: {
+      brand: "",
+      last4: "",
+      exp_month: "",
+      exp_year: ""
+    },
+    fingerprint: ""
   },
   campaignBudget: "0"
 };
@@ -175,7 +170,6 @@ export default function EditCampaign() {
   });
 
   const [formData, setFormData] = useState(initialFormData);
-  console.log("formData",formData);
 
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
@@ -399,29 +393,24 @@ export default function EditCampaign() {
         ageRange: formData.ageRange,
         campaignStartDate: formData.startDate.toISOString(),
         campaignEndDate: formData.endDate ? formData.endDate.toISOString() : null,
-        cardDetail: {
-          ...formData.cardDetail,
-          cardNumber: formData.cardNumber,
-          cvc: formData.cvc,
-          nameOnCard: formData.nameOnCard,
-          dateOnCard: formData.monthOnCard,
-          country: formData.country,
-          zip: formData.zipCode,
-        },
-        bankDetail: {
-          ...formData.bankDetail,
-          accountNumber: formData.bankAccountNumber,
-          routingNumber: formData.routingNumber,
-          accountType: formData.accountType,
-        },
+        cardDetail: formData.cardDetail?.paymentMethodId ? {
+          paymentMethodId: formData.cardDetail.paymentMethodId,
+          cardDetails: {
+            brand: formData.cardDetail.cardDetails.brand,
+            last4: formData.cardDetail.cardDetails.last4,
+            exp_month: formData.cardDetail.cardDetails.exp_month,
+            exp_year: formData.cardDetail.cardDetails.exp_year
+          },
+          fingerprint: formData.cardDetail.fingerprint
+        } : null,
         engagements: formData.engagements,
-        clickCount: formData.clickCount ,
+        clickCount: formData.clickCount,
         totalViews: formData.totalViews,
         impressions: formData.impressions,
         // categories: formData.categories,
         // videoDuration: formData.videoDuration,
         videoUrlIntelligenceStatus: formData.videoUrlIntelligenceStatus,
-        videoUrlId:formData.videoUrlId
+        videoUrlId: formData.videoUrlId
       };
 
       const response = await axios.post(
@@ -488,212 +477,145 @@ export default function EditCampaign() {
       if (dataParam) {
         try {
           const parsedData = JSON.parse(decodeURIComponent(dataParam));
-          console.log("Parsed campaign data:", parsedData);
+
           const endDate = parsedData.campaignEndDate ?
             new Date(parsedData.campaignEndDate) :
             parsedData.endDate ?
               new Date(parsedData.endDate) :
               null;
-          const transformedData = {
-            ...parsedData,
-            endDate: endDate,
-            campaignEndDate: endDate,
-            engagements: parsedData.engagements || { totalCount: 0 },
-            clickCount: parsedData.clickCount || { totalCount: 0, dailyCounts: [] },
-            brandName: parsedData.brandName || parsedData.campaignTitle || "",
-            videoFile: parsedData.videoFile || {},
-            imageFile: parsedData.imageFile || {},
-            videoUrl: parsedData.campaignVideoUrl || parsedData.videoUrl || "",
-            videoUrlId: parsedData.videoUrlId || "",
-            videoUrlIntelligenceStatus: parsedData.videoUrlIntelligenceStatus || "",
-            imageUrl: parsedData.companyLogo || parsedData.imageUrl || "",
-            quizQuestion: {
-              text: parsedData.quizQuestion?.text || parsedData.quizQuestion?.questionText || "",
-              options: parsedData.quizQuestion?.options || [
-                parsedData.quizQuestion?.option1 || "",
-                parsedData.quizQuestion?.option2 || "",
-                parsedData.quizQuestion?.option3 || "",
-                parsedData.quizQuestion?.option4 || "",
-              ],
-              correctAnswer: parsedData.quizQuestion?.correctAnswer ??
-                (parsedData.quizQuestion?.answer ?
-                  [
-                    parsedData.quizQuestion?.option1 || "",
-                    parsedData.quizQuestion?.option2 || "",
-                    parsedData.quizQuestion?.option3 || "",
-                    parsedData.quizQuestion?.option4 || "",
-                  ].indexOf(parsedData.quizQuestion?.answer) :
-                  0),
-              optionStats: parsedData.quizQuestion?.optionStats || {
-                option1: {
-                  demographics: {
-                    age18_24: { male: 0, female: 0, other: 0 },
-                    age25_33: { male: 0, female: 0, other: 0 },
-                    age35_44: { male: 0, female: 0, other: 0 },
-                    age45Plus: { male: 0, female: 0, other: 0 }
-                  },
-                  totalCount: 0
+
+          const cardDetail = parsedData.cardDetail ? {
+            paymentMethodId: parsedData.cardDetail.paymentMethodId || "",
+            cardDetails: {
+              brand: parsedData.cardDetail.cardDetails?.brand || "",
+              last4: parsedData.cardDetail.cardDetails?.last4 || "",
+              exp_month: parsedData.cardDetail.cardDetails?.exp_month?.toString() || "",
+              exp_year: parsedData.cardDetail.cardDetails?.exp_year?.toString() || ""
+            },
+            fingerprint: parsedData.cardDetail.fingerprint || ""
+          } : null;
+
+          const quizQuestion = {
+            text: parsedData.quizQuestion?.text || parsedData.quizQuestion?.questionText || "",
+            options: parsedData.quizQuestion?.options || [
+              parsedData.quizQuestion?.option1 || "",
+              parsedData.quizQuestion?.option2 || "",
+              parsedData.quizQuestion?.option3 || "",
+              parsedData.quizQuestion?.option4 || "",
+            ],
+            correctAnswer: parsedData.quizQuestion?.correctAnswer ??
+              (parsedData.quizQuestion?.answer ?
+                [
+                  parsedData.quizQuestion?.option1 || "",
+                  parsedData.quizQuestion?.option2 || "",
+                  parsedData.quizQuestion?.option3 || "",
+                  parsedData.quizQuestion?.option4 || "",
+                ].indexOf(parsedData.quizQuestion?.answer) :
+                0),
+            optionStats: parsedData.quizQuestion?.optionStats || {
+              option1: {
+                demographics: {
+                  age18_24: { male: 0, female: 0, other: 0 },
+                  age25_33: { male: 0, female: 0, other: 0 },
+                  age35_44: { male: 0, female: 0, other: 0 },
+                  age45Plus: { male: 0, female: 0, other: 0 }
                 },
-                option2: {
-                  demographics: {
-                    age18_24: { male: 0, female: 0, other: 0 },
-                    age25_33: { male: 0, female: 0, other: 0 },
-                    age35_44: { male: 0, female: 0, other: 0 },
-                    age45Plus: { male: 0, female: 0, other: 0 }
-                  },
-                  totalCount: 0
+                totalCount: 0
+              },
+              option2: {
+                demographics: {
+                  age18_24: { male: 0, female: 0, other: 0 },
+                  age25_33: { male: 0, female: 0, other: 0 },
+                  age35_44: { male: 0, female: 0, other: 0 },
+                  age45Plus: { male: 0, female: 0, other: 0 }
                 },
-                option3: {
-                  demographics: {
-                    age18_24: { male: 0, female: 0, other: 0 },
-                    age25_33: { male: 0, female: 0, other: 0 },
-                    age35_44: { male: 0, female: 0, other: 0 },
-                    age45Plus: { male: 0, female: 0, other: 0 }
-                  },
-                  totalCount: 0
+                totalCount: 0
+              },
+              option3: {
+                demographics: {
+                  age18_24: { male: 0, female: 0, other: 0 },
+                  age25_33: { male: 0, female: 0, other: 0 },
+                  age35_44: { male: 0, female: 0, other: 0 },
+                  age45Plus: { male: 0, female: 0, other: 0 }
                 },
-                option4: {
-                  demographics: {
-                    age18_24: { male: 0, female: 0, other: 0 },
-                    age25_33: { male: 0, female: 0, other: 0 },
-                    age35_44: { male: 0, female: 0, other: 0 },
-                    age45Plus: { male: 0, female: 0, other: 0 }
-                  },
-                  totalCount: 0
-                }
+                totalCount: 0
               },
-              _id: parsedData.quizQuestion?._id || ""
+              option4: {
+                demographics: {
+                  age18_24: { male: 0, female: 0, other: 0 },
+                  age25_33: { male: 0, female: 0, other: 0 },
+                  age35_44: { male: 0, female: 0, other: 0 },
+                  age45Plus: { male: 0, female: 0, other: 0 }
+                },
+                totalCount: 0
+              }
             },
-            surveyQuestion1: {
-              text: parsedData.surveyQuestion1?.text || parsedData.surveyQuestion1?.questionText || "",
-              options: parsedData.surveyQuestion1?.options || [
-                parsedData.surveyQuestion1?.option1 || "",
-                parsedData.surveyQuestion1?.option2 || "",
-                parsedData.surveyQuestion1?.option3 || "",
-                parsedData.surveyQuestion1?.option4 || "",
-              ],
-              optionStats: parsedData.surveyQuestion1?.optionStats || {
-                option1: { totalCount: 0 },
-                option2: { totalCount: 0 },
-                option3: { totalCount: 0 },
-                option4: { totalCount: 0 }
-              },
-              _id: parsedData.surveyQuestion1?._id || ""
-            },
-            surveyQuestion2: {
-              text: parsedData.surveyQuestion2?.text || parsedData.surveyQuestion2?.questionText || "",
-              options: parsedData.surveyQuestion2?.options || [
-                parsedData.surveyQuestion2?.option1 || "",
-                parsedData.surveyQuestion2?.option2 || "",
-                parsedData.surveyQuestion2?.option3 || "",
-                parsedData.surveyQuestion2?.option4 || "",
-              ],
-              optionStats: parsedData.surveyQuestion2?.optionStats || {
-                option1: { totalCount: 0 },
-                option2: { totalCount: 0 },
-                option3: { totalCount: 0 },
-                option4: { totalCount: 0 }
-              },
-              _id: parsedData.surveyQuestion2?._id || ""
-            },
-            cardNumber: parsedData.cardDetail?.cardNumber || parsedData.cardNumber || "",
-            monthOnCard: parsedData.cardDetail?.dateOnCard || parsedData.monthOnCard || "",
-            cvc: parsedData.cardDetail?.cvc || parsedData.cvc || "",
-            nameOnCard: parsedData.cardDetail?.nameOnCard || parsedData.nameOnCard || "",
-            country: parsedData.cardDetail?.country || parsedData.country || "",
-            zipCode: parsedData.cardDetail?.zip || parsedData.zipCode || "",
-            bankAccountNumber: parsedData.bankDetail?.accountNumber || parsedData.bankAccountNumber || "",
-            routingNumber: parsedData.bankDetail?.routingNumber || parsedData.routingNumber || "",
-            accountType: parsedData.bankDetail?.accountType || parsedData.accountType || "",
-            cardDetail: parsedData.cardDetail || {
-              cardNumber: parsedData.cardNumber || "",
-              cvc: parsedData.cvc || "",
-              nameOnCard: parsedData.nameOnCard || "",
-              dateOnCard: parsedData.monthOnCard || "",
-              country: parsedData.country || "",
-              zip: parsedData.zipCode || "",
-              _id: parsedData.cardDetail?._id || ""
-            },
-            bankDetail: parsedData.bankDetail || {
-              accountNumber: parsedData.bankAccountNumber || "",
-              routingNumber: parsedData.routingNumber || "",
-              accountType: parsedData.accountType || "",
-              _id: parsedData.bankDetail?._id || ""
-            }
+            _id: parsedData.quizQuestion?._id || ""
           };
+
+          const transformSurveyQuestion = (question) => ({
+            text: question?.text || question?.questionText || "",
+            options: question?.options || [
+              question?.option1 || "",
+              question?.option2 || "",
+              question?.option3 || "",
+              question?.option4 || "",
+            ],
+            optionStats: question?.optionStats || {
+              option1: { totalCount: 0 },
+              option2: { totalCount: 0 },
+              option3: { totalCount: 0 },
+              option4: { totalCount: 0 }
+            },
+            _id: question?._id || ""
+          });
 
           setFormData(prev => ({
             ...prev,
-            ...transformedData,
+            ...parsedData,
+            _id: parsedData._id || "",
+            userId: parsedData.userId || "",
+            campaignTitle: parsedData.campaignTitle || "",
+            status: parsedData.status || "Pending",
+            websiteLink: parsedData.websiteLink || "",
+            videoFile: parsedData.videoFile || {},
+            videoUrl: parsedData.campaignVideoUrl || parsedData.videoUrl || "",
+            imageFile: parsedData.imageFile || {},
+            imageUrl: parsedData.companyLogo || parsedData.imageUrl || "",
+            videoDuration: parsedData.videoDuration || "0:00",
+            genderRatio: parseInt(parsedData.genderRatio) || 50,
+            genderType: parsedData.genderType || "",
+            ageRange: Array.isArray(parsedData.ageRange) ? parsedData.ageRange : [18, 65],
+            categories: Array.isArray(parsedData.categories) ? parsedData.categories : [],
             videoUrlId: parsedData.videoUrlId || "",
             videoUrlIntelligenceStatus: parsedData.videoUrlIntelligenceStatus || "",
-            genderRatio: parseInt(parsedData.genderRatio),
-            genderType: parsedData.genderType,
-            ageRange: Array.isArray(parsedData.ageRange) ? parsedData.ageRange : [18, 65],
-            budget: parseFloat(parsedData.campaignBudget) || parseFloat(parsedData.budget) || 0,
-            campignBudget: parseFloat(parsedData.campaignBudget) || 0,
+            quizQuestion: quizQuestion,
+            surveyQuestion1: parsedData.surveyQuestion1 ? transformSurveyQuestion(parsedData.surveyQuestion1) : prev.surveyQuestion1,
+            surveyQuestion2: parsedData.surveyQuestion2 ? transformSurveyQuestion(parsedData.surveyQuestion2) : prev.surveyQuestion2,
             startDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
             campaignStartDate: parsedData.campaignStartDate ? new Date(parsedData.campaignStartDate) : new Date(parsedData.startDate) || new Date(),
             endDate: endDate || null,
             campaignEndDate: endDate || null,
-            createdAt: parsedData.createdAt ? new Date(parsedData.createdAt) : new Date(),
-            updatedAt: parsedData.updatedAt ? new Date(parsedData.updatedAt) : new Date(),
+            budget: parseFloat(parsedData.campaignBudget) || parseFloat(parsedData.budget) || 0,
+            campignBudget: parseFloat(parsedData.campaignBudget) || 0,
+            cardDetail: cardDetail,
             cardAdded: !!parsedData.cardDetail,
             bankAdded: !!parsedData.bankDetail,
-            categories: Array.isArray(parsedData.categories) ? parsedData.categories : [],
-            videoDuration: parsedData.videoDuration || "0:00",
-            status: parsedData.status || "Pending",
+            couponCode: parsedData.couponCode || "",
             totalViews: parsedData.totalViews || 0,
             impressions: parsedData.impressions || 0,
-            couponCode: parsedData.couponCode || "",
-            quizQuestion: {
-              ...transformedData.quizQuestion,
-              optionStats: parsedData.quizQuestion?.optionStats ? {
-                option1: {
-                  demographics: parsedData.quizQuestion.optionStats.option1?.demographics || {
-                    age18_24: { male: 0, female: 0, other: 0 },
-                    age25_33: { male: 0, female: 0, other: 0 },
-                    age35_44: { male: 0, female: 0, other: 0 },
-                    age45Plus: { male: 0, female: 0, other: 0 }
-                  },
-                  totalCount: parsedData.quizQuestion.optionStats.option1?.totalCount || 0
-                },
-                option2: {
-                  demographics: parsedData.quizQuestion.optionStats.option2?.demographics || {
-                    age18_24: { male: 0, female: 0, other: 0 },
-                    age25_33: { male: 0, female: 0, other: 0 },
-                    age35_44: { male: 0, female: 0, other: 0 },
-                    age45Plus: { male: 0, female: 0, other: 0 }
-                  },
-                  totalCount: parsedData.quizQuestion.optionStats.option2?.totalCount || 0
-                },
-                option3: {
-                  demographics: parsedData.quizQuestion.optionStats.option3?.demographics || {
-                    age18_24: { male: 0, female: 0, other: 0 },
-                    age25_33: { male: 0, female: 0, other: 0 },
-                    age35_44: { male: 0, female: 0, other: 0 },
-                    age45Plus: { male: 0, female: 0, other: 0 }
-                  },
-                  totalCount: parsedData.quizQuestion.optionStats.option3?.totalCount || 0
-                },
-                option4: {
-                  demographics: parsedData.quizQuestion.optionStats.option4?.demographics || {
-                    age18_24: { male: 0, female: 0, other: 0 },
-                    age25_33: { male: 0, female: 0, other: 0 },
-                    age35_44: { male: 0, female: 0, other: 0 },
-                    age45Plus: { male: 0, female: 0, other: 0 }
-                  },
-                  totalCount: parsedData.quizQuestion.optionStats.option4?.totalCount || 0
-                }
-              } : transformedData.quizQuestion.optionStats
-            }
+            createdAt: parsedData.createdAt ? new Date(parsedData.createdAt) : new Date(),
+            updatedAt: parsedData.updatedAt ? new Date(parsedData.updatedAt) : new Date(),
+            __v: parsedData.__v || 0
           }));
+
         } catch (error) {
           console.error("Error parsing campaign data:", error);
+          toast.error("Failed to load campaign data");
         }
       }
     }
-  }, []);
+  }, [searchParams]);
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">

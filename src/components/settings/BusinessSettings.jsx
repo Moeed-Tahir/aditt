@@ -1,6 +1,6 @@
 "use client";
 
-import { House, Globe, LandmarkIcon, ChevronDown } from "lucide-react";
+import { House, Globe, LandmarkIcon, ChevronDown, Tag } from "lucide-react";
 import { useState } from "react";
 
 export default function BusinessSettings({
@@ -88,6 +88,26 @@ export default function BusinessSettings({
               onChange={handleChange}
               name="companyName"
               value={formData.companyName}
+              className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2 h-[56px]"
+              disabled={!businessEditMode}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-start gap-2 md:gap-6">
+          <div className="w-full md:w-1/3">
+            <label className="block text-[16px] md:text-[18px] font-medium">
+              Brand Name
+            </label>
+          </div>
+          <div className="relative w-full md:flex-1">
+            <Tag className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Your brand name"
+              onChange={handleChange}
+              name="brandName"
+              value={formData.brandName || ""}
               className="w-full border border-gray-300 rounded-full pl-10 pr-4 py-2 h-[56px]"
               disabled={!businessEditMode}
             />

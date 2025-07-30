@@ -30,7 +30,7 @@ export function CreateCampaigns({ userId }) {
   const searchParams = useSearchParams();
   const currentStep = parseInt(searchParams.get("step") || "0");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [values, setValues] = useState([13, 25]);
+  const [values, setValues] = useState([18, 35]);
   const [showBackConfirmation, setShowBackConfirmation] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -68,22 +68,21 @@ export function CreateCampaigns({ userId }) {
     endDate: null,
     budget: "",
 
-    cardNumber: "",
-    monthOnCard: "",
-    cvc: "",
-    nameOnCard: "",
-    country: "",
-    zipCode: "",
-    cards: [],
-    bankAccounts: [],
+    paymentMethodId: "",
+    cardDetails: {
+      brand: "",
+      last4: "",
+      exp_month: "",
+      exp_year: ""
+    },
+    fingerprint: "",
+    customerId: "",
 
-    bankAccountNumber: "",
-    routingNumber: "",
-    accountType: "",
     couponCode: "",
     age: "",
     campignBudget: "",
   });
+
 
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
@@ -149,7 +148,6 @@ export function CreateCampaigns({ userId }) {
         });
 
         const intelligenceData = await intelUploadPromise;
-        console.log("Video intelligence data:", intelligenceData);
 
         setFormData(prev => ({
           ...prev,
@@ -317,22 +315,19 @@ export function CreateCampaigns({ userId }) {
         ageRange: formData.ageRange,
         categories: formData.categories.join(","),
         campaignStartDate: formData.startDate.toISOString(),
-        campaignEndDate: formData.endDate || null,
-        cardDetails: formData.cards,
-        cardDetail: {
-          cardNumber: formData.cardNumber,
-          cvc: formData.cvc,
-          nameOnCard: formData.nameOnCard,
-          dateOnCard: formData.monthOnCard,
-          country: formData.country,
-          zip: formData.zipCode,
-        },
+        campaignEndDate: formData.endDate.toISOString(),
+        cardDetail: formData.paymentMethodId ? {
+          paymentMethodId: formData.paymentMethodId,
+          customerId: formData.customerId,
+          cardDetails: {
+            brand: formData.cardDetails.brand,
+            last4: formData.cardDetails.last4,
+            exp_month: formData.cardDetails.exp_month,
+            exp_year: formData.cardDetails.exp_year
+          },
+          fingerprint: formData.fingerprint
+        } : null,
         totalEngagementValue: formData.totalEngagementValue,
-        bankDetail: {
-          accountNumber: formData.bankAccountNumber,
-          routingNumber: formData.routingNumber,
-          accountType: formData.accountType,
-        },
       };
 
       const response = await axios.post(
@@ -348,7 +343,7 @@ export function CreateCampaigns({ userId }) {
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error creating campaign:", error);
-      toast.error(error?.response?.data?.message || "Error is occur");
+      toast.error(error?.response?.data?.message || "Error occurred");
     }
   };
 

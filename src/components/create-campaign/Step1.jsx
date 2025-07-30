@@ -135,29 +135,6 @@ const showProgressSection =
               Add key details to set up and optimize your campaign.
             </span>
           </div>
-
-          <Link
-            href="?step=1"
-            className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
-              !formData.campaignTitle ||
-              !formData.brandName ||
-              !formData.websiteLink ||
-              !formData.videoFile
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-            onClick={(e) => {
-              if (
-                !formData.campaignTitle ||
-                !formData.websiteLink ||
-                !formData.videoFile
-              ) {
-                e.preventDefault();
-              }
-            }}
-          >
-            Next
-          </Link>
         </div>
 
         <hr className="border-t mb-4 border-gray-300" />
@@ -385,6 +362,32 @@ const showProgressSection =
               )}
             </div>
           </div>
+        </div>
+
+        {/* Moved Next button to bottom */}
+        <div className="mt-8 flex justify-end">
+          <Link
+            href="?step=1"
+            className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
+              !formData.campaignTitle ||
+              !formData.brandName ||
+              !formData.websiteLink ||
+              !formData.videoFile
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+            onClick={(e) => {
+              if (
+                !formData.campaignTitle ||
+                !formData.websiteLink ||
+                !formData.videoFile
+              ) {
+                e.preventDefault();
+              }
+            }}
+          >
+            Next
+          </Link>
         </div>
       </div>
     </div>

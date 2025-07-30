@@ -3,7 +3,6 @@ import Sliders from '../Sliders'
 import { DualRangeSlider } from '../DualSlider'
 
 const Step2 = ({ setFormData, formData, handleStepChange, uploadProgress }) => {
-    console.log("formData", formData);
 
     const handleAgeRangeChange = (newRange) => {
         setFormData(prev => ({
