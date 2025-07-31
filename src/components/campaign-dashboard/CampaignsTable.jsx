@@ -52,7 +52,7 @@ const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAc
                         <TableHead className="text-gray-500">Title</TableHead>
                         <TableHead className="text-gray-500">Total Attentive Engagements</TableHead>
                         <TableHead className="text-gray-500">Date</TableHead>
-                        <TableHead className="text-gray-500">Amount</TableHead>
+                        <TableHead className="text-gray-500">Active Budget</TableHead>
                         <TableHead className="text-gray-500">Status</TableHead>
                         {showActionColumn && (
                             <TableHead className="text-gray-500">Action</TableHead>
@@ -67,7 +67,7 @@ const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAc
                                 <TableCell className="text-gray-800 text-[14px] py-6">
                                     <Link
                                         href={`campaigns?id=${c.id}`}
-                                        className="text-gray-800 hover:text-blue-600 hover:underline"
+                                        className="text-blue-600 hover:text-blue-800 underline font-bold"
                                     >
                                         {c.title}
                                     </Link>

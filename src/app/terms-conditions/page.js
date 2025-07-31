@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 export default function TermsConditions() {
   return (
     <div className="min-h-screen bg-gray-100 px-4 py-8">
-      <div className="max-w-4xl mt-20 mx-auto mb-6">
+      <div className="max-w-7xl mt-20 mx-auto mb-6">
         <div className="flex items-center mb-6">
           <Link
             href="/signup-user"
@@ -22,64 +22,610 @@ export default function TermsConditions() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-8 relative">
-        <p className="block text-sm mb-3">
-          Privacy policy, often referred to as T&C or Terms of Service
-          (ToS), are a legal agreement between a company or service
-          provider and its users or customers. They outline the rules,
-          responsibilities, and obligations that both parties must adhere
-          to when using a particular service, website, or product
+      <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow p-8 relative">
+        <h1 className="text-2xl font-bold mb-4">ADVERTISER AGREEMENT</h1>
+        <p className="text-sm mb-6">
+          This Advertiser Agreement (the "Agreement") is between Aditt, LLC., a Delaware corporation
+          ("Company"), and the advertising customer (the "Customer"). This Agreement will be effective as of the date that
+          you click "I Accept" (the "Effective Date"). Please read this agreement carefully. By signing and using the system,
+          you represent that you have the authority to enter into this agreement and our privacy policy attached hereto as
+          Exhibit A and hereinafter referred to as the "Privacy Policy," (which is incorporated herein by reference) on behalf
+          of Customer, and agree that Customer, and all of Customer's employees and users, will be bound by this Agreement.
+          If you and your company do not wish to be bound by this agreement, you may not use the Platform (as defined
+          herein).
         </p>
-        <p className="block text-sm mb-3">
-          Here are some key points typically covered in Terms and
-          Conditions: Acceptance of Terms: Users are required to agree to
-          the terms presented before using the service or product. User
-          Obligations: The responsibilities and restrictions placed on
-          users, such as providing accurate information, complying with
-          applicable laws, and not engaging in illegal or harmful
-          activities. Intellectual Property: Information regarding the
-          ownership and protection of intellectual property, trademarks,
-          copyrights, and other proprietary rights related to the service
-          or product. Privacy and Data Collection: How user data is
-          collected, stored, used, and protected. It may include details
-          about cookies, tracking technologies, and the company&apos;s approach
-          to handling personal information.
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">1. Services</h2>
+        <h3 className="text-lg font-semibold mt-4 mb-2">a. Scope</h3>
+        <p className="text-sm mb-4">
+          Subject to the terms of the Agreement, Company and/or its affiliates will perform certain software
+          based services including (i) the placement of Customer created Internet advertising content or materials ("Ads");
+          and (ii) enabling views of certain data about the delivery of, and interactions with, Ads via the Platform (as defined
+          below) (collectively, "Services") for Customer. "Platform" shall mean any and all computer hardware, software,
+          APIs, websites, mobile applications, devices, servers, or other related systems under the control of Company and
+          containing the underlying software used to provide the Company's services including, but not limited to, the
+          Company's dashboard.
         </p>
-        <p className="block text-sm mb-3">
-          Privacy policy, often referred to as T&C or Terms of Service
-          (ToS), are a legal agreement between a company or service
-          provider and its users or customers. They outline the rules,
-          responsibilities, and obligations that both parties must adhere
-          to when using a particular service, website, or product
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">b. Reporting</h3>
+        <p className="text-sm mb-4">
+          The Platform tracks impressions, clicks, conversions, and other data which go into the
+          Campaign Overview in the Campaign Dashboard delivered by Company as well as the metrics for calculating
+          applicable Fees (as defined below). Customer acknowledges that (i) its use of the Services and provision of Ads,
+          content and other data to Company hereunder are for the purpose of purchasing and displaying advertising and
+          related services under this Agreement, and that such purchases will be recorded by the Services; (ii) other than with
+          respect to errors caused solely by Company's gross negligence or willful misconduct, all applicable Fees will be
+          calculated based on metrics reported by the Services; (iii) Company may accept, reject or suspend (even after any
+          initial acceptance), any Campaign (as defined below), or any specific Ad, or any portion thereof, at its sole
+          discretion, including to the extent such Campaign or content violates the requirements set forth in Section 3 herein
+          as may be updated from time to time; (iv) Company will be responsible for determining the size, placement and
+          positioning of Ads; (v) Company will use commercially reasonable efforts to direct Ads based on the criteria you set
+          forth in your Campaign Dashboard though Company does not guarantee that your Campaign or Ads will reach
+          Customer's intended audience or reach Customer's performance goals, including with respect to any desired number
+          of engagements or impressions; (vi) Company does not guarantee that placement meeting Customer's preferred
+          criteria will be available, or that it will be available in the volume desired by Customer; and (vii) while Company
+          will use reasonable efforts to filter fraudulent User accounts and related engagement activity, Company makes no
+          guarantees as to the amount or method of views generated by any Campaign or Ad and shall have no responsibility
+          for User account fraud, bot activity or any related data or technological issues even where such issues may impact
+          the cost of an applicable Campaign or Ad.
         </p>
-        <p className="block text-sm mb-3">
-          Privacy policy, often referred to as T&C or Terms of Service
-          (ToS), are a legal agreement between a company or service
-          provider and its users or customers. They outline the rules,
-          responsibilities, and obligations that both parties must adhere
-          to when using a particular service, website, or product{" "}
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">c. Testing</h3>
+        <p className="text-sm mb-6">
+          Customer authorizes Company and its affiliates to periodically conduct tests that may affect
+          Customer's usage of the Services, including Ad formatting; Ad targeting and keywords; URLs and other landing
+          pages to which Ads direct viewers; quality, ranking, and performance for Ads. Notwithstanding anything to the
+          contrary, Customer authorizes Company to conduct such tests without notice or compensation to Customer.
         </p>
-        <p className="block text-sm mb-3">
-          Here are some key points typically covered in Terms and
-          Conditions: Acceptance of Terms: Users are required to agree to
-          the terms presented before using the service or product. User
-          Obligations: The responsibilities and restrictions placed on
-          users, such as providing accurate information, complying with
-          applicable laws, and not engaging in illegal or harmful
-          activities. Intellectual Property: Information regarding the
-          ownership and protection of intellectual property, trademarks,
-          copyrights, and other proprietary rights related to the service
-          or product. Privacy and Data Collection: How user data is
-          collected, stored, used, and protected. It may include details
-          about cookies, tracking technologies, and the companys approach
-          to handling personal information.
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">2. Customer Responsibilities</h2>
+        <h3 className="text-lg font-semibold mt-4 mb-2">a. General Responsibilities</h3>
+        <p className="text-sm mb-4">
+          Customer shall at all times (i) enter and otherwise provide accurate and complete information to Company
+          and the Platform; (ii) secure, and upon Company's request, provide documentation of, all necessary authorization
+          from applicable third parties to distribute the Ads, Ad content and materials through the Platform;
+          (iii) ensure that Customer's use of the Services and Platform, the Ads, content and materials connected to the Ads, and the web
+          pages on which the Platform ad tags are placed, and the selection criteria used to target the Ads, conform to the Aditt
+          Advertiser Policies, and not violate any applicable law (including, but not limited to, all laws applicable to consumer
+          protection, consumer credit, privacy, and intellectual property), and do not cause damage or injury to Company or
+          the Platform; (iv) be prohibited from uploading or otherwise introducing into the Services any Ad, content or other
+          information that violates the Aditt Advertiser Policies; and (v) pay all applicable Fees. Any breach of the restrictions
+          and requirements set forth in this paragraph shall be a material breach of this Agreement and Company may suspend
+          Services and remove Ads as a result of such breach.
         </p>
-        <p className="block text-sm mb-3">
-          Privacy policy, often referred to as T&C or Terms of Service
-          (ToS), are a legal agreement between a company or service
-          provider and its users or customers. They outline the rules,
-          responsibilities, and obligations that both parties must adhere
-          to when using a particular service, website, or product
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">b. Account Responsibility</h3>
+        <p className="text-sm mb-4">
+          Customer agrees that it is responsible for the use of the Platform (including the incurrence of costs and
+          fees) by its employees, approved agents subcontractors, and any other users that gain access to the Platform via
+          Customer's login credentials, and that it will ensure such users comply with the terms of this Agreement and
+          Customer shall be liable for any breach of this Agreement by any of the foregoing.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">c. Sensitive Information</h3>
+        <p className="text-sm mb-4">
+          Notwithstanding anything to the contrary, Customer shall ensure that it will not use any Deliverables or
+          data generated by the Platform to target individuals or households which have opted out of targeted advertising,
+          including, but not limited to, by using any information that identifies or could be used to identify a particular
+          individual, as compared to a particular device, such as name, address, telephone number, email address, financial
+          account numbers, or government-issued identifiers ("PII") or Sensitive Information. "Sensitive Information" shall
+          mean: (i) any information revealing race or ethnic origin, political opinions, religious or philosophical beliefs, or
+          trade union membership; (ii) genetic data; (iii) biometric data for the purposes of uniquely identifying a natural
+          person; (iv) data concerning health; (v) data concerning a natural person's sex life or sexual orientation; (vi) any
+          personal data regarding a minor under the age of 13 (or under the age of 16 with respect to EEA Data); (vii) any
+          financial account numbers or insurance plan numbers that can be used to identify an individual; (viii) any
+          government-issued identifiers; or (ix) characteristics deemed sensitive under the Code of Conduct promulgated by
+          the Network Advertising Initiative ("NAI"), located at the
+          https://www.networkadvertising.org/sites/default/files/nai_code2018.pdf (or any successor website). "EEA Data"
+          shall mean data originating in the European Economic Area and the United Kingdom.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">d. Data Merging</h3>
+        <p className="text-sm mb-4">
+          Customer shall not merge any Company-provided data with any PII or otherwise re-identifying, or
+          attempting to re-identify, an individual for targeted advertising without obtaining specific opt-in consent from such
+          individual.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">e. Breach Consequences</h3>
+        <p className="text-sm mb-4">
+          Customer acknowledges that in the event of a breach of any requirements in Section 2, Section 3, or
+          Customer's breach of its payment obligations hereunder, Company reserves the right to remove any applicable Ads
+          and/or suspend or permanently deactivate Customer's account on the Platform.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">f. Export Compliance</h3>
+        <p className="text-sm mb-6">
+          Customer acknowledges that the Services are not designed or intended to be removed or exported from the
+          United States in violation of any restrictions, laws or regulations of the United States Department of Commerce, the
+          United States Department of Treasury Office of Foreign Assets Control, or any other United States or foreign
+          agency or authority, or used in a way that may violate any of the requirements of the foregoing. As defined in FAR
+          section 2.101, the Services are "commercial items" and according to DFAR section 252.227-7014(a)(1) and (5) are
+          deemed to be "commercial computer software." Customer shall comply with all export and re-export restrictions and
+          regulations of the Department of Commerce or other United States agency or authority, and shall not transfer, or
+          authorize the transfer of, the Services to a prohibited country or otherwise in violation of any such restrictions or
+          regulations or directly or indirectly, take any action that would cause Company to be in violation of United States
+          anti-boycott laws under the United States Export Administration Act or the United States Internal Revenue Code,
+          any sanctions administered or enforced by the U.S. Department of the Treasury's Office of Foreign Assets Control
+          (OFAC) the United Nations Security Council (UNSC), the United States Export Administration Regulations, 15
+          C.F.R. chapter VII, subchapter C (§§730-774), administered by the United States Commerce Department's Bureau
+          of Industry and Security ("BIS") (the foregoing limitations shall be referred to collectively as "Export Control
+          Regulations"). To the extent Customer violates any Export Control Violations or requests Company perform the
+          Services in a way that is alleged to violate any Export Control Regulations, Customer hereby agrees to defend,
+          indemnify and hold harmless Company and its affiliates, subsidiaries, employees, agents, shareholders, officers,
+          directors and attorneys from and against any and all claims, costs, damages, losses, liabilities, fines, penalties,
+          settlements and expenses (including attorneys' fees and costs) arising out of or in connection with the foregoing.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">3. Advertising Standards</h2>
+        <h3 className="text-lg font-semibold mt-4 mb-2">a. Prohibited Content</h3>
+        <p className="text-sm mb-4">
+          This section outlines content that is not allowed under any circumstances:
+        </p>
+        <ul className="list-disc pl-5 mb-4 text-sm space-y-2">
+          <li><strong>Dangerous Products or Services:</strong> We do not allow the promotion of products or services that primarily cause damage, harm, or injury. Examples include drugs and drug paraphernalia, tobacco products and accessories, weapons, ammunition and explosive materials.</li>
+          <li><strong>Sexual Content:</strong> We do not allow advertisements that contain sexual content. Examples of such content include hook-up dating, sex toys, strip clubs, sexually suggestive live chat, pornographic material.</li>
+          <li><strong>Alcohol:</strong> We do not allow advertisements for alcoholic beverages. Examples of beverages prohibited under this policy include beer, wine, sake, spirits or hard alcohol, Champagne, and fortified wine.</li>
+          <li><strong>Gambling and Gambling-Related Games:</strong> Gambling-related advertisements are not permitted on our Platforms. Examples of gambling-related content include physical casinos; sites where users can bet on poker, bingo, roulette, or sports events; national or private lotteries; sports odds aggregator sites; sites offering "poker-for-fun" or social casino games which offer in-app purchases; non-casino-based cash games.</li>
+          <li><strong>Illegal Products, Services, or Practices:</strong> Advertisers may not use Aditt's platform to traffic in, purchase, sell, or trade goods or services that are legally restricted under applicable law, including counterfeit products. Advertisements may not contain content that infringes upon or violates the intellectual property rights of any third party, including copyright, trademark or other legal rights.</li>
+          <li><strong>Malicious Software:</strong> Any product, service, or company that harms users such as by using viruses, spyware or malware, worms, trojan horses, time bombs or any other such malicious codes or instructions.</li>
+          <li><strong>Misinformation and Deceptive Practices:</strong> Ads that include content that has been debunked by third-party fact checkers, or can otherwise be deemed false, including conspiracy theories. Any product, service, or company that is designed to scam or mislead people out of money or personal information. This includes the promotion of fraudulent or misleading investments, loans, jobs, charitable donations, or business opportunities. Ads that over promise or suggest sensationalistic or unrealistic outcomes, such as those relating to weight loss or financial opportunity.</li>
+          <li><strong>Discrimination:</strong> Any ad that discriminates against people based on personal attributes such as race, ethnicity, color, national origin, religion, age, sex, sexual orientation, gender identity, family status, disability, medical or genetic condition. In addition, any advertiser running ads related to credit, housing or employment in the United States must comply with applicable U.S. laws pertaining to this type of advertising.</li>
+          <li><strong>Political Content:</strong> Promotion of political events, parties, or candidates. Political statements and/or advocacy, explicit or implied. Additional Categories: Astrology, fortune telling and/or psychic services, endangered species and live animals, religion and religious content.</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">b. Restricted Content</h3>
+        <p className="text-sm mb-4">
+          This section outlines categories which are subject to additional policies and further review:
+        </p>
+        <ul className="list-disc pl-5 mb-4 text-sm space-y-2">
+          <li><strong>Healthcare:</strong>
+            <ul className="list-disc pl-5 mt-2 space-y-2">
+              <li>We do not allow: Prescription, OTC, or recreational drugs, including CBD products Online pharmacies Pharmaceutical manufacturers Telehealth services Sexual and reproductive health products and services Cosmetic procedures and/or body modification</li>
+              <li>We do allow: Health supplements Eyeglasses and contact lenses Teeth alignment services Health insurance Class I and Class II medical devices upon further review</li>
+            </ul>
+          </li>
+          <li><strong>Financial Products and Services:</strong> For the purposes of this policy, we consider financial products and services to be those related to the investment and/or management of money and cryptocurrencies, including personalized advice.
+            <ul className="list-disc pl-5 mt-2 space-y-2">
+              <li>We do not allow: Payday or car title loans Credit repair or debt management services Rent-a-bank loans Any predatory financial or lending strategies Get-rich-quick schemes Cryptocurrency NFTs Promotion of a single stock or specific investing decision</li>
+            </ul>
+          </li>
+          <li><strong>Weight Loss, Wellness, and Coaching Products and Services:</strong>
+            <ul className="list-disc pl-5 mt-2 space-y-2">
+              <li>We do not allow advertisements that contain false claims or that entice the user with an improbable weight-loss result; weight loss or appetite suppressant pills and supplements; before-and-after imagery, cosmetic procedures or claims; or body shaming.</li>
+              <li>Advertising copy for coaching-focused services and other wellness and food-subscription programs should emphasize a healthy lifestyle over language that implies weight loss.</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">c. Sweepstakes & Giveaways</h3>
+        <p className="text-sm mb-4">
+          Partners are responsible for all legal compliance related to the sweepstakes and represent and warrant that they are compliant with all applicable rules and regulations. Any service or product involved in the sweepstakes or giveaway must meet relevant Aditt ad guidelines.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">d. Language and Style</h3>
+        <p className="text-sm mb-4">
+          Sponsor display name must match the product or service being promoted. Ad headlines and excerpts should be relevant to the landing pages. Sensational language is discouraged. Language should not attempt to convince a user to take an action through urgency, fear, or shame. Examples include "insane offer," "outrageous savings," "take action before it's too late," "you will regret missing your chance," "you're putting yourself at risk if you don't do this" No explicit language (even if censored, such as "sh*t" or "WTF"), emojis, exclamation points, or all-caps words for emphasis.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">e. Imagery</h3>
+        <p className="text-sm mb-4">
+          Aditt reserves the right to reject any ad unit or creative that we deem inappropriate or potentially offensive to our users.
+        </p>
+        <p className="text-sm mb-4">
+          <strong>Prohibited:</strong>
+        </p>
+        <ul className="list-disc pl-5 mb-4 text-sm space-y-2">
+          <li>Sensational, shocking, unrealistic, or misleading images.</li>
+          <li>Nudity, implied nudity, or partial nudity. Images cannot depict models in any state of undress including swimsuits or underwear.</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">f. Third-Party Intellectual Property Infringement</h3>
+        <p className="text-sm mb-4">
+          Ads may not contain content that violates the intellectual property rights of any third party, including copyright, trademark or other legal rights. This includes, but is not limited to, the promotion or sale of counterfeit goods, such as products that copy the trademark (name or logo) and/or distinctive features of another company's products to imitate a genuine product.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">g. Cybersecurity</h3>
+        <p className="text-sm mb-4">
+          Ads must not use phishing or social engineering techniques to capture others' sensitive information and must not promote or link to malicious code - such as malware or spyware.
+        </p>
+        <ul className="list-disc pl-5 mb-4 text-sm space-y-2">
+          <li>Ensure any ad data collected, received or derived from your ad ("Aditt Advertising Data") is only shared with someone acting on your behalf, such as your service provider. You are responsible for ensuring your service providers protect any Aditt Advertising Data or any obtained from us, limit their use of all of that information, and keep it confidential and secure.</li>
+          <li>Don't use Aditt Advertising Data for any purpose (including retargeting, commingling data across multiple advertisers' campaigns, or allowing piggybacking or redirecting with tags), except on an aggregate and anonymous basis (unless authorized by Aditt) and only to assess the performance and effectiveness of your Aditt advertising campaigns.</li>
+          <li>Don't use Aditt Advertising Data, including the targeting criteria for your ad, to build, append to, edit, influence, or augment user profiles, including profiles associated with any mobile device identifier or other unique identifier that identifies any particular user, browser, computer or device.</li>
+          <li>Don't transfer any Aditt Advertising Data (including anonymous, aggregate, or derived data) to any ad network, ad exchange, data broker or other advertising or monetization related service.</li>
+        </ul>
+
+        <p className="text-sm mb-4">
+          These standards should be used as a guideline when developing and submitting creative and messaging assets for the purposes of advertising on the Aditt Platform. Aditt reserves the right to update our advertising standards and/or refuse ads it decides are unacceptable and will not meet our users expectations.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">h. About Our Policies</h3>
+        <p className="text-sm mb-4">
+          No set of guidelines can address every situation or issue that may arise. Accordingly, we anticipate that these guidelines will be revisited and updated from time to time. Aditt reserves the right to refuse or remove any advertising that is inconsistent with or may tend to bring disparagement, harm to reputation, or other damage to the Aditt brand. We may also remove ads, categories of ads, or advertisers that receive negative feedback from users.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">i. Enforcement of our Policies</h3>
+        <p className="text-sm mb-4">
+          We use automated and, in some instances, manual review to enforce our policies. Our review process may not detect all policy violations, and ads remain subject to review and re-review and may be rejected for violating our policies at any time. It is an advertiser's responsibility to understand and comply with our policies outlined in herein, in Aditt's Terms of Service and any other applicable terms and guidelines, in addition to all local laws and regulations. Advertisers whose ads are rejected will typically be provided an opportunity to edit their ads in order to bring them into compliance and can request another review if they believe their ad was incorrectly rejected.
+        </p>
+        <ul className="list-disc pl-5 mb-4 text-sm space-y-2">
+          <li>Advertisers are responsible for understanding and complying with all applicable laws and regulations. Failure to comply may result in a variety of consequences, including the cancellation of ads you have placed and termination of your account.</li>
+          <li>We do not use sensitive personal data for ad targeting. Topics you choose for targeting your ad don't reflect the personal beliefs, characteristics or values of the Users.</li>
+          <li>Once displayed, ads are public information. Aditt may display (at no cost to you) and provide access to the ad content and creative, as well as information about the ad campaign (such as total spend and delivery data) for a period of seven (7) years from the completion of your order. Aditt may disclose your advertising content, and all information associated with your advertising, to a governmental entity or body if Aditt believes that disclosure would assist in a lawful investigation.</li>
+          <li>We reserve the right to reject, approve or remove any ad for any reason, in our sole discretion, including ads that negatively affect our relationship with our Users or that promote content, services, or activities, contrary to our competitive position, interests, or advertising philosophy.</li>
+          <li>For policies that require prior written permission, Aditt may grant these permissions.</li>
+          <li>These policies are subject to change at any time without notice.</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">j. The ad review process</h3>
+        <p className="text-sm mb-4">
+          Our ad review system relies primarily on a manual review/automated tools to check ads and business assets against our policies. Our ad review process starts automatically before ads begin running, and is typically completed within 24 hours, although it may take longer in some cases. During this review, the status of the ad will be "Pending" Additionally, ads may be reviewed again, including after they are live.
+        </p>
+        <ul className="list-disc pl-5 mb-4 text-sm space-y-2">
+          <li><strong>What is reviewed.</strong> Ads are reviewed for violations of our policies. This review process may include the specific components of an ad, such as images, video, text and targeting information, as well as an ad's associated landing page or other destinations, among other information.</li>
+          <li><strong>Outcome of review.</strong> If a violation is found at any point in the review process, the ad will be rejected. If your ad is rejected, Aditt will inform you.</li>
+          <li><strong>Re-review of ads.</strong> Ads remain subject to review and re-review at all times and may be rejected or restricted for violation of our policies at any time. It is your responsibility to understand and comply with our policies.</li>
+          <li><strong>What to do if your ad is rejected:</strong>
+            <ul className="list-disc pl-5 mt-2 space-y-2">
+              <li>Create a new ad or edit your ad. You may create a new ad or edit your ad to comply with our policies. These ads will be treated as new ads and reviewed by our ad review system.</li>
+              <li>Request another review. If you believe the ad was incorrectly rejected or restricted, you can request a review of the decision by emailing us at supportadvertiser@aditt.app</li>
+            </ul>
+          </li>
+        </ul>
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">4. Fees and Payments</h2>
+        <h3 className="text-lg font-semibold mt-4 mb-2">a. Fees</h3>
+        <p className="text-sm mb-4">
+          All applicable fees for the placement of Ads based on the parameters and criteria, and according to
+          the budget level made available as part of the Services are set forth on the Campaign dashboard (such placement a
+          "Campaign", and such dashboard the "Campaign Dashboard") and charged on a per use basis.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">b. Taxes</h3>
+        <p className="text-sm mb-4">
+          All invoiced amounts are exclusive of any and all value added, use, sales, service, property or other
+          taxes or contributions. Customer shall be responsible for payment of any such value added, use, sales, service,
+          property or other taxes or contributions that are, or should ultimately be, assessed against or required to be collected
+          by Company in connection with Company's performance hereunder (except to the extent Customer is exempt by law
+          and can provide Company with a bona fide exemption certificate).
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">c. Disputes; Suspension of Services</h3>
+        <p className="text-sm mb-6">
+          In the event that Customer disputes, in good faith, any charges on an invoice, it shall notify Company with a detailed written explanation prior to the date that the invoiced amount is due and Customer shall continue to timely pay Company any portion of the invoice not subject to a good faith dispute. In the event that Company does not receive payment of any Fees, or other amounts due, within the time frames above, interest shall accrue at the rate of two percent (2%) per month (or the maximum rate allowed by law) and Company reserves the right, in addition to any other rights and in its sole discretion, to suspend or terminate access to the Services by such Customer and/or stop any and all Services being performed. In addition, Customer shall reimburse Company for the costs of collection including, without limitation, attorneys' fees and expenses.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">5. Proprietary Rights</h2>
+        <h3 className="text-lg font-semibold mt-4 mb-2">a. Ownership</h3>
+        <p className="text-sm mb-4">
+          All right, title and interest in and to all Services, Platform, Deliverables (as defined below) and
+          any and all components and materials related to such items whether or not created, assembled, organized or
+          produced by Company and modification and enhancements to any such items whether or not created by Company
+          ("Company Materials") and any and all any patents, patent applications, trademarks, trade secrets, copyrights, and
+          all other similar items of intellectual property, whether registered or unregistered, any and all applications thereto,
+          including any common law or other rights created by use thereof, all proceeds thereof (such as by the way of
+          example any licenses, royalties and proceeds of current infringements), and the right to sue for past, present and
+          future infringements therein (collectively "Intellectual Property Rights") shall belong exclusively to Company,
+          and all rights granted to Customer under the Agreement are expressly limited to the license granted herein.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">b. License</h3>
+        <p className="text-sm mb-4">
+          Subject to the terms and conditions of the Agreement and subject to receipt of all applicable Fees
+          and other amounts due hereunder, Company hereby grants to Customer a limited, non-exclusive, non-transferable,
+          non-sublicensable license during the Term to access and use the Platform and Services for the sole purpose of (i)
+          uploading Customer Information; and (ii) viewing, downloading, importing, or otherwise managing any reports,
+          tables or data created or prepared by Company in the course of performing the Services ("Deliverables").
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">c. Limitations</h3>
+        <p className="text-sm mb-6">
+          Customer may only use the Company Materials in its own business and pursuant to the terms
+          of the Agreement, including any additional terms or restrictions set forth on the Campaign Dashboard, and shall
+          ensure that its authorized employees and agents that utilize the Services comply with the terms herein. Customer
+          agrees that it shall not, in whole or in part, at any time during or after the Term: (i) sell, assign, sub-licensee, lease,
+          distribute, transfer, communicate or disclose any of the Company Materials to any third party; (ii) modify or attempt
+          to modify any of the Company Materials or decompile, reverse engineer, create or recreate any related source code;
+          (iii) use any of the Company Materials to provide services to, or to otherwise benefit, any third party; (iv) use any of
+          the Company Materials to create a program having similar features or functions of the Company Materials; (v)
+          remove or modify any copyright or other proprietary notice contained in any of the Company Materials; or (vi)
+          allow others to do any of the foregoing. The licenses granted to Customer hereunder are specific to Customer and
+          may not be conveyed in any way.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">d. Customer Marks</h3>
+        <p className="text-sm mb-6">
+          Customer hereby provides Company with a limited, non-exclusive, royalty-free right and
+          license to use Customer's name, logo, ads, and any associated trademarks or service marks (collectively, "Customer
+          Marks") in connection with Company naming Customer as a customer in Company's promotional and marketing
+          materials. Notwithstanding the contrary, other than with respect to the limited license set forth in this Section,
+          Customer shall retain all right, title and interest in the Customer Marks.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">6. Representations, Warranties, Regulatory Compliance</h2>
+        <h3 className="text-lg font-semibold mt-4 mb-2">a. Duly Authorized</h3>
+        <p className="text-sm mb-4">
+          Each party represents and warrants that it is duly authorized to enter into the Agreement,
+          it has the authorization to grant the rights herein, its performance of the Agreement will not breach any separate
+          agreement to which it is bound, and that the Agreement, upon execution and delivery, represents a binding
+          obligation of such party, enforceable in accordance with its terms.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">b. Services</h3>
+        <p className="text-sm mb-4">
+          Company warrants that the Services will be provided in a professional and workmanlike manner
+          consistent with industry practices.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">c. Regulatory Compliance</h3>
+        <p className="text-sm mb-6">
+          Each party shall comply with all federal, state, and local laws and regulations that
+          are applicable to its respective business and the performance of its obligations under the Agreement.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">d. Additional Customer Warranties</h3>
+        <p className="text-sm mb-6">
+          Customer further represents, warrants and covenants to Company that (i)
+          it has the rights to use the Ads as contemplated by this Agreement; and (ii) Customer shall employ commercially
+          reasonable methodologies, technologies, and other means reasonably necessary to keep Company Confidential
+          Information secure and to prevent introduction, and shall not intentionally introduce into the Services any virus,
+          worm, "back door", Trojan Horse, or similar harmful code.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">7. DISCLAIMERS; LIMITATION OF LIABILITY</h2>
+        <h3 className="text-lg font-semibold mt-4 mb-2">a. Disclaimer</h3>
+        <p className="text-sm mb-4">
+          EXCEPT AS EXPRESSLY SET FORTH IN SECTION 6, THE PLATFORM AND SERVICES ARE
+          PROVIDED "AS IS" AND COMPANY MAKES NO OTHER REPRESENTATIONS OR WARRANTIES,
+          EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY WARRANTY OF MERCHANTABILITY
+          OR FITNESS FOR A PARTICULAR PURPOSE WITH RESPECT TO THE SERVICES PROVIDED
+          HEREUNDER OR THAT THE SERVICES PROVIDED WILL BE UNINTERRUPTED, TIMELY, ERROR-FREE
+          OR NON-INFRINGING. COMPANY MAKES NO REPRESENTATIONS OR WARRANTIES REGARDING
+          THE BENEFITS OR RESULTS THAT CUSTOMER WILL RECEIVE FROM THE SERVICES.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">b. Limitation of Liability</h3>
+        <p className="text-sm mb-4">
+          COMPANY SHALL HAVE NO LIABILITY WHATSOEVER FOR SPECIAL, INDIRECT,
+          INCIDENTAL OR CONSEQUENTIAL DAMAGES (INCLUDING WITHOUT LIMITATION LOST REVENUE
+          OR PROFITS, LOSS OF DATA, LOSS OF OPPORTUNITY OR DISRUPTION OF BUSINESS) OF THE
+          CUSTOMER OR ANY THIRD PARTY, EVEN IF SUCH PARTY HAS BEEN ADVISED OF THE POSSIBILITY
+          OF SUCH DAMAGES.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">c. Exclusive Remedy</h3>
+        <p className="text-sm mb-6">
+          NOTWITHSTANDING ANYTHING TO THE CONTRARY, CUSTOMER'S EXCLUSIVE REMEDY
+          FOR ANY CAUSE OF ACTION AGAINST COMPANY, ITS AFFILIATES, ITS VENDORS OR ITS
+          SUBCONTRACTORS IN CONNECTION WITH THE PERFORMANCE OF THE SERVICES AND
+          REGARDLESS OF THE FORM OF ACTION (INCLUDING BREACH OF CONTRACT, STRICT LIABILITY,
+          TORT INCLUDING NEGLIGENCE, OR ANY OTHER LEGAL OR EQUITABLE ACTION) SHALL BE
+          LIMITED TO PAYMENT FOR ACTUAL DAMAGES UP TO A MAXIMUM AGGREGATE AMOUNT EQUAL
+          TO THE TOTAL AMOUNTS PAID TO COMPANY HEREUNDER DURING THE SIX (6) MONTHS
+          PRECEDING THE DATE THE CAUSE OF ACTION AROSE. OTHER THAN WITH RESPECT TO
+          COMPANY'S GROSS NEGLIGENCE OR WILLFUL MISCONDUCT, COMPANY SHALL NOT BE LIABLE
+          TO CUSTOMER FOR LOSS, COSTS, DAMAGES, OR EXPENSES INCURRED IN CONNECTION WITH
+          CUSTOMER'S USE OF THE SERVICES, INCLUDING WITH RESPECT TO ANY TECHNICAL
+          MALFUNCTION, INPUTTING ERRORS, SYSTEM ERRORS, CORRUPTION OR LOSS OF DATA, OR
+          OTHER DAMAGES.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">8. Term and Termination</h2>
+        <h3 className="text-lg font-semibold mt-4 mb-2">a. Term</h3>
+        <p className="text-sm mb-4">
+          The term of this Agreement shall commence upon registration of Customer's Account and shall
+          continue until terminated as permitted hereunder (the "Term").
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">b. Termination</h3>
+        <p className="text-sm mb-4">
+          The Agreement may be terminated as follows:
+        </p>
+        <ul className="list-disc pl-5 mb-4 text-sm space-y-2">
+          <li>Unless otherwise provided herein, by either party by providing at least two (2) days' written notice to the other party.</li>
+          <li>In the event that either party breaches any term or condition of the Agreement in any material respect the other party shall have the right to terminate the Agreement if the breaching party has not cured such breach within thirty (30) days of receiving written notice from the non-breaching party.</li>
+          <li>Either party may terminate the Agreement immediately upon written notice in the event: (A) the other party commences or becomes the subject of any bankruptcy, insolvency, or equivalent case or proceeding; (B) the other party makes a general assignment for the benefit of its creditors; (C) a trustee or receiver is appointed for the other party, or for any of its property; or (D) any petition by or on behalf of the other party is filed to take advantage of any debtor's act or to reorganize under the bankruptcy or similar laws, which petition is not removed within sixty (60) days after filing.</li>
+          <li>Company may, in its sole discretion, terminate the Agreement immediately upon written notice in the event of (i) any unauthorized or unlawful usage by Customer or any third party gaining access to the Services, directly or indirectly, through or as a result of Customer's use of the Services; or (ii) Company's determination, in its sole discretion, that any Campaigns, Ads, or any portions thereof, violate any of the requirements set forth in Section 2.</li>
+        </ul>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">c. Effect of Termination</h3>
+        <p className="text-sm mb-6">
+          Upon termination of the Agreement Customer may no longer access the Services or
+          other Company Materials or any rights or licenses granted to Customer hereunder. The terms of Sections 2(d), 6(a),
+          6(d), 8, 9(c), 10, 11 and 12 shall survive the termination or expiration of the Agreement. Notwithstanding anything
+          to the contrary, Customer will remain liable after termination or expiration for all applicable Fees for Services
+          performed prior to the effective date of termination as well as any non-cancellable charges, including, but not limited
+          to, costs of any Ads purchased or placed by Company prior to such date. Other than in the event of a termination for
+          Customer's breach, Company shall provide Customer with a refund of a pro rata share of any unused prepaid Fees
+          as of the effective date of termination.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">9. Confidentiality</h2>
+        <h3 className="text-lg font-semibold mt-4 mb-2">a. Definition</h3>
+        <p className="text-sm mb-4">
+          "Confidential Information" means any and all business, financial or technical information or data in any
+          form or medium, tangible or intangible, used in or relating to the business activities or operations of the disclosing
+          party which is disclosed, either orally or in writing, by the disclosing party to the receiving party, whether on, before
+          or after the date of the Agreement, including without limitation Intellectual Property Rights; data, know-how,
+          business rules, reports, summaries, processes, samples, ideas, research and development, security procedures and
+          passwords; computer software and programs; database technologies, systems, structures and architectures;
+          marketing plans, business plans, strategies, forecasts, financial information, customer lists, price lists, market
+          studies, business plans; and information regarding suppliers, dealers, affiliates, subsidiaries, investors, or lenders.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">b. Protection of Confidential Information</h3>
+        <p className="text-sm mb-4">
+          Each party shall take all reasonable steps to prevent the disclosure of the other party's Confidential
+          Information in violation of the Agreement, which shall be no less than the steps it takes to protect its own
+          Confidential Information. Each party shall use its reasonable efforts to confine knowledge of the other party's
+          Confidential Information to its employees and agents who have a reasonable need to know Confidential Information
+          disclosed hereunder ("Representatives") provided that prior to any disclosure to a Representative such
+          Representative has either (i) executed a written agreement to keep such Confidential Information confidential on at
+          least the same terms as described herein, or (ii) is subject to a professional obligation to maintain the confidentiality
+          of such information; and provided further that the receiving party shall remain liable to the disclosing party for any
+          breaches of the Agreement by its Representatives.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">c. Required Disclosure</h3>
+        <p className="text-sm mb-4">
+          Notwithstanding the foregoing, Confidential Information may be disclosed as required by any
+          governmental agency, provided that before disclosing such information the disclosing party must provide the
+          non-disclosing party with sufficient advance notice of the agency's request for the information to enable the
+          non-disclosing party to exercise any rights it may have to challenge or limit the agency's authority to receive such
+          Confidential Information.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">d. Exclusions</h3>
+        <p className="text-sm mb-4">
+          Confidential Information shall not include information that (i) is or becomes publicly available through no
+          breach or omission of the receiving party; (ii) was lawfully in the possession of the receiving party prior to the
+          disclosure of by the disclosing party; (iii) is lawfully disclosed to the receiving party from a source other than the
+          disclosing party, provided that such source is not bound by any fiduciary, contractual or legal duties of
+          confidentiality; and (iv) is lawfully and independently developed by the receiving party, which can be established by
+          written evidence.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">e. Customer Information</h3>
+        <p className="text-sm mb-4">
+          In order for Company to provide the Services and deliver the Deliverables, Customer will be required to
+          provide Company and its affiliates with data concerning Customer, its products and/or services and customers,
+          including any content or data to be used in connection with Ads generated or placed via the Services ("Customer
+          Information"). Such Customer Information may be generated by Customer's use of the Services and hosted on
+          servers under the possession or control of third parties. Customer hereby grants Company and its authorized
+          subcontractors and service providers, a non-exclusive, royalty-free right and license (i) to have access to and make
+          use of the Customer Information as necessary for the performance of Services; (ii) store in the Platform(s) any and
+          all Customer Information; and (iii) to use Customer Information, as well as any data or information generated by
+          Customer's use of the Services, for research, analytics and Company's business purposes. Customer acknowledges
+          that it is Customer's sole responsibility to ensure that the Customer Information is accurate and up-to-date and
+          Company will not be able to perform the Services in the event Customer fails to maintain accurate Customer
+          Information. Customer grants to Company a perpetual, irrevocable, royalty-free license to use and incorporate into
+          the Services any suggestion, enhancement request, recommendation, correction or other feedback provided by Client
+          regarding the Services or Platform.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">f. Company Materials</h3>
+        <p className="text-sm mb-4">
+          Customer expressly acknowledges and agrees that any ideas, concepts, know-how, methods, models, data,
+          techniques, business rules, skill, knowledge and experience that were or are used, developed or gained by Company
+          or any of its personnel and all components thereof, including without limitation the Company Materials and any
+          websites, systems, reports or tools made available to Customer in connection with the performance of the Services
+          and delivery of the Deliverables are owned by Company as provided herein and are the Confidential Information of
+          Company.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">g. Return or Destruction</h3>
+        <p className="text-sm mb-6">
+          Upon termination of this Agreement for any reason, or upon or on the disclosing party's request at any
+          time, the receiving party will promptly deliver to the disclosing party, or, at the disclosing party's option, destroy, all
+          notes, memoranda, programs, computer memory media, equipment and all other materials containing the disclosing
+          party's Confidential Information and will not retain any copies thereof, other than as permitted under this
+          Agreement. The receiving party shall promptly provide the disclosing party with written certification of such return
+          or destruction of Confidential Information. To the extent that any Confidential Information is retained as permitted
+          hereunder, or to the extent that copies of any Confidential Information are stored in electronic archives or backups
+          made in the ordinary course of business in accordance with applicable legal, disaster recovery and professional
+          requirements, all such Confidential Information shall continue to be governed by the provisions of this Section.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">10. Privacy</h2>
+        <h3 className="text-lg font-semibold mt-4 mb-2">a. Privacy Policy</h3>
+        <p className="text-sm mb-4">
+          Customer acknowledges that all use of the Services by Customer and its employees or
+          other authorized users, as well as Company's use of any data provided by Customer or generated by Customer's use
+          of the Services, shall be governed by the Privacy Policy except that to the extent any terms of the Privacy Policy
+          conflict with the terms of this Agreement the terms of this Agreement shall control.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">b. Compliance with Laws and Regulations</h3>
+        <p className="text-sm mb-6">
+          Each party shall, at all times during the Term, comply with all
+          applicable privacy laws and governmental and industry regulations including, but not limited to, Section 5 of the
+          FTC Act, the NAI Code of Conduct and Digital Advertising Alliance Self-Regulatory Principles for Multi-Site Data
+          found at http://www.aboutads.info/msdprinciples (or any successor site), and the applicable laws of EU members
+          states and the United Kingdom (collectively "Laws"). Each party shall be responsible for posting a privacy policy
+          on its own web site that is in compliance with all applicable Laws. Customer shall (i) ensure that its privacy policy
+          provides users with adequate notice of the types of personal data that are collected, an explanation of how and for
+          which purpose(s) personal data will be used or transferred to third parties, any disclosures of personal data that have
+          been made, and if requested by Company, identifying Company by name and providing a link to Company's privacy
+          notice, and (ii) secure specific consent to the use of cookies and other tracking or similar technologies that store or
+          access information stored on user devices (and provide users with a means to opt-out from advertising cookies and
+          such tracking technologies). In the event that Customer intends to provide Customer Information to Company that
+          constitutes PII, Customer is responsible for encrypting such data in a manner which prevents it from being
+          disassembled or reverse engineered in order to identify the individual to which it pertains prior to providing it to
+          Company, and such encrypted data shall then no longer be PII. Customer may not merge or otherwise associate
+          personally identifiable information with information collected through the Services, unless such merger or
+          association is conducted in accordance with all applicable Laws.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">11. Indemnification</h2>
+        <p className="text-sm mb-6">
+          Customer agrees to indemnify, defend and hold harmless Company and its affiliates,
+          subsidiaries, employees, agents, shareholders, officers, directors and attorneys from and against any and all claims,
+          costs, damages, losses, liabilities, fines, penalties, settlements and expenses (including attorneys' fees and costs)
+          arising out of or in connection with: (i) a claim alleging that use of the Customer Information, including, but not
+          limited to, the Ads or advertising content, infringes the rights of, or has caused harm to, a third party, including but
+          not limited to claims that the Customer Information violates the intellectual property rights or privacy of any third
+          party or is illegal, deceptive, defamatory, obscene or otherwise violates any of the content restrictions set forth
+          herein; or (ii) any breach of Customer's representations or warranties or Customer's failure to fulfill any of its
+          obligations under the Agreement.
+        </p>
+
+        <h2 className="text-xl font-semibold mt-6 mb-3">12. General</h2>
+        <h3 className="text-lg font-semibold mt-4 mb-2">a. Assignment</h3>
+        <p className="text-sm mb-4">
+          This Agreement shall be binding upon and shall inure to the benefit of Company and
+          Customer and their respective successors and permitted assigns. This Agreement may not be assigned by either
+          party, in whole or in part, without the prior written consent of the other party, which consent shall not be
+          unreasonably withheld or delayed. Notwithstanding the foregoing, either party may assign this Agreement in its
+          entirety, upon written notice but without consent of the other party, in connection with a (i) merger, acquisition,
+          corporate reorganization resulting in a change of voting control, or (ii) sale of all or substantially all of its assets not
+          involving a direct competitor of the other party. Any attempt by a party to assign its rights or obligations under this
+          Agreement in breach of this Section shall be void and of no effect.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">b. Force Majeure</h3>
+        <p className="text-sm mb-4">
+          Neither party shall be liable for any delay (except for obligations to pay all Fees and other
+          payments hereunder) or other failure of performance caused by reasonably unforeseeable factors beyond its control,
+          including without limitation strikes, riots, insurrection, labor shortage, earthquake, hurricane, epidemic, war, acts of
+          terrorism, fire, acts of God, or governmental acts or regulation.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">c. Independent Contractor</h3>
+        <p className="text-sm mb-4">
+          The parties are independent contractors, and nothing in the Agreement or the
+          performance of the Services or the delivery of Deliverables shall be considered to create a partnership, joint venture
+          or similar relationship between the Parties.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">d. Governing Law and Venue</h3>
+        <p className="text-sm mb-4">
+          This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware without regard to its conflict of law provisions. Each party agrees that any dispute shall be brought exclusively in the state or federal courts sitting within the judiciary district of the United States District Court in the District of Delaware, and that it will submit to the jurisdiction of the state or federal courts therein, and to waive any and all objections to the exercise of jurisdiction over the parties by such courts and to venue in such courts.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">e. Notices</h3>
+        <p className="text-sm mb-4">
+          All demands, notices and communications required or permitted under this Agreement shall be in
+          writing and shall be deemed given (i) upon personal delivery to the party to be notified, (ii) upon sending if by email
+          (with confirmation), if sent during normal business hours and, if not, then on the next business day, (iii) three (3)
+          days after mailing, if sent by registered or certified mail, return receipt requested, postage prepaid, or (iv) one day
+          after dispatch, if sent by a nationally recognized overnight courier, to the respective addresses set forth in the first
+          paragraph of this Agreement.
+        </p>
+
+        <h3 className="text-lg font-semibold mt-4 mb-2">f. Miscellaneous</h3>
+        <p className="text-sm mb-6">
+          If any provision of the Agreement (or any portion thereof) shall be held to be invalid, illegal
+          or unenforceable, the validity, legality or enforceability of the remainder hereof shall not in any way be affected or
+          impaired thereby. The headings in the Agreement are intended for convenience of reference and shall not affect its
+          interpretation. This Agreement, including any additional terms or restrictions set forth as part of the Campaign, and
+          any related exhibits or amendments contain the entire agreement of the parties with respect to its subject matter and
+          supersede all existing agreements and all other oral, written or other communications between them concerning its
+          subject matter. Neither party's failure to enforce strict performance of any provision of the Agreement will constitute
+          a waiver of a right to subsequently enforce such a provision. No written waiver shall constitute, or be construed as, a
+          waiver of any other obligation or condition of the Agreement. This Agreement may be amended by the parties,
+          provided that no amendment, modification or waiver of the Agreement shall be valid unless made in writing and
+          signed by an authorized representative of the party to be charged.
         </p>
       </div>
     </div>
