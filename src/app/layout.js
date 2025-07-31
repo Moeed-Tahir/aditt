@@ -5,7 +5,7 @@ export const metadata = {
   title: "Aditt - Manage Your Campaigns",
   description: "Manage your campaigns effectively with Aditt",
   icons: {
-    icon: "/favicon.ico", // Path inside /public
+    icon: "/favicon.ico",
   },
 };
 
