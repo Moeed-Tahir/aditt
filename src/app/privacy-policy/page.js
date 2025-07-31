@@ -28,13 +28,13 @@ export default function PrivacyPolicy() {
 
         <h2 className="text-xl font-semibold mt-6 mb-3">Introduction</h2>
         <p className="text-sm mb-4">
-          Aditt, LLC ("Aditt", "we", "our" or "us") is committed to protecting your privacy. This privacy policy ("Policy") describes the types of personal information we collect through our website at https://www.aditt.app and any related applications, features or services (collectively, the "Platform"), how we use that information, who we share it with, and the choices you can make about our collection, use and disclosure of that information.
+          Aditt, LLC (&quot;Aditt&quot;, &quot;we&quot;, &quot;our&quot; or &quot;us&quot;) is committed to protecting your privacy. This privacy policy (&quot;Policy&quot;) describes the types of personal information we collect through our website at https://www.aditt.app and any related applications, features or services (collectively, the &quot;Platform&quot;), how we use that information, who we share it with, and the choices you can make about our collection, use and disclosure of that information.
         </p>
         <p className="text-sm mb-4">
           By visiting the website and using the Platform provided by Aditt, you consent to our use and processing of your information as set forth herein. This policy does not apply to third parties that Aditt does not own or control.
         </p>
         <p className="text-sm mb-6">
-          You acknowledge that the Platform is built to function in conjunction with Stripe, Inc. ("Stripe") digital payments processing platform which is utilized to facilitate financial transactions between Aditt, its Advertisers and its Users. All payment processing is conducted by Stripe. As such, should you engage in financial transactions on the Platform, these transactions will also be governed by the Stripe privacy policy available at https://stripe.com/privacy as applicable. For more information about how Stripe uses, collects and provides you with information in the course of executing transactions and processing payments please consult the aforementioned policies.
+          You acknowledge that the Platform is built to function in conjunction with Stripe, Inc. (&quot;Stripe&quot;) digital payments processing platform which is utilized to facilitate financial transactions between Aditt, its Advertisers and its Users. All payment processing is conducted by Stripe. As such, should you engage in financial transactions on the Platform, these transactions will also be governed by the Stripe privacy policy available at https://stripe.com/privacy as applicable. For more information about how Stripe uses, collects and provides you with information in the course of executing transactions and processing payments please consult the aforementioned policies.
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-3">Data Collection and Use</h2>
@@ -81,7 +81,7 @@ export default function PrivacyPolicy() {
           We use commercially reasonable safeguards to help keep the information collected through the Platform secure and take reasonable steps (such as requesting a unique password and username) to verify your identity before granting you access to your account. However, Aditt cannot ensure the security of any information you transmit via the Platform or guarantee that information on the Platform may not be accessed, disclosed, altered, or destroyed.
         </p>
         <p className="text-sm mb-4">
-          You are responsible for maintaining the secrecy of your unique password and account information. If you believe the Platform's security has been breached, you agree to notify Aditt immediately.
+          You are responsible for maintaining the secrecy of your unique password and account information. If you believe the Platform&apos;s security has been breached, you agree to notify Aditt immediately.
         </p>
         <p className="text-sm mb-6">
           We may remove parts of data that can identify you and share anonymized data with other parties. We may also combine your information with other information in a way that it is no longer associated with you and share that aggregated information.
@@ -89,7 +89,7 @@ export default function PrivacyPolicy() {
 
         <h3 className="text-lg font-semibold mt-4 mb-2">Information We Collect Through Automatic Data Collection Technologies</h3>
         <p className="text-sm mb-4">
-          As you navigate through and interact with our Platform, we may use automatic data collection technologies to collect certain information about your equipment, browsing actions, and patterns, including: (i) details of your visits to our Platform, including traffic data, location data, logs, and other communication data and the resources that you access and use on the Platform; and (ii) information about your computer and internet connection, including your IP address, operating system, browser type, MAC address, unique device identifier, International Mobile Equipment Identity ("IMEI") and mobile network information. We also create and store information about our users in logs. The logged information includes IP addresses, endpoints you use, and if there are any errors, we store information to diagnose and correct any problems with the Platform.
+          As you navigate through and interact with our Platform, we may use automatic data collection technologies to collect certain information about your equipment, browsing actions, and patterns, including: (i) details of your visits to our Platform, including traffic data, location data, logs, and other communication data and the resources that you access and use on the Platform; and (ii) information about your computer and internet connection, including your IP address, operating system, browser type, MAC address, unique device identifier, International Mobile Equipment Identity (&quot;IMEI&quot;) and mobile network information. We also create and store information about our users in logs. The logged information includes IP addresses, endpoints you use, and if there are any errors, we store information to diagnose and correct any problems with the Platform.
         </p>
         <p className="text-sm mb-4">
           The information we collect automatically may include personal information or we may maintain or associate your information with personal information we collect in other ways or receive from third parties. It helps us to improve our Platform and to deliver a better and more personalized service, including by enabling us to: (i) estimate our audience size and usage patterns; (ii) store information about your preferences, allowing us to customize our Platform according to your individual interests; (iii) speed up your searches; and (iv) recognize you when you return to our Platform.
@@ -99,14 +99,14 @@ export default function PrivacyPolicy() {
         </p>
         <ul className="list-disc pl-5 mb-4 text-sm space-y-2">
           <li><strong>Cookies</strong> – Cookies are small text files that contain a string of characters. Aditt uses cookies to uniquely identify an Internet browser. Certain browsers or browser settings sometimes block cookies, and cookies may not work effectively on some mobile devices. For more information about cookies, please visit http://www.allaboutcookies.org/.</li>
-          <li><strong>Mobile Advertising Identifiers</strong> – Mobile advertising IDs (e.g., Apple's IDFA or Google's AAID) are unique IDs that are associated with individual mobile devices and that do not reveal your real world identity. They usually are user-resettable.</li>
+          <li><strong>Mobile Advertising Identifiers</strong> – Mobile advertising IDs (e.g., Apple&apos;s IDFA or Google&apos;s AAID) are unique IDs that are associated with individual mobile devices and that do not reveal your real world identity. They usually are user-resettable.</li>
           <li><strong>Pixel Tags</strong> – Pixel tags (also commonly known as web beacons) are transparent images, iFrames, or JavaScript that our clients and partners use to understand how consumers interact with them online, including on websites and in mobile apps.</li>
           <li><strong>Statistical IDs</strong> – Statistical IDs are created via an algorithm using pseudonymous information about your computer or device, including your operating system, user-agent string, IP address, Internet browser, installed fonts, and similar information. This information makes your computer or device distinct enough for our systems to determine within a reasonable probability that they are encountering the same computer or device, including in environments where Aditt and 3rd party vendor cookies are not supported.</li>
           <li><strong>Flash Cookies</strong> - Certain features of our Platform may use local stored objects (or Flash cookies) to collect and store information about your preferences and navigation to, from, and on our Platform. Flash cookies are not managed by the same browser settings as are used for browser cookies.</li>
           <li><strong>Web Beacons</strong> - Pages of the Platform may contain small electronic files known as web beacons (also referred to as clear gifs, pixel tags, and single-pixel gifs) that permit the Company, for example, to count users who have visited those pages and for other related website statistics (for example, recording the popularity of certain website content and verifying system and server integrity).</li>
         </ul>
         <p className="text-sm mb-6">
-          You can set your browser to refuse all or some browser cookies, or to alert you when cookies are being sent. Disabling cookies may impact how you view and interact with the Platform, including rendering some features unusable. To learn how you can manage your Flash cookie settings, visit the Flash player settings page on Adobe's website. If you disable or refuse cookies, please note that some parts of this site may then be inaccessible or not function properly.
+          You can set your browser to refuse all or some browser cookies, or to alert you when cookies are being sent. Disabling cookies may impact how you view and interact with the Platform, including rendering some features unusable. To learn how you can manage your Flash cookie settings, visit the Flash player settings page on Adobe&apos;s website. If you disable or refuse cookies, please note that some parts of this site may then be inaccessible or not function properly.
         </p>
 
         <h3 className="text-lg font-semibold mt-4 mb-2">Information About You We May Receive from Third Parties</h3>
@@ -132,7 +132,7 @@ export default function PrivacyPolicy() {
           <li>To analyze trends and conduct research about improving our products, services and Platform.</li>
           <li>To correlate information with other commercially available information to identify demographics and preferences to assist us in marketing efforts.</li>
           <li>To contact users for research, informational or marketing purposes.</li>
-          <li>To learn about our users' needs.</li>
+          <li>To learn about our users&apos; needs.</li>
           <li>To address information security and/or privacy practices control, network functioning, engineering, and troubleshooting issues.</li>
           <li>To investigate claims and/or legal actions, violations of law or agreements, and compliance with relevant applicable laws and legal process.</li>
           <li>To comply with law, or based on our good-faith belief that it is necessary to conform or comply with the law, or otherwise to disclose information to prevent fraud and reduce credit risks, to cooperate with police and other governmental authorities, or to protect the rights, property or safety of visitors to the Platform or the public.</li>
@@ -152,7 +152,7 @@ export default function PrivacyPolicy() {
 
         <h2 className="text-xl font-semibold mt-6 mb-3">Opt-Out</h2>
         <p className="text-sm mb-4">
-          If you are served an advertisement over the Internet that you believe may have been created or placed by a user of the Platform you can find information regarding opting out of such advertisements and related data collection by consulting the relevant advertiser's published privacy policy.
+          If you are served an advertisement over the Internet that you believe may have been created or placed by a user of the Platform you can find information regarding opting out of such advertisements and related data collection by consulting the relevant advertiser&apos;s published privacy policy.
         </p>
 
         <h3 className="text-lg font-semibold mt-4 mb-2">Other ways to opt out</h3>
@@ -183,7 +183,7 @@ export default function PrivacyPolicy() {
 
         <h2 className="text-xl font-semibold mt-6 mb-3">Your California and Other State Privacy Rights</h2>
         <p className="text-sm mb-4">
-          The California Consumer Privacy Act ("CCPA"), as amended by the California Privacy Rights Act ("CPRA"), provides California residents with specific rights regarding their personal information. If you are a California resident, your rights are described below. If you have any questions about whether any of the following applies to you, please email us at info@aditt.app.
+          The California Consumer Privacy Act (&quot;CCPA&quot;), as amended by the California Privacy Rights Act (&quot;CPRA&quot;), provides California residents with specific rights regarding their personal information. If you are a California resident, your rights are described below. If you have any questions about whether any of the following applies to you, please email us at info@aditt.app.
         </p>
         <p className="text-sm mb-4">
           You have the right to request certain information about our collection and use of your personal information over the past 12 months, including the following:
@@ -245,7 +245,7 @@ export default function PrivacyPolicy() {
 
         <h2 className="text-xl font-semibold mt-6 mb-3">Testimonials</h2>
         <p className="text-sm mb-6">
-          We may display testimonials from satisfied clients on the Platform in addition to other endorsements. We will obtain our client's permission before we place these testimonials on the Platform. If you are a client who wishes to update or delete a testimonial, please contact us at info@aditt.app.
+          We may display testimonials from satisfied clients on the Platform in addition to other endorsements. We will obtain our client&apos;s permission before we place these testimonials on the Platform. If you are a client who wishes to update or delete a testimonial, please contact us at info@aditt.app.
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-3">Service Providers</h2>
@@ -273,14 +273,14 @@ export default function PrivacyPolicy() {
         <ul className="list-disc pl-5 mb-4 text-sm space-y-2">
           <li>To our subsidiaries and affiliates.</li>
           <li>To contractors, service providers, and other third parties we use to support our business and who are bound by contractual obligations to keep personal information confidential and use it only for the purposes for which we disclose it to them. Such service providers may include payment processors for the purpose of processing your purchases on the Platform.</li>
-          <li>To a buyer or other successor in the event of a merger, divestiture, restructuring, reorganization, dissolution, or other sale or transfer of some or all of Company's assets, whether as a going concern or as part of bankruptcy, liquidation, or similar proceeding, in which personal information held by Company about our Platform users is among the assets transferred.</li>
+          <li>To a buyer or other successor in the event of a merger, divestiture, restructuring, reorganization, dissolution, or other sale or transfer of some or all of Company&apos;s assets, whether as a going concern or as part of bankruptcy, liquidation, or similar proceeding, in which personal information held by Company about our Platform users is among the assets transferred.</li>
           <li>To fulfill the purpose for which you provide it. (e.g. payment processing)</li>
           <li>For any other purpose disclosed by us when you provide the information.</li>
           <li>With your consent.</li>
           <li>To comply with any court order, law, or legal process</li>
           <li>If we believe disclosure is necessary or appropriate to protect the rights, property, or safety of the Company, our customers, or others</li>
           <li>To enforce or apply the terms of our Advertiser Agreement on our website</li>
-          <li>In addition, with your consent, we may share your information with third parties that provide products or services that you have requested and such third parties are not acting on our behalf in these instances. Please be aware that we are not responsible for the privacy practices of such third parties. We do not control these third parties' policies regarding the collection or use of your information. If you have any questions about the privacy practices of a third party, you should contact them directly.</li>
+          <li>In addition, with your consent, we may share your information with third parties that provide products or services that you have requested and such third parties are not acting on our behalf in these instances. Please be aware that we are not responsible for the privacy practices of such third parties. We do not control these third parties&apos; policies regarding the collection or use of your information. If you have any questions about the privacy practices of a third party, you should contact them directly.</li>
         </ul>
 
         <h2 className="text-xl font-semibold mt-6 mb-3">Maintenance of Information</h2>
@@ -357,18 +357,18 @@ export default function PrivacyPolicy() {
           Your consent to this Policy followed by your submission of such information represents your agreement to that transfer.
         </p>
         <p className="text-sm mb-4">
-          Our Service may contain links to other sites that are not operated by us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Policy of every site you visit.
+          Our Service may contain links to other sites that are not operated by us. If you click on a third party link, you will be directed to that third party&apos;s site. We strongly advise you to review the Policy of every site you visit.
         </p>
         <p className="text-sm mb-6">
           We have no control over, and assume no responsibility for the content, privacy policies or practices of any third party sites or services.
         </p>
 
-        <h2 className="text-xl font-semibold mt-6 mb-3">Children's Privacy</h2>
+        <h2 className="text-xl font-semibold mt-6 mb-3">Children&apos;s Privacy</h2>
         <p className="text-sm mb-4">
           By using this site, you represent that you are at least the age of majority in your state or province of residence, or that you are the age of majority in your state or province of residence and you have given us your consent to allow any of your minor dependents to use this site.
         </p>
         <p className="text-sm mb-4">
-          Only persons age 13 or older have permission to access our Service. Our Service does not address anyone under the age of 13 ("Children").
+          Only persons age 13 or older have permission to access our Service. Our Service does not address anyone under the age of 13 (&apos;Children&apos;).
         </p>
         <p className="text-sm mb-6">
           We do not knowingly collect personally identifiable information from children under 13. If you are a parent or guardian and you learn that your Children have provided us with Personal Information, please contact us at info@aditt.app. If we discover that a Child under 13 has provided us with Personal Information, we will delete such information from our servers.
