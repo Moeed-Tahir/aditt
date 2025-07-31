@@ -8,12 +8,13 @@ import { toast } from 'sonner';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-
 let stripePromise;
 
 const getStripe = () => {
     if (!stripePromise) {
         const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+        console.log("key",key);
+        
         if (!key) {
             console.error('Stripe publishable key is missing!');
             throw new Error('Stripe publishable key is not configured');

@@ -74,7 +74,7 @@ export const signUp = async (req, res) => {
         await sendOTP(businessEmail, otp);
 
         const token = jwt.sign(
-            { userId: newUser._id },
+            { userId: newUser.userId },
             process.env.SECRET_KEY,
             { expiresIn: '1h' }
         );
@@ -82,7 +82,7 @@ export const signUp = async (req, res) => {
         res.status(201).json({
             message: "Account created successfully! Please check your email for the verification code.",
             user: {
-                userId: newUser._id,
+                userId: newUser.userId,
                 name: newUser.name,
                 email: newUser.businessEmail,
                 website: newUser.businessWebsite,

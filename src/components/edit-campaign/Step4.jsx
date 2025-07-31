@@ -7,7 +7,6 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { toast } from "sonner";
 
-// Initialize Stripe promise
 let stripePromise;
 
 const getStripe = () => {
