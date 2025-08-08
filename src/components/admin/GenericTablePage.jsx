@@ -28,7 +28,8 @@ export function GenericTablePage({
     customStatusOptions: [],
   },
   fetchConsumers,
-  fetchAdvertiserUser
+  fetchAdvertiserUser,
+  showAction = true
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState(null);
@@ -59,12 +60,10 @@ export function GenericTablePage({
     );
   }
 
-  // Sort data if sort function provided
   if (sortBy && typeof sortBy === "function") {
     filteredData.sort(sortBy);
   }
 
-  // Paginate data
   const paginatedData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -149,6 +148,7 @@ export function GenericTablePage({
 
   const defaultRenderActions = (item) => (
     <div className="flex gap-2">
+
       {title === "ADVERTISERS" && (
         <Link
           href={{
@@ -238,9 +238,11 @@ export function GenericTablePage({
                       {col.label}
                     </th>
                   ))}
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
-                    ACTIONS
-                  </th>
+                  {showAction && (
+                    <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                      ACTIONS
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
@@ -255,13 +257,18 @@ export function GenericTablePage({
                           {render ? render(item) : item[key]}
                         </td>
                       ))}
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                        {getActions
-                          ? getActions(item)
-                          : renderActions
-                            ? renderActions(item)
-                            : defaultRenderActions(item)}
-                      </td>
+                      {
+                        showAction && (
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                            {getActions
+                              ? getActions(item)
+                              : renderActions
+                                ? renderActions(item)
+                                : defaultRenderActions(item)}
+                          </td>
+                        )
+                      }
+
                     </tr>
                   ))
                 ) : (

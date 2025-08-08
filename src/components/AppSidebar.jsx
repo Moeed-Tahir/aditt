@@ -53,6 +53,11 @@ export function AppSidebar({ mode = "user" }) {
       icon: User2,
     },
     {
+      title: "Consumer Pending User",
+      url: `/admin/consumer-user`,
+      icon: User2,
+    },
+    {
       title: "Advertisers",
       url: `/admin/advertisers`,
       icon: Users,

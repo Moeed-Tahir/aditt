@@ -21,7 +21,10 @@ import {
   getAllConsumerUser,
   deleteAdvertiserUser,
   deleteConsumerUser,
-  listAllConsumerUsers
+  listAllConsumerUsers,
+  getUnverifiedConsumerUser,
+  rejectConsumerVerification,
+  approveConsumerVerification
 } from "../../controllers/v1/authControllers";
 
 export default async function handler(req, res) {
@@ -78,6 +81,12 @@ export default async function handler(req, res) {
           return await deleteConsumerUser(req, res);
         case "listAllConsumerUsers":
           return await listAllConsumerUsers(req, res);
+        case "getUnverifiedConsumerUser":
+          return await getUnverifiedConsumerUser(req, res);
+        case "rejectConsumerVerification":
+          return await rejectConsumerVerification(req, res);
+        case "approveConsumerVerification":
+          return await approveConsumerVerification(req, res);
         default:
           return res.status(400).json({ message: "Invalid action parameter" });
       }

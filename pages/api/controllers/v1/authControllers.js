@@ -1,7 +1,8 @@
 const bcrypt = require("bcrypt");
 import User from '../../models/User.model';
 import Campaign from '../../models/Campaign.model';
-import { ObjectId } from 'mongodb';
+const { ObjectId } = require('mongodb');
+const mongoose = require('mongoose');
 const { generateOTP, sendOTP } = require("../../services/otpServices");
 const jwt = require("jsonwebtoken");
 const { getConsumerUsersCollection, connectToDatabase } = require("../../config/dbConnect");
@@ -471,7 +472,7 @@ export const resendOTP = async (req, res) => {
         }
 
         user.otp = generateOTP();
-        user.otpExpires = Date.now() + 5 * 60 * 1000; 
+        user.otpExpires = Date.now() + 5 * 60 * 1000;
         await user.save();
 
         await sendOTP(user.businessEmail, user.otp);
@@ -735,6 +736,115 @@ export const getAllConsumerUser = async (req, res) => {
     }
 }
 
+export const getUnverifiedConsumerUser = async (req, res) => {
+    try {
+        await connectToDatabase();
+        const consumerUsers = await getConsumerUsersCollection();
+
+        const unverifiedUsers = await consumerUsers.find({
+            identityVerificationStatus: 'pending_approval'
+        }).toArray();
+
+        if (unverifiedUsers.length === 0) {
+            return res.status(404).json({ message: 'No unverified users found' });
+        }
+
+        res.status(200).json({
+            message: "Unverified Consumer Users Retrieved Successfully",
+            unverifiedUsers
+        });
+    } catch (error) {
+        console.error('Error fetching unverified consumer users:', error);
+        res.status(500).json({
+            message: 'Error fetching unverified consumer users',
+            error: error.message
+        });
+    }
+}
+
+export const approveConsumerVerification = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        console.log("userId",userId);
+
+        if (!userId) {
+            return res.status(400).json({ message: 'UserId not found' });
+        }
+
+        await connectToDatabase();
+        const consumerUsers = await getConsumerUsersCollection();
+
+        const updatedUser = await consumerUsers.findOneAndUpdate(
+            { _id: new mongoose.Types.ObjectId(userId) },
+            {
+                $set: {
+                    identityVerificationStatus: 'verified',
+                    isVerified: true
+                }
+            },
+            { returnDocument: 'after' }
+        );
+
+        console.log("updatedUser",updatedUser);
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({
+            message: "User verification approved successfully",
+            user: updatedUser
+        });
+
+    } catch (error) {
+        console.error('Error approving user verification:', error);
+        res.status(500).json({
+            message: 'Error approving user verification',
+            error: error.message
+        });
+    }
+}
+
+export const rejectConsumerVerification = async (req, res) => {
+    try {
+        const { userId } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
+
+        await connectToDatabase();
+        const consumerUsers = await getConsumerUsersCollection();
+
+        const updateData = {
+            identityVerificationStatus: 'rejected',
+            isVerified: false
+        };
+
+        const updatedUser = await consumerUsers.findOneAndUpdate(
+            { _id: new mongoose.Types.ObjectId(userId) },
+            { $set: updateData },
+            { returnDocument: 'after' }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({
+            message: "User verification rejected successfully",
+            user: updatedUser
+        });
+
+    } catch (error) {
+        console.error('Error rejecting user verification:', error);
+        res.status(500).json({
+            message: 'Error rejecting user verification',
+            error: error.message
+        });
+    }
+}
+
 export const getLatestUsers = async (req, res) => {
     try {
         await connectToDatabase();
@@ -848,7 +958,9 @@ export const listAllConsumerUsers = async (req, res) => {
         client = await MongoClient.connect(process.env.MONGO_URI);
         const db = client.db();
 
-        const userList = await db.collection('consumerusers').find().toArray();
+        const userList = await db.collection('consumerusers')
+            .find({ identityVerificationStatus: 'verified' })
+            .toArray();
 
         res.status(200).json({
             status: 'success',

@@ -28,10 +28,10 @@ export default function UsersPage() {
       const limitResponse = await axios.post("/api/routes/v1/adminDashboardRoutes?action=getUserLimit");
       setUserLimit(limitResponse.data.userLimit || 0);
       setEditedLimit(limitResponse.data.userLimit || 0);
-      
+
       const usersResponse = await axios.post("/api/routes/v1/authRoutes?action=listAllConsumerUsers");
       setUsers(usersResponse.data.data || []);
-      
+
     } catch (error) {
       toast.error(error?.response?.data?.message || "Error fetching data");
       console.error('Error fetching data:', error);
@@ -56,10 +56,10 @@ export default function UsersPage() {
   const updateUserLimit = async (newLimit) => {
     try {
       const limitResponse = await axios.post(
-        "/api/routes/v1/adminDashboardRoutes?action=updateUserLimit", 
+        "/api/routes/v1/adminDashboardRoutes?action=updateUserLimit",
         { newUserLimit: newLimit }
       );
-      
+
       const updatedLimit = limitResponse.data.userLimit;
       setUserLimit(updatedLimit);
       setEditedLimit(updatedLimit);
@@ -88,7 +88,7 @@ export default function UsersPage() {
       }
 
       if (usersToUpdate.length > 0) {
-        const updatePromises = usersToUpdate.map(user => 
+        const updatePromises = usersToUpdate.map(user =>
           updateUserStatus(user._id, user.newStatus)
         );
 
@@ -148,16 +148,11 @@ export default function UsersPage() {
             </div>
           )}
           <div>
-            <div>{user.name || "No Name"}</div>
+            <div>{`${user.firstName} ${user.lastName}` || "No Name"}</div>
             <div className="text-xs text-gray-500">{user.email || "No email"}</div>
           </div>
         </div>
       ),
-    },
-    {
-      label: "PHONE NUMBER",
-      key: "phone",
-      render: (user) => user.phone || "N/A"
     },
     {
       label: "DATE OF BIRTH",
@@ -178,11 +173,10 @@ export default function UsersPage() {
       label: "STATUS",
       key: "status",
       render: (user) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          user.status === "active" && activeUsers.includes(user)
-            ? "bg-green-100 text-green-800" 
-            : "bg-yellow-100 text-yellow-800"
-        }`}>
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.status === "active" && activeUsers.includes(user)
+          ? "bg-green-100 text-green-800"
+          : "bg-yellow-100 text-yellow-800"
+          }`}>
           {user.status === "active" && activeUsers.includes(user) ? "active" : "waitlist"}
         </span>
       ),
@@ -300,6 +294,8 @@ export default function UsersPage() {
         headerAction={headerAction}
         showHeaderAction={true}
         loading={loading}
+        showAction={true}
+
       />
     </SidebarProvider>
   );
