@@ -11,8 +11,8 @@ exports.sendOTP = async (email, otp) => {
     port: 465,
     secure: true,
     auth: {
-      user: 'info@aditt.app',
-      pass: 'frqx vwxi ycjr trzg'
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD
     }
   });
 
