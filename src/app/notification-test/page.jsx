@@ -9,6 +9,7 @@ const VerificationStatus = () => {
     const [socket, setSocket] = useState(null);
     const userId = '6893cd76af20078257257206';
 
+
     useEffect(() => {
         const newSocket = io('https://app.dashaditt.app', {
             path: '/socket.io',
@@ -20,6 +21,7 @@ const VerificationStatus = () => {
             reconnectionDelay: 1000,
         });
 
+        
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
