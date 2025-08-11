@@ -3,20 +3,20 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  host: 'smtp.gmail.com', // Gmail SMTP server
+  port: 465,              // Secure SMTP
+  secure: true,           // Use SSL
   auth: {
-    user:  process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
+    user: process.env.EMAIL_USER,     // info@aditt.app
+    pass: process.env.EMAIL_PASSWORD  // frqx vwxi ycjr trzg
   }
 });
 
 const sendEmail = async ({ to, subject, template, context }) => {
-    try {
+  try {
 
-        const templateDesigns = {
-            'campaign-activated': `
+    const templateDesigns = {
+      'campaign-activated': `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
           <h1 style="color: #2d3748; font-size: 24px; margin-bottom: 20px;">${context.header}</h1>
           <p style="font-size: 16px; line-height: 1.6; color: #4a5568;">${context.body}</p>
@@ -37,7 +37,7 @@ const sendEmail = async ({ to, subject, template, context }) => {
           </p>
         </div>
       `,
-            'campaign-rejected': `
+      'campaign-rejected': `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
           <h1 style="color: #e53e3e; font-size: 24px; margin-bottom: 20px;">${context.header}</h1>
           <p style="font-size: 16px; line-height: 1.6; color: #4a5568; white-space: pre-line;">${context.body}</p>
@@ -61,7 +61,7 @@ const sendEmail = async ({ to, subject, template, context }) => {
           </p>
         </div>
       `,
-            'campaign-paused': `
+      'campaign-paused': `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
           <h1 style="color: #d69e2e; font-size: 24px; margin-bottom: 20px;">${context.header}</h1>
           <p style="font-size: 16px; line-height: 1.6; color: #4a5568;">${context.body}</p>
@@ -82,7 +82,7 @@ const sendEmail = async ({ to, subject, template, context }) => {
           </p>
         </div>
       `,
-            'campaign-completed': `
+      'campaign-completed': `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
           <h1 style="color: #38a169; font-size: 24px; margin-bottom: 20px;">${context.header}</h1>
           <p style="font-size: 16px; line-height: 1.6; color: #4a5568;">${context.body}</p>
@@ -103,42 +103,86 @@ const sendEmail = async ({ to, subject, template, context }) => {
           </p>
         </div>
       `
-        };
+    };
 
-        const html = templateDesigns[template]
-            .replace(/\${companyName}/g, context.companyName || 'Aditt')
-            .replace(/\${currentYear}/g, context.currentYear || new Date().getFullYear());
+    const html = templateDesigns[template]
+      .replace(/\${companyName}/g, context.companyName || 'Aditt')
+      .replace(/\${currentYear}/g, context.currentYear || new Date().getFullYear());
 
-        const mailOptions = {
-            from: `"${context.companyName || 'Aditt'}"`,
-            to,
-            subject,
-            html,
-        };
+    const mailOptions = {
+      from: `"${context.companyName || 'Aditt'}"`,
+      to,
+      subject,
+      html,
+    };
 
-        const info = await transporter.sendMail(mailOptions);
-        return info;
-    } catch (error) {
-        console.error('Error sending email:', error);
-        throw error;
-    }
+    const info = await transporter.sendMail(mailOptions);
+    return info;
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
+  }
 };
 
 const sendUserEmail = async ({ to, subject, html }) => {
-    try {
-        const mailOptions = {
-            from: process.env.EMAIL_FROM,
-            to,
-            subject,
-            html,
-        };
-        
-        await transporter.sendMail(mailOptions);
-        return true;
-    } catch (error) {
-        console.error('Error sending email:', error);
-        throw error;
-    }
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_FROM,
+      to,
+      subject,
+      html,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
+  }
 };
 
-module.exports = {sendEmail,sendUserEmail};
+const sendApprovedIdentityEmail = async (email, name) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'You\'re Verified — Welcome to Aditt!',
+    html: `
+            <p>Hi ${name},</p>
+            <p>Great news — your identity has been verified successfully!</p>
+            <p>You can now access all features of the Aditt app and start earning.</p>
+            <p>Thanks for being part of the community.</p>
+            <p>— The Aditt Team</p>
+        `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Approved identity email sent successfully');
+  } catch (error) {
+    console.error('Error sending approved identity email:', error);
+  }
+};
+
+const sendRejectedIdentityEmail = async (email, name) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Identity Verification Issue on Aditt',
+    html: `
+            <p>Hi ${name},</p>
+            <p>After reviewing your submitted documents, we're unable to verify your identity at this time.</p>
+            <p>Your account has been restricted for security reasons.</p>
+            <p>If you believe this is a mistake, please reply to this email for further assistance.</p>
+            <p>— The Aditt Team</p>
+        `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Rejected identity email sent successfully');
+  } catch (error) {
+    console.error('Error sending rejected identity email:', error);
+  }
+};
+
+module.exports = { sendEmail, sendUserEmail, sendApprovedIdentityEmail, sendRejectedIdentityEmail };

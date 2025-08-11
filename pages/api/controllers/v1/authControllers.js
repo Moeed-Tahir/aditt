@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 import User from '../../models/User.model';
 import Campaign from '../../models/Campaign.model';
+import { sendApprovedIdentityEmail, sendRejectedIdentityEmail } from '../../services/emailServices';
 const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 const { generateOTP, sendOTP } = require("../../services/otpServices");
@@ -764,8 +765,9 @@ export const getUnverifiedConsumerUser = async (req, res) => {
 
 export const approveConsumerVerification = async (req, res) => {
     try {
+        await connectToDatabase();
         const { userId } = req.body;
-        console.log("userId",userId);
+        console.log("userId", userId);
 
         if (!userId) {
             return res.status(400).json({ message: 'UserId not found' });
@@ -785,7 +787,7 @@ export const approveConsumerVerification = async (req, res) => {
             { returnDocument: 'after' }
         );
 
-        console.log("updatedUser",updatedUser);
+        console.log("updatedUser", updatedUser);
 
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
@@ -970,6 +972,110 @@ export const listAllConsumerUsers = async (req, res) => {
     } catch (error) {
         console.error('Error fetching consumer users:', error);
         res.status(500).json({ status: 'error', message: 'Internal server error' });
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+};
+
+export const verifiedConsumer = async (req, res) => {
+    let client;
+    try {
+        await connectToDatabase();
+
+        const { userId } = req.body;
+
+        client = await MongoClient.connect(process.env.MONGO_URI);
+        const db = client.db();
+
+        const result = await db.collection('consumerusers').findOneAndUpdate(
+            { _id: new ObjectId(userId) },
+            {
+                $set: {
+                    identityVerificationStatus: 'verified',
+                    isVerified: true
+                }
+            },
+            { returnDocument: 'after' }
+        );
+
+        const updatedUser = result;
+
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        await sendApprovedIdentityEmail(
+            updatedUser.email,
+            `${updatedUser.firstName} ${updatedUser.lastName}`
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'User verification status updated to verified',
+            user: updatedUser
+        });
+
+    } catch (error) {
+        console.error('Error in verifiedConsumer:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        });
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+};
+
+export const rejectedConsumer = async (req, res) => {
+    let client;
+    try {
+        await connectToDatabase();
+
+        const { userId } = req.body;
+
+        client = await MongoClient.connect(process.env.MONGO_URI);
+        const db = client.db();
+
+        const result = await db.collection('consumerusers').findOneAndUpdate(
+            { _id: new ObjectId(userId) },
+            {
+                $set: {
+                    identityVerificationStatus: 'rejected',
+                    isVerified: false
+                }
+            },
+            { returnDocument: 'after' }
+        );
+
+        const updatedUser = result;
+
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        await sendRejectedIdentityEmail(
+            updatedUser.email,
+            `${updatedUser.firstName} ${updatedUser.lastName}`
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'User verification status updated to rejected',
+            user: updatedUser
+        });
+
+    } catch (error) {
+        console.error('Error in rejectedConsumer:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        });
     } finally {
         if (client) {
             await client.close();

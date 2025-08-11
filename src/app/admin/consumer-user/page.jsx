@@ -42,7 +42,7 @@ export default function UsersPage() {
     const handleApprove = async (userId) => {
         try {
             const response = await axios.post(
-                "/api/routes/v1/authRoutes?action=approveConsumerVerification",
+                "/api/routes/v1/authRoutes?action=verifiedConsumer",
                 { userId }
             );
             toast.success("User verification approved successfully");
@@ -60,9 +60,9 @@ export default function UsersPage() {
     const handleReject = async (userId) => {
         try {
             const response = await axios.post(
-                "/api/routes/v1/authRoutes?action=rejectConsumerVerification",
+                "/api/routes/v1/authRoutes?action=rejectedConsumer",
                 {
-                    userId: userId
+                    userId
                 }
             );
             toast.success("User verification rejected successfully");
