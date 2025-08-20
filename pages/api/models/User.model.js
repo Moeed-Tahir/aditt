@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
+    brandName: {
+        type: String,
+        required: false,
+    },
     businessWebsite: {
         type: String,
         required: true,

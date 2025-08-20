@@ -1,4 +1,4 @@
-import { Copy, Globe, House, Image, Trash, Upload, Video } from "lucide-react";
+import { Copy, Globe, House, Image, Trash, Upload, Video, X } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 
@@ -12,6 +12,7 @@ const Step1 = ({
 }) => {
   const [videoError, setVideoError] = useState("");
   const [imageError, setImageError] = useState("");
+  const [previewItem, setPreviewItem] = useState(null); // To track which item to preview
 
   const validateFileSize = (file, fileType) => {
     const maxSize = fileType === "video" ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
@@ -77,12 +78,48 @@ const Step1 = ({
     handleFileChange(e, type);
   };
 
-const showProgressSection = 
+  const showProgressSection = 
     (uploadProgress.video > 0 && uploadProgress.video < 100) || 
     (uploadProgress.image > 0 && uploadProgress.image < 100);
     
   return (
     <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
+      {/* Preview Modal */}
+      {previewItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-medium">Preview</h3>
+              <button 
+                onClick={() => setPreviewItem(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-4 flex justify-center items-center max-h-[70vh] overflow-auto">
+              {previewItem.type === 'video' ? (
+                <video 
+                  src={URL.createObjectURL(previewItem.file)} 
+                  controls 
+                  className="max-w-full max-h-full"
+                />
+              ) : (
+                <img 
+                  src={URL.createObjectURL(previewItem.file)} 
+                  alt="Preview" 
+                  className="max-w-full max-h-full object-contain"
+                />
+              )}
+            </div>
+            <div className="p-4 border-t text-sm text-gray-500">
+              <p>File name: {previewItem.file.name}</p>
+              <p>File size: {(previewItem.file.size / (1024 * 1024)).toFixed(1)} MB</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="max-w-6xl mx-auto bg-white rounded-xl md:rounded-2xl shadow p-4 md:p-8 relative">
         {showProgressSection && (
           <div className="bg-gray-100 rounded-t-xl md:rounded-t-2xl -mt-4 -mx-4 md:-mt-8 md:-mx-8 mb-4 md:mb-6 p-3">
@@ -265,7 +302,9 @@ const showProgressSection =
               )}
 
               {formData.videoFile && (
-                <div className="mt-3 md:mt-4 flex items-center gap-3 md:gap-4 border bg-white text-blue-700 px-3 py-1 md:px-4 md:py-2 rounded-md">
+                <div className="mt-3 md:mt-4 flex items-center gap-3 md:gap-4 border bg-white text-blue-700 px-3 py-1 md:px-4 md:py-2 rounded-md cursor-pointer"
+                  onClick={() => setPreviewItem({ type: 'video', file: formData.videoFile })}
+                >
                   <div className="bg-blue-50 p-2 md:p-[10px] rounded-full w-8 h-8 md:w-10 md:h-10 flex items-center justify-center">
                     <Video className="w-4 h-4 md:w-5 md:h-5 text-blue-500" />
                   </div>
@@ -280,13 +319,14 @@ const showProgressSection =
                   </div>
 
                   <button
-                    onClick={() =>
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent triggering the preview
                       setFormData((prev) => ({
                         ...prev,
                         videoFile: null,
                         videoUrl: "",
-                      }))
-                    }
+                      }));
+                    }}
                     className="text-red-500 ml-auto"
                   >
                     <Trash className="w-4 h-4 md:w-5 md:h-5" />
@@ -332,7 +372,9 @@ const showProgressSection =
               )}
 
               {formData.imageFile && (
-                <div className="mt-3 md:mt-4 flex items-center gap-3 md:gap-4 border bg-white text-blue-700 px-3 py-1 md:px-4 md:py-2 rounded-md">
+                <div className="mt-3 md:mt-4 flex items-center gap-3 md:gap-4 border bg-white text-blue-700 px-3 py-1 md:px-4 md:py-2 rounded-md cursor-pointer"
+                  onClick={() => setPreviewItem({ type: 'image', file: formData.imageFile })}
+                >
                   <div className="bg-blue-50 p-2 md:p-[10px] rounded-full w-8 h-8 md:w-10 md:h-10">
                     <Image className="w-4 h-4 md:w-5 md:h-5 text-blue-500" />
                   </div>
@@ -347,13 +389,14 @@ const showProgressSection =
                   </div>
 
                   <button
-                    onClick={() =>
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent triggering the preview
                       setFormData((prev) => ({
                         ...prev,
                         imageFile: null,
                         imageUrl: "",
-                      }))
-                    }
+                      }));
+                    }}
                     className="text-red-500 ml-auto"
                   >
                     <Trash className="w-4 h-4 md:w-5 md:h-5" />
@@ -364,7 +407,6 @@ const showProgressSection =
           </div>
         </div>
 
-        {/* Moved Next button to bottom */}
         <div className="mt-8 flex justify-end">
           <Link
             href="?step=1"

@@ -13,8 +13,8 @@ let stripePromise;
 const getStripe = () => {
     if (!stripePromise) {
         const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-        console.log("key",key);
-        
+        console.log("key", key);
+
         if (!key) {
             console.error('Stripe publishable key is missing!');
             throw new Error('Stripe publishable key is not configured');
@@ -73,8 +73,8 @@ const StripePaymentForm = ({ onSuccess, onError }) => {
                 throw new Error(data.message || 'Payment verification failed');
             }
 
-            console.log("data",data);
-            
+            console.log("data", data);
+
 
             onSuccess({
                 paymentMethodId: data.paymentMethodId,
@@ -85,7 +85,7 @@ const StripePaymentForm = ({ onSuccess, onError }) => {
                     exp_year: data.cardDetails.exp_year
                 },
                 fingerprint: data.fingerprint,
-                customerId:data.customerId
+                customerId: data.customerId
             });
 
         } catch (err) {
@@ -492,7 +492,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                                         handleInputChange(e);
                                         calculateAndSetEngagement();
                                     }}
-                                    placeholder={discountInfo.fullWavier ? "Full wavier applied" : "Enter campaign budget"}
+                                    placeholder={discountInfo.fullWavier ? discountInfo.value : "Enter campaign budget"}
                                     className="w-full h-full border border-gray-300 text-gray-600 rounded-full pl-10 pr-4 py-1 md:py-2"
                                     min="0"
                                     step="0.01"
@@ -500,7 +500,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                                 />
                             </div>
 
-                            {/* {formData.videoDuration && (
+                            {formData.videoDuration && (
                                 <div className="mt-2 text-xs md:text-sm text-gray-500">
                                     {discountInfo.fullWavier ? (
                                         <>
@@ -525,7 +525,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                                         </>
                                     ) : null}
                                 </div>
-                            )} */}
+                            )}
                         </div>
                     </div>
 
@@ -656,9 +656,8 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                     <button
                         onClick={handleSubmit}
                         disabled={isSubmitDisabled()}
-                        className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
-                            isSubmitDisabled() ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
+                        className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${isSubmitDisabled() ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                     >
                         Submit
                     </button>

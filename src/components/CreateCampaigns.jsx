@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Navbar2 from "@/components/Navbar2";
 import { ArrowLeft, Check, CircleCheck, CircleDot } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
@@ -13,6 +13,7 @@ import Step2 from "./create-campaign/Step2";
 import Step3 from "./create-campaign/Step3";
 import Step4 from "./create-campaign/Step4";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
 
 const supabaseUrl = "https://pcgpvkvbbyafxhsjszow.supabase.co";
 const supabaseKey =
@@ -359,6 +360,16 @@ export function CreateCampaigns({ userId }) {
 
     return (budget / duration) * 1000;
   }, [formData.budget, formData.videoDuration]);
+
+  useEffect(() => {
+    const brandNameFromCookie = Cookies.get("brandName");
+    if (brandNameFromCookie) {
+      setFormData(prev => ({
+        ...prev,
+        brandName: brandNameFromCookie
+      }));
+    }
+  }, [setFormData]);
 
   return (
     <main className="flex h-auto min-h-screen w-full flex-col gap-4 bg-[var(--bg-color-off-white)]">

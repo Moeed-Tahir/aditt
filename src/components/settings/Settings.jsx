@@ -26,13 +26,14 @@ export default function Settings() {
     currentPassword: "",
     newPassword: "",
     companyName: "",
+    brandName: "",
     phone: "",
     profileType: "",
   });
   const userId = Cookies.get("userId");
   const [error, setError] = useState("");
-
-  const fetchProfileData = async () => {
+  
+const fetchProfileData = async () => {
     try {
       const response = await axios.post(
         "/api/routes/v1/authRoutes?action=getProfile",
@@ -40,14 +41,23 @@ export default function Settings() {
       );
 
       if (response.data.profile) {
+        const profileData = response.data.profile;
+        
+        if (profileData.brandName) {
+          Cookies.set("brandName", profileData.brandName, { 
+            expires: 7,
+          });
+        }
+
         setFormData({
-          userId: response.data.profile.userId || "",
-          name: response.data.profile.name || "",
-          email: response.data.profile.businessEmail || "",
-          website: response.data.profile.businessWebsite || "",
-          companyName: response.data.profile.companyName || "",
-          phone: response.data.profile.phone || "",
-          profileType: response.data.profile.profileType || "",
+          userId: profileData.userId || "",
+          name: profileData.name || "",
+          email: profileData.businessEmail || "",
+          website: profileData.businessWebsite || "",
+          companyName: profileData.companyName || "",
+          brandName: profileData.brandName || "",
+          phone: profileData.phone || "",
+          profileType: profileData.profileType || "",
           currentPassword: "",
           newPassword: "",
         });
@@ -55,10 +65,11 @@ export default function Settings() {
         setError(response.data.message || "Failed to get profile data");
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Error is occur");
+      console.error("Error fetching profile:", error);
       setError("Failed to fetch profile data");
     }
   };
+
 
   useEffect(() => {
     if (userId) fetchProfileData();

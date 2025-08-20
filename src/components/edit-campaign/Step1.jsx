@@ -1,5 +1,5 @@
 "use client"
-import React from 'react'
+import React, { useState } from 'react'
 import {
     Copy,
     Globe,
@@ -8,13 +8,52 @@ import {
     Trash,
     Upload,
     Video,
+    X,
 } from "lucide-react";
 
-const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handleFileChange, handleStepChange }) => {
+const Step1 = ({ formData, handleInputChange, uploadProgress, handleFileChange, handleStepChange }) => {
     const isDisabled = formData.status === "Active" || formData.status === "Paused";
+    const [previewItem, setPreviewItem] = useState(null);
 
     return (
         <>
+            {previewItem && (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden">
+                        <div className="flex justify-between items-center p-4 border-b">
+                            <h3 className="text-lg font-medium">Preview</h3>
+                            <button 
+                                onClick={() => setPreviewItem(null)}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <div className="p-4 flex justify-center items-center max-h-[70vh] overflow-auto">
+                            {previewItem.type === 'video' ? (
+                                <video 
+                                    src={previewItem.url} 
+                                    controls 
+                                    className="max-w-full max-h-full"
+                                />
+                            ) : (
+                                <img 
+                                    src={previewItem.url} 
+                                    alt="Preview" 
+                                    className="max-w-full max-h-full object-contain"
+                                />
+                            )}
+                        </div>
+                        <div className="p-4 border-t text-sm text-gray-500">
+                            <p>File name: {previewItem.name}</p>
+                            {previewItem.size && (
+                                <p>File size: {(previewItem.size / (1024 * 1024)).toFixed(1)} MB</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+            
             <div className="min-h-screen px-4 py-8">
                 <div className="max-w-[1200px] w-full mx-auto bg-white rounded-2xl shadow p-8 relative">
                     {(uploadProgress.video > 0 && uploadProgress.video < 100) ||
@@ -191,7 +230,15 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                             <div className="flex-1">
                                 {formData.videoFile ? (
                                     <>
-                                        <div className="mt-4 flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md">
+                                        <div 
+                                            className="mt-4 flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md cursor-pointer"
+                                            onClick={() => setPreviewItem({
+                                                type: 'video',
+                                                url: URL.createObjectURL(formData.videoFile),
+                                                name: formData.videoFile.name,
+                                                size: formData.videoFile.size
+                                            })}
+                                        >
                                             <div className="bg-blue-50 p-[10px] rounded-full w-10 h-10 flex items-center justify-center">
                                                 <Video className="w-5 h-5 text-blue-500" />
                                             </div>
@@ -210,14 +257,15 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
 
                                             {!isDisabled && (
                                                 <button
-                                                    onClick={() =>
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
                                                         handleInputChange({
                                                             target: {
                                                                 name: "videoFile",
                                                                 value: null
                                                             }
-                                                        })
-                                                    }
+                                                        });
+                                                    }}
                                                     className="text-red-500 ml-auto"
                                                 >
                                                     <Trash />
@@ -227,7 +275,14 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                     </>
                                 ) : formData.videoUrl ? (
                                     <>
-                                        <div className="flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md">
+                                        <div 
+                                            className="flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md cursor-pointer"
+                                            onClick={() => setPreviewItem({
+                                                type: 'video',
+                                                url: formData.videoUrl,
+                                                name: 'Existing Video'
+                                            })}
+                                        >
                                             <div className="bg-blue-50 p-[10px] rounded-full w-10 h-10 flex items-center justify-center">
                                                 <Video className="w-5 h-5 text-blue-500" />
                                             </div>
@@ -235,18 +290,14 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                                 <span className="text-sm">
                                                     Existing Video
                                                 </span>
-                                                <a
-                                                    href={formData.videoUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-xs text-blue-500 hover:underline"
-                                                >
-                                                    View Video
-                                                </a>
+                                                <span className="text-xs text-blue-500">
+                                                    Click to preview
+                                                </span>
                                             </div>
                                             {!isDisabled && (
                                                 <button
-                                                    onClick={() => {
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
                                                         handleInputChange({
                                                             target: {
                                                                 name: "videoUrl",
@@ -318,7 +369,15 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                             <div className="flex-1">
                                 {formData.imageFile ? (
                                     <>
-                                        <div className="mt-4 flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md">
+                                        <div 
+                                            className="mt-4 flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md cursor-pointer"
+                                            onClick={() => setPreviewItem({
+                                                type: 'image',
+                                                url: URL.createObjectURL(formData.imageFile),
+                                                name: formData.imageFile.name,
+                                                size: formData.imageFile.size
+                                            })}
+                                        >
                                             <div className="bg-blue-50 p-[10px] rounded-full w-10 h-10">
                                                 <Image className="w-5 h-5 text-blue-500" />
                                             </div>
@@ -337,14 +396,15 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
 
                                             {!isDisabled && (
                                                 <button
-                                                    onClick={() =>
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
                                                         handleInputChange({
                                                             target: {
                                                                 name: "imageFile",
                                                                 value: null
                                                             }
-                                                        })
-                                                    }
+                                                        });
+                                                    }}
                                                     className="text-red-500 ml-auto"
                                                 >
                                                     <Trash />
@@ -354,7 +414,14 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                     </>
                                 ) : formData.imageUrl ? (
                                     <>
-                                        <div className="flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md">
+                                        <div 
+                                            className="flex items-center gap-4 border bg-white text-blue-700 px-4 py-2 rounded-md cursor-pointer"
+                                            onClick={() => setPreviewItem({
+                                                type: 'image',
+                                                url: formData.imageUrl,
+                                                name: 'Existing Image'
+                                            })}
+                                        >
                                             <div className="bg-blue-50 p-[10px] rounded-full w-10 h-10">
                                                 <Image className="w-5 h-5 text-blue-500" />
                                             </div>
@@ -362,18 +429,14 @@ const Step1 = ({ formData, handleInputChange, isUploading, uploadProgress, handl
                                                 <span className="text-sm">
                                                     Existing Image
                                                 </span>
-                                                <a
-                                                    href={formData.imageUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-xs text-blue-500 hover:underline"
-                                                >
-                                                    View Image
-                                                </a>
+                                                <span className="text-xs text-blue-500">
+                                                    Click to preview
+                                                </span>
                                             </div>
                                             {!isDisabled && (
                                                 <button
-                                                    onClick={() => {
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
                                                         handleInputChange({
                                                             target: {
                                                                 name: "imageUrl",

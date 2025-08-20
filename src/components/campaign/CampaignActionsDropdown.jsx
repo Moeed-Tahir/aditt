@@ -175,12 +175,12 @@ export default function CampaignActionsDropdown({
           </DropdownMenuItem>
         )}
 
-        {showDelete && (
+        {/* {showDelete && (
           <DropdownMenuItem onClick={handleDelete}>
             <Trash2 className="h-4 w-4 mr-2 text-red-600" />
             Delete
           </DropdownMenuItem>
-        )}
+        )} */}
       </DropdownMenuContent>
     </DropdownMenu>
   );

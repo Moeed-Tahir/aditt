@@ -104,6 +104,7 @@ const StripePaymentForm = ({ onSuccess, onError }) => {
             },
           }}
         />
+        
       </div>
 
       {error && (
@@ -126,6 +127,16 @@ const StripePaymentForm = ({ onSuccess, onError }) => {
 const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploading, uploadProgress }) => {
   const isBudgetZero = parseFloat(formData.budget) === 0;
   const isDisabled = formData.status === "Active" || formData.status === "Paused";
+  
+  // Check if coupon code is applied
+  const hasCouponCode = formData.couponCode && formData.couponCode.trim() !== '';
+  
+  // Determine if payment method is required
+  const paymentMethodRequired = !hasCouponCode;
+  
+  // Check if form can be submitted
+  const canSubmit = !isUploading && !isBudgetZero && 
+                   (hasCouponCode || (!hasCouponCode && formData.cardDetail));
 
   const handlePaymentSuccess = (paymentData) => {
     setFormData(prev => ({
@@ -207,9 +218,9 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
 
           <button
             onClick={handleSubmit}
-            disabled={isUploading || isBudgetZero || !formData.cardDetail}
+            disabled={!canSubmit}
             className={`bg-blue-600 w-[218px] h-[56px] text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
-              isUploading || isBudgetZero || !formData.cardDetail ? 'opacity-50 cursor-not-allowed' : ''
+              !canSubmit ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
             {isUploading ? 'Processing...' : 'Submit'}
@@ -337,47 +348,50 @@ const Step4 = ({ handleSubmit, setFormData, formData, handleInputChange, isUploa
 
           <hr className="border-t mb-4 border-gray-300" />
 
-          <div className="flex items-start gap-6">
-            <div className="w-1/3">
-              <label className="block text-[18px] text-gray-800 font-medium">
-                Payment Method
-              </label>
-              <span className="block text-[16px] text-gray-400 mt-1">
-                Add a payment method to fund your campaign.
-              </span>
-            </div>
+          {/* Conditionally render Payment Method section */}
+          {paymentMethodRequired && (
+            <div className="flex items-start gap-6">
+              <div className="w-1/3">
+                <label className="block text-[18px] text-gray-800 font-medium">
+                  Payment Method
+                </label>
+                <span className="block text-[16px] text-gray-400 mt-1">
+                  Add a payment method to fund your campaign.
+                </span>
+              </div>
 
-            <div className="relative w-full flex-1">
-              {formData.cardDetail?.paymentMethodId ? (
-                <div className="border rounded-lg p-4 bg-gray-50">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">
-                        {formData.cardDetail.cardDetails.brand} ending in {formData.cardDetail.cardDetails.last4}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Expires {formData.cardDetail.cardDetails.exp_month}/{formData.cardDetail.cardDetails.exp_year}
-                      </p>
+              <div className="relative w-full flex-1">
+                {formData.cardDetail?.paymentMethodId ? (
+                  <div className="border rounded-lg p-4 bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">
+                          {formData.cardDetail.cardDetails.brand} ending in {formData.cardDetail.cardDetails.last4}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Expires {formData.cardDetail.cardDetails.exp_month}/{formData.cardDetail.cardDetails.exp_year}
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleRemoveCard}
+                        className="text-red-500 hover:text-red-700"
+                        disabled={isDisabled}
+                      >
+                        Remove
+                      </button>
                     </div>
-                    <button
-                      onClick={handleRemoveCard}
-                      className="text-red-500 hover:text-red-700"
-                      disabled={isDisabled}
-                    >
-                      Remove
-                    </button>
                   </div>
-                </div>
-              ) : (
-                <Elements stripe={getStripe()}>
-                  <StripePaymentForm
-                    onSuccess={handlePaymentSuccess}
-                    onError={handlePaymentError}
-                  />
-                </Elements>
-              )}
+                ) : (
+                  <Elements stripe={getStripe()}>
+                    <StripePaymentForm
+                      onSuccess={handlePaymentSuccess}
+                      onError={handlePaymentError}
+                    />
+                  </Elements>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
