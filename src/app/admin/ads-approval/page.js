@@ -5,7 +5,6 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { GenericTablePage } from "@/components/admin/GenericTablePage";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RejectDialog from "@/components/RejectDialog";
 import { toast } from "sonner";
@@ -15,7 +14,6 @@ export default function AdsApproval() {
   const [approvalData, setApprovalData] = useState([]);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
-  const router = useRouter();
 
   const handleCampaignAction = async (campaignId, action, reason = "") => {
     try {
