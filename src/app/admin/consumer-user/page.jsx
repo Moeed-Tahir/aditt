@@ -7,6 +7,12 @@ import { GenericTablePage } from "@/components/admin/GenericTablePage";
 import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function UsersPage() {
     const [activeTab, setActiveTab] = useState("active");
@@ -17,6 +23,9 @@ export default function UsersPage() {
     const [loading, setLoading] = useState(true);
     const [rejectionReason, setRejectionReason] = useState("");
     const [selectedUserId, setSelectedUserId] = useState(null);
+    // Add states for loading buttons
+    const [approvingUserId, setApprovingUserId] = useState(null);
+    const [rejectingUserId, setRejectingUserId] = useState(null);
 
     const fetchData = useCallback(async () => {
         try {
@@ -41,6 +50,7 @@ export default function UsersPage() {
 
     const handleApprove = async (userId) => {
         try {
+            setApprovingUserId(userId); // Set loading state for this user
             const response = await axios.post(
                 "/api/routes/v1/authRoutes?action=verifiedConsumer",
                 { userId }
@@ -54,11 +64,14 @@ export default function UsersPage() {
                 error?.response?.data?.message || "Error approving verification"
             );
             console.error("Error approving verification:", error);
+        } finally {
+            setApprovingUserId(null); // Reset loading state
         }
     };
 
     const handleReject = async (userId) => {
         try {
+            setRejectingUserId(userId); // Set loading state for this user
             const response = await axios.post(
                 "/api/routes/v1/authRoutes?action=rejectedConsumer",
                 {
@@ -74,6 +87,8 @@ export default function UsersPage() {
                 error?.response?.data?.message || "Error rejecting verification"
             );
             console.error("Error rejecting verification:", error);
+        } finally {
+            setRejectingUserId(null); // Reset loading state
         }
     };
 
@@ -87,7 +102,7 @@ export default function UsersPage() {
             key: "user",
             render: (user) => (
                 <div className="flex flex-col">
-                    <div className="font-medium">{`${user.firstName || ''} ${user.lastName || ''}`.trim() || "No Name"}</div>
+                    <div className="font-medium">{`${user.fullName}` || "No Name"}</div>
                     <div className="text-sm text-gray-500">{user.email || "No email"}</div>
                 </div>
             ),
@@ -107,6 +122,31 @@ export default function UsersPage() {
             ),
         },
         {
+            label: "VERIFICATION Message",
+            key: "identityVerificationMessage",
+            render: (user) => {
+                const message = user.identityVerificationMessage || "N/A";
+                const truncatedMessage = message.length > 10
+                    ? `${message.substring(0, 10)}...`
+                    : message;
+
+                return (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="text-sm font-mono text-gray-600 cursor-default">
+                                    {truncatedMessage}
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p className="max-w-xs break-words">{message}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                );
+            },
+        },
+        {
             label: "ACTIONS",
             key: "actions",
             render: (user) => (
@@ -115,17 +155,37 @@ export default function UsersPage() {
                         size="sm"
                         variant="success"
                         onClick={() => handleApprove(user._id)}
-                        disabled={user.identityVerificationStatus === 'verified'}
+                        disabled={user.identityVerificationStatus === 'verified' || approvingUserId === user._id}
+                        className="relative"
                     >
-                        Approve
+                        {approvingUserId === user._id ? (
+                            <>
+                                <span className="opacity-0">Approve</span>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                            </>
+                        ) : (
+                            "Approve"
+                        )}
                     </Button>
                     <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => handleReject(user._id)}
-                        disabled={user.identityVerificationStatus === 'rejected'}
+                        disabled={user.identityVerificationStatus === 'rejected' || rejectingUserId === user._id}
+                        className="relative"
                     >
-                        Reject
+                        {rejectingUserId === user._id ? (
+                            <>
+                                <span className="opacity-0">Reject</span>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                            </>
+                        ) : (
+                            "Reject"
+                        )}
                     </Button>
                 </div>
             ),

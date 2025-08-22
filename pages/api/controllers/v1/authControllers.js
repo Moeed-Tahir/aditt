@@ -262,7 +262,6 @@ export const forgotPassword = async (req, res) => {
             });
         }
 
-        // Generate and save OTP
         user.otp = generateOTP();
         user.otpExpires = Date.now() + 5 * 60 * 1000;
         await user.save();
@@ -743,7 +742,7 @@ export const getUnverifiedConsumerUser = async (req, res) => {
         const consumerUsers = await getConsumerUsersCollection();
 
         const unverifiedUsers = await consumerUsers.find({
-            identityVerificationStatus: 'pending_approval'
+            identityVerificationStatus: { $ne: 'verified' }
         }).toArray();
 
         if (unverifiedUsers.length === 0) {
@@ -754,6 +753,7 @@ export const getUnverifiedConsumerUser = async (req, res) => {
             message: "Unverified Consumer Users Retrieved Successfully",
             unverifiedUsers
         });
+        
     } catch (error) {
         console.error('Error fetching unverified consumer users:', error);
         res.status(500).json({
