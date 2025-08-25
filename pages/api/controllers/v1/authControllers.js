@@ -993,7 +993,7 @@ export const verifiedConsumer = async (req, res) => {
             { _id: new ObjectId(userId) },
             {
                 $set: {
-                    identityVerificationStatus: 'verified',
+                    identityVerificationStatus: 'approved',
                     isVerified: true
                 }
             },

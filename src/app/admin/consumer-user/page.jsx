@@ -23,7 +23,6 @@ export default function UsersPage() {
     const [loading, setLoading] = useState(true);
     const [rejectionReason, setRejectionReason] = useState("");
     const [selectedUserId, setSelectedUserId] = useState(null);
-    // Add states for loading buttons
     const [approvingUserId, setApprovingUserId] = useState(null);
     const [rejectingUserId, setRejectingUserId] = useState(null);
 
@@ -50,7 +49,7 @@ export default function UsersPage() {
 
     const handleApprove = async (userId) => {
         try {
-            setApprovingUserId(userId); // Set loading state for this user
+            setApprovingUserId(userId); 
             const response = await axios.post(
                 "/api/routes/v1/authRoutes?action=verifiedConsumer",
                 { userId }
@@ -65,13 +64,13 @@ export default function UsersPage() {
             );
             console.error("Error approving verification:", error);
         } finally {
-            setApprovingUserId(null); // Reset loading state
+            setApprovingUserId(null);
         }
     };
 
     const handleReject = async (userId) => {
         try {
-            setRejectingUserId(userId); // Set loading state for this user
+            setRejectingUserId(userId);
             const response = await axios.post(
                 "/api/routes/v1/authRoutes?action=rejectedConsumer",
                 {
@@ -88,7 +87,7 @@ export default function UsersPage() {
             );
             console.error("Error rejecting verification:", error);
         } finally {
-            setRejectingUserId(null); // Reset loading state
+            setRejectingUserId(null);
         }
     };
 
