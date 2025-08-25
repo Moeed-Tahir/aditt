@@ -1045,7 +1045,7 @@ export const rejectedConsumer = async (req, res) => {
             { _id: new ObjectId(userId) },
             {
                 $set: {
-                    identityVerificationStatus: 'rejected',
+                    identityVerificationStatus: 'denied',
                     isVerified: false
                 }
             },
