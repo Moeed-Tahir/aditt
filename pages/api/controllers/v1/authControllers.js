@@ -742,26 +742,26 @@ export const getUnverifiedConsumerUser = async (req, res) => {
         const consumerUsers = await getConsumerUsersCollection();
 
         const unverifiedUsers = await consumerUsers.find({
-            identityVerificationStatus: { $ne: 'verified' }
+            identityVerificationStatus: { $in: ['pending_approval', 'rejected'] }
         }).toArray();
 
         if (unverifiedUsers.length === 0) {
-            return res.status(404).json({ message: 'No unverified users found' });
+            return res.status(404).json({ message: 'No pending or rejected users found' });
         }
 
         res.status(200).json({
-            message: "Unverified Consumer Users Retrieved Successfully",
+            message: "Pending and Rejected Consumer Users Retrieved Successfully",
             unverifiedUsers
         });
-        
+
     } catch (error) {
-        console.error('Error fetching unverified consumer users:', error);
+        console.error('Error fetching pending or rejected consumer users:', error);
         res.status(500).json({
-            message: 'Error fetching unverified consumer users',
+            message: 'Error fetching pending or rejected consumer users',
             error: error.message
         });
     }
-}
+};
 
 export const approveConsumerVerification = async (req, res) => {
     try {
@@ -1036,7 +1036,7 @@ export const rejectedConsumer = async (req, res) => {
     try {
         await connectToDatabase();
 
-        
+
         const { userId } = req.body;
 
         client = await MongoClient.connect(process.env.MONGO_URI);
