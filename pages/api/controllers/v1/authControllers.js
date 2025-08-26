@@ -1036,6 +1036,7 @@ export const rejectedConsumer = async (req, res) => {
     try {
         await connectToDatabase();
 
+        
         const { userId } = req.body;
 
         client = await MongoClient.connect(process.env.MONGO_URI);
