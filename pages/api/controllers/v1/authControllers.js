@@ -1041,6 +1041,7 @@ export const rejectedConsumer = async (req, res) => {
         client = await MongoClient.connect(process.env.MONGO_URI);
         const db = client.db();
 
+        
         const result = await db.collection('consumerusers').findOneAndUpdate(
             { _id: new ObjectId(userId) },
             {
