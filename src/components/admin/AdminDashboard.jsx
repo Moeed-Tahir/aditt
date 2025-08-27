@@ -235,11 +235,11 @@ export function AdminDashboard() {
         <div className="flex items-center gap-2">
           <img
             src={`/${item.image}`}
-            alt={item.name}
+            alt={item.fullName}
             className="w-8 h-8 rounded-full"
           />
           <div>
-            <div>{item.name}</div>
+            <div>{item.fullName}</div>
             <div className="text-gray-500 text-xs">
               {item.gender} {item.isVerified && "✓"}
             </div>
@@ -250,7 +250,6 @@ export function AdminDashboard() {
     { label: "PHONE NUMBER", key: "phone" },
     { label: "DOB", key: "dob" },
     { label: "TOTAL EARNINGS", key: "earnings" },
-    { label: "TOTAL WITHDRAW", key: "withdraw" },
   ];
 
   const advertiserColumns = [

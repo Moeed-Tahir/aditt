@@ -964,9 +964,9 @@ export const listAllConsumerUsers = async (req, res) => {
         client = await MongoClient.connect(process.env.MONGO_URI);
         const db = client.db();
 
-        const userList = await db.collection('consumerusers')
-            .find({ identityVerificationStatus: 'verified' })
-            .toArray();
+        const usersCollection = db.collection('consumerusers');
+        
+        const userList = await usersCollection.find({}).toArray();
 
         res.status(200).json({
             status: 'success',
