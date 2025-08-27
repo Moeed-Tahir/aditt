@@ -60,9 +60,9 @@ export default function Navbar({ userId = "", mode = "" }) {
       </div>
 
       <div className="flex items-center justify-end w-full md:w-auto">
-        <div className="hidden md:block mr-4">
+        {/* <div className="hidden md:block mr-4">
           <NotificationDropdown />
-        </div>
+        </div> */}
 
         {/* Desktop image with name and email */}
         <div className="hidden md:flex items-center gap-4">

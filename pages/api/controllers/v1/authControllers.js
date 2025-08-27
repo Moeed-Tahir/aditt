@@ -750,7 +750,7 @@ export const getUnverifiedConsumerUser = async (req, res) => {
         }).toArray();
 
         if (unverifiedUsers.length === 0) {
-            return res.status(404).json({ message: 'No pending or rejected users found' });
+            return res.status(200).json({ message: 'No pending or rejected users found',unverifiedUsers:[] });
         }
 
         res.status(200).json({

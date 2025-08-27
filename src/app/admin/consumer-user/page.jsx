@@ -8,23 +8,22 @@ import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
 
 export default function UsersPage() {
-    const [activeTab, setActiveTab] = useState("active");
     const [userLimit, setUserLimit] = useState(0);
     const [editedLimit, setEditedLimit] = useState(0);
-    const [showLimitModal, setShowLimitModal] = useState(false);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [rejectionReason, setRejectionReason] = useState("");
     const [selectedUserId, setSelectedUserId] = useState(null);
     const [approvingUserId, setApprovingUserId] = useState(null);
     const [rejectingUserId, setRejectingUserId] = useState(null);
+    console.log("users", users);
 
     const fetchData = useCallback(async () => {
         try {
@@ -38,6 +37,8 @@ export default function UsersPage() {
             const usersResponse = await axios.post(
                 "/api/routes/v1/authRoutes?action=getUnverifiedConsumerUser"
             );
+            console.log("usersResponse", usersResponse);
+
             setUsers(usersResponse.data.unverifiedUsers || []);
         } catch (error) {
             toast.error(error?.response?.data?.message || "Error fetching data");
@@ -49,15 +50,16 @@ export default function UsersPage() {
 
     const handleApprove = async (userId) => {
         try {
-            setApprovingUserId(userId); 
+            console.log("Approve is called");
+
+            setApprovingUserId(userId);
             const response = await axios.post(
                 "/api/routes/v1/authRoutes?action=verifiedConsumer",
                 { userId }
             );
             toast.success("User verification approved successfully");
-            if (response.data) {
-                fetchData();
-            }
+            fetchData();
+
         } catch (error) {
             toast.error(
                 error?.response?.data?.message || "Error approving verification"
@@ -70,7 +72,10 @@ export default function UsersPage() {
 
     const handleReject = async (userId) => {
         try {
+            console.log("Reject is called");
+
             setRejectingUserId(userId);
+
             const response = await axios.post(
                 "/api/routes/v1/authRoutes?action=rejectedConsumer",
                 {
@@ -93,7 +98,7 @@ export default function UsersPage() {
 
     useEffect(() => {
         fetchData();
-    }, [fetchData]);
+    }, []);
 
     const columns = [
         {
@@ -155,7 +160,7 @@ export default function UsersPage() {
                         variant="success"
                         onClick={() => handleApprove(user._id)}
                         disabled={user.identityVerificationStatus === 'verified' || approvingUserId === user._id}
-                        className="relative"
+                        className="relative cursor-pointer"
                     >
                         {approvingUserId === user._id ? (
                             <>
@@ -172,8 +177,7 @@ export default function UsersPage() {
                         size="sm"
                         variant="destructive"
                         onClick={() => handleReject(user._id)}
-                        disabled={user.identityVerificationStatus === 'rejected' || rejectingUserId === user._id}
-                        className="relative"
+                        className="relative cursor-pointer"
                     >
                         {rejectingUserId === user._id ? (
                             <>
@@ -188,7 +192,8 @@ export default function UsersPage() {
                     </Button>
                 </div>
             ),
-        },
+        }
+
     ];
 
     const sortOptions = [

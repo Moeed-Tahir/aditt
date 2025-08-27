@@ -144,11 +144,11 @@ export default function UsersPage() {
             />
           ) : (
             <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
-              {user.name ? user.name.charAt(0).toUpperCase() : "?"}
+              {user.fullName ? user.fullName.charAt(0).toUpperCase() : "?"}
             </div>
           )}
           <div>
-            <div>{`${user.firstName} ${user.lastName}` || "No Name"}</div>
+            <div>{`${user.fullName}` || "No Name"}</div>
             <div className="text-xs text-gray-500">{user.email || "No email"}</div>
           </div>
         </div>
