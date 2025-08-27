@@ -334,8 +334,9 @@ export const resetPassword = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
     try {
+
         await connectToDatabase();
-        const { userId, name, email, website, companyName, phone, currentPassword, newPassword, profileType } = req.body;
+        const { userId, name, email, website, companyName, phone, currentPassword, newPassword, profileType,brandName } = req.body;
 
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
@@ -361,6 +362,7 @@ export const updateProfile = async (req, res) => {
         user.companyName = companyName || user.companyName;
         user.phone = phone || user.phone;
         user.profileType = profileType || user.profileType;
+        user.brandName = brandName || user.brandName;
 
         await user.save();
 
@@ -371,6 +373,7 @@ export const updateProfile = async (req, res) => {
                 email: user.businessEmail,
                 website: user.businessWebsite,
                 companyName: user.companyName,
+                brandName: user.brandName,
                 phone: user.phone,
                 profileType: user.profileType,
             }
@@ -513,6 +516,7 @@ export const getProfile = async (req, res) => {
             companyName: user.companyName,
             businessWebsite: user.businessWebsite,
             businessEmail: user.businessEmail,
+            brandName: user.brandName,
             profileType: user.profileType,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt
@@ -1042,7 +1046,7 @@ export const rejectedConsumer = async (req, res) => {
         client = await MongoClient.connect(process.env.MONGO_URI);
         const db = client.db();
 
-        
+
         const result = await db.collection('consumerusers').findOneAndUpdate(
             { _id: new ObjectId(userId) },
             {
