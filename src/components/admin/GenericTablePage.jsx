@@ -8,7 +8,7 @@ import Link from "next/link";
 import SortByAndFilters from "@/components/admin/SortByAndFilters";
 import ConfirmationModal from "../ConfirmationModal";
 import axios from "axios";
-
+import { toast } from "sonner";
 export function GenericTablePage({
   title = "Data Table",
   data = [],
@@ -27,7 +27,7 @@ export function GenericTablePage({
     status: true,
     customStatusOptions: [],
   },
-  fetchConsumers,
+  fetchData,
   fetchAdvertiserUser,
   showAction = true
 }) {
@@ -72,6 +72,8 @@ export function GenericTablePage({
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const handleDeleteClick = (item) => {
+    console.log("item",item);
+
     setItemToDelete(item);
     setIsDeleteModalOpen(true);
   };
@@ -84,26 +86,17 @@ export function GenericTablePage({
       const response = await axios.post(
         "/api/routes/v1/authRoutes?action=deleteConsumerUser",
         {
-          id: itemToDelete.userId,
+          id: itemToDelete._id,
         }
       );
 
       if (response.status === 200) {
-        toast({
-          title: "Success",
-          description: "Account deleted successfully",
-          variant: "default",
-        });
-        fetchConsumers();
+        toast("Account deleted successfully");
+        fetchData();
       }
     } catch (error) {
       console.error("Account deletion failed:", error);
-      toast({
-        title: "Error",
-        description:
-          error.response?.data?.message || "Failed to delete account",
-        variant: "destructive",
-      });
+      toast(error.response?.data?.message || "Failed to delete account");
     } finally {
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
@@ -124,21 +117,12 @@ export function GenericTablePage({
       );
 
       if (response.status === 200) {
-        toast({
-          title: "Success",
-          description: "Account deleted successfully",
-          variant: "default",
-        });
+        toast("Account deleted successfully");
         fetchAdvertiserUser();
       }
     } catch (error) {
       console.error("Account deletion failed:", error);
-      toast({
-        title: "Error",
-        description:
-          error.response?.data?.message || "Failed to delete account",
-        variant: "destructive",
-      });
+      toast(error.response?.data?.message || "Failed to delete account");
     } finally {
       setIsDeleting(false);
       setIsDeleteModalOpen(false);

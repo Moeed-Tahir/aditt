@@ -1,6 +1,7 @@
-export const BudgetSummary = ({ campaignData }) => {
-  const budget = campaignData?.campaignBudget;
-  const spent = 0
+export const BudgetSummary = ({ campaignData }) => {  
+  const budget = campaignData?.campaignBudget || 0;
+  const spentInCents = campaignData?.engagements?.totalEngagementValue || 0;
+  const spent = spentInCents / 100;
   const remaining = budget - spent;
 
   return (
@@ -8,7 +9,7 @@ export const BudgetSummary = ({ campaignData }) => {
       <div className="flex-1 p-6">
         <h2 className="text-[16px] text-gray-400 mb-2">ALLOCATED BUDGET</h2>
         <p className="text-[30px] font-md text-gray-800">
-          ${budget}
+          ${budget.toFixed(2)}
         </p>
       </div>
 
@@ -24,7 +25,7 @@ export const BudgetSummary = ({ campaignData }) => {
       <div className="flex-1 bg-white rounded-xl p-6">
         <h2 className="text-[16px] text-gray-400 mb-2">REMAINING BUDGET</h2>
         <p className="text-[30px] font-md text-gray-800">
-          ${remaining}
+          ${remaining.toFixed(2)}
         </p>
       </div>
     </div>

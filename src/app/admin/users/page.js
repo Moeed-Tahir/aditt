@@ -295,7 +295,7 @@ export default function UsersPage() {
         showHeaderAction={true}
         loading={loading}
         showAction={true}
-
+        fetchData={fetchData}
       />
     </SidebarProvider>
   );
