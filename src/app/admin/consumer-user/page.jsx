@@ -23,7 +23,6 @@ export default function UsersPage() {
     const [selectedUserId, setSelectedUserId] = useState(null);
     const [approvingUserId, setApprovingUserId] = useState(null);
     const [rejectingUserId, setRejectingUserId] = useState(null);
-    console.log("users", users);
 
     const fetchData = useCallback(async () => {
         try {
@@ -37,7 +36,6 @@ export default function UsersPage() {
             const usersResponse = await axios.post(
                 "/api/routes/v1/authRoutes?action=getUnverifiedConsumerUser"
             );
-            console.log("usersResponse", usersResponse);
 
             setUsers(usersResponse.data.unverifiedUsers || []);
         } catch (error) {
@@ -50,8 +48,6 @@ export default function UsersPage() {
 
     const handleApprove = async (userId) => {
         try {
-            console.log("Approve is called");
-
             setApprovingUserId(userId);
             const response = await axios.post(
                 "/api/routes/v1/authRoutes?action=verifiedConsumer",
@@ -72,8 +68,6 @@ export default function UsersPage() {
 
     const handleReject = async (userId) => {
         try {
-            console.log("Reject is called");
-
             setRejectingUserId(userId);
 
             const response = await axios.post(

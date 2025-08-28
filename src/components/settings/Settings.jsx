@@ -31,7 +31,6 @@ export default function Settings() {
     profileType: "",
   });
   const userId = Cookies.get("userId");
-  console.log("userId",userId);
   
   const [error, setError] = useState("");
   
@@ -41,8 +40,6 @@ const fetchProfileData = async () => {
         "/api/routes/v1/authRoutes?action=getProfile",
         { userId }
       );
-
-      console.log("response.data.profile",response.data.profile);
 
       if (response.data.profile) {
         const profileData = response.data.profile;

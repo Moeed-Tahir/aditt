@@ -13,7 +13,6 @@ let stripePromise;
 const getStripe = () => {
     if (!stripePromise) {
         const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-        console.log("key", key);
 
         if (!key) {
             console.error('Stripe publishable key is missing!');
@@ -72,8 +71,6 @@ const StripePaymentForm = ({ onSuccess, onError }) => {
             if (!response.ok) {
                 throw new Error(data.message || 'Payment verification failed');
             }
-
-            console.log("data", data);
 
 
             onSuccess({
@@ -210,17 +207,9 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                 code: formData.couponCode.trim()
             });
 
-
             if (response.data.success) {
                 const originalBudget = parseFloat(formData.budget);
-
-                if (response.data.fullWavier !== true && (isNaN(originalBudget) || originalBudget <= 0)) {
-                    throw new Error('Please set a valid budget before applying coupon');
-                }
-
-
-                let discountedBudget = originalBudget;
-                let discountValue = parseFloat(response.data.discountValue);
+                const discountValue = parseFloat(response.data.discountValue);
                 const discountType = normalizeDiscountType(response.data.discountType);
                 const fullWavier = response.data.fullWavier === true;
 
@@ -228,8 +217,12 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                     throw new Error('Invalid discount value');
                 }
 
+                let discountedBudget = originalBudget;
+                let campaignBudgetValue = formData.campignBudget || 0;
+
                 if (fullWavier) {
                     discountedBudget = 0;
+                    campaignBudgetValue = discountValue; 
                 } else if (discountType === 'percentage') {
                     discountValue = Math.min(Math.max(0, discountValue), 100);
                     discountedBudget = originalBudget * (1 - (discountValue / 100));
@@ -252,6 +245,8 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                 setFormData(prev => ({
                     ...prev,
                     actualBudget: discountedBudget.toFixed(2),
+                    campignBudget: campaignBudgetValue,
+                    budget:campaignBudgetValue,
                     appliedCoupon: formData.couponCode.trim()
                 }));
 
@@ -290,6 +285,8 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
         setFormData(prev => ({
             ...prev,
             actualBudget: '',
+            campignBudget: 0,
+            budget:'',
             couponCode: '',
             appliedCoupon: '',
             totalEngagementValue: ''

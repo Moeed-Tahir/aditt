@@ -268,6 +268,10 @@ const CampaignSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    videoDuration: {
+        type: String,
+        required: true
+    },
     genderRatio: {
         type: String,
         required: true

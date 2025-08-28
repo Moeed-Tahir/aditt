@@ -15,9 +15,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 exports.createCampaign = async (req, res) => {
     try {
-
         await connectToDatabase();
-
         const {
             campaignTitle,
             websiteLink,
@@ -29,6 +27,7 @@ exports.createCampaign = async (req, res) => {
             genderType,
             genderRatio,
             ageRange,
+            videoDuration,
             campaignStartDate,
             campaignEndDate,
             cardDetail,
@@ -64,6 +63,7 @@ exports.createCampaign = async (req, res) => {
             videoUrlId,
             videoUrlIntelligenceStatus,
             companyLogo: companyLogo || null,
+            videoDuration,
             quizQuestion: {
                 questionText: quizQuestion.questionText,
                 option1: quizQuestion.option1,

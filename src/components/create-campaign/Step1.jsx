@@ -12,7 +12,7 @@ const Step1 = ({
 }) => {
   const [videoError, setVideoError] = useState("");
   const [imageError, setImageError] = useState("");
-  const [previewItem, setPreviewItem] = useState(null); // To track which item to preview
+  const [previewItem, setPreviewItem] = useState(null);
 
   const validateFileSize = (file, fileType) => {
     const maxSize = fileType === "video" ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
@@ -40,11 +40,17 @@ const Step1 = ({
       video.onloadedmetadata = () => {
         window.URL.revokeObjectURL(video.src);
         const duration = video.duration;
+
         if (duration > 30) {
           setVideoError("Video duration too long. Maximum allowed duration is 30 seconds.");
           resolve(false);
         } else {
           setVideoError("");
+          // Save the duration to formData
+          setFormData(prev => ({
+            ...prev,
+            videoDuration: duration
+          }));
           resolve(true);
         }
       };
@@ -78,10 +84,10 @@ const Step1 = ({
     handleFileChange(e, type);
   };
 
-  const showProgressSection = 
-    (uploadProgress.video > 0 && uploadProgress.video < 100) || 
+  const showProgressSection =
+    (uploadProgress.video > 0 && uploadProgress.video < 100) ||
     (uploadProgress.image > 0 && uploadProgress.image < 100);
-    
+
   return (
     <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
       {/* Preview Modal */}
@@ -90,7 +96,7 @@ const Step1 = ({
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden">
             <div className="flex justify-between items-center p-4 border-b">
               <h3 className="text-lg font-medium">Preview</h3>
-              <button 
+              <button
                 onClick={() => setPreviewItem(null)}
                 className="text-gray-500 hover:text-gray-700"
               >
@@ -99,15 +105,15 @@ const Step1 = ({
             </div>
             <div className="p-4 flex justify-center items-center max-h-[70vh] overflow-auto">
               {previewItem.type === 'video' ? (
-                <video 
-                  src={URL.createObjectURL(previewItem.file)} 
-                  controls 
+                <video
+                  src={URL.createObjectURL(previewItem.file)}
+                  controls
                   className="max-w-full max-h-full"
                 />
               ) : (
-                <img 
-                  src={URL.createObjectURL(previewItem.file)} 
-                  alt="Preview" 
+                <img
+                  src={URL.createObjectURL(previewItem.file)}
+                  alt="Preview"
                   className="max-w-full max-h-full object-contain"
                 />
               )}
@@ -119,7 +125,7 @@ const Step1 = ({
           </div>
         </div>
       )}
-      
+
       <div className="max-w-6xl mx-auto bg-white rounded-xl md:rounded-2xl shadow p-4 md:p-8 relative">
         {showProgressSection && (
           <div className="bg-gray-100 rounded-t-xl md:rounded-t-2xl -mt-4 -mx-4 md:-mt-8 md:-mx-8 mb-4 md:mb-6 p-3">
@@ -133,9 +139,8 @@ const Step1 = ({
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      uploadProgress.video < 100 ? 'bg-blue-600' : 'bg-green-500'
-                    }`}
+                    className={`h-full rounded-full transition-all duration-300 ${uploadProgress.video < 100 ? 'bg-blue-600' : 'bg-green-500'
+                      }`}
                     style={{ width: `${uploadProgress.video}%` }}
                   ></div>
                 </div>
@@ -152,9 +157,8 @@ const Step1 = ({
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      uploadProgress.image < 100 ? 'bg-blue-600' : 'bg-green-500'
-                    }`}
+                    className={`h-full rounded-full transition-all duration-300 ${uploadProgress.image < 100 ? 'bg-blue-600' : 'bg-green-500'
+                      }`}
                     style={{ width: `${uploadProgress.image}%` }}
                   ></div>
                 </div>
@@ -273,7 +277,7 @@ const Step1 = ({
                 Campaign Video
               </label>
               <span className="block text-sm md:text-[16px] text-gray-400 mt-1">
-                Upload your campaign video (max 100MB, max 30 seconds). 
+                Upload your campaign video (max 100MB, max 30 seconds).
                 For best results, we recommend using vertical videos.
               </span>
             </div>
@@ -410,14 +414,13 @@ const Step1 = ({
         <div className="mt-8 flex justify-end">
           <Link
             href="?step=1"
-            className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
-              !formData.campaignTitle ||
-              !formData.brandName ||
-              !formData.websiteLink ||
-              !formData.videoFile
+            className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${!formData.campaignTitle ||
+                !formData.brandName ||
+                !formData.websiteLink ||
+                !formData.videoFile
                 ? "opacity-50 cursor-not-allowed"
                 : ""
-            }`}
+              }`}
             onClick={(e) => {
               if (
                 !formData.campaignTitle ||

@@ -771,7 +771,6 @@ export const approveConsumerVerification = async (req, res) => {
     try {
         await connectToDatabase();
         const { userId } = req.body;
-        console.log("userId", userId);
 
         if (!userId) {
             return res.status(400).json({ message: 'UserId not found' });
@@ -790,8 +789,6 @@ export const approveConsumerVerification = async (req, res) => {
             },
             { returnDocument: 'after' }
         );
-
-        console.log("updatedUser", updatedUser);
 
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });

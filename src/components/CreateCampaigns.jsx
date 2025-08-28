@@ -84,7 +84,6 @@ export function CreateCampaigns({ userId }) {
     campignBudget: "",
   });
 
-
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
     image: 0,
@@ -278,6 +277,7 @@ export function CreateCampaigns({ userId }) {
         couponCode: formData.couponCode,
         videoUrlIntelligenceStatus: formData.videoUrlIntelligenceStatus,
         videoUrlId: formData.videoUrlId,
+        videoDuration:formData.videoDuration,
         quizQuestion: formData.quizQuestion.text
           ? {
             questionText: formData.quizQuestion.text,
