@@ -2,14 +2,14 @@ const bcrypt = require("bcrypt");
 import User from '../../models/User.model';
 import Campaign from '../../models/Campaign.model';
 import { sendApprovedIdentityEmail, sendRejectedIdentityEmail } from '../../services/emailServices';
-const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 const { generateOTP, sendOTP } = require("../../services/otpServices");
 const jwt = require("jsonwebtoken");
 const { getConsumerUsersCollection, connectToDatabase } = require("../../config/dbConnect");
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const dotenv = require("dotenv");
 dotenv.config();
+const AdminDashboard = require('../../models/AdminDashboard.model');
 
 export const signUp = async (req, res) => {
     try {
@@ -336,7 +336,7 @@ export const updateProfile = async (req, res) => {
     try {
 
         await connectToDatabase();
-        const { userId, name, email, website, companyName, phone, currentPassword, newPassword, profileType,brandName } = req.body;
+        const { userId, name, email, website, companyName, phone, currentPassword, newPassword, profileType, brandName } = req.body;
 
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
@@ -750,7 +750,7 @@ export const getUnverifiedConsumerUser = async (req, res) => {
         }).toArray();
 
         if (unverifiedUsers.length === 0) {
-            return res.status(200).json({ message: 'No pending or rejected users found',unverifiedUsers:[] });
+            return res.status(200).json({ message: 'No pending or rejected users found', unverifiedUsers: [] });
         }
 
         res.status(200).json({
@@ -962,7 +962,7 @@ export const listAllConsumerUsers = async (req, res) => {
         const db = client.db();
 
         const usersCollection = db.collection('consumerusers');
-        
+
         const userList = await usersCollection.find({}).toArray();
 
         res.status(200).json({
@@ -1078,6 +1078,88 @@ export const rejectedConsumer = async (req, res) => {
             success: false,
             message: 'Internal server error',
             error: error.message
+        });
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+};
+
+export const activeConsumerUser = async (req, res) => {
+    let client;
+
+    try {
+        const { userId } = req.body;
+        console.log("userId", userId);
+
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: "User ID is required"
+            });
+        }
+
+        if (!ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid User ID format"
+            });
+        }
+
+        client = await MongoClient.connect(process.env.MONGO_URI);
+        const db = client.db();
+        const usersCollection = db.collection('consumerusers');
+
+        const updatedUser = await usersCollection.findOneAndUpdate(
+            { _id: new ObjectId(userId) },
+            { $set: { status: "active" } },
+            { returnDocument: "after" }
+        );
+
+        console.log("updatedUser", updatedUser);
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        const dashboardCollection = db.collection('admindashboards');
+
+        const updatedDashboard = await dashboardCollection.findOneAndUpdate(
+            {},
+            {
+                $inc: { userLimit: 1 },
+                $set: { lastUpdated: new Date() }
+            },
+            { returnDocument: "after", upsert: true }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "User status updated to active and user limit increased",
+            data: {
+                user: {
+                    id: updatedUser._id,
+                    status: updatedUser.status,
+                    email: updatedUser.email
+                },
+                dashboard: {
+                    userLimit: updatedDashboard.userLimit,
+                    lastUpdated: updatedDashboard.lastUpdated
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error("Error in activeConsumerUser:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     } finally {
         if (client) {

@@ -29,7 +29,8 @@ export function GenericTablePage({
   },
   fetchData,
   fetchAdvertiserUser,
-  showAction = true
+  showAction = true,
+  activeTab
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState(null);
@@ -72,11 +73,31 @@ export function GenericTablePage({
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const handleDeleteClick = (item) => {
-    console.log("item",item);
-
     setItemToDelete(item);
     setIsDeleteModalOpen(true);
   };
+
+  const handleAcceptClick = async (item) => {
+    try {
+      console.log("item", item);
+
+      const response = await axios.post(
+        "/api/routes/v1/authRoutes?action=activeConsumerUser",
+        { userId: item._id }
+      );
+
+      if (response.data.success === true) {
+        toast.success("User activated successfully");
+        fetchData();
+      } else {
+        toast.error(response.data.message || "Failed to activate user");
+      }
+    } catch (error) {
+      console.error("Error activating user:", error);
+      toast.error("An error occurred while activating user");
+    }
+  };
+
 
   const deleteAccount = async () => {
     if (!itemToDelete) return;
@@ -151,6 +172,17 @@ export function GenericTablePage({
       >
         <Trash className="w-4 h-4" />
       </button>
+      {
+        activeTab == "active" ? <></> : <button
+          onClick={() => handleAcceptClick(item)}
+          className="text-green-500 hover:text-green-700"
+          aria-label="Accept"
+        >
+          Accept
+        </button>
+      }
+
+
     </div>
   );
 

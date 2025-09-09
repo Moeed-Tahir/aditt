@@ -112,6 +112,34 @@ export default function UsersPage() {
     setShowLimitModal(false);
   };
 
+  const parseDateOfBirth = (dateString) => {
+    if (!dateString) return null;
+    
+    if (typeof dateString === 'object') return dateString;
+    
+    if (typeof dateString === 'string' && dateString.includes('/')) {
+      const parts = dateString.split('/');
+      if (parts.length === 3) {
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+      }
+    }
+    
+    return new Date(dateString);
+  };
+
+  const formatDateOfBirth = (dateString) => {
+    if (!dateString) return "N/A";
+    
+    const date = parseDateOfBirth(dateString);
+    if (isNaN(date.getTime())) return "N/A";
+    
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${day}/${month}/${year}`;
+  };
+
   const activeUsers = users
     .filter(user => user.status === "active")
     .slice(0, userLimit);
@@ -157,7 +185,7 @@ export default function UsersPage() {
     {
       label: "DATE OF BIRTH",
       key: "dateOfBirth",
-      render: (user) => user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "N/A",
+      render: (user) => formatDateOfBirth(user.dateOfBirth),
     },
     {
       label: "TOTAL EARNINGS",
@@ -296,6 +324,7 @@ export default function UsersPage() {
         loading={loading}
         showAction={true}
         fetchData={fetchData}
+        activeTab={activeTab}
       />
     </SidebarProvider>
   );

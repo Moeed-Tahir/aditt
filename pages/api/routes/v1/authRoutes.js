@@ -26,7 +26,8 @@ import {
   rejectConsumerVerification,
   approveConsumerVerification,
   verifiedConsumer,
-  rejectedConsumer
+  rejectedConsumer,
+  activeConsumerUser
 } from "../../controllers/v1/authControllers";
 
 export default async function handler(req, res) {
@@ -39,6 +40,8 @@ export default async function handler(req, res) {
   try {
     if (req.method === "POST") {
       switch (action) {
+        case "activeConsumerUser":
+          return await activeConsumerUser(req, res);
         case "verify-otp":
           return await verifyOTP(req, res);
         case "signUp":

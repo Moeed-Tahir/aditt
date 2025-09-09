@@ -4,7 +4,6 @@ const UserChatSupportSchema = new mongoose.Schema({
     userId: {
         type: String,
         require: true,
-
     },
     queryTitle: {
         type: String,
