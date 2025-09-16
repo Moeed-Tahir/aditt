@@ -9,6 +9,7 @@ import SortByAndFilters from "@/components/admin/SortByAndFilters";
 import ConfirmationModal from "../ConfirmationModal";
 import axios from "axios";
 import { toast } from "sonner";
+
 export function GenericTablePage({
   title = "Data Table",
   data = [],
@@ -39,6 +40,8 @@ export function GenericTablePage({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [approvingUserId, setApprovingUserId] = useState(null);
+  const [rejectingUserId, setRejectingUserId] = useState(null);
   const itemsPerPage = 10;
 
   let filteredData = [...data];
@@ -98,6 +101,43 @@ export function GenericTablePage({
     }
   };
 
+  const handleApprove = async (userId) => {
+    try {
+      setApprovingUserId(userId);
+      const response = await axios.post(
+        "/api/routes/v1/authRoutes?action=verifiedConsumer",
+        { userId }
+      );
+      toast.success("User verification approved successfully");
+      fetchData();
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Error approving verification"
+      );
+      console.error("Error approving verification:", error);
+    } finally {
+      setApprovingUserId(null);
+    }
+  };
+
+  const handleReject = async (userId) => {
+    try {
+      setRejectingUserId(userId);
+      const response = await axios.post(
+        "/api/routes/v1/authRoutes?action=rejectedConsumer",
+        { userId }
+      );
+      toast.success("User verification rejected successfully");
+      fetchData();
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Error rejecting verification"
+      );
+      console.error("Error rejecting verification:", error);
+    } finally {
+      setRejectingUserId(null);
+    }
+  };
 
   const deleteAccount = async () => {
     if (!itemToDelete) return;
@@ -151,39 +191,66 @@ export function GenericTablePage({
     }
   };
 
-  const defaultRenderActions = (item) => (
-    <div className="flex gap-2">
-      {title === "ADVERTISERS" && (
-        <Link
-          href={{
-            pathname: "/admin/advertisers-profile",
-            query: { id: item.userId },
-          }}
-          className="hover:underline"
-        >
-          <Eye className="w-4 h-4" />
-        </Link>
-      )}
-      <button
-        onClick={() => handleDeleteClick(item)}
-        className="text-red-500 hover:text-red-700"
-        aria-label="Delete"
-      >
-        <Trash className="w-4 h-4" />
-      </button>
+  const defaultRenderActions = (item) => {
+    // For users with pendingApproval status, show Accept/Reject buttons
+    if (item.identityVerificationStatus === "pendingApproval") {
+      return (
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleApprove(item._id)}
+            disabled={approvingUserId === item._id}
+            className="px-3 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 disabled:opacity-50"
+            aria-label="Approve"
+          >
+            {approvingUserId === item._id ? "Approving..." : "Accept"}
+          </button>
+          <button
+            onClick={() => handleReject(item._id)}
+            disabled={rejectingUserId === item._id}
+            className="px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 disabled:opacity-50"
+            aria-label="Reject"
+          >
+            {rejectingUserId === item._id ? "Rejecting..." : "Reject"}
+          </button>
+        </div>
+      );
+    }
 
-      {/* Show Accept button only for waitlist status */}
-      {item.status === "waitlist" && (
+    // For other users, show the default actions
+    return (
+      <div className="flex gap-2">
+        {title === "ADVERTISERS" && (
+          <Link
+            href={{
+              pathname: "/admin/advertisers-profile",
+              query: { id: item.userId },
+            }}
+            className="hover:underline"
+          >
+            <Eye className="w-4 h-4" />
+          </Link>
+        )}
         <button
-          onClick={() => handleAcceptClick(item)}
-          className="text-green-500 hover:text-green-700"
-          aria-label="Accept"
+          onClick={() => handleDeleteClick(item)}
+          className="text-red-500 hover:text-red-700"
+          aria-label="Delete"
         >
-          Accept
+          <Trash className="w-4 h-4" />
         </button>
-      )}
-    </div>
-  );
+
+        {/* Show Accept button only for waitlist status */}
+        {item.status === "waitlist" && (
+          <button
+            onClick={() => handleAcceptClick(item)}
+            className="text-green-500 hover:text-green-700"
+            aria-label="Accept"
+          >
+            Accept
+          </button>
+        )}
+      </div>
+    );
+  };
 
   return (
     <main
@@ -364,4 +431,3 @@ export function GenericTablePage({
     </main>
   );
 }
-

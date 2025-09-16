@@ -143,29 +143,31 @@ export default function UsersPage() {
 
   const signupPipelineUsers = users.filter(user =>
     (user.status === "pending" ||
-     user.status === "signUpPipeline" ||
-     user.status === "pending_verification") &&
+      user.status === "signUpPipeline" ||
+      user.status === "pending_verification" ||
+      (user.status === "active" && user.identityVerificationStatus !== "verified")) &&
     user.identityVerificationStatus !== "pendingApproval" &&
     user.identityVerificationStatus !== "rejected"
   );
 
-  const activeUsers = users.filter(user => 
+  const activeUsers = users.filter(user =>
     user.status === "active" &&
+    user.identityVerificationStatus === "verified" && 
     user.identityVerificationStatus !== "pendingApproval" &&
     user.identityVerificationStatus !== "rejected"
   );
 
-  const waitlistUsers = users.filter(user => 
+  const waitlistUsers = users.filter(user =>
     user.status === "waitlist" &&
     user.identityVerificationStatus !== "pendingApproval" &&
     user.identityVerificationStatus !== "rejected"
   );
 
-  const flaggedUsers = users.filter(user => 
+  const flaggedUsers = users.filter(user =>
     user.identityVerificationStatus === "pendingApproval"
   );
 
-  const rejectedUsers = users.filter(user => 
+  const rejectedUsers = users.filter(user =>
     user.identityVerificationStatus === "rejected"
   );
 
@@ -243,8 +245,8 @@ export default function UsersPage() {
       render: (user) => {
         let statusClass = "";
         let displayStatus = user.identityVerificationStatus || "not_started";
-        
-        switch(user.identityVerificationStatus) {
+
+        switch (user.identityVerificationStatus) {
           case "verified":
             statusClass = "bg-green-100 text-green-800";
             break;
@@ -256,12 +258,8 @@ export default function UsersPage() {
             statusClass = "bg-red-100 text-red-800";
             displayStatus = "rejected";
             break;
-          case "not_started":
-          default:
-            statusClass = "bg-gray-100 text-gray-800";
-            displayStatus = "not started";
         }
-        
+
         return (
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusClass}`}>
             {displayStatus}
@@ -290,7 +288,7 @@ export default function UsersPage() {
             statusClass = "bg-gray-100 text-gray-800";
             break;
           case "pending":
-          case "signUpPipeline": 
+          case "signUpPipeline":
           case "pending_verification":
             statusClass = "bg-blue-100 text-blue-800";
             displayStatus = "signup pipeline";
@@ -319,48 +317,48 @@ export default function UsersPage() {
 
   const headerAction = (
     <div className="flex flex-col gap-4 w-full">
-      <div className="flex gap-2 rounded p-1 text-sm font-semibold w-full max-w-3xl overflow-x-auto">
+      <div className="flex gap-1 rounded p-1 text-sm font-semibold w-full overflow-hidden">
         <button
-          className={`flex-1 py-2 px-4 rounded-full whitespace-nowrap ${activeTab === "signupPipeline"
+          className={`flex-1 py-2 px-2 rounded-full whitespace-nowrap ${activeTab === "signupPipeline"
             ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
             : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
-            } transition flex items-center justify-center`}
+            } transition flex items-center justify-center text-xs sm:text-sm`}
           onClick={() => setActiveTab("signupPipeline")}
         >
           Sign Up Pipeline ({signupPipelineCount})
         </button>
         <button
-          className={`flex-1 py-2 px-4 rounded-full whitespace-nowrap ${activeTab === "active"
+          className={`flex-1 py-2 px-2 rounded-full whitespace-nowrap ${activeTab === "active"
             ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
             : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
-            } transition flex items-center justify-center`}
+            } transition flex items-center justify-center text-xs sm:text-sm`}
           onClick={() => setActiveTab("active")}
         >
           Active Users ({activeCount})
         </button>
         <button
-          className={`flex-1 py-2 px-4 rounded-full whitespace-nowrap ${activeTab === "waitlist"
+          className={`flex-1 py-2 px-2 rounded-full whitespace-nowrap ${activeTab === "waitlist"
             ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
             : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
-            } transition flex items-center justify-center`}
+            } transition flex items-center justify-center text-xs sm:text-sm`}
           onClick={() => setActiveTab("waitlist")}
         >
           Waitlist ({waitlistCount})
         </button>
         <button
-          className={`flex-1 py-2 px-4 rounded-full whitespace-nowrap ${activeTab === "flagged"
+          className={`flex-1 py-2 px-2 rounded-full whitespace-nowrap ${activeTab === "flagged"
             ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
             : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
-            } transition flex items-center justify-center`}
+            } transition flex items-center justify-center text-xs sm:text-sm`}
           onClick={() => setActiveTab("flagged")}
         >
           Flagged Users ({flaggedCount})
         </button>
         <button
-          className={`flex-1 py-2 px-4 rounded-full whitespace-nowrap ${activeTab === "rejected"
+          className={`flex-1 py-2 px-2 rounded-full whitespace-nowrap ${activeTab === "rejected"
             ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
             : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
-            } transition flex items-center justify-center`}
+            } transition flex items-center justify-center text-xs sm:text-sm`}
           onClick={() => setActiveTab("rejected")}
         >
           Rejected Users ({rejectedCount})
