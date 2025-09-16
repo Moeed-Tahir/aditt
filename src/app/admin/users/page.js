@@ -15,12 +15,13 @@ import { toast } from "sonner";
 import Image from "next/image";
 
 export default function UsersPage() {
-  const [activeTab, setActiveTab] = useState("active");
+  const [activeTab, setActiveTab] = useState("signupPipeline");
   const [userLimit, setUserLimit] = useState(0);
   const [editedLimit, setEditedLimit] = useState(0);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  console.log("users", users);
 
   const fetchData = useCallback(async () => {
     try {
@@ -114,47 +115,86 @@ export default function UsersPage() {
 
   const parseDateOfBirth = (dateString) => {
     if (!dateString) return null;
-    
+
     if (typeof dateString === 'object') return dateString;
-    
+
     if (typeof dateString === 'string' && dateString.includes('/')) {
       const parts = dateString.split('/');
       if (parts.length === 3) {
         return new Date(parts[2], parts[1] - 1, parts[0]);
       }
     }
-    
+
     return new Date(dateString);
   };
 
   const formatDateOfBirth = (dateString) => {
     if (!dateString) return "N/A";
-    
+
     const date = parseDateOfBirth(dateString);
     if (isNaN(date.getTime())) return "N/A";
-    
+
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
-    
+
     return `${day}/${month}/${year}`;
   };
 
-  const activeUsers = users
-    .filter(user => user.status === "active")
-    .slice(0, userLimit);
+  const signupPipelineUsers = users.filter(user =>
+    (user.status === "pending" ||
+     user.status === "signUpPipeline" ||
+     user.status === "pending_verification") &&
+    user.identityVerificationStatus !== "pendingApproval" &&
+    user.identityVerificationStatus !== "rejected"
+  );
 
-  const waitlistUsers = [
-    ...users.filter(user => user.status === "waitlist"),
-    ...users
-      .filter(user => user.status === "active")
-      .slice(userLimit)
-  ];
+  const activeUsers = users.filter(user => 
+    user.status === "active" &&
+    user.identityVerificationStatus !== "pendingApproval" &&
+    user.identityVerificationStatus !== "rejected"
+  );
 
-  const currentActiveCount = activeUsers.length;
-  const currentWaitlistCount = waitlistUsers.length;
+  const waitlistUsers = users.filter(user => 
+    user.status === "waitlist" &&
+    user.identityVerificationStatus !== "pendingApproval" &&
+    user.identityVerificationStatus !== "rejected"
+  );
 
-  const dataToShow = activeTab === "active" ? activeUsers : waitlistUsers;
+  const flaggedUsers = users.filter(user => 
+    user.identityVerificationStatus === "pendingApproval"
+  );
+
+  const rejectedUsers = users.filter(user => 
+    user.identityVerificationStatus === "rejected"
+  );
+
+  const signupPipelineCount = signupPipelineUsers.length;
+  const activeCount = activeUsers.length;
+  const waitlistCount = waitlistUsers.length;
+  const flaggedCount = flaggedUsers.length;
+  const rejectedCount = rejectedUsers.length;
+
+  let dataToShow = [];
+  switch (activeTab) {
+    case "signupPipeline":
+      dataToShow = signupPipelineUsers;
+      break;
+    case "active":
+      dataToShow = activeUsers;
+      break;
+    case "waitlist":
+      dataToShow = waitlistUsers;
+      break;
+    case "flagged":
+      dataToShow = flaggedUsers;
+      break;
+    case "rejected":
+      dataToShow = rejectedUsers;
+      break;
+    default:
+      dataToShow = signupPipelineUsers;
+  }
 
   const columns = [
     {
@@ -198,16 +238,73 @@ export default function UsersPage() {
       render: (user) => `$${(user.totalWithdraw || 0).toFixed(2)}`,
     },
     {
-      label: "STATUS",
+      label: "VERIFICATION STATUS",
+      key: "identityVerificationStatus",
+      render: (user) => {
+        let statusClass = "";
+        let displayStatus = user.identityVerificationStatus || "not_started";
+        
+        switch(user.identityVerificationStatus) {
+          case "verified":
+            statusClass = "bg-green-100 text-green-800";
+            break;
+          case "pendingApproval":
+            statusClass = "bg-yellow-100 text-yellow-800";
+            displayStatus = "pending approval";
+            break;
+          case "rejected":
+            statusClass = "bg-red-100 text-red-800";
+            displayStatus = "rejected";
+            break;
+          case "not_started":
+          default:
+            statusClass = "bg-gray-100 text-gray-800";
+            displayStatus = "not started";
+        }
+        
+        return (
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusClass}`}>
+            {displayStatus}
+          </span>
+        );
+      },
+    },
+    {
+      label: "ACCOUNT STATUS",
       key: "status",
-      render: (user) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.status === "active" && activeUsers.includes(user)
-          ? "bg-green-100 text-green-800"
-          : "bg-yellow-100 text-yellow-800"
-          }`}>
-          {user.status === "active" && activeUsers.includes(user) ? "active" : "waitlist"}
-        </span>
-      ),
+      render: (user) => {
+        let statusClass = "";
+        let displayStatus = user.status;
+
+        switch (user.status) {
+          case "active":
+            statusClass = "bg-green-100 text-green-800";
+            break;
+          case "waitlist":
+            statusClass = "bg-yellow-100 text-yellow-800";
+            break;
+          case "flagged":
+            statusClass = "bg-red-100 text-red-800";
+            break;
+          case "rejected":
+            statusClass = "bg-gray-100 text-gray-800";
+            break;
+          case "pending":
+          case "signUpPipeline": 
+          case "pending_verification":
+            statusClass = "bg-blue-100 text-blue-800";
+            displayStatus = "signup pipeline";
+            break;
+          default:
+            statusClass = "bg-gray-100 text-gray-800";
+        }
+
+        return (
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusClass}`}>
+            {displayStatus}
+          </span>
+        );
+      },
     }
   ];
 
@@ -222,24 +319,51 @@ export default function UsersPage() {
 
   const headerAction = (
     <div className="flex flex-col gap-4 w-full">
-      <div className="flex gap-2 rounded p-1 text-sm font-semibold w-full max-w-md">
+      <div className="flex gap-2 rounded p-1 text-sm font-semibold w-full max-w-3xl overflow-x-auto">
         <button
-          className={`flex-1 py-2 px-4 rounded-full ${activeTab === "active"
+          className={`flex-1 py-2 px-4 rounded-full whitespace-nowrap ${activeTab === "signupPipeline"
+            ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
+            : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
+            } transition flex items-center justify-center`}
+          onClick={() => setActiveTab("signupPipeline")}
+        >
+          Sign Up Pipeline ({signupPipelineCount})
+        </button>
+        <button
+          className={`flex-1 py-2 px-4 rounded-full whitespace-nowrap ${activeTab === "active"
             ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
             : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
             } transition flex items-center justify-center`}
           onClick={() => setActiveTab("active")}
         >
-          Active Users ({currentActiveCount})
+          Active Users ({activeCount})
         </button>
         <button
-          className={`flex-1 py-2 px-4 rounded-full ${activeTab === "waitlist"
+          className={`flex-1 py-2 px-4 rounded-full whitespace-nowrap ${activeTab === "waitlist"
             ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
             : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
             } transition flex items-center justify-center`}
           onClick={() => setActiveTab("waitlist")}
         >
-          Waitlist ({currentWaitlistCount})
+          Waitlist ({waitlistCount})
+        </button>
+        <button
+          className={`flex-1 py-2 px-4 rounded-full whitespace-nowrap ${activeTab === "flagged"
+            ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
+            : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
+            } transition flex items-center justify-center`}
+          onClick={() => setActiveTab("flagged")}
+        >
+          Flagged Users ({flaggedCount})
+        </button>
+        <button
+          className={`flex-1 py-2 px-4 rounded-full whitespace-nowrap ${activeTab === "rejected"
+            ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
+            : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
+            } transition flex items-center justify-center`}
+          onClick={() => setActiveTab("rejected")}
+        >
+          Rejected Users ({rejectedCount})
         </button>
       </div>
 
@@ -247,7 +371,7 @@ export default function UsersPage() {
         <div className="bg-white shadow-sm rounded-xl px-6 py-4 w-full flex justify-between items-start flex-wrap gap-4">
           <div>
             <p className="text-[22px] font-semibold text-gray-800">
-              Active Users Limit: {userLimit} ({currentActiveCount} active)
+              Active Users Limit: {userLimit} ({activeCount} active)
             </p>
             <p className="text-sm text-gray-500">
               Total users: {users.length}

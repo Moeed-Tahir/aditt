@@ -153,7 +153,6 @@ export function GenericTablePage({
 
   const defaultRenderActions = (item) => (
     <div className="flex gap-2">
-
       {title === "ADVERTISERS" && (
         <Link
           href={{
@@ -172,17 +171,17 @@ export function GenericTablePage({
       >
         <Trash className="w-4 h-4" />
       </button>
-      {
-        activeTab == "active" ? <></> : <button
+
+      {/* Show Accept button only for waitlist status */}
+      {item.status === "waitlist" && (
+        <button
           onClick={() => handleAcceptClick(item)}
           className="text-green-500 hover:text-green-700"
           aria-label="Accept"
         >
           Accept
         </button>
-      }
-
-
+      )}
     </div>
   );
 
