@@ -8,7 +8,6 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import RejectDialog from "@/components/RejectDialog";
 import { toast } from "sonner";
-
 export default function AdsApproval() {
   const [loading, setLoading] = useState(false);
   const [approvalData, setApprovalData] = useState([]);
