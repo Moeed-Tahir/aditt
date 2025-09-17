@@ -65,6 +65,19 @@ export default function UsersPage() {
       setUserLimit(updatedLimit);
       setEditedLimit(updatedLimit);
 
+      // First, move waitlist users with completed verification to signup pipeline
+      const waitlistUsersWithVerification = users.filter(user =>
+        user.status === "waitlist" &&
+        user.identityVerificationStatus !== false
+      );
+
+      if (waitlistUsersWithVerification.length > 0) {
+        const updatePromises = waitlistUsersWithVerification.map(user =>
+          updateUserStatus(user._id, "pending")
+        );
+        await Promise.all(updatePromises);
+      }
+
       const sortedUsers = [...users].sort((a, b) => {
         if (a.status === b.status) {
           return new Date(a.createdAt) - new Date(b.createdAt);
@@ -141,26 +154,18 @@ export default function UsersPage() {
     return `${day}/${month}/${year}`;
   };
 
-  const signupPipelineUsers = users.filter(user =>
-    (user.status === "pending" ||
-      user.status === "signUpPipeline" ||
-      user.status === "pending_verification" ||
-      (user.status === "active" && user.identityVerificationStatus !== "verified")) &&
-    user.identityVerificationStatus !== "pendingApproval" &&
-    user.identityVerificationStatus !== "rejected"
-  );
-
   const activeUsers = users.filter(user =>
-    user.status === "active" &&
-    user.identityVerificationStatus === "verified" && 
-    user.identityVerificationStatus !== "pendingApproval" &&
-    user.identityVerificationStatus !== "rejected"
+    user.status === "active" && user.identityVerificationStatus === "verified"
   );
 
   const waitlistUsers = users.filter(user =>
     user.status === "waitlist" &&
-    user.identityVerificationStatus !== "pendingApproval" &&
-    user.identityVerificationStatus !== "rejected"
+    (user.identityVerificationStatus === "false" || user.identityVerificationStatus === "verified")
+  );
+
+  const signupPipelineUsers = users.filter(user =>
+    user.status === "signUpPipeline" &&
+    (user.identityVerificationStatus === "approved" || user.identityVerificationStatus === "false" || user.identityVerificationStatus === "rejected")
   );
 
   const flaggedUsers = users.filter(user =>
@@ -170,6 +175,7 @@ export default function UsersPage() {
   const rejectedUsers = users.filter(user =>
     user.identityVerificationStatus === "rejected"
   );
+
 
   const signupPipelineCount = signupPipelineUsers.length;
   const activeCount = activeUsers.length;
@@ -244,20 +250,26 @@ export default function UsersPage() {
       key: "identityVerificationStatus",
       render: (user) => {
         let statusClass = "";
-        let displayStatus = user.identityVerificationStatus || "not_started";
+        let displayStatus = "";
 
-        switch (user.identityVerificationStatus) {
-          case "verified":
-            statusClass = "bg-green-100 text-green-800";
-            break;
-          case "pendingApproval":
-            statusClass = "bg-yellow-100 text-yellow-800";
-            displayStatus = "pending approval";
-            break;
-          case "rejected":
-            statusClass = "bg-red-100 text-red-800";
-            displayStatus = "rejected";
-            break;
+        if (user.identityVerificationStatus === "verified") {
+          statusClass = "bg-green-100 text-green-800";
+          displayStatus = "verified";
+        } else if (user.identityVerificationStatus === "false") {
+          statusClass = "bg-gray-100 text-gray-800";
+          displayStatus = "false";
+        } else if (user.identityVerificationStatus === "approved") {
+          statusClass = "bg-gray-100 text-gray-800";
+          displayStatus = "approved";
+        } else if (user.identityVerificationStatus === "pendingApproval") {
+          statusClass = "bg-yellow-100 text-yellow-800";
+          displayStatus = "pending approval";
+        } else if (user.identityVerificationStatus === "rejected") {
+          statusClass = "bg-red-100 text-red-800";
+          displayStatus = "rejected";
+        } else {
+          statusClass = "bg-gray-100 text-gray-800";
+          displayStatus = "unknown status";
         }
 
         return (
