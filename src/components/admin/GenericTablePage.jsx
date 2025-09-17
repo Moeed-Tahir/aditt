@@ -192,7 +192,6 @@ export function GenericTablePage({
   };
 
   const defaultRenderActions = (item) => {
-    // For users with pendingApproval status, show Accept/Reject buttons
     if (item.identityVerificationStatus === "pendingApproval") {
       return (
         <div className="flex gap-2">

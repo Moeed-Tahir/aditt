@@ -1113,7 +1113,7 @@ export const activeConsumerUser = async (req, res) => {
 
         const updatedUser = await usersCollection.findOneAndUpdate(
             { _id: new ObjectId(userId) },
-            { $set: { status: "active" } },
+            { $set: { status: "signUpPipeline" } },
             { returnDocument: "after" }
         );
 
