@@ -65,7 +65,6 @@ export default function UsersPage() {
       setUserLimit(updatedLimit);
       setEditedLimit(updatedLimit);
 
-      // First, move waitlist users with completed verification to signup pipeline
       const waitlistUsersWithVerification = users.filter(user =>
         user.status === "waitlist" &&
         user.identityVerificationStatus !== false

@@ -1091,7 +1091,6 @@ export const activeConsumerUser = async (req, res) => {
 
     try {
         const { userId } = req.body;
-        console.log("userId", userId);
 
         if (!userId) {
             return res.status(400).json({
