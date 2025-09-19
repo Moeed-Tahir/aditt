@@ -21,7 +21,6 @@ export default function UsersPage() {
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  console.log("users", users);
 
   const fetchData = useCallback(async () => {
     try {
@@ -206,7 +205,7 @@ export default function UsersPage() {
   const columns = [
     {
       label: "USER",
-      key: "name",
+      key: "email",
       render: (user) => (
         <div className="flex items-center gap-2">
           {user.image ? (
@@ -214,17 +213,16 @@ export default function UsersPage() {
               width={32}
               height={32}
               src={user.image}
-              alt={user.name}
+              alt={user.email || "No Email"}
               className="w-8 h-8 rounded-full"
             />
           ) : (
             <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
-              {user.fullName ? user.fullName.charAt(0).toUpperCase() : "?"}
+              {user.email ? user.email.charAt(0).toUpperCase() : "?"}
             </div>
           )}
           <div>
-            <div>{`${user.fullName}` || "No Name"}</div>
-            <div className="text-xs text-gray-500">{user.email || "No email"}</div>
+            <div>{user.email || "No Email"}</div>
           </div>
         </div>
       ),
