@@ -171,7 +171,7 @@ export default function UsersPage() {
   );
 
   const rejectedUsers = users.filter(user =>
-    user.identityVerificationStatus === "rejected"
+    user.identityVerificationStatus === "denied"
   );
 
 
