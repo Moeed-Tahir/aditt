@@ -1172,14 +1172,28 @@ exports.totalCampaignsStat = async (req, res) => {
     }
 
     const stats = await Compaign.aggregate([
-      {
-        $match: { userId: userId }
-      },
+      { $match: { userId } },
       {
         $group: {
           _id: null,
-          totalBudget: { $sum: "$campaignBudget" },
-          totalSpent: { $sum: "$engagements.totalEngagementValue" }, 
+          totalBudget: { $sum: { $ifNull: ["$campaignBudget", 0] } },
+          totalSpent: {
+            $sum: {
+              $add: [
+                { $ifNull: ["$engagements.totalEngagementValue", 0] },
+                { $ifNull: ["$clickCount.totalCount", 0] },
+                {
+                  $sum: {
+                    $map: {
+                      input: { $ifNull: ["$videoWatchTime", []] },
+                      as: "vw",
+                      in: { $multiply: ["$$vw.seconds", "$$vw.count"] }
+                    }
+                  }
+                }
+              ]
+            }
+          }
         }
       }
     ]);
