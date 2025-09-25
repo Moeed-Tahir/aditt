@@ -741,12 +741,12 @@ exports.campaignStatusUpdate = async (req, res) => {
                 console.log('Final payment processed:', paymentResult);
             } catch (paymentError) {
                 console.error('Failed to process final payment:', paymentError);
-                
+
                 await Compaign.findByIdAndUpdate(
                     id,
-                    { 
+                    {
                         status: currentCampaign.status,
-                        updatedAt: new Date() 
+                        updatedAt: new Date()
                     }
                 );
 
@@ -1108,16 +1108,16 @@ exports.verifyCardDetail = async (req, res) => {
         const { paymentMethodId } = req.body;
 
         const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
-        
+
         if (!paymentMethod) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                message: 'Invalid payment method' 
+                message: 'Invalid payment method'
             });
         }
 
         let customerId = paymentMethod.customer;
-        
+
         if (!customerId) {
             const customer = await stripe.customers.create({
                 payment_method: paymentMethodId,
@@ -1125,15 +1125,15 @@ exports.verifyCardDetail = async (req, res) => {
                     default_payment_method: paymentMethodId
                 }
             });
-            
+
             customerId = customer.id;
-            
+
             await stripe.paymentMethods.attach(paymentMethodId, {
                 customer: customerId
             });
         }
 
-        return res.status(200).json({ 
+        return res.status(200).json({
             success: true,
             paymentMethodId: paymentMethod.id,
             customerId: customerId,
@@ -1148,7 +1148,7 @@ exports.verifyCardDetail = async (req, res) => {
 
     } catch (error) {
         console.error('Payment verification error:', error);
-        
+
         if (error.type === 'StripeCardError') {
             return res.status(400).json({
                 success: false,
@@ -1156,10 +1156,10 @@ exports.verifyCardDetail = async (req, res) => {
                 error: error.message
             });
         }
-        
-        return res.status(500).json({ 
+
+        return res.status(500).json({
             success: false,
-            message: error.message || 'Payment verification failed' 
+            message: error.message || 'Payment verification failed'
         });
     }
 };
@@ -1171,47 +1171,26 @@ exports.totalCampaignsStat = async (req, res) => {
       return res.status(400).json({ success: false, message: "userId is required" });
     }
 
-    const stats = await Compaign.aggregate([
-      { $match: { userId } },
-      {
-        $group: {
-          _id: null,
-          totalBudget: { $sum: { $ifNull: ["$campaignBudget", 0] } },
-          totalSpent: {
-            $sum: {
-              $add: [
-                { $ifNull: ["$engagements.totalEngagementValue", 0] },
-                { $ifNull: ["$clickCount.totalCount", 0] },
-                {
-                  $sum: {
-                    $map: {
-                      input: { $ifNull: ["$videoWatchTime", []] },
-                      as: "vw",
-                      in: { $multiply: ["$$vw.seconds", "$$vw.count"] }
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      }
+    const budgetResult = await Compaign.aggregate([
+      { $match: { userId: userId } },
+      { $group: { _id: null, totalBudget: { $sum: "$campaignBudget" } } }
     ]);
 
-    let totalBudget = 0, totalSpent = 0, totalRemaining = 0;
+    const spentResult = await Compaign.aggregate([
+      { $match: { userId: userId, status: "Completed" } },
+      { $group: { _id: null, totalSpent: { $sum: "$engagements.totalEngagementValue" } } }
+    ]);
 
-    if (stats.length > 0) {
-      totalBudget = stats[0].totalBudget || 0;
-      totalSpent = stats[0].totalSpent || 0;
-      totalRemaining = totalBudget - totalSpent;
-    }
+    const totalBudget = budgetResult.length > 0 ? budgetResult[0].totalBudget : 0;
+    const totalSpent = spentResult.length > 0 ? spentResult[0].totalSpent : 0;
+
+    const totalRemaining = Math.max(totalBudget - totalSpent, 0);
 
     return res.status(200).json({
       success: true,
-      userId,
-      totalBudget,
-      totalSpent,
-      totalRemaining
+      totalBudget: Number(totalBudget.toFixed(2)),
+      totalSpent: Number(totalSpent.toFixed(2)),
+      totalRemaining: Number(totalRemaining.toFixed(2))
     });
 
   } catch (error) {
