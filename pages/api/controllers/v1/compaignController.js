@@ -1176,15 +1176,26 @@ exports.totalCampaignsStat = async (req, res) => {
       { $group: { _id: null, totalBudget: { $sum: "$campaignBudget" } } }
     ]);
 
-    const spentResult = await Compaign.aggregate([
-      { $match: { userId: userId, status: "Completed" } },
-      { $group: { _id: null, totalSpent: { $sum: "$engagements.totalEngagementValue" } } }
-    ]);
+    const completedCampaigns = await Compaign.find({ userId: userId, status: "Completed" });
+
+    let totalSpent = 0;
+    for (const campaign of completedCampaigns) {
+      const totalEngagements = campaign.engagements?.totalCount || 0;
+      if (totalEngagements === 0) continue;
+
+      const [minutes, seconds] = (campaign.videoDuration || "0:0").split(":").map(Number);
+      const videoLengthInSeconds = (minutes * 60) + (seconds || 0);
+
+      const costPerEngagementInCents = videoLengthInSeconds + 5;
+      const spentForCampaign = (totalEngagements * costPerEngagementInCents) / 100;
+
+      totalSpent += spentForCampaign;
+
+      console.log(`Campaign ${campaign._id}: engagements=${totalEngagements}, duration=${videoLengthInSeconds}s, spent=${spentForCampaign}`);
+    }
 
     const totalBudget = budgetResult.length > 0 ? budgetResult[0].totalBudget : 0;
-    const totalSpent = spentResult.length > 0 ? spentResult[0].totalSpent : 0;
-
-    const totalRemaining = Math.max(totalBudget - totalSpent, 0);
+    const totalRemaining = totalBudget - totalSpent; 
 
     return res.status(200).json({
       success: true,
@@ -1194,7 +1205,7 @@ exports.totalCampaignsStat = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error fetching campaign stats:", error);
+    console.error("❌ Error fetching campaign stats:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch campaign stats",
