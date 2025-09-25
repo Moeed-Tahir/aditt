@@ -163,7 +163,7 @@ export default function UsersPage() {
 
   const signupPipelineUsers = users.filter(user =>
     user.status === "signUpPipeline" &&
-    (user.identityVerificationStatus === "approved" || user.identityVerificationStatus === "false" || user.identityVerificationStatus === "rejected")
+    (user.identityVerificationStatus === "approved" || user.identityVerificationStatus === "false" || user.identityVerificationStatus === "rejected" || user.identityVerificationStatus === "unKnown")
   );
 
   const flaggedUsers = users.filter(user =>
@@ -173,7 +173,6 @@ export default function UsersPage() {
   const rejectedUsers = users.filter(user =>
     user.identityVerificationStatus === "denied"
   );
-
 
   const signupPipelineCount = signupPipelineUsers.length;
   const activeCount = activeUsers.length;
@@ -264,6 +263,9 @@ export default function UsersPage() {
         } else if (user.identityVerificationStatus === "rejected") {
           statusClass = "bg-red-100 text-red-800";
           displayStatus = "rejected";
+        }else if (user.identityVerificationStatus === "unKnown") {
+          statusClass = "bg-red-100 text-red-800";
+          displayStatus = "unKnown";
         } else {
           statusClass = "bg-gray-100 text-gray-800";
           displayStatus = "unknown status";

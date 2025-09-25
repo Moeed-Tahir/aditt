@@ -77,29 +77,33 @@ const updateUserLimit = async (req, res) => {
             return res.status(400).json({ message: 'Invalid user limit value' });
         }
 
+        const currentDashboard = await AdminDashboard.findOne({});
+        if (!currentDashboard) {
+            return res.status(404).json({ message: 'Dashboard not found' });
+        }
+
+        if (newUserLimit < currentDashboard.userLimit) {
+            return res.status(400).json({
+                message: `User limit can only be increased. Current limit is ${currentDashboard.userLimit}`
+            });
+        }
+
         const dashboard = await AdminDashboard.findOneAndUpdate(
             {},
             { $set: { userLimit: newUserLimit } },
             { new: true }
         );
 
-        if (!dashboard) {
-            return res.status(404).json({ message: 'Dashboard not found' });
-        }
-
         client = await MongoClient.connect(process.env.MONGO_URI);
         const db = client.db();
 
-        const [activeCount, waitlistCount] = await Promise.all([
-            db.collection('consumerusers').countDocuments({ status: 'active' }),
-            db.collection('consumerusers').countDocuments({ status: 'waitlist' })
-        ]);
+        const activeCount = await db.collection('consumerusers').countDocuments({ status: 'active' });
 
         if (activeCount > newUserLimit) {
             const excess = activeCount - newUserLimit;
             const activeUsers = await db.collection('consumerusers')
                 .find({ status: 'active' })
-                .sort({ createdAt: -1 })
+                .sort({ createdAt: -1 }) 
                 .limit(excess)
                 .toArray();
 
@@ -107,41 +111,6 @@ const updateUserLimit = async (req, res) => {
                 { _id: { $in: activeUsers.map(u => u._id) } },
                 { $set: { status: 'waitlist' } }
             );
-        } else if (activeCount < newUserLimit) {
-            const needed = newUserLimit - activeCount;
-            const waitlistUsers = await db.collection('consumerusers')
-                .find({ status: 'waitlist' })
-                .sort({ createdAt: 1 })
-                .limit(needed)
-                .toArray();
-
-            const usersWithEmails = waitlistUsers.filter(user => user.email);
-
-            await db.collection('consumerusers').updateMany(
-                { _id: { $in: waitlistUsers.map(u => u._id) } },
-                { $set: { status: 'active' } }
-            );
-
-            const welcomeEmailPromises = usersWithEmails.map(user => {
-                const mailOptions = {
-                    from: process.env.EMAIL_USER,
-                    to: user.email,
-                    subject: "You're In — Welcome to Aditt 🚀",
-                    html: `
-                        <p>Hello ${user.name || 'there'},</p>
-                        <p>The wait is over — your Aditt account is now live!</p>
-                        <p>Start earning real money for watching ads and helping brands grow.</p>
-                        <p>Best regards,<br/>The Aditt Team</p>
-                    `
-                };
-
-                return transporter.sendMail(mailOptions)
-                    .catch(error => {
-                        console.error(`Failed to send welcome email to ${user.email}:`, error);
-                    });
-            });
-
-            await Promise.all(welcomeEmailPromises);
         }
 
         const [finalActive, finalWaitlist] = await Promise.all([
@@ -150,7 +119,7 @@ const updateUserLimit = async (req, res) => {
         ]);
 
         res.status(200).json({
-            message: 'User statuses updated successfully',
+            message: 'User limit updated successfully',
             userLimit: newUserLimit,
             activeUsers: finalActive,
             waitlistUsers: finalWaitlist

@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Cookies from 'js-cookie';
 
-// Wrap the component that uses useSearchParams in a Suspense boundary
 function AdvertisersProfileContent() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");

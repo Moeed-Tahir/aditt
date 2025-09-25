@@ -15,7 +15,8 @@ import CampaignDataTable from "./campaign-dashboard/CampaignDataTable";
 import FeedbackDialog from "./campaign-dashboard/FeedbackDialog";
 import { toast } from "sonner";
 
-export function DataTable({ campaignData, fetchCampaign }) {
+export function DataTable({ campaignData, fetchCampaign,campaignStats }) {
+  console.log("campaignStats",campaignStats);
 
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortBy, setSortBy] = useState("");
@@ -178,7 +179,7 @@ export function DataTable({ campaignData, fetchCampaign }) {
             </Link>
           </div>
 
-          <CampaignMetricsDashboard totalEngagementsAcrossAllCampaigns={totalEngagementsAcrossAllCampaigns} transformedCampaigns={transformedCampaigns} />
+          <CampaignMetricsDashboard campaignStats={campaignStats} totalEngagementsAcrossAllCampaigns={totalEngagementsAcrossAllCampaigns} transformedCampaigns={transformedCampaigns} />
 
           <CampaignDataTable
             setDateFilter={setDateFilter}

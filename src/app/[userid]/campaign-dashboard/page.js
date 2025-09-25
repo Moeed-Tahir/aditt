@@ -8,7 +8,8 @@ import Cookies from "js-cookie";
 import { toast } from "sonner";
 
 export default function CampaignDashboard() {
-  const [campaignData, setCampaignData] = useState();
+  const [campaignData, setCampaignData] = useState(null);
+  const [allCampaignStats, setAllCampaignStats] = useState(null);
 
   const fetchCampaign = useCallback(async () => {
     try {
@@ -23,14 +24,28 @@ export default function CampaignDashboard() {
     }
   }, []);
 
+  const fetchCampaignsStats = useCallback(async () => {
+    try {
+      const userId = Cookies.get("userId");
+      const response = await axios.post("/api/routes/v1/campaignRoutes?action=totalCampaignsStat", {
+        userId
+      });
+      setAllCampaignStats(response.data); // ✅ save stats response
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Error fetching stats");
+      console.error("Error fetching stats:", error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchCampaign();
-  }, [fetchCampaign]);
+    fetchCampaignsStats();
+  }, [fetchCampaign, fetchCampaignsStats]);
 
   return (
     <SidebarProvider>
       <AppSidebar />
-      <DataTable fetchCampaign={fetchCampaign} campaignData={campaignData} />
+      <DataTable fetchCampaign={fetchCampaign} campaignData={campaignData} campaignStats={allCampaignStats} />
     </SidebarProvider>
   );
 }

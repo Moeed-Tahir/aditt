@@ -585,6 +585,102 @@ exports.updateCampaign = async (req, res) => {
     }
 };
 
+const processPaymentDeduction = async (campaignId) => {
+    let client;
+    try {
+        client = await MongoClient.connect(process.env.MONGO_URI);
+        const db = client.db();
+
+        const campaign = await db.collection('campaigns').findOne({ _id: campaignId });
+
+        if (!campaign) {
+            throw new Error('Campaign not found');
+        }
+
+        if (!campaign.cardDetail || !campaign.cardDetail.paymentMethodId) {
+            throw new Error('No payment method associated with this campaign');
+        }
+
+        const totalEngagements = campaign.engagements?.totalCount || 0;
+
+        if (totalEngagements <= 0) {
+            return {
+                success: true,
+                message: 'No engagements to charge',
+                engagements: 0,
+            };
+        }
+
+        if (campaign.campaignBudget < totalEngagements) {
+            throw new Error(`Insufficient campaign budget. Required: ${totalEngagements}, Available: ${campaign.campaignBudget}`);
+        }
+
+        let customerId = campaign.cardDetail.customerId;
+        const paymentMethodId = campaign.cardDetail.paymentMethodId;
+
+        if (!customerId) {
+            const customer = await stripe.customers.create({
+                payment_method: paymentMethodId,
+                invoice_settings: {
+                    default_payment_method: paymentMethodId
+                }
+            });
+            customerId = customer.id;
+
+            await db.collection('campaigns').updateOne(
+                { _id: campaign._id },
+                { $set: { 'cardDetail.customerId': customerId } }
+            );
+        }
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: totalEngagements * 100,
+            currency: 'usd',
+            customer: customerId,
+            payment_method: paymentMethodId,
+            confirm: true,
+            description: `Final charge for ${totalEngagements} engagements on ${campaign.campaignTitle}`,
+            metadata: {
+                campaignId: campaign._id.toString(),
+                userId: campaign.userId,
+                type: 'final_payment'
+            },
+            off_session: true,
+        });
+
+        await db.collection('campaigns').updateOne(
+            { _id: campaign._id },
+            {
+                $inc: { campaignBudget: -totalEngagements },
+                $push: {
+                    paymentHistory: {
+                        date: new Date(),
+                        amount: totalEngagements,
+                        status: 'success',
+                        stripeChargeId: paymentIntent.id,
+                        type: 'final_payment',
+                        description: `Final payment for completed campaign`
+                    },
+                },
+            }
+        );
+
+        return {
+            success: true,
+            message: 'Final payment processed successfully',
+            paymentIntentId: paymentIntent.id,
+            amount: totalEngagements,
+            remainingBudget: campaign.campaignBudget - totalEngagements,
+        };
+
+    } catch (error) {
+        console.error('Final payment error:', error);
+        throw error;
+    } finally {
+        if (client) client.close();
+    }
+};
+
 exports.campaignStatusUpdate = async (req, res) => {
     try {
         const { status, id, rejectionReason, to } = req.body;
@@ -638,18 +734,45 @@ exports.campaignStatusUpdate = async (req, res) => {
             { new: true, runValidators: true }
         );
 
+        let paymentResult = null;
+        if (status === 'Completed') {
+            try {
+                paymentResult = await processPaymentDeduction(id);
+                console.log('Final payment processed:', paymentResult);
+            } catch (paymentError) {
+                console.error('Failed to process final payment:', paymentError);
+                
+                await Compaign.findByIdAndUpdate(
+                    id,
+                    { 
+                        status: currentCampaign.status,
+                        updatedAt: new Date() 
+                    }
+                );
+
+                return res.status(400).json({
+                    success: false,
+                    message: 'Campaign completion failed due to payment error',
+                    error: paymentError.message,
+                    code: 'PAYMENT_PROCESSING_FAILED'
+                });
+            }
+        }
+
         await sendStatusEmailNotification({
             newStatus: status,
             previousStatus: currentCampaign.status,
             campaign: updatedCampaign,
             userEmail: to,
-            rejectionReason: status === 'Rejected' ? rejectionReason : undefined
+            rejectionReason: status === 'Rejected' ? rejectionReason : undefined,
+            paymentInfo: status === 'Completed' ? paymentResult : undefined
         });
 
         return res.status(200).json({
             success: true,
             message: `Campaign status updated to ${status}`,
-            campaign: updatedCampaign
+            campaign: updatedCampaign,
+            paymentResult: status === 'Completed' ? paymentResult : undefined
         });
 
     } catch (error) {
@@ -1039,4 +1162,50 @@ exports.verifyCardDetail = async (req, res) => {
             message: error.message || 'Payment verification failed' 
         });
     }
+};
+
+exports.totalCampaignsStat = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "userId is required" });
+    }
+
+    const stats = await Compaign.aggregate([
+      {
+        $match: { userId: userId }
+      },
+      {
+        $group: {
+          _id: null,
+          totalBudget: { $sum: "$campaignBudget" },
+          totalSpent: { $sum: "$engagements.totalEngagementValue" }, 
+        }
+      }
+    ]);
+
+    let totalBudget = 0, totalSpent = 0, totalRemaining = 0;
+
+    if (stats.length > 0) {
+      totalBudget = stats[0].totalBudget || 0;
+      totalSpent = stats[0].totalSpent || 0;
+      totalRemaining = totalBudget - totalSpent;
+    }
+
+    return res.status(200).json({
+      success: true,
+      userId,
+      totalBudget,
+      totalSpent,
+      totalRemaining
+    });
+
+  } catch (error) {
+    console.error("Error fetching campaign stats:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch campaign stats",
+      error: error.message
+    });
+  }
 };
