@@ -221,12 +221,12 @@ export function CreateCampaigns({ userId }) {
       }));
 
       setIsUploading(false);
-      
+
       // Mark video upload as complete
       if (type === "video") {
         setVideoUploadComplete(true);
       }
-      
+
       return publicUrl;
     } catch (error) {
       setIsUploading(false);
@@ -274,7 +274,6 @@ export function CreateCampaigns({ userId }) {
     visible: false,
   });
 
-  // Check if video upload is required and completed for step 0
   const canProceedToNextStep = () => {
     if (currentStep === 0) {
       // For step 0, check if video is uploaded and complete
@@ -282,7 +281,25 @@ export function CreateCampaigns({ userId }) {
         toast.error("Please wait for video upload to complete before proceeding");
         return false;
       }
+
+      // Check if upload progress is 100% for any ongoing uploads
+      if (uploadProgress.video < 100 && formData.videoFile) {
+        toast.error("Please wait for video upload to complete before proceeding");
+        return false;
+      }
+
+      if (uploadProgress.image < 100 && formData.imageFile) {
+        toast.error("Please wait for image upload to complete before proceeding");
+        return false;
+      }
     }
+
+    // For other steps, check if there are any ongoing uploads
+    if (isUploading) {
+      toast.error("Please wait for uploads to complete before proceeding");
+      return false;
+    }
+
     return true;
   };
 
@@ -290,7 +307,7 @@ export function CreateCampaigns({ userId }) {
     if (!canProceedToNextStep()) {
       return;
     }
-    
+
     const nextStep = currentStep + 1;
     if (nextStep < steps.length) {
       window.location.href = `?step=${nextStep}`;
@@ -310,7 +327,7 @@ export function CreateCampaigns({ userId }) {
         couponCode: formData.couponCode,
         videoUrlIntelligenceStatus: formData.videoUrlIntelligenceStatus,
         videoUrlId: formData.videoUrlId,
-        videoDuration:formData.videoDuration,
+        videoDuration: formData.videoDuration,
         quizQuestion: formData.quizQuestion.text
           ? {
             questionText: formData.quizQuestion.text,

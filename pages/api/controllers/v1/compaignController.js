@@ -1175,7 +1175,6 @@ exports.totalCampaignsStat = async (req, res) => {
 
         // ✅ 1. Fetch only Active campaigns
         const activeCampaigns = await Compaign.find({ userId: userId, status: "Active" });
-        console.log("activeCampaigns", activeCampaigns);
 
         // ✅ 2. Calculate total active budget (sum of all active campaign budgets)
         const totalBudget = activeCampaigns.reduce(
@@ -1189,7 +1188,6 @@ exports.totalCampaignsStat = async (req, res) => {
             const totalEngagements = campaign.engagements?.totalCount || 0;
             if (totalEngagements === 0) continue;
 
-            // Use your existing cost formula
             const [minutes, seconds] = (campaign.videoDuration || "0:0").split(":").map(Number);
             const videoLengthInSeconds = (minutes * 60) + (seconds || 0);
 
@@ -1203,19 +1201,14 @@ exports.totalCampaignsStat = async (req, res) => {
             );
         }
 
-        // ✅ 4. Remaining = total active budget - total spent
         const totalRemaining = totalBudget - totalSpent;
 
-        console.log("totalActiveBudget", totalBudget);
-        console.log("totalSpent", totalSpent);
-        console.log("totalRemaining", totalRemaining);
 
-        // ✅ 5. Return formatted result
         return res.status(200).json({
             success: true,
-            totalBudget: Number(totalBudget.toFixed(2)),      // sum of all active campaign budgets
-            totalSpent: Number(totalSpent.toFixed(2)),        // total spent
-            totalRemaining: Number(totalRemaining.toFixed(2)) // remaining budget
+            totalBudget: Number(totalBudget.toFixed(2)),     
+            totalSpent: Number(totalSpent.toFixed(2)),     
+            totalRemaining: Number(totalRemaining.toFixed(2)) 
         });
 
     } catch (error) {

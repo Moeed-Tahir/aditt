@@ -1,5 +1,4 @@
 export const PerformanceSummary = ({ campaignData }) => {
-  console.log("campaignData", campaignData);
 
   return (
     <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">

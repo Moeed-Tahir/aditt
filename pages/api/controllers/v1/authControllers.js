@@ -1116,8 +1116,6 @@ export const activeConsumerUser = async (req, res) => {
             { returnDocument: "after" }
         );
 
-        console.log("updatedUser", updatedUser);
-
         if (!updatedUser) {
             return res.status(404).json({
                 success: false,

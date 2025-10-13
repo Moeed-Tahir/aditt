@@ -88,6 +88,17 @@ const Step1 = ({
     (uploadProgress.video > 0 && uploadProgress.video < 100) ||
     (uploadProgress.image > 0 && uploadProgress.image < 100);
 
+  // Check if video upload is complete (100%)
+  const isVideoUploadComplete = uploadProgress.video === 100;
+  
+  // Check if all required fields are filled and video upload is complete
+  const canProceed = 
+    formData.campaignTitle &&
+    formData.brandName &&
+    formData.websiteLink &&
+    formData.videoFile &&
+    isVideoUploadComplete;
+
   return (
     <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
       {/* Preview Modal */}
@@ -320,6 +331,8 @@ const Step1 = ({
                     <span className="text-xs text-gray-500">
                       {(formData.videoFile.size / (1024 * 1024)).toFixed(1)} MB
                     </span>
+             
+                
                   </div>
 
                   <button
@@ -414,19 +427,11 @@ const Step1 = ({
         <div className="mt-8 flex justify-end">
           <Link
             href="?step=1"
-            className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${!formData.campaignTitle ||
-                !formData.brandName ||
-                !formData.websiteLink ||
-                !formData.videoFile
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-              }`}
+            className={`bg-blue-600 w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full hover:bg-blue-700 ${
+              !canProceed ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+            }`}
             onClick={(e) => {
-              if (
-                !formData.campaignTitle ||
-                !formData.websiteLink ||
-                !formData.videoFile
-              ) {
+              if (!canProceed) {
                 e.preventDefault();
               }
             }}

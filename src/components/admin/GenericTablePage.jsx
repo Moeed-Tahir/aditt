@@ -82,7 +82,6 @@ export function GenericTablePage({
 
   const handleAcceptClick = async (item) => {
     try {
-      console.log("item", item);
 
       const response = await axios.post(
         "/api/routes/v1/authRoutes?action=activeConsumerUser",

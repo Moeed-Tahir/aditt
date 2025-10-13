@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-
 let stripePromise;
 
 const getStripe = () => {
@@ -46,7 +45,6 @@ const StripePaymentForm = ({ onSuccess, onError }) => {
         setError('');
 
         try {
-            console.log('Creating payment method...');
             const { error: stripeError, paymentMethod } = await stripe.createPaymentMethod({
                 type: 'card',
                 card: elements.getElement(CardElement),
@@ -56,8 +54,6 @@ const StripePaymentForm = ({ onSuccess, onError }) => {
                 console.error('Stripe error details:', stripeError);
                 throw new Error(stripeError.message);
             }
-
-            console.log('Payment method created:', paymentMethod);
 
             const response = await fetch('/api/routes/v1/campaignRoutes?action=verifyCardDetail', {
                 method: 'POST',
