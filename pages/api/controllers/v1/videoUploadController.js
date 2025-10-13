@@ -26,11 +26,20 @@ export const uploadAndAnalyzeVideo = async (req, res) => {
     const bucketName = 'aditt-video-tester';
     const fileName = `videos/${Date.now()}_${file.originalname}`;
 
+    // Upload video to Google Cloud Storage
     await storage.bucket(bucketName).file(fileName).save(file.buffer, {
       metadata: { contentType: file.mimetype },
     });
 
     const gcsUri = `gs://${bucketName}/${fileName}`;
+
+    // ===============================
+    // VIDEO INTELLIGENCE DISABLED
+    // ===============================
+    // The following code has been commented out to skip video analysis.
+    // It can be re-enabled later if needed.
+
+    /*
     const [operation] = await videoIntelligenceClient.annotateVideo({
       inputUri: gcsUri,
       features: ['LABEL_DETECTION', 'SHOT_CHANGE_DETECTION', 'EXPLICIT_CONTENT_DETECTION'],
@@ -51,6 +60,17 @@ export const uploadAndAnalyzeVideo = async (req, res) => {
         shots: result.annotationResults[0].shotAnnotations.length
       },
       rawData: result
+    });
+    */
+
+    // ===============================
+    // UPLOAD-ONLY RESPONSE
+    // ===============================
+    return res.status(200).json({
+      status: "UPLOADED",
+      videoId: fileName,
+      gcsUri,
+      message: "Video uploaded successfully (no analysis performed)",
     });
 
   } catch (error) {

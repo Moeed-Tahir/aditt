@@ -158,40 +158,64 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
         return type.toLowerCase().replace(/\s+/g, '');
     };
 
-    const calculateWaiverUsers = useCallback(() => {
-        if (!discountInfo.fullWavier || !formData.videoDuration) return 0;
+    const calculateAttentiveEngagements = useCallback(() => {
+        if (!formData.videoDuration || (!formData.budget && !discountInfo.fullWavier)) return 0;
 
+        // Parse video duration to get total seconds
         const [minutes, seconds] = formData.videoDuration.split(':').map(Number);
         const totalSeconds = (minutes * 60) + seconds;
 
-        if (isNaN(totalSeconds) || isNaN(discountInfo.value)) return 0;
+        if (isNaN(totalSeconds)) return 0;
 
-        return Math.floor(totalSeconds * discountInfo.value);
-    }, [discountInfo.fullWavier, discountInfo.value, formData.videoDuration]);
+        // Calculate cost per attentive engagement: $0.01/s + $0.05
+        const costPerAE = 0.01 * totalSeconds + 0.05;
+
+        let budgetToUse;
+        
+        if (discountInfo.fullWavier) {
+            // For full waiver, use the waiver value as budget
+            budgetToUse = discountInfo.value;
+        } else if (discountApplied) {
+            // Use discounted budget if coupon applied
+            budgetToUse = parseFloat(formData.actualBudget || formData.budget || 0);
+        } else {
+            // Use regular budget
+            budgetToUse = parseFloat(formData.budget || 0);
+        }
+
+        if (isNaN(budgetToUse) || budgetToUse <= 0) return 0;
+
+        // Calculate number of attentive engagements: Budget / Cost per AE
+        const attentiveEngagements = Math.floor(budgetToUse / costPerAE);
+
+        return attentiveEngagements;
+    }, [formData.videoDuration, formData.budget, formData.actualBudget, discountInfo.fullWavier, discountInfo.value, discountApplied]);
 
     const calculateAndSetEngagement = useCallback(() => {
         if (!formData.videoDuration) return;
 
-        let engagementValue = 0;
-
-        if (discountInfo.fullWavier) {
-            engagementValue = calculateWaiverUsers();
-        } else if (formData.budget) {
-            engagementValue = formData.campignBudget || 0;
-        }
+        const engagementValue = calculateAttentiveEngagements();
 
         setFormData(prev => {
             if (prev.totalEngagementValue === engagementValue) return prev;
             return {
                 ...prev,
-                totalEngagementValue: engagementValue
+                totalEngagementValue: engagementValue,
+                campignBudget: engagementValue // Also update campignBudget to show the number
             };
         });
-    }, [formData.videoDuration, formData.budget, formData.campignBudget, discountInfo.fullWavier, calculateWaiverUsers, setFormData]);
+    }, [formData.videoDuration, calculateAttentiveEngagements, setFormData]);
 
     useEffect(() => {
         calculateAndSetEngagement();
     }, [calculateAndSetEngagement]);
+
+    const formatVideoDurationDisplay = (duration) => {
+        if (!duration) return '';
+        const [minutes, seconds] = duration.split(':').map(Number);
+        const totalSeconds = (minutes * 60) + seconds;
+        return `${totalSeconds}-second`;
+    };
 
     const handleApplyCoupon = async () => {
         if (!formData.couponCode?.trim()) {
@@ -209,7 +233,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
 
             if (response.data.success) {
                 const originalBudget = parseFloat(formData.budget);
-                const discountValue = parseFloat(response.data.discountValue);
+                let discountValue = parseFloat(response.data.discountValue);
                 const discountType = normalizeDiscountType(response.data.discountType);
                 const fullWavier = response.data.fullWavier === true;
 
@@ -222,7 +246,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
 
                 if (fullWavier) {
                     discountedBudget = 0;
-                    campaignBudgetValue = discountValue; 
                 } else if (discountType === 'percentage') {
                     discountValue = Math.min(Math.max(0, discountValue), 100);
                     discountedBudget = originalBudget * (1 - (discountValue / 100));
@@ -245,8 +268,8 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                 setFormData(prev => ({
                     ...prev,
                     actualBudget: discountedBudget.toFixed(2),
-                    campignBudget: campaignBudgetValue,
-                    budget:campaignBudgetValue,
+                    campignBudget: calculateAttentiveEngagements(),
+                    budget: discountedBudget.toFixed(2),
                     appliedCoupon: formData.couponCode.trim()
                 }));
 
@@ -286,7 +309,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
             ...prev,
             actualBudget: '',
             campignBudget: 0,
-            budget:'',
+            budget: '',
             couponCode: '',
             appliedCoupon: '',
             totalEngagementValue: ''
@@ -501,17 +524,16 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                                 <div className="mt-2 text-xs md:text-sm text-gray-500">
                                     {discountInfo.fullWavier ? (
                                         <>
-                                            With your {formData.videoDuration}-second video, you will reach approximately {' '}
-                                            {calculateWaiverUsers().toLocaleString()} unique users.
+                                            With your {formatVideoDurationDisplay(formData.videoDuration)} video, you will receive a maximum of {' '}
+                                            {calculateAttentiveEngagements().toLocaleString()} attentive engagements.
                                             <span className="text-green-600 ml-2">
-                                                (Full wavier rate: ${discountInfo.value.toFixed(2)} per second)
+                                                (Full wavier applied)
                                             </span>
                                         </>
                                     ) : formData.budget ? (
                                         <>
-                                            With a ${discountApplied ? formData.actualBudget : formData.budget} budget for your{' '}
-                                            {formData.videoDuration}-second video, you will reach
-                                            approximately {formData.campignBudget} unique users.
+                                            With your {formatVideoDurationDisplay(formData.videoDuration)} video, you will receive a maximum of {' '}
+                                            {calculateAttentiveEngagements().toLocaleString()} attentive engagements.
                                             {discountApplied && (
                                                 <span className="text-green-600 ml-2">
                                                     (Discount applied: {discountInfo.type === 'percentage'
@@ -614,7 +636,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                                                     setFormData(prev => ({
                                                         ...prev,
                                                         paymentMethodId: "",
-                                                        card: {
+                                                        cardDetails: {
                                                             brand: "",
                                                             last4: "",
                                                             exp_month: "",

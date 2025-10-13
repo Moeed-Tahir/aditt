@@ -90,6 +90,7 @@ export function CreateCampaigns({ userId }) {
   });
 
   const [isUploading, setIsUploading] = useState(false);
+  const [videoUploadComplete, setVideoUploadComplete] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -111,6 +112,7 @@ export function CreateCampaigns({ userId }) {
     if (!file || !type) return;
 
     setIsUploading(true);
+    setVideoUploadComplete(false);
     setUploadProgress(prev => ({ ...prev, [type]: 0 }));
 
     if (type === "video") {
@@ -158,6 +160,7 @@ export function CreateCampaigns({ userId }) {
       } catch (error) {
         console.error("Video intelligence error:", error);
         setIsUploading(false);
+        setVideoUploadComplete(false);
         toast.error("Failed to Upload Video Kindly Try Again");
         return null;
       }
@@ -218,9 +221,16 @@ export function CreateCampaigns({ userId }) {
       }));
 
       setIsUploading(false);
+      
+      // Mark video upload as complete
+      if (type === "video") {
+        setVideoUploadComplete(true);
+      }
+      
       return publicUrl;
     } catch (error) {
       setIsUploading(false);
+      setVideoUploadComplete(false);
       toast.error("Failed to Upload Video Kindly Try Again");
       return null;
     }
@@ -263,6 +273,29 @@ export function CreateCampaigns({ userId }) {
     type: "",
     visible: false,
   });
+
+  // Check if video upload is required and completed for step 0
+  const canProceedToNextStep = () => {
+    if (currentStep === 0) {
+      // For step 0, check if video is uploaded and complete
+      if (formData.videoFile && !videoUploadComplete) {
+        toast.error("Please wait for video upload to complete before proceeding");
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleNextStep = () => {
+    if (!canProceedToNextStep()) {
+      return;
+    }
+    
+    const nextStep = currentStep + 1;
+    if (nextStep < steps.length) {
+      window.location.href = `?step=${nextStep}`;
+    }
+  };
 
   const handleSubmit = async () => {
     try {
@@ -399,6 +432,11 @@ export function CreateCampaigns({ userId }) {
               >
                 <Link
                   href={`?step=${index}`}
+                  onClick={(e) => {
+                    if (index > currentStep && !canProceedToNextStep()) {
+                      e.preventDefault();
+                    }
+                  }}
                   className={`gap-1 md:gap-2 h-10 flex items-center justify-center md:justify-start rounded-full text-xs font-medium px-2 md:px-4
           ${index === currentStep
                       ? "border-blue-600 border bg-white text-gray-600"
@@ -441,6 +479,9 @@ export function CreateCampaigns({ userId }) {
             handleInputChange={handleInputChange}
             setFormData={setFormData}
             formData={formData}
+            videoUploadComplete={videoUploadComplete}
+            canProceedToNextStep={canProceedToNextStep}
+            handleNextStep={handleNextStep}
           />
         )}
 
@@ -452,6 +493,7 @@ export function CreateCampaigns({ userId }) {
             values={values}
             setFormData={setFormData}
             formData={formData}
+            handleNextStep={handleNextStep}
           />
         )}
 
@@ -461,6 +503,7 @@ export function CreateCampaigns({ userId }) {
             uploadProgress={uploadProgress}
             setFormData={setFormData}
             formData={formData}
+            handleNextStep={handleNextStep}
           />
         )}
 

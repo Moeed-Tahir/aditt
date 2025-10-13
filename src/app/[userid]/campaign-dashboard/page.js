@@ -30,7 +30,7 @@ export default function CampaignDashboard() {
       const response = await axios.post("/api/routes/v1/campaignRoutes?action=totalCampaignsStat", {
         userId
       });
-      setAllCampaignStats(response.data); // ✅ save stats response
+      setAllCampaignStats(response.data); 
     } catch (error) {
       toast.error(error?.response?.data?.message || "Error fetching stats");
       console.error("Error fetching stats:", error);

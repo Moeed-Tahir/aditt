@@ -1165,51 +1165,66 @@ exports.verifyCardDetail = async (req, res) => {
 };
 
 exports.totalCampaignsStat = async (req, res) => {
-  try {
-    const { userId } = req.body;
-    if (!userId) {
-      return res.status(400).json({ success: false, message: "userId is required" });
+    try {
+        const { userId } = req.body;
+        console.log("userId", userId);
+
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "userId is required" });
+        }
+
+        // ✅ 1. Fetch only Active campaigns
+        const activeCampaigns = await Compaign.find({ userId: userId, status: "Active" });
+        console.log("activeCampaigns", activeCampaigns);
+
+        // ✅ 2. Calculate total active budget (sum of all active campaign budgets)
+        const totalBudget = activeCampaigns.reduce(
+            (sum, campaign) => sum + (campaign.campaignBudget || 0),
+            0
+        );
+
+        // ✅ 3. Calculate total spent
+        let totalSpent = 0;
+        for (const campaign of activeCampaigns) {
+            const totalEngagements = campaign.engagements?.totalCount || 0;
+            if (totalEngagements === 0) continue;
+
+            // Use your existing cost formula
+            const [minutes, seconds] = (campaign.videoDuration || "0:0").split(":").map(Number);
+            const videoLengthInSeconds = (minutes * 60) + (seconds || 0);
+
+            const costPerEngagementInCents = videoLengthInSeconds + 5;
+            const spentForCampaign = (totalEngagements * costPerEngagementInCents) / 100;
+
+            totalSpent += spentForCampaign;
+
+            console.log(
+                `Campaign ${campaign._id}: engagements=${totalEngagements}, duration=${videoLengthInSeconds}s, spent=${spentForCampaign}`
+            );
+        }
+
+        // ✅ 4. Remaining = total active budget - total spent
+        const totalRemaining = totalBudget - totalSpent;
+
+        console.log("totalActiveBudget", totalBudget);
+        console.log("totalSpent", totalSpent);
+        console.log("totalRemaining", totalRemaining);
+
+        // ✅ 5. Return formatted result
+        return res.status(200).json({
+            success: true,
+            totalBudget: Number(totalBudget.toFixed(2)),      // sum of all active campaign budgets
+            totalSpent: Number(totalSpent.toFixed(2)),        // total spent
+            totalRemaining: Number(totalRemaining.toFixed(2)) // remaining budget
+        });
+
+    } catch (error) {
+        console.error("❌ Error fetching campaign stats:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to fetch campaign stats",
+            error: error.message
+        });
     }
-
-    const budgetResult = await Compaign.aggregate([
-      { $match: { userId: userId } },
-      { $group: { _id: null, totalBudget: { $sum: "$campaignBudget" } } }
-    ]);
-
-    const completedCampaigns = await Compaign.find({ userId: userId, status: "Completed" });
-
-    let totalSpent = 0;
-    for (const campaign of completedCampaigns) {
-      const totalEngagements = campaign.engagements?.totalCount || 0;
-      if (totalEngagements === 0) continue;
-
-      const [minutes, seconds] = (campaign.videoDuration || "0:0").split(":").map(Number);
-      const videoLengthInSeconds = (minutes * 60) + (seconds || 0);
-
-      const costPerEngagementInCents = videoLengthInSeconds + 5;
-      const spentForCampaign = (totalEngagements * costPerEngagementInCents) / 100;
-
-      totalSpent += spentForCampaign;
-
-      console.log(`Campaign ${campaign._id}: engagements=${totalEngagements}, duration=${videoLengthInSeconds}s, spent=${spentForCampaign}`);
-    }
-
-    const totalBudget = budgetResult.length > 0 ? budgetResult[0].totalBudget : 0;
-    const totalRemaining = totalBudget - totalSpent; 
-
-    return res.status(200).json({
-      success: true,
-      totalBudget: Number(totalBudget.toFixed(2)),
-      totalSpent: Number(totalSpent.toFixed(2)),
-      totalRemaining: Number(totalRemaining.toFixed(2))
-    });
-
-  } catch (error) {
-    console.error("❌ Error fetching campaign stats:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch campaign stats",
-      error: error.message
-    });
-  }
 };
+

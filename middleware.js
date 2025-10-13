@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
 
 const userProtectedPaths = [
   /^\/campaign-dashboard(\/.*)?$/,
@@ -9,21 +10,45 @@ const adminProtectedPaths = [
   /^\/admin(\/.*)?$/,
 ];
 
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
   const userId = request.cookies.get('userId')?.value;
   const token = request.cookies.get('token')?.value;
   const role = request.cookies.get('Role')?.value;
-  const isAuthenticated = userId && token;
-  const isAdmin = role === 'Admin';
-  const isRegularUser = isAuthenticated && !isAdmin;
+
+  let isAuthenticated = false;
+  let isTokenExpired = false;
+  let isAdmin = false;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET_KEY);
+      isAuthenticated = true;
+      isAdmin = role === 'Admin';
+    } catch (err) {
+      if (err.name === 'TokenExpiredError') {
+        isTokenExpired = true;
+      }
+      isAuthenticated = false;
+    }
+  }
+
+  if (isTokenExpired) {
+    const response = NextResponse.redirect(new URL('/signin-user', request.url));
+    response.cookies.delete('token');
+    response.cookies.delete('userId');
+    response.cookies.delete('Role');
+    return response;
+  }
 
   if (pathname === '/') {
     return NextResponse.redirect(new URL('/signin-user', request.url));
   }
 
-  if ((pathname === '/signin-user' || pathname === '/signup-user') && (isAuthenticated || isAdmin)) {
+  if ((pathname === '/signin-user' || pathname === '/signup-user') && isAuthenticated) {
     if (isAdmin) {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
@@ -32,7 +57,7 @@ export function middleware(request) {
 
   const isAdminPath = adminProtectedPaths.some(regex => regex.test(pathname));
   if (isAdminPath) {
-    if (!isAdmin) {
+    if (!isAuthenticated || !isAdmin) {
       return NextResponse.redirect(new URL('/signin-user', request.url));
     }
     return NextResponse.next();
