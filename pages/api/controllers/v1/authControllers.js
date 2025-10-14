@@ -1063,7 +1063,7 @@ export const rejectedConsumer = async (req, res) => {
 
         await sendRejectedIdentityEmail(
             updatedUser.email,
-            `${updatedUser.firstName} ${updatedUser.lastName}`
+            `${updatedUser.name}`
         );
 
         res.status(200).json({

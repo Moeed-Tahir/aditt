@@ -169,7 +169,7 @@ const sendRejectedIdentityEmail = async (email, name) => {
     to: email,
     subject: 'Identity Verification Issue on Aditt',
     html: `
-            <p>Hi ${name},</p>
+            <p>Hi</p>
             <p>After reviewing your submitted documents, we're unable to verify your identity at this time.</p>
             <p>Your account has been restricted for security reasons.</p>
             <p>If you believe this is a mistake, please reply to this email for further assistance.</p>
