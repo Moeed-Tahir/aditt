@@ -56,7 +56,7 @@ function SignupUser() {
       }
 
       if (data.token && data.user) {
-        Cookies.set("token", data.token, { expires: 1 });
+        Cookies.set("token", data.token, { expires: 10 / (24 * 60) });
         Cookies.set("userId", data.user.userId, { expires: 1 });
         Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
         Cookies.set("userEmail", data.user.email, { expires: 1 });
