@@ -3,12 +3,12 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com', // Gmail SMTP server
-  port: 465,              // Secure SMTP
-  secure: true,           // Use SSL
+  host: 'smtp.gmail.com', 
+  port: 465,              
+  secure: true,        
   auth: {
-    user: process.env.EMAIL_USER,     // info@aditt.app
-    pass: process.env.EMAIL_PASSWORD  // frqx vwxi ycjr trzg
+    user: process.env.EMAIL_USER,   
+    pass: process.env.EMAIL_PASSWORD 
   }
 });
 
@@ -147,7 +147,7 @@ const sendApprovedIdentityEmail = async (email, name) => {
     to: email,
     subject: 'You\'re Verified — Welcome to Aditt!',
     html: `
-            <p>Hi ${name},</p>
+            <p>Hi</p>
             <p>Great news — your identity has been verified successfully!</p>
             <p>You can now access all features of the Aditt app and start earning.</p>
             <p>Thanks for being part of the community.</p>
@@ -182,6 +182,33 @@ const sendRejectedIdentityEmail = async (email, name) => {
     console.log('Rejected identity email sent successfully');
   } catch (error) {
     console.error('Error sending rejected identity email:', error);
+  }
+};
+
+export const activeToPipelineEmail = async (to) => {
+  try {
+    const subject = "You're In — Welcome to Aditt 🚀";
+
+    const html = `
+      <div style="font-family: 'Segoe UI', sans-serif; color: #333; padding: 20px;">
+        <h2 style="color: #1d72b8;">You're In — Welcome to <strong>Aditt</strong> 🚀</h2>
+        <p>The wait is over — your Aditt account is now live!</p>
+        <p>Start earning real money for watching ads and helping brands grow.</p>
+        <p>Log in, complete your sign up, and explore your dashboard.</p>
+        <p>Welcome aboard!<br>— <strong>The Aditt Team</strong></p>
+      </div>
+    `;
+
+    await transporter.sendMail({
+      from: `"Aditt Team"`,
+      to,
+      subject,
+      html,
+    });
+
+    console.log(`📧 Active-to-pipeline email sent to ${to}`);
+  } catch (error) {
+    console.error("❌ Failed to send activeToPipelineEmail:", error.message);
   }
 };
 

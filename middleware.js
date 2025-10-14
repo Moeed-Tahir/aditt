@@ -1,28 +1,56 @@
 import { NextResponse } from 'next/server';
 
+const userProtectedPaths = [
+  /^\/campaign-dashboard(\/.*)?$/,
+  /^\/create-campaign(\/.*)?$/,
+];
+
+const adminProtectedPaths = [
+  /^\/admin(\/.*)?$/,
+];
+
 export function middleware(request) {
   const { pathname } = request.nextUrl;
+
   const userId = request.cookies.get('userId')?.value;
   const token = request.cookies.get('token')?.value;
+  const role = request.cookies.get('Role')?.value;
+  const isAuthenticated = userId && token;
+  const isAdmin = role === 'Admin';
+  const isRegularUser = isAuthenticated && !isAdmin;
 
-  console.log('🔍 Middleware running on Edge');
-  console.log('userId:', userId);
-  console.log('token exists:', !!token);
-  console.log('pathname:', pathname);
-
-  if (token && userId) {
-    if (!pathname.startsWith(`/${userId}/campaign-dashboard`)) {
-      console.log(`➡️ Redirecting to /${userId}/campaign-dashboard`);
-      return NextResponse.redirect(new URL(`/${userId}/campaign-dashboard`, request.url));
-    }
-  }
-
-  if (!token && pathname !== '/signin-user' && pathname !== '/signup-user') {
-    console.log('🚫 No token found — redirecting to /signin-user');
+  if (pathname === '/') {
     return NextResponse.redirect(new URL('/signin-user', request.url));
   }
 
-  console.log('✅ Middleware complete — proceeding');
+  if ((pathname === '/signin-user' || pathname === '/signup-user') && (isAuthenticated || isAdmin)) {
+    if (isAdmin) {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+    return NextResponse.redirect(new URL(`/${userId}/campaign-dashboard`, request.url));
+  }
+
+  const isAdminPath = adminProtectedPaths.some(regex => regex.test(pathname));
+  if (isAdminPath) {
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL('/signin-user', request.url));
+    }
+    return NextResponse.next();
+  }
+
+  const isUserPath = userProtectedPaths.some(regex => regex.test(pathname));
+  if (isUserPath) {
+    if (!isAuthenticated) {
+      const loginUrl = new URL('/signin-user', request.url);
+      loginUrl.searchParams.set('from', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    if (isAdmin) {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+    return NextResponse.next();
+  }
+
   return NextResponse.next();
 }
 

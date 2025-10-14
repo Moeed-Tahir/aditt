@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 import User from '../../models/User.model';
 import Campaign from '../../models/Campaign.model';
-import { sendApprovedIdentityEmail, sendRejectedIdentityEmail } from '../../services/emailServices';
+import { activeToPipelineEmail, sendApprovedIdentityEmail, sendRejectedIdentityEmail } from '../../services/emailServices';
 const mongoose = require('mongoose');
 const { generateOTP, sendOTP } = require("../../services/otpServices");
 const jwt = require("jsonwebtoken");
@@ -1009,7 +1009,7 @@ export const verifiedConsumer = async (req, res) => {
 
         await sendApprovedIdentityEmail(
             updatedUser.email,
-            `${updatedUser.firstName} ${updatedUser.lastName}`
+            `${updatedUser.name}`
         );
 
         res.status(200).json({
@@ -1133,6 +1133,8 @@ export const activeConsumerUser = async (req, res) => {
             },
             { returnDocument: "after", upsert: true }
         );
+
+        await activeToPipelineEmail(updatedUser.value.email);
 
         return res.status(200).json({
             success: true,
