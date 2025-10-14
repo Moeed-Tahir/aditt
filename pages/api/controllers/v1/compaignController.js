@@ -1173,16 +1173,13 @@ exports.totalCampaignsStat = async (req, res) => {
             return res.status(400).json({ success: false, message: "userId is required" });
         }
 
-        // ✅ 1. Fetch only Active campaigns
         const activeCampaigns = await Compaign.find({ userId: userId, status: "Active" });
 
-        // ✅ 2. Calculate total active budget (sum of all active campaign budgets)
         const totalBudget = activeCampaigns.reduce(
             (sum, campaign) => sum + (campaign.campaignBudget || 0),
             0
         );
 
-        // ✅ 3. Calculate total spent
         let totalSpent = 0;
         for (const campaign of activeCampaigns) {
             const totalEngagements = campaign.engagements?.totalCount || 0;
@@ -1206,9 +1203,9 @@ exports.totalCampaignsStat = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            totalBudget: Number(totalBudget.toFixed(2)),     
-            totalSpent: Number(totalSpent.toFixed(2)),     
-            totalRemaining: Number(totalRemaining.toFixed(2)) 
+            totalBudget: Number(totalBudget.toFixed(2)),
+            totalSpent: Number(totalSpent.toFixed(2)),
+            totalRemaining: Number(totalRemaining.toFixed(2))
         });
 
     } catch (error) {
