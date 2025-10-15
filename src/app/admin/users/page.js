@@ -163,7 +163,7 @@ export default function UsersPage() {
 
   const signupPipelineUsers = users.filter(user =>
     user.status === "signUpPipeline" &&
-    (user.identityVerificationStatus === "approved" || user.identityVerificationStatus === "false" || user.identityVerificationStatus === "rejected" || user.identityVerificationStatus === "unKnown")
+    (user.identityVerificationStatus === "approved" || user.identityVerificationStatus === "false" || user.identityVerificationStatus === "rejected" || user.identityVerificationStatus === "unKnown" || user.identityVerificationStatus === "in_progress")
   );
 
   const flaggedUsers = users.filter(user =>
