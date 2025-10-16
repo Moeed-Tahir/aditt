@@ -185,7 +185,7 @@ const sendRejectedIdentityEmail = async (email, name) => {
   }
 };
 
-export const activeToPipelineEmail = async (to) => {
+const activeToPipelineEmail = async (to) => {
   try {
     const subject = "You're In — Welcome to Aditt 🚀";
 
@@ -212,4 +212,4 @@ export const activeToPipelineEmail = async (to) => {
   }
 };
 
-module.exports = { sendEmail, sendUserEmail, sendApprovedIdentityEmail, sendRejectedIdentityEmail };
+module.exports = { activeToPipelineEmail,sendEmail, sendUserEmail, sendApprovedIdentityEmail, sendRejectedIdentityEmail };
