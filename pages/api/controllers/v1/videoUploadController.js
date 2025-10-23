@@ -1,18 +1,18 @@
-import { Storage } from '@google-cloud/storage';
-import { VideoIntelligenceServiceClient } from '@google-cloud/video-intelligence';
+import { S3Client, PutObjectCommand,GetObjectCommand,ListObjectsV2Command   } from "@aws-sdk/client-s3";
+import { VideoIntelligenceServiceClient } from "@google-cloud/video-intelligence";
 
-const storage = new Storage({
-  projectId: 'aditt-app',
+const s3 = new S3Client({
+  region: process.env.AWS_REGION || "us-east-1",
   credentials: {
-    client_email: process.env.GOOGLE_CLIENT_EMAIL || 'aditt-24@aditt-app.iam.gserviceaccount.com',
-    private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
 
 const videoIntelligenceClient = new VideoIntelligenceServiceClient({
   credentials: {
-    client_email: process.env.GOOGLE_CLIENT_EMAIL || 'aditt-24@aditt-app.iam.gserviceaccount.com',
-    private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    client_email: process.env.GOOGLE_CLIENT_EMAIL || "aditt-24@aditt-app.iam.gserviceaccount.com",
+    private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
   },
 });
 
@@ -23,22 +23,30 @@ export const uploadAndAnalyzeVideo = async (req, res) => {
     }
 
     const file = req.file;
-    const bucketName = 'aditt-video-tester';
+    const bucketName = process.env.S3_BUCKET_NAME || "aditt-video-tester";
     const fileName = `videos/${Date.now()}_${file.originalname}`;
 
-    // Upload video to Google Cloud Storage
-    await storage.bucket(bucketName).file(fileName).save(file.buffer, {
-      metadata: { contentType: file.mimetype },
-    });
+    // ===============================
+    // UPLOAD VIDEO TO S3
+    // ===============================
+    const uploadParams = {
+      Bucket: bucketName,
+      Key: fileName,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    };
 
-    const gcsUri = `gs://${bucketName}/${fileName}`;
+    await s3.send(new PutObjectCommand(uploadParams));
+
+    // S3 file URL
+    const s3Url = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
 
     // ===============================
-    // VIDEO INTELLIGENCE DISABLED
+    // VIDEO INTELLIGENCE (OPTIONAL)
     // ===============================
-    // The following code has been commented out to skip video analysis.
-    // It can be re-enabled later if needed.
-
+    // Google Video Intelligence can only process GCS URIs,
+    // so if you still want to analyze, you’d need to upload the file
+    // to a temporary Google Cloud bucket. Currently, we skip analysis.
     /*
     const [operation] = await videoIntelligenceClient.annotateVideo({
       inputUri: gcsUri,
@@ -69,19 +77,98 @@ export const uploadAndAnalyzeVideo = async (req, res) => {
     return res.status(200).json({
       status: "UPLOADED",
       videoId: fileName,
-      gcsUri,
+      s3Url,
       message: "Video uploaded successfully (no analysis performed)",
     });
 
   } catch (error) {
-    console.error('Error in video processing:', error);
+    console.error("Error in video processing:", error);
     return res.status(500).json({
       status: "ERROR",
       message: "Failed to process video",
-      error: error.message
+      error: error.message,
     });
   }
 };
+
+export const streamVideoFromS3 = async (req, res) => {
+  try {
+    const { fileName } = req.body;
+    const range = req.headers.range;
+
+    if (!range) {
+      console.warn("⚠️ Missing Range header — required for streaming.");
+      return res.status(400).send("Requires Range header");
+    }
+
+    if (!fileName) {
+      console.warn("⚠️ Missing fileName in request body.");
+      return res.status(400).json({ message: "Missing fileName in request body" });
+    }
+
+    const bucket = process.env.S3_BUCKET_NAME;
+
+    const key = fileName.startsWith("videos/") ? fileName : `videos/${fileName}`;
+
+    const listCommand = new ListObjectsV2Command({
+      Bucket: bucket,
+      Prefix: key,
+      MaxKeys: 1,
+    });
+    const listResponse = await s3.send(listCommand);
+
+    if (!listResponse.Contents || listResponse.Contents.length === 0) {
+      console.error(`❌ Video not found in bucket. Tried key: ${key}`);
+      return res.status(404).json({
+        message: `Video not found in bucket.`,
+        keyAttempted: key,
+      });
+    }
+
+    const videoParams = {
+      Bucket: bucket,
+      Key: key,
+      Range: range,
+    };
+
+    const command = new GetObjectCommand(videoParams);
+    const video = await s3.send(command);
+
+    res.writeHead(206, {
+      "Content-Range": video.ContentRange,
+      "Accept-Ranges": "bytes",
+      "Content-Length": video.ContentLength,
+      "Content-Type": "video/mp4",
+    });
+
+    video.Body.pipe(res);
+
+    video.Body.on("end", () => {
+      console.log("✅ Finished sending current video chunk.\n");
+    });
+
+    video.Body.on("error", (err) => {
+      console.error("❌ Stream error while piping video:", err);
+    });
+  } catch (error) {
+    console.error("💥 Error streaming video:", error);
+
+    if (error.Code === "NoSuchKey") {
+      console.error(`❌ NoSuchKey: File not found for key: ${error.Key}`);
+      return res.status(404).json({
+        message: "Video not found in S3 bucket. Check the file name or key.",
+        key: error.Key,
+      });
+    }
+
+    return res.status(500).json({
+      message: "Error streaming video",
+      error: error.message,
+    });
+  }
+};
+
+// ========== Helper Functions (same as before) ==========
 
 function evaluateVideo(analysisResult) {
   const { safe: isExplicitContentSafe } = checkExplicitContent(analysisResult);
@@ -103,7 +190,7 @@ function checkForViolentContent(analysisResult) {
   const violentLabels = analysisResult.annotationResults[0]?.segmentLabelAnnotations?.filter(
     label => {
       const description = label.entity.description.toLowerCase();
-      return violentKeywords.some(keyword => description.includes(keyword)) && 
+      return violentKeywords.some(keyword => description.includes(keyword)) &&
              label.segments[0].confidence > 0.5;
     }
   ) || [];
@@ -113,13 +200,13 @@ function checkForViolentContent(analysisResult) {
     detectedLabels: violentLabels.map(label => ({
       label: label.entity.description,
       confidence: label.segments[0].confidence
-    }))
+    })),
   };
 }
 
 function checkExplicitContent(analysisResult) {
   if (!analysisResult.annotationResults[0]?.explicitAnnotation?.frames) {
-    return { safe: true, worstCase: 'UNKNOWN' }; 
+    return { safe: true, worstCase: 'UNKNOWN' };
   }
 
   const frames = analysisResult.annotationResults[0].explicitAnnotation.frames;
@@ -132,7 +219,7 @@ function checkExplicitContent(analysisResult) {
 
   return {
     safe: worstCase === 'VERY_UNLIKELY' || worstCase === 'UNLIKELY',
-    worstCase
+    worstCase,
   };
 }
 
@@ -142,6 +229,6 @@ function extractTopLabels(analysisResult, count = 5) {
     ?.slice(0, count)
     ?.map(label => ({
       label: label.entity.description,
-      confidence: label.segments[0].confidence
+      confidence: label.segments[0].confidence,
     })) || [];
 }

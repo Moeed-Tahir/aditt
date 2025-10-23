@@ -1,10 +1,12 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { Copy, X } from "lucide-react";
+import axios from "axios";
 
 export const CampaignVideoInfo = ({ campaignData }) => {
   const [duration, setDuration] = useState(null);
-  const [showModal, setShowModal] = useState(false); // modal state
+  const [showModal, setShowModal] = useState(false);
+  const [videoStreamUrl, setVideoStreamUrl] = useState("");
   const videoRef = useRef(null);
 
   const handleLoadedMetadata = () => {
@@ -13,14 +15,40 @@ export const CampaignVideoInfo = ({ campaignData }) => {
     }
   };
 
+  useEffect(() => {
+    const fetchVideoStream = async () => {
+      try {
+        if (!campaignData?.videoUrlId) return;
+
+        const rangeHeader = "bytes=0-";
+
+        const response = await axios.post(
+          "/api/routes/v1/streamVideo?action=streamVideoFromS3",
+          { fileName: campaignData.videoUrlId },
+          {
+            headers: {
+              Range: rangeHeader,
+            },
+            responseType: "blob",
+          }
+        );
+
+        const videoBlob = new Blob([response.data], { type: "video/mp4" });
+        const blobUrl = URL.createObjectURL(videoBlob);
+        setVideoStreamUrl(blobUrl);
+      } catch (error) {
+        console.error("Error fetching video stream:", error);
+      }
+    };
+
+    fetchVideoStream();
+  }, [campaignData]);
+
+
   const formatDateRange = () => {
-
     if (!campaignData?.campaignStartDate) return "N/A";
-
     const startDate = new Date(campaignData.campaignStartDate).toLocaleDateString();
-
     if (!campaignData?.campaignEndDate) return `Starts on ${startDate}`;
-
     const endDate = new Date(campaignData.campaignEndDate).toLocaleDateString();
     return `${startDate} - ${endDate}`;
   };
@@ -32,14 +60,12 @@ export const CampaignVideoInfo = ({ campaignData }) => {
 
   return (
     <>
-      {/* Main Video Info Layout */}
       <div className="flex flex-col md:flex-row gap-6">
         <div className="flex-shrink-0 w-full md:w-auto">
           <video
             ref={videoRef}
-            src={campaignData?.campaignVideoUrl}
-            
-            onClick={() => setShowModal(true)} // open modal on click
+            src={videoStreamUrl || ""}
+            onClick={() => setShowModal(true)}
             className="rounded-lg object-cover w-full md:w-[170px] h-[200px] cursor-pointer"
             onLoadedMetadata={handleLoadedMetadata}
           />
@@ -93,7 +119,6 @@ export const CampaignVideoInfo = ({ campaignData }) => {
         </div>
       </div>
 
-      {/* Modal for full-screen video preview */}
       {showModal && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/10 flex items-center justify-center z-50 p-4">
           <div className="relative bg-white rounded-lg shadow-lg overflow-hidden max-w-3xl w-full">
@@ -105,7 +130,7 @@ export const CampaignVideoInfo = ({ campaignData }) => {
             </button>
 
             <video
-              src={campaignData?.campaignVideoUrl}
+              src={videoStreamUrl || ""}
               controls
               autoPlay
               className="w-full h-[500px] object-contain"
