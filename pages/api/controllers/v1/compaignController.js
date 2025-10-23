@@ -10,7 +10,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 const { Storage } = require('@google-cloud/storage');
-const { MongoClient } = require('mongodb');
+const { MongoClient,ObjectId } = require('mongodb');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 exports.createCampaign = async (req, res) => {
@@ -590,16 +590,18 @@ const processPaymentDeduction = async (campaignId) => {
     try {
         client = await MongoClient.connect(process.env.MONGO_URI);
         const db = client.db();
+        console.log("campaignId",campaignId);
 
-        const campaign = await db.collection('campaigns').findOne({ _id: campaignId });
+        const campaign = await db.collection('campaigns').findOne({ _id: new ObjectId(campaignId) });
+        console.log("campaign",campaign);
 
         if (!campaign) {
             throw new Error('Campaign not found');
         }
 
-        if (!campaign.cardDetail || !campaign.cardDetail.paymentMethodId) {
-            throw new Error('No payment method associated with this campaign');
-        }
+        // if (!campaign.cardDetail || !campaign.cardDetail.paymentMethodId) {
+        //     throw new Error('No payment method associated with this campaign');
+        // }
 
         const totalEngagements = campaign.engagements?.totalCount || 0;
 
@@ -700,14 +702,6 @@ exports.campaignStatusUpdate = async (req, res) => {
                 success: false,
                 message: 'Campaign not found',
                 code: 'CAMPAIGN_NOT_FOUND'
-            });
-        }
-
-        if (currentCampaign.videoUrlIntelligenceStatus !== "PASSED") {
-            return res.status(400).json({
-                success: false,
-                message: 'Cannot update status - video not passed',
-                code: 'VIDEO_INTELLIGENCE_CHECK_NOT_PASSED'
             });
         }
 

@@ -131,6 +131,7 @@ const StripePaymentForm = ({ onSuccess, onError }) => {
 
 const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploading,
     uploadProgress, }) => {
+    console.log("formData in Step4",formData);
 
     const [isApplying, setIsApplying] = useState(false);
     const [discountApplied, setDiscountApplied] = useState(false);
@@ -158,31 +159,25 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
     const calculateAttentiveEngagements = useCallback(() => {
         if (!formData.videoDuration || (!formData.budget && !discountInfo.fullWavier)) return 0;
 
-        // Parse video duration to get total seconds
         const [minutes, seconds] = formData.videoDuration.split(':').map(Number);
         const totalSeconds = (minutes * 60) + seconds;
 
         if (isNaN(totalSeconds)) return 0;
 
-        // Calculate cost per attentive engagement: $0.01/s + $0.05
         const costPerAE = 0.01 * totalSeconds + 0.05;
 
         let budgetToUse;
         
         if (discountInfo.fullWavier) {
-            // For full waiver, use the waiver value as budget
             budgetToUse = discountInfo.value;
         } else if (discountApplied) {
-            // Use discounted budget if coupon applied
             budgetToUse = parseFloat(formData.actualBudget || formData.budget || 0);
         } else {
-            // Use regular budget
             budgetToUse = parseFloat(formData.budget || 0);
         }
 
         if (isNaN(budgetToUse) || budgetToUse <= 0) return 0;
 
-        // Calculate number of attentive engagements: Budget / Cost per AE
         const attentiveEngagements = Math.floor(budgetToUse / costPerAE);
 
         return attentiveEngagements;
@@ -198,7 +193,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
             return {
                 ...prev,
                 totalEngagementValue: engagementValue,
-                campignBudget: engagementValue // Also update campignBudget to show the number
+                campignBudget: engagementValue 
             };
         });
     }, [formData.videoDuration, calculateAttentiveEngagements, setFormData]);
@@ -233,6 +228,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                 let discountValue = parseFloat(response.data.discountValue);
                 const discountType = normalizeDiscountType(response.data.discountType);
                 const fullWavier = response.data.fullWavier === true;
+                console.log("fullWavier",fullWavier);
 
                 if (isNaN(discountValue)) {
                     throw new Error('Invalid discount value');
@@ -242,7 +238,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                 let campaignBudgetValue = formData.campignBudget || 0;
 
                 if (fullWavier) {
-                    discountedBudget = 0;
+                     discountedBudget = discountValue;
                 } else if (discountType === 'percentage') {
                     discountValue = Math.min(Math.max(0, discountValue), 100);
                     discountedBudget = originalBudget * (1 - (discountValue / 100));

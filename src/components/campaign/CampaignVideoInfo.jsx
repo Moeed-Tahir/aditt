@@ -7,11 +7,13 @@ export const CampaignVideoInfo = ({ campaignData }) => {
   const [duration, setDuration] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [videoStreamUrl, setVideoStreamUrl] = useState("");
+  const [isVideoLoading, setIsVideoLoading] = useState(true); // 👈 loader state
   const videoRef = useRef(null);
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(Math.floor(videoRef.current.duration));
+      setIsVideoLoading(false); // 👈 hide loader once metadata is loaded
     }
   };
 
@@ -20,8 +22,9 @@ export const CampaignVideoInfo = ({ campaignData }) => {
       try {
         if (!campaignData?.videoUrlId) return;
 
-        const rangeHeader = "bytes=0-";
+        setIsVideoLoading(true); // 👈 start loader before fetching
 
+        const rangeHeader = "bytes=0-";
         const response = await axios.post(
           "/api/routes/v1/streamVideo?action=streamVideoFromS3",
           { fileName: campaignData.videoUrlId },
@@ -44,7 +47,6 @@ export const CampaignVideoInfo = ({ campaignData }) => {
     fetchVideoStream();
   }, [campaignData]);
 
-
   const formatDateRange = () => {
     if (!campaignData?.campaignStartDate) return "N/A";
     const startDate = new Date(campaignData.campaignStartDate).toLocaleDateString();
@@ -61,16 +63,29 @@ export const CampaignVideoInfo = ({ campaignData }) => {
   return (
     <>
       <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-shrink-0 w-full md:w-auto">
+        {/* Video Section */}
+        <div className="relative flex-shrink-0 w-full md:w-auto">
+          {/* Loader */}
+          {isVideoLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
+              <div className="w-10 h-10 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+
           <video
             ref={videoRef}
             src={videoStreamUrl || ""}
             onClick={() => setShowModal(true)}
-            className="rounded-lg object-cover w-full md:w-[170px] h-[200px] cursor-pointer"
+            className={`rounded-lg object-cover w-full md:w-[170px] h-[200px] cursor-pointer ${
+              isVideoLoading ? "opacity-50" : "opacity-100"
+            }`}
             onLoadedMetadata={handleLoadedMetadata}
+            onWaiting={() => setIsVideoLoading(true)}  // 👈 show loader if buffering
+            onPlaying={() => setIsVideoLoading(false)} // 👈 hide when playing
           />
         </div>
 
+        {/* Campaign Info Section */}
         <div className="flex-1 flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <h2 className="text-[24px] sm:text-2xl font-md text-gray-900">
@@ -119,6 +134,7 @@ export const CampaignVideoInfo = ({ campaignData }) => {
         </div>
       </div>
 
+      {/* Modal for full video */}
       {showModal && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/10 flex items-center justify-center z-50 p-4">
           <div className="relative bg-white rounded-lg shadow-lg overflow-hidden max-w-3xl w-full">

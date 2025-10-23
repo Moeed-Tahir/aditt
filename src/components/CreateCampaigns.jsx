@@ -83,6 +83,7 @@ export function CreateCampaigns({ userId }) {
     age: "",
     campignBudget: "",
   });
+  console.log("formData", formData);
 
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
@@ -276,13 +277,11 @@ export function CreateCampaigns({ userId }) {
 
   const canProceedToNextStep = () => {
     if (currentStep === 0) {
-      // For step 0, check if video is uploaded and complete
       if (formData.videoFile && !videoUploadComplete) {
         toast.error("Please wait for video upload to complete before proceeding");
         return false;
       }
 
-      // Check if upload progress is 100% for any ongoing uploads
       if (uploadProgress.video < 100 && formData.videoFile) {
         toast.error("Please wait for video upload to complete before proceeding");
         return false;
@@ -294,7 +293,6 @@ export function CreateCampaigns({ userId }) {
       }
     }
 
-    // For other steps, check if there are any ongoing uploads
     if (isUploading) {
       toast.error("Please wait for uploads to complete before proceeding");
       return false;
@@ -380,6 +378,8 @@ export function CreateCampaigns({ userId }) {
         } : null,
         totalEngagementValue: formData.totalEngagementValue,
       };
+
+      console.log("campaignData in submit",campaignData);
 
       const response = await axios.post(
         "/api/routes/v1/campaignRoutes?action=createCampaign",
