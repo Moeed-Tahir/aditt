@@ -46,7 +46,6 @@ const Step1 = ({
           resolve(false);
         } else {
           setVideoError("");
-          // Save the duration to formData
           setFormData(prev => ({
             ...prev,
             videoDuration: duration
@@ -87,17 +86,12 @@ const Step1 = ({
   const showProgressSection =
     (uploadProgress.video > 0 && uploadProgress.video < 100) ||
     (uploadProgress.image > 0 && uploadProgress.image < 100);
-
-  // Check if video upload is complete (100%)
-  const isVideoUploadComplete = uploadProgress.video === 100;
   
-  // Check if all required fields are filled and video upload is complete
   const canProceed = 
     formData.campaignTitle &&
     formData.brandName &&
     formData.websiteLink &&
-    formData.videoFile &&
-    isVideoUploadComplete;
+    formData.videoFile
 
   return (
     <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Navbar from "../Navbar";
 import { Button } from "@/components/ui/button";
-import { Eye, Trash } from "lucide-react";
+import { Eye, Trash, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import SortByAndFilters from "@/components/admin/SortByAndFilters";
 import ConfirmationModal from "../ConfirmationModal";
@@ -250,6 +250,47 @@ export function GenericTablePage({
     );
   };
 
+  // Smart pagination buttons for mobile responsiveness
+  const getPaginationButtons = () => {
+    const buttons = [];
+    const maxVisibleButtons = 5;
+
+    if (totalPages <= maxVisibleButtons) {
+      // Show all pages if total pages are less than or equal to maxVisibleButtons
+      for (let i = 1; i <= totalPages; i++) {
+        buttons.push(i);
+      }
+    } else {
+      // Logic for showing limited pages with ellipsis
+      if (currentPage <= 3) {
+        // Near the start
+        for (let i = 1; i <= 4; i++) {
+          buttons.push(i);
+        }
+        buttons.push("...");
+        buttons.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        // Near the end
+        buttons.push(1);
+        buttons.push("...");
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          buttons.push(i);
+        }
+      } else {
+        // In the middle
+        buttons.push(1);
+        buttons.push("...");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          buttons.push(i);
+        }
+        buttons.push("...");
+        buttons.push(totalPages);
+      }
+    }
+
+    return buttons;
+  };
+
   return (
     <main
       className={`flex h-auto w-full flex-col ${compactLayout ? "" : "bg-[var(--bg-color-off-white)]"
@@ -365,47 +406,57 @@ export function GenericTablePage({
             </table>
           </div>
 
-          {/* Pagination */}
+          {/* Responsive Pagination */}
           {!compactLayout && filteredData.length > 0 && (
-            <div className="flex justify-between items-center mt-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
               <p className="text-sm text-gray-500">
                 Showing {paginatedData.length} of {filteredData.length} results
               </p>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
+                {/* Previous Button */}
                 <Button
                   size="sm"
                   variant="outline"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage(currentPage - 1)}
+                  className="flex items-center gap-1"
                 >
-                  Previous
+                  <ChevronLeft className="w-4 h-4" />
+                  <span className="hidden sm:inline">Previous</span>
                 </Button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
+                {/* Page Numbers */}
+                <div className="flex gap-1">
+                  {getPaginationButtons().map((page, index) => (
                     <Button
-                      key={page}
+                      key={index}
                       size="sm"
                       variant={page === currentPage ? "default" : "outline"}
-                      onClick={() => setCurrentPage(page)}
-                      className={
+                      onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                      disabled={page === "..."}
+                      className={`min-w-[40px] ${
                         page === currentPage
                           ? "bg-blue-600 text-white hover:bg-blue-700"
                           : ""
-                      }
+                      } ${
+                        page === "..." ? "cursor-default hover:bg-transparent" : ""
+                      }`}
                     >
                       {page}
                     </Button>
-                  )
-                )}
+                  ))}
+                </div>
 
+                {/* Next Button */}
                 <Button
                   size="sm"
                   variant="outline"
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage(currentPage + 1)}
+                  className="flex items-center gap-1"
                 >
-                  Next
+                  <span className="hidden sm:inline">Next</span>
+                  <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
             </div>

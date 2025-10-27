@@ -174,11 +174,15 @@ export default function UsersPage() {
     user.identityVerificationStatus === "denied"
   );
 
+  // All users - showing all users without any filtering
+  const allUsers = users;
+
   const signupPipelineCount = signupPipelineUsers.length;
   const activeCount = activeUsers.length;
   const waitlistCount = waitlistUsers.length;
   const flaggedCount = flaggedUsers.length;
   const rejectedCount = rejectedUsers.length;
+  const allUsersCount = allUsers.length;
 
   let dataToShow = [];
   switch (activeTab) {
@@ -196,6 +200,9 @@ export default function UsersPage() {
       break;
     case "rejected":
       dataToShow = rejectedUsers;
+      break;
+    case "all":
+      dataToShow = allUsers;
       break;
     default:
       dataToShow = signupPipelineUsers;
@@ -328,7 +335,7 @@ export default function UsersPage() {
 
   const headerAction = (
     <div className="flex flex-col gap-4 w-full">
-      <div className="flex gap-1 rounded p-1 text-sm font-semibold w-full overflow-hidden">
+      <div className="flex gap-1 rounded p-1 text-sm font-semibold w-full overflow-x-auto">
         <button
           className={`flex-1 py-2 px-2 rounded-full whitespace-nowrap ${activeTab === "signupPipeline"
             ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
@@ -373,6 +380,15 @@ export default function UsersPage() {
           onClick={() => setActiveTab("rejected")}
         >
           Rejected Users ({rejectedCount})
+        </button>
+        <button
+          className={`flex-1 py-2 px-2 rounded-full whitespace-nowrap ${activeTab === "all"
+            ? "bg-blue-600 text-white border border-blue-800 hover:bg-blue-800"
+            : "bg-white text-gray-700 border hover:bg-blue-600 hover:text-white"
+            } transition flex items-center justify-center text-xs sm:text-sm`}
+          onClick={() => setActiveTab("all")}
+        >
+          All Users ({allUsersCount})
         </button>
       </div>
 

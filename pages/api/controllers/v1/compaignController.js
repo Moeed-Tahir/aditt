@@ -590,10 +590,8 @@ const processPaymentDeduction = async (campaignId) => {
     try {
         client = await MongoClient.connect(process.env.MONGO_URI);
         const db = client.db();
-        console.log("campaignId",campaignId);
 
         const campaign = await db.collection('campaigns').findOne({ _id: new ObjectId(campaignId) });
-        console.log("campaign",campaign);
 
         if (!campaign) {
             throw new Error('Campaign not found');
@@ -1161,7 +1159,6 @@ exports.verifyCardDetail = async (req, res) => {
 exports.totalCampaignsStat = async (req, res) => {
     try {
         const { userId } = req.body;
-        console.log("userId", userId);
 
         if (!userId) {
             return res.status(400).json({ success: false, message: "userId is required" });

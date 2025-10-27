@@ -19,6 +19,7 @@ const Step3 = ({ formData, setFormData, isUploading, uploadProgress }) => {
         formData.quizQuestion.correctAnswer !== null;
 
     const showProgressSection = (uploadProgress.video > 0 || uploadProgress.image > 0);
+    const isVideoUploadComplete = uploadProgress.video === 100;
 
     return (
         <div className="min-h-screen px-2 md:px-4 py-4 md:py-8">
@@ -76,7 +77,7 @@ const Step3 = ({ formData, setFormData, isUploading, uploadProgress }) => {
                 </div>
 
                 <hr className="border-t mb-4 border-gray-300" />
-                
+
                 <div className="space-y-4 md:space-y-6">
                     <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
                         <div className="w-full md:w-1/3">
@@ -153,15 +154,15 @@ const Step3 = ({ formData, setFormData, isUploading, uploadProgress }) => {
                 {/* Moved Next button to bottom */}
                 <div className="mt-8 flex justify-end">
                     <Link
-                        href={isQuizQuestionFilled ? "?step=3" : "#"}
-                        className={`w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full ${isQuizQuestionFilled
+                        href={isQuizQuestionFilled && isVideoUploadComplete ? "?step=3" : "#"}
+                        className={`w-full md:w-[218px] h-12 md:h-[56px] text-sm md:text-[16px] font-md text-white flex justify-center items-center rounded-full ${isQuizQuestionFilled && isVideoUploadComplete
                             ? 'bg-blue-600 hover:bg-blue-700'
                             : 'bg-blue-600 opacity-50 cursor-not-allowed'
                             }`}
-                        aria-disabled={!isQuizQuestionFilled}
-                        tabIndex={!isQuizQuestionFilled ? -1 : undefined}
+                        aria-disabled={!(isQuizQuestionFilled && isVideoUploadComplete)}
+                        tabIndex={!(isQuizQuestionFilled && isVideoUploadComplete) ? -1 : undefined}
                         onClick={(e) => {
-                            if (!isQuizQuestionFilled) {
+                            if (!isQuizQuestionFilled || !isVideoUploadComplete) {
                                 e.preventDefault();
                             }
                         }}
