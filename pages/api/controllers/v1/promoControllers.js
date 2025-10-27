@@ -134,7 +134,6 @@ export const updatePromoCode = async (req, res) => {
   }
 };
 
-
 export const togglePromoCodeStatus = async (req, res) => {
   try {
     const { id } = req.body;

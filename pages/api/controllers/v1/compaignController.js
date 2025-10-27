@@ -592,7 +592,8 @@ const processPaymentDeduction = async (campaignId) => {
         const db = client.db();
 
         const campaign = await db.collection('campaigns').findOne({ _id: new ObjectId(campaignId) });
-
+        console.log("campaign",campaign);
+        
         if (!campaign) {
             throw new Error('Campaign not found');
         }
