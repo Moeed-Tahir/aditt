@@ -83,7 +83,6 @@ export function CreateCampaigns({ userId }) {
     age: "",
     campignBudget: "",
   });
-  console.log("formData", formData);
 
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,

@@ -592,15 +592,11 @@ const processPaymentDeduction = async (campaignId) => {
         const db = client.db();
 
         const campaign = await db.collection('campaigns').findOne({ _id: new ObjectId(campaignId) });
-        console.log("campaign",campaign);
-        
+        console.log("campaign", campaign);
+
         if (!campaign) {
             throw new Error('Campaign not found');
         }
-
-        // if (!campaign.cardDetail || !campaign.cardDetail.paymentMethodId) {
-        //     throw new Error('No payment method associated with this campaign');
-        // }
 
         const totalEngagements = campaign.engagements?.totalCount || 0;
 
@@ -612,12 +608,20 @@ const processPaymentDeduction = async (campaignId) => {
             };
         }
 
-        if (campaign.campaignBudget < totalEngagements) {
-            throw new Error(`Insufficient campaign budget. Required: ${totalEngagements}, Available: ${campaign.campaignBudget}`);
+        const chargePerEngagement = 1;
+        const totalAmountUSD = totalEngagements * chargePerEngagement;
+        const totalAmountCents = totalAmountUSD * 100;
+
+        if (campaign.campaignBudget < totalAmountUSD) {
+            throw new Error(`Insufficient campaign budget. Required: $${totalAmountUSD}, Available: $${campaign.campaignBudget}`);
         }
 
-        let customerId = campaign.cardDetail.customerId;
-        const paymentMethodId = campaign.cardDetail.paymentMethodId;
+        let customerId = campaign.cardDetail?.customerId;
+        const paymentMethodId = campaign.cardDetail?.paymentMethodId;
+
+        if (!paymentMethodId) {
+            throw new Error('No payment method associated with this campaign');
+        }
 
         if (!customerId) {
             const customer = await stripe.customers.create({
@@ -635,12 +639,12 @@ const processPaymentDeduction = async (campaignId) => {
         }
 
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: totalEngagements * 100,
+            amount: totalAmountCents,
             currency: 'usd',
             customer: customerId,
             payment_method: paymentMethodId,
             confirm: true,
-            description: `Final charge for ${totalEngagements} engagements on ${campaign.campaignTitle}`,
+            description: `Charge for ${totalEngagements} engagements on ${campaign.campaignTitle}`,
             metadata: {
                 campaignId: campaign._id.toString(),
                 userId: campaign.userId,
@@ -652,15 +656,15 @@ const processPaymentDeduction = async (campaignId) => {
         await db.collection('campaigns').updateOne(
             { _id: campaign._id },
             {
-                $inc: { campaignBudget: -totalEngagements },
+                $inc: { campaignBudget: -totalAmountUSD },
                 $push: {
                     paymentHistory: {
                         date: new Date(),
-                        amount: totalEngagements,
+                        amount: totalAmountUSD,
                         status: 'success',
                         stripeChargeId: paymentIntent.id,
                         type: 'final_payment',
-                        description: `Final payment for completed campaign`
+                        description: `Final payment for ${totalEngagements} engagements`,
                     },
                 },
             }
@@ -668,10 +672,10 @@ const processPaymentDeduction = async (campaignId) => {
 
         return {
             success: true,
-            message: 'Final payment processed successfully',
+            message: `Charged $${totalAmountUSD} for ${totalEngagements} engagements.`,
             paymentIntentId: paymentIntent.id,
-            amount: totalEngagements,
-            remainingBudget: campaign.campaignBudget - totalEngagements,
+            amount: totalAmountUSD,
+            remainingBudget: campaign.campaignBudget - totalAmountUSD,
         };
 
     } catch (error) {

@@ -157,15 +157,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
     };
 
     const calculateAttentiveEngagements = useCallback(() => {
-        if (!formData.videoDuration || (!formData.budget && !discountInfo.fullWavier)) return 0;
-
-        const [minutes, seconds] = formData.videoDuration.split(':').map(Number);
-        const totalSeconds = (minutes * 60) + seconds;
-
-        if (isNaN(totalSeconds)) return 0;
-
-        const costPerAE = 0.01 * totalSeconds + 0.05;
-
         let budgetToUse;
         
         if (discountInfo.fullWavier) {
@@ -178,14 +169,12 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
 
         if (isNaN(budgetToUse) || budgetToUse <= 0) return 0;
 
-        const attentiveEngagements = Math.floor(budgetToUse / costPerAE);
+        const attentiveEngagements = Math.floor(budgetToUse);
 
         return attentiveEngagements;
-    }, [formData.videoDuration, formData.budget, formData.actualBudget, discountInfo.fullWavier, discountInfo.value, discountApplied]);
+    }, [formData.budget, formData.actualBudget, discountInfo.fullWavier, discountInfo.value, discountApplied]);
 
     const calculateAndSetEngagement = useCallback(() => {
-        if (!formData.videoDuration) return;
-
         const engagementValue = calculateAttentiveEngagements();
 
         setFormData(prev => {
@@ -196,18 +185,11 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                 campignBudget: engagementValue 
             };
         });
-    }, [formData.videoDuration, calculateAttentiveEngagements, setFormData]);
+    }, [calculateAttentiveEngagements, setFormData]);
 
     useEffect(() => {
         calculateAndSetEngagement();
     }, [calculateAndSetEngagement]);
-
-    const formatVideoDurationDisplay = (duration) => {
-        if (!duration) return '';
-        const [minutes, seconds] = duration.split(':').map(Number);
-        const totalSeconds = (minutes * 60) + seconds;
-        return `${totalSeconds}-second`;
-    };
 
     const handleApplyCoupon = async () => {
         if (!formData.couponCode?.trim()) {
@@ -513,20 +495,18 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                                 />
                             </div>
 
-                            {formData.videoDuration && (
+                            {formData.budget && (
                                 <div className="mt-2 text-xs md:text-sm text-gray-500">
                                     {discountInfo.fullWavier ? (
                                         <>
-                                            With your {formatVideoDurationDisplay(formData.videoDuration)} video, you will receive a maximum of {' '}
-                                            {calculateAttentiveEngagements().toLocaleString()} attentive engagements.
+                                            You will receive {calculateAttentiveEngagements().toLocaleString()} attentive engagements.
                                             <span className="text-green-600 ml-2">
                                                 (Full wavier applied)
                                             </span>
                                         </>
-                                    ) : formData.budget ? (
+                                    ) : (
                                         <>
-                                            With your {formatVideoDurationDisplay(formData.videoDuration)} video, you will receive a maximum of {' '}
-                                            {calculateAttentiveEngagements().toLocaleString()} attentive engagements.
+                                            You will receive {calculateAttentiveEngagements().toLocaleString()} attentive engagements.
                                             {discountApplied && (
                                                 <span className="text-green-600 ml-2">
                                                     (Discount applied: {discountInfo.type === 'percentage'
@@ -535,7 +515,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                                                 </span>
                                             )}
                                         </>
-                                    ) : null}
+                                    )}
                                 </div>
                             )}
                         </div>
