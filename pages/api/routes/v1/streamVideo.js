@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        if (req.method === "POST") {
+        if (req.method === "GET") {
             switch (action) {
                 case "streamVideoFromS3":
                     return await streamVideoFromS3(req, res);

@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand,GetObjectCommand,ListObjectsV2Command   } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand,GetObjectCommand,ListObjectsV2Command,HeadObjectCommand   } from "@aws-sdk/client-s3";
 import { VideoIntelligenceServiceClient } from "@google-cloud/video-intelligence";
 
 const s3 = new S3Client({
@@ -93,7 +93,7 @@ export const uploadAndAnalyzeVideo = async (req, res) => {
 
 export const streamVideoFromS3 = async (req, res) => {
   try {
-    const { fileName } = req.body;
+    const { fileName } = req.query;
     const range = req.headers.range;
 
     if (!range) {
@@ -107,60 +107,64 @@ export const streamVideoFromS3 = async (req, res) => {
     }
 
     const bucket = process.env.S3_BUCKET_NAME;
-
     const key = fileName.startsWith("videos/") ? fileName : `videos/${fileName}`;
 
-    const listCommand = new ListObjectsV2Command({
+    // First, get the file size
+    const headCommand = new HeadObjectCommand({
       Bucket: bucket,
-      Prefix: key,
-      MaxKeys: 1,
+      Key: key,
     });
-    const listResponse = await s3.send(listCommand);
 
-    if (!listResponse.Contents || listResponse.Contents.length === 0) {
-      console.error(`❌ Video not found in bucket. Tried key: ${key}`);
+    let fileSize;
+    try {
+      const headResponse = await s3.send(headCommand);
+      fileSize = headResponse.ContentLength;
+    } catch (error) {
+      console.error("❌ Error getting file info:", error);
       return res.status(404).json({
-        message: `Video not found in bucket.`,
+        message: "Video not found in S3 bucket",
         keyAttempted: key,
       });
     }
 
-    const videoParams = {
-      Bucket: bucket,
-      Key: key,
-      Range: range,
+    // Parse range header
+    const CHUNK_SIZE = 10 ** 6; // 1MB chunks
+    const start = Number(range.replace(/\D/g, ""));
+    const end = Math.min(start + CHUNK_SIZE, fileSize - 1);
+
+    // Create headers
+    const contentLength = end - start + 1;
+    const headers = {
+      "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": contentLength,
+      "Content-Type": "video/mp4",
     };
 
-    const command = new GetObjectCommand(videoParams);
-    const video = await s3.send(command);
+    // Set HTTP status
+    res.writeHead(206, headers);
 
-    res.writeHead(206, {
-      "Content-Range": video.ContentRange,
-      "Accept-Ranges": "bytes",
-      "Content-Length": video.ContentLength,
-      "Content-Type": "video/mp4",
+    // Stream the video chunk
+    const getObjectCommand = new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Range: `bytes=${start}-${end}`,
     });
 
-    video.Body.pipe(res);
+    const response = await s3.send(getObjectCommand);
+    
+    // Pipe the stream directly to response
+    response.Body.pipe(res);
 
-    video.Body.on("end", () => {
-      console.log("✅ Finished sending current video chunk.\n");
-    });
-
-    video.Body.on("error", (err) => {
-      console.error("❌ Stream error while piping video:", err);
-    });
   } catch (error) {
     console.error("💥 Error streaming video:", error);
-
-    if (error.Code === "NoSuchKey") {
-      console.error(`❌ NoSuchKey: File not found for key: ${error.Key}`);
+    
+    if (error.name === "NoSuchKey") {
       return res.status(404).json({
-        message: "Video not found in S3 bucket. Check the file name or key.",
-        key: error.Key,
+        message: "Video not found in S3 bucket",
       });
     }
-
+    
     return res.status(500).json({
       message: "Error streaming video",
       error: error.message,

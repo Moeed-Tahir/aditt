@@ -1,51 +1,47 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { Copy, X } from "lucide-react";
-import axios from "axios";
 
 export const CampaignVideoInfo = ({ campaignData }) => {
   const [duration, setDuration] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [videoStreamUrl, setVideoStreamUrl] = useState("");
-  const [isVideoLoading, setIsVideoLoading] = useState(true); // 👈 loader state
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
+  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef(null);
+
+  const getStreamingUrl = () => {
+    if (!campaignData?.videoUrlId) return "";
+    return `/api/routes/v1/streamVideo?action=streamVideoFromS3&fileName=${encodeURIComponent(campaignData.videoUrlId)}`;
+  };
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(Math.floor(videoRef.current.duration));
-      setIsVideoLoading(false); // 👈 hide loader once metadata is loaded
+      setIsVideoLoading(false);
     }
   };
 
-  useEffect(() => {
-    const fetchVideoStream = async () => {
-      try {
-        if (!campaignData?.videoUrlId) return;
+  const handleVideoError = (e) => {
+    console.error("Video error:", e);
+    setVideoError(true);
+    setIsVideoLoading(false);
+  };
 
-        setIsVideoLoading(true); // 👈 start loader before fetching
+  const handleLoadStart = () => {
+    setIsVideoLoading(true);
+  };
 
-        const rangeHeader = "bytes=0-";
-        const response = await axios.post(
-          "/api/routes/v1/streamVideo?action=streamVideoFromS3",
-          { fileName: campaignData.videoUrlId },
-          {
-            headers: {
-              Range: rangeHeader,
-            },
-            responseType: "blob",
-          }
-        );
+  const handleCanPlay = () => {
+    setIsVideoLoading(false);
+  };
 
-        const videoBlob = new Blob([response.data], { type: "video/mp4" });
-        const blobUrl = URL.createObjectURL(videoBlob);
-        setVideoStreamUrl(blobUrl);
-      } catch (error) {
-        console.error("Error fetching video stream:", error);
-      }
-    };
-
-    fetchVideoStream();
-  }, [campaignData]);
+  const handleRetry = () => {
+    setVideoError(false);
+    setIsVideoLoading(true);
+    if (videoRef.current) {
+      videoRef.current.load();
+    }
+  };
 
   const formatDateRange = () => {
     if (!campaignData?.campaignStartDate) return "N/A";
@@ -63,29 +59,46 @@ export const CampaignVideoInfo = ({ campaignData }) => {
   return (
     <>
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Video Section */}
         <div className="relative flex-shrink-0 w-full md:w-auto">
-          {/* Loader */}
           {isVideoLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg z-10">
               <div className="w-10 h-10 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+
+          {videoError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg z-10">
+              <div className="text-center text-gray-500">
+                <p>Failed to load video</p>
+                <button
+                  onClick={handleRetry}
+                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Retry
+                </button>
+              </div>
             </div>
           )}
 
           <video
             ref={videoRef}
-            src={videoStreamUrl || ""}
+            src={getStreamingUrl()}
             onClick={() => setShowModal(true)}
-            className={`rounded-lg object-cover w-full md:w-[170px] h-[200px] cursor-pointer ${
-              isVideoLoading ? "opacity-50" : "opacity-100"
-            }`}
+            className={`rounded-lg object-cover w-full md:w-[170px] h-[200px] cursor-pointer ${isVideoLoading ? "opacity-50" : "opacity-100"
+              }`}
             onLoadedMetadata={handleLoadedMetadata}
-            onWaiting={() => setIsVideoLoading(true)}  // 👈 show loader if buffering
-            onPlaying={() => setIsVideoLoading(false)} // 👈 hide when playing
-          />
+            onError={handleVideoError}
+            onLoadStart={handleLoadStart}
+            onCanPlay={handleCanPlay}
+            onWaiting={() => setIsVideoLoading(true)}
+            onPlaying={() => setIsVideoLoading(false)}
+            preload="metadata"
+            controls={false}
+          >
+            Your browser does not support the video tag.
+          </video>
         </div>
 
-        {/* Campaign Info Section */}
         <div className="flex-1 flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <h2 className="text-[24px] sm:text-2xl font-md text-gray-900">
@@ -134,7 +147,6 @@ export const CampaignVideoInfo = ({ campaignData }) => {
         </div>
       </div>
 
-      {/* Modal for full video */}
       {showModal && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/10 flex items-center justify-center z-50 p-4">
           <div className="relative bg-white rounded-lg shadow-lg overflow-hidden max-w-3xl w-full">
@@ -146,11 +158,14 @@ export const CampaignVideoInfo = ({ campaignData }) => {
             </button>
 
             <video
-              src={videoStreamUrl || ""}
+              src={getStreamingUrl()}
               controls
               autoPlay
               className="w-full h-[500px] object-contain"
-            />
+              onError={handleVideoError}
+            >
+              Your browser does not support the video tag.
+            </video>
           </div>
         </div>
       )}
