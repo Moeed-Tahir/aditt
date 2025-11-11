@@ -115,126 +115,70 @@ export function CreateCampaigns({ userId }) {
     setVideoUploadComplete(false);
     setUploadProgress(prev => ({ ...prev, [type]: 0 }));
 
-    if (type === "video") {
-      try {
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const intelUploadPromise = new Promise((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open('POST', '/api/routes/v1/videoUploadRoutes?action=upload');
-
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const percent = Math.round((event.loaded / event.total) * 50);
-              setUploadProgress(prev => ({ ...prev, [type]: percent }));
-            }
-          };
-
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              try {
-                const data = JSON.parse(xhr.responseText);
-                resolve(data);
-              } catch (e) {
-                reject(new Error('Failed to parse response'));
-              }
-            } else {
-              reject(new Error(`Upload failed with status ${xhr.status}`));
-            }
-          };
-
-          xhr.onerror = () => reject(new Error('Network error'));
-          xhr.send(formData);
-        });
-
-        const intelligenceData = await intelUploadPromise;
-
-        setFormData(prev => ({
-          ...prev,
-          videoUrlIntelligenceStatus: intelligenceData.status,
-          videoUrlId: intelligenceData.videoId,
-        }));
-
-      } catch (error) {
-        console.error("Video intelligence error:", error);
-        setIsUploading(false);
-        setVideoUploadComplete(false);
-        toast.error("Failed to Upload Video Kindly Try Again");
-        return null;
-      }
-    }
-
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `aditt-assets/${type}s/${fileName}`;
+      const formData = new FormData();
+      formData.append('file', file);
 
-      const supabaseUploadPromise = new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', `${supabaseUrl}/storage/v1/object/aditt/${filePath}`);
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `/api/routes/v1/videoUploadRoutes?action=upload`);
 
-        xhr.setRequestHeader("Authorization", `Bearer ${supabaseKey}`);
-        xhr.setRequestHeader("x-upsert", "false");
-        xhr.setRequestHeader("Content-Type", file.type);
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percent = Math.round((event.loaded / event.total) * 100);
+          setUploadProgress(prev => ({ ...prev, [type]: percent }));
+        }
+      };
 
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percent = 50 + Math.round((event.loaded / event.total) * 50);
-            setUploadProgress(prev => ({ ...prev, [type]: percent }));
-          }
-        };
-
+      const uploadPromise = new Promise((resolve, reject) => {
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
-              const response = JSON.parse(xhr.responseText);
-              resolve(response);
-            } catch (e) {
-              reject(new Error('Failed to parse Supabase response'));
+              const data = JSON.parse(xhr.responseText);
+              resolve(data);
+            } catch {
+              reject(new Error('Failed to parse upload response'));
             }
           } else {
-            reject(new Error('Supabase upload failed'));
+            reject(new Error(`Upload failed with status ${xhr.status}`));
           }
         };
 
-        xhr.onerror = () => reject(new Error('Network error'));
-        xhr.send(file);
+        xhr.onerror = () => reject(new Error('Network error during upload'));
+        xhr.send(formData);
       });
 
-      await supabaseUploadPromise;
+      const response = await uploadPromise;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from("aditt")
-        .getPublicUrl(filePath);
+      const { s3Url, videoId, status } = response;
 
       let duration = "";
       if (type === "video") {
         duration = await getVideoDuration(file);
       }
 
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
-        [`${type}Url`]: publicUrl,
-        ...(type === "video" && { videoDuration: duration }),
+        [`${type}Url`]: s3Url,
+        ...(type === "video" && {
+          videoUrlId: videoId,
+          videoUrlIntelligenceStatus: status,
+          videoDuration: duration
+        }),
       }));
 
-      setIsUploading(false);
-
-      // Mark video upload as complete
       if (type === "video") {
         setVideoUploadComplete(true);
       }
 
-      return publicUrl;
+      toast.success("Video uploaded successfully!");
     } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload video. Please try again.");
+    } finally {
       setIsUploading(false);
-      setVideoUploadComplete(false);
-      toast.error("Failed to Upload Video Kindly Try Again");
-      return null;
     }
   }, []);
+
 
   const getVideoDuration = (file) => {
     return new Promise((resolve) => {
@@ -378,7 +322,7 @@ export function CreateCampaigns({ userId }) {
         totalEngagementValue: formData.totalEngagementValue,
       };
 
-      console.log("campaignData in submit",campaignData);
+      console.log("campaignData in submit", campaignData);
 
       const response = await axios.post(
         "/api/routes/v1/campaignRoutes?action=createCampaign",

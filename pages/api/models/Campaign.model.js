@@ -240,10 +240,6 @@ const CampaignSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    videoUrlIntelligenceStatus: {
-        type: String,
-        required: true,
-    },
     videoUrlId: {
         type: String,
         required: true,

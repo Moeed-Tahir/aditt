@@ -1181,21 +1181,12 @@ exports.totalCampaignsStat = async (req, res) => {
             const totalEngagements = campaign.engagements?.totalCount || 0;
             if (totalEngagements === 0) continue;
 
-            const [minutes, seconds] = (campaign.videoDuration || "0:0").split(":").map(Number);
-            const videoLengthInSeconds = (minutes * 60) + (seconds || 0);
-
-            const costPerEngagementInCents = videoLengthInSeconds + 5;
-            const spentForCampaign = (totalEngagements * costPerEngagementInCents) / 100;
+            const spentForCampaign = totalEngagements * 1; 
 
             totalSpent += spentForCampaign;
-
-            console.log(
-                `Campaign ${campaign._id}: engagements=${totalEngagements}, duration=${videoLengthInSeconds}s, spent=${spentForCampaign}`
-            );
         }
 
         const totalRemaining = totalBudget - totalSpent;
-
 
         return res.status(200).json({
             success: true,
@@ -1213,4 +1204,3 @@ exports.totalCampaignsStat = async (req, res) => {
         });
     }
 };
-
