@@ -236,7 +236,6 @@ export function GenericTablePage({
           <Trash className="w-4 h-4" />
         </button>
 
-        {/* Show Accept button only for waitlist status */}
         {item.status === "waitlist" && (
           <button
             onClick={() => handleAcceptClick(item)}
@@ -250,34 +249,28 @@ export function GenericTablePage({
     );
   };
 
-  // Smart pagination buttons for mobile responsiveness
   const getPaginationButtons = () => {
     const buttons = [];
     const maxVisibleButtons = 5;
 
     if (totalPages <= maxVisibleButtons) {
-      // Show all pages if total pages are less than or equal to maxVisibleButtons
       for (let i = 1; i <= totalPages; i++) {
         buttons.push(i);
       }
     } else {
-      // Logic for showing limited pages with ellipsis
       if (currentPage <= 3) {
-        // Near the start
         for (let i = 1; i <= 4; i++) {
           buttons.push(i);
         }
         buttons.push("...");
         buttons.push(totalPages);
       } else if (currentPage >= totalPages - 2) {
-        // Near the end
         buttons.push(1);
         buttons.push("...");
         for (let i = totalPages - 3; i <= totalPages; i++) {
           buttons.push(i);
         }
       } else {
-        // In the middle
         buttons.push(1);
         buttons.push("...");
         for (let i = currentPage - 1; i <= currentPage + 1; i++) {
@@ -330,7 +323,7 @@ export function GenericTablePage({
                 onFilterChange={({ status, date }) => {
                   setStatusFilter(status);
                   setDateFilter(date);
-                  setCurrentPage(1); // Reset to first page when filters change
+                  setCurrentPage(1); 
                 }}
               />
             )}

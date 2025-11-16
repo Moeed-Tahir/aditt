@@ -994,8 +994,9 @@ export const verifiedConsumer = async (req, res) => {
             { _id: new ObjectId(userId) },
             {
                 $set: {
-                    identityVerificationStatus: 'approved',
-                    isVerified: true
+                    identityVerificationStatus: 'verified',
+                    isVerified: true,
+                    status: 'active'
                 }
             },
             { returnDocument: 'after' }

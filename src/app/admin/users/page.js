@@ -174,7 +174,6 @@ export default function UsersPage() {
     user.identityVerificationStatus === "denied"
   );
 
-  // All users - showing all users without any filtering
   const allUsers = users;
 
   const signupPipelineCount = signupPipelineUsers.length;
