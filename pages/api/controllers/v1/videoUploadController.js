@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand,GetObjectCommand,ListObjectsV2Command,HeadObjectCommand   } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand,GetObjectCommand,ListObjectsV2Command,HeadObjectCommand,CompleteMultipartUploadCommand,UploadPartCommand,CreateMultipartUploadCommand} from "@aws-sdk/client-s3";
 import { VideoIntelligenceServiceClient } from "@google-cloud/video-intelligence";
 
 const s3 = new S3Client({
@@ -24,68 +24,63 @@ export const uploadAndAnalyzeVideo = async (req, res) => {
 
     const file = req.file;
     const bucketName = process.env.S3_BUCKET_NAME || "aditt-video-tester";
-    const fileName = `videos/${Date.now()}_${file.originalname}`;
+    const key = `videos/${Date.now()}_${file.originalname}`;
 
-    // ===============================
-    // UPLOAD VIDEO TO S3
-    // ===============================
-    const uploadParams = {
-      Bucket: bucketName,
-      Key: fileName,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-    };
+    const createUploadResp = await s3.send(
+      new CreateMultipartUploadCommand({
+        Bucket: bucketName,
+        Key: key,
+        ContentType: file.mimetype,
+      })
+    );
 
-    await s3.send(new PutObjectCommand(uploadParams));
+    const uploadId = createUploadResp.UploadId;
+    const chunkSize = 5 * 1024 * 1024;
+    const parts = [];
 
-    // S3 file URL
-    const s3Url = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    for (let start = 0, partNumber = 1; start < file.size; start += chunkSize, partNumber++) {
+      const end = Math.min(start + chunkSize, file.size);
+      const chunk = file.buffer.slice(start, end);
 
-    // ===============================
-    // VIDEO INTELLIGENCE (OPTIONAL)
-    // ===============================
-    // Google Video Intelligence can only process GCS URIs,
-    // so if you still want to analyze, you’d need to upload the file
-    // to a temporary Google Cloud bucket. Currently, we skip analysis.
-    /*
-    const [operation] = await videoIntelligenceClient.annotateVideo({
-      inputUri: gcsUri,
-      features: ['LABEL_DETECTION', 'SHOT_CHANGE_DETECTION', 'EXPLICIT_CONTENT_DETECTION'],
-    });
+      const uploadPartResp = await s3.send(
+        new UploadPartCommand({
+          Bucket: bucketName,
+          Key: key,
+          PartNumber: partNumber,
+          UploadId: uploadId,
+          Body: chunk,
+        })
+      );
 
-    const [result] = await operation.promise();
+      parts.push({
+        ETag: uploadPartResp.ETag,
+        PartNumber: partNumber,
+      });
+    }
 
-    const passed = evaluateVideo(result);
-    
-    return res.status(200).json({
-      status: passed ? "PASSED" : "FAILED",
-      videoId: fileName,
-      analysis: {
-        duration: `${result.annotationResults[0].segment.endTimeOffset.seconds}s`,
-        labels: extractTopLabels(result),
-        explicitContent: checkExplicitContent(result),
-        violentContent: checkForViolentContent(result),
-        shots: result.annotationResults[0].shotAnnotations.length
-      },
-      rawData: result
-    });
-    */
+    await s3.send(
+      new CompleteMultipartUploadCommand({
+        Bucket: bucketName,
+        Key: key,
+        UploadId: uploadId,
+        MultipartUpload: { Parts: parts },
+      })
+    );
 
-    // ===============================
-    // UPLOAD-ONLY RESPONSE
-    // ===============================
+    const s3Url = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+
     return res.status(200).json({
       status: "UPLOADED",
-      videoId: fileName,
+      videoId: key,
       s3Url,
-      message: "Video uploaded successfully (no analysis performed)",
+      message: "Video uploaded successfully in chunks",
     });
 
   } catch (error) {
-    console.error("Error in video processing:", error);
+    console.error("Multipart upload error:", error);
     return res.status(500).json({
       status: "ERROR",
-      message: "Failed to process video",
+      message: "Failed to upload video in chunks",
       error: error.message,
     });
   }
@@ -109,7 +104,6 @@ export const streamVideoFromS3 = async (req, res) => {
     const bucket = process.env.S3_BUCKET_NAME;
     const key = fileName.startsWith("videos/") ? fileName : `videos/${fileName}`;
 
-    // First, get the file size
     const headCommand = new HeadObjectCommand({
       Bucket: bucket,
       Key: key,
@@ -127,12 +121,10 @@ export const streamVideoFromS3 = async (req, res) => {
       });
     }
 
-    // Parse range header
-    const CHUNK_SIZE = 10 ** 6; // 1MB chunks
+    const CHUNK_SIZE = 10 ** 6;
     const start = Number(range.replace(/\D/g, ""));
     const end = Math.min(start + CHUNK_SIZE, fileSize - 1);
 
-    // Create headers
     const contentLength = end - start + 1;
     const headers = {
       "Content-Range": `bytes ${start}-${end}/${fileSize}`,
@@ -141,10 +133,8 @@ export const streamVideoFromS3 = async (req, res) => {
       "Content-Type": "video/mp4",
     };
 
-    // Set HTTP status
     res.writeHead(206, headers);
 
-    // Stream the video chunk
     const getObjectCommand = new GetObjectCommand({
       Bucket: bucket,
       Key: key,
@@ -153,7 +143,6 @@ export const streamVideoFromS3 = async (req, res) => {
 
     const response = await s3.send(getObjectCommand);
     
-    // Pipe the stream directly to response
     response.Body.pipe(res);
 
   } catch (error) {

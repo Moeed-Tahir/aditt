@@ -15,11 +15,6 @@ import Step4 from "./create-campaign/Step4";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 
-const supabaseUrl = "https://pcgpvkvbbyafxhsjszow.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjZ3B2a3ZiYnlhZnhoc2pzem93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwODQwNzAsImV4cCI6MjA2NTY2MDA3MH0.Atj4LdjM56PgRrIQiI0WRJuU5krmpTDaajpWdoDsTDQ";
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export function CreateCampaigns({ userId }) {
   const steps = [
     { label: "Campaign Info" },
