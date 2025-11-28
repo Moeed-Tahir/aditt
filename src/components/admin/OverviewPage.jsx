@@ -47,9 +47,9 @@ export function OverViewPage({ id }) {
           <CampaignVideoInfo campaignData={campaignData} />
         </div>
 
-        {campaignData?.status === "Completed" && (
+        {/* {campaignData?.status === "Completed" && (
           <CampaignFeedbackForm feedbackData={feedbackData} />
-        )}
+        )} */}
 
         <div className="bg-white p-4 sm:p-6 rounded-[24px] shadow">
           <h2 className="text-lg font-semibold mb-2">Budget & Spending</h2>

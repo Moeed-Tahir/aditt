@@ -17,7 +17,7 @@ export const signUp = async (req, res) => {
 
         const { name, businessWebsite, businessEmail, password } = req.body;
 
-        if (!name || !businessWebsite || !businessEmail || !password) {
+        if (!name || !businessEmail || !password) {
             return res.status(400).json({
                 message: "All fields are required",
                 code: "VALIDATION_ERROR"

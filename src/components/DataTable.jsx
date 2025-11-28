@@ -212,7 +212,7 @@ export function DataTable({ campaignData, fetchCampaign,campaignStats }) {
         }}
         onCancel={() => setDialogOpen(false)}
       />
-      <FeedbackDialog
+      {/* <FeedbackDialog
         open={feedbackDialogOpen}
         onClose={() => setFeedbackDialogOpen(false)}
         feedback={feedback}
@@ -228,7 +228,7 @@ export function DataTable({ campaignData, fetchCampaign,campaignStats }) {
             console.error("Failed to submit feedback:", error);
           }
         }}
-      />
+      /> */}
     </>
   );
 }

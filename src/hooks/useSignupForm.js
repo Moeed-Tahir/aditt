@@ -32,7 +32,6 @@ const useSignupForm = () => {
   const validateForm = () => {
     const newErrors = {
       name: !formData.name ? "Name is required" : "",
-      website: !formData.website ? "Website is required" : "",
       email: !formData.email ? "Email is required" : "",
       password: !formData.password
         ? "Password is required"

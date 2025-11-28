@@ -36,7 +36,6 @@ export default function TotalCampaigns() {
     fetchAllCampaign();
   }, [fetchAllCampaign]);
 
-  // Calculate verified responses (attentive engagement)
   const calculateVerifiedResponses = (campaign) => {
     // Sum of all quiz question option stats
     let totalResponses = 0;

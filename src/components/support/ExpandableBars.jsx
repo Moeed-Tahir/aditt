@@ -62,7 +62,7 @@ export default function ExpandableBars() {
         </AccordionTrigger>
         <AccordionContent className="text-gray-600 md:text-[16px] md:leading-6 text-[14px] leading-5">
           <li>
-          Absolutely. Your dashboard provides real-time analytics, including views, correct verification rates, attentive engagement percentage, call-to-action completions, and cost-per-result. This helps you optimize your ads and maximize ROI.
+          Absolutely. Your dashboard provides real-time analytics, including views, correct verification rates, verified response percentage, call-to-action completions, and cost-per-result. This helps you optimize your ads and maximize ROI.
 
           </li>
         </AccordionContent>

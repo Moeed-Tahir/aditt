@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
     },
     businessWebsite: {
         type: String,
-        required: true,
+        required: false,
     },
     profileType: {
         type: String,

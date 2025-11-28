@@ -121,13 +121,13 @@ export default function CampaignDetailPage({ campaignData, campaignId }) {
           onCancel={() => setDialogOpen(false)}
         />
 
-        <FeedbackDialog
+        {/* <FeedbackDialog
           open={feedbackDialogOpen}
           onClose={() => setFeedbackDialogOpen(false)}
           onSubmit={(feedback) => {
             console.log("Feedback submitted:", feedback);
           }}
-        />
+        /> */}
       </main>
     </>
   );
