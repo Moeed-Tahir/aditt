@@ -1177,11 +1177,11 @@ exports.totalCampaignsStat = async (req, res) => {
         );
 
         let totalSpent = 0;
-        for (const campaign of activeCampaigns) {
-            const totalEngagements = campaign.engagements?.totalCount || 0;
-            if (totalEngagements === 0) continue;
 
-            const spentForCampaign = totalEngagements * 1; 
+        for (const campaign of activeCampaigns) {
+            const verifiedResponses = campaign?.engagements?.totalCount || 0;
+
+            const spentForCampaign = verifiedResponses * 1; 
 
             totalSpent += spentForCampaign;
         }

@@ -1,4 +1,3 @@
-// hooks/useSignupForm.js
 import { useState } from "react";
 
 const useSignupForm = () => {
@@ -30,21 +29,11 @@ const useSignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const validateEmailDomain = (email, website) => {
-    if (!website) return false;
-    const domain = website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0];
-    return email.endsWith(`@${domain}`);
-  };
-
   const validateForm = () => {
     const newErrors = {
       name: !formData.name ? "Name is required" : "",
       website: !formData.website ? "Website is required" : "",
-      email: !formData.email
-        ? "Email is required"
-        : !validateEmailDomain(formData.email, formData.website)
-        ? "Email must match your business domain"
-        : "",
+      email: !formData.email ? "Email is required" : "",
       password: !formData.password
         ? "Password is required"
         : formData.password.length < 8

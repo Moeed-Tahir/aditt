@@ -499,14 +499,14 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                                 <div className="mt-2 text-xs md:text-sm text-gray-500">
                                     {discountInfo.fullWavier ? (
                                         <>
-                                            You will receive {calculateAttentiveEngagements().toLocaleString()} attentive engagements.
+                                            You will receive {calculateAttentiveEngagements().toLocaleString()} verified responses.
                                             <span className="text-green-600 ml-2">
                                                 (Full wavier applied)
                                             </span>
                                         </>
                                     ) : (
                                         <>
-                                            You will receive {calculateAttentiveEngagements().toLocaleString()} attentive engagements.
+                                            You will receive {calculateAttentiveEngagements().toLocaleString()} verified responses.
                                             {discountApplied && (
                                                 <span className="text-green-600 ml-2">
                                                     (Discount applied: {discountInfo.type === 'percentage'

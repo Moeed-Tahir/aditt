@@ -32,7 +32,7 @@ const CampaignMetricsDashboard = ({ transformedCampaigns, totalEngagementsAcross
 
         <div className="flex-1 bg-white rounded-xl p-6">
           <h2 className="text-[16px] text-gray-400 mb-2">
-            🎉 TOTAL ATTENTIVE ENGAGEMENTS
+            🎉 TOTAL VERIFIED RESPONSE
           </h2>
           <p className="font-md text-[30px]">
             {totalEngagementsAcrossAllCampaigns}

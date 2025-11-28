@@ -50,7 +50,7 @@ const CampaignsTable = ({ paginatedCampaigns, campaignData, openDialog, handleAc
                 <TableHeader>
                     <TableRow className="bg-[var(--bg-color-off-white)]">
                         <TableHead className="text-gray-500">Title</TableHead>
-                        <TableHead className="text-gray-500">Total Attentive Engagements</TableHead>
+                        <TableHead className="text-gray-500">Total Verified Responses</TableHead>
                         <TableHead className="text-gray-500">Date</TableHead>
                         <TableHead className="text-gray-500">Active Budget</TableHead>
                         <TableHead className="text-gray-500">Status</TableHead>
