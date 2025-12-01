@@ -732,28 +732,30 @@ exports.campaignStatusUpdate = async (req, res) => {
         );
 
         let paymentResult = null;
+
         if (status === 'Completed') {
-            try {
-                paymentResult = await processPaymentDeduction(id);
-                console.log('Final payment processed:', paymentResult);
-            } catch (paymentError) {
-                console.error('Failed to process final payment:', paymentError);
+            // Payment deduction is skipped
+            // try {
+            //     paymentResult = await processPaymentDeduction(id);
+            //     console.log('Final payment processed:', paymentResult);
+            // } catch (paymentError) {
+            //     console.error('Failed to process final payment:', paymentError);
 
-                await Compaign.findByIdAndUpdate(
-                    id,
-                    {
-                        status: currentCampaign.status,
-                        updatedAt: new Date()
-                    }
-                );
+            //     await Compaign.findByIdAndUpdate(
+            //         id,
+            //         {
+            //             status: currentCampaign.status,
+            //             updatedAt: new Date()
+            //         }
+            //     );
 
-                return res.status(400).json({
-                    success: false,
-                    message: 'Campaign completion failed due to payment error',
-                    error: paymentError.message,
-                    code: 'PAYMENT_PROCESSING_FAILED'
-                });
-            }
+            //     return res.status(400).json({
+            //         success: false,
+            //         message: 'Campaign completion failed due to payment error',
+            //         error: paymentError.message,
+            //         code: 'PAYMENT_PROCESSING_FAILED'
+            //     });
+            // }
         }
 
         await sendStatusEmailNotification({
@@ -782,6 +784,7 @@ exports.campaignStatusUpdate = async (req, res) => {
         });
     }
 };
+
 
 exports.activeOrRejectCampaign = async (req, res) => {
     try {

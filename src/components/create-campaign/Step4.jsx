@@ -131,7 +131,6 @@ const StripePaymentForm = ({ onSuccess, onError }) => {
 
 const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploading,
     uploadProgress, }) => {
-    console.log("formData in Step4",formData);
 
     const [isApplying, setIsApplying] = useState(false);
     const [discountApplied, setDiscountApplied] = useState(false);
@@ -181,7 +180,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
             if (prev.totalEngagementValue === engagementValue) return prev;
             return {
                 ...prev,
-                totalEngagementValue: engagementValue,
+                totalEngagementValue: 0,
                 campignBudget: engagementValue 
             };
         });

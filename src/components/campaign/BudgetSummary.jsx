@@ -1,18 +1,9 @@
 export const BudgetSummary = ({ campaignData }) => {  
-  
   const budget = campaignData?.campaignBudget || 0;
   
   const calculateTotalSpent = () => {
-    const totalEngagements = campaignData?.engagements?.totalCount || 0;
-    
-    if (totalEngagements === 0) return 0;
-    
-    const [minutes, seconds] = campaignData?.videoDuration?.split(':').map(Number) || [0, 0];
-    const videoLengthInSeconds = (minutes * 60) + seconds;
-    
-    const costPerEngagementInCents = videoLengthInSeconds + 5;
-    
-    return (totalEngagements * costPerEngagementInCents) / 100;
+    const totalEngagementValue = campaignData?.engagements?.totalEngagementValue || 0;
+    return totalEngagementValue * 1; // $1 per engagement value
   };
   
   const spent = calculateTotalSpent();
