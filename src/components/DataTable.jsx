@@ -16,7 +16,6 @@ import FeedbackDialog from "./campaign-dashboard/FeedbackDialog";
 import { toast } from "sonner";
 
 export function DataTable({ campaignData, fetchCampaign,campaignStats }) {
-  console.log("campaignStats",campaignStats);
 
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortBy, setSortBy] = useState("");

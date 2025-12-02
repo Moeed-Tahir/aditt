@@ -157,7 +157,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
 
     const calculateAttentiveEngagements = useCallback(() => {
         let budgetToUse;
-        
+
         if (discountInfo.fullWavier) {
             budgetToUse = discountInfo.value;
         } else if (discountApplied) {
@@ -181,7 +181,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
             return {
                 ...prev,
                 totalEngagementValue: 0,
-                campignBudget: engagementValue 
+                campignBudget: engagementValue
             };
         });
     }, [calculateAttentiveEngagements, setFormData]);
@@ -209,7 +209,6 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                 let discountValue = parseFloat(response.data.discountValue);
                 const discountType = normalizeDiscountType(response.data.discountType);
                 const fullWavier = response.data.fullWavier === true;
-                console.log("fullWavier",fullWavier);
 
                 if (isNaN(discountValue)) {
                     throw new Error('Invalid discount value');
@@ -219,7 +218,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
                 let campaignBudgetValue = formData.campignBudget || 0;
 
                 if (fullWavier) {
-                     discountedBudget = discountValue;
+                    discountedBudget = discountValue;
                 } else if (discountType === 'percentage') {
                     discountValue = Math.min(Math.max(0, discountValue), 100);
                     discountedBudget = originalBudget * (1 - (discountValue / 100));
@@ -292,13 +291,15 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
     };
 
     const isSubmitDisabled = () => {
+
         if (!formData.startDate) {
             return true;
         }
 
-        if (isUploading && (uploadProgress.video < 100 || uploadProgress.image < 100)) {
+        if (isUploading && uploadProgress.video < 100) {
             return true;
         }
+
 
         if (discountInfo.fullWavier) {
             return false;
@@ -323,6 +324,7 @@ const Step4 = ({ formData, handleSubmit, setFormData, handleInputChange, isUploa
 
         return false;
     };
+
 
     const showProgressSection = (uploadProgress.video > 0 || uploadProgress.image > 0);
 

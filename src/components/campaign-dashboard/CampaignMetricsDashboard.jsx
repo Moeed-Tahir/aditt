@@ -1,7 +1,6 @@
 import React from 'react'
 
 const CampaignMetricsDashboard = ({ transformedCampaigns, totalEngagementsAcrossAllCampaigns, campaignStats }) => {
-  console.log(campaignStats,"campaignStats")
   return (
     <>
       <div className="flex flex-col md:flex-row p-4 mt-4 mb-4 bg-white rounded-xl">

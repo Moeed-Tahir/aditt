@@ -5,7 +5,6 @@ dotenv.config();
 exports.generateOTP = () => crypto.randomInt(1000, 9999).toString();
 
 exports.sendOTP = async (email, otp) => {
-   console.log("This is Called");
    
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',

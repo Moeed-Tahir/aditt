@@ -592,7 +592,6 @@ const processPaymentDeduction = async (campaignId) => {
         const db = client.db();
 
         const campaign = await db.collection('campaigns').findOne({ _id: new ObjectId(campaignId) });
-        console.log("campaign", campaign);
 
         if (!campaign) {
             throw new Error('Campaign not found');
@@ -1167,7 +1166,6 @@ exports.verifyCardDetail = async (req, res) => {
 exports.totalCampaignsStat = async (req, res) => {
     try {
         const { userId } = req.body;
-
         if (!userId) {
             return res.status(400).json({ success: false, message: "userId is required" });
         }
@@ -1190,7 +1188,7 @@ exports.totalCampaignsStat = async (req, res) => {
         }
 
         const totalRemaining = totalBudget - totalSpent;
-
+        
         return res.status(200).json({
             success: true,
             totalBudget: Number(totalBudget.toFixed(2)),

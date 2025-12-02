@@ -78,6 +78,7 @@ export function CreateCampaigns({ userId }) {
     age: "",
     campignBudget: "",
   });
+  
 
   const [uploadProgress, setUploadProgress] = useState({
     video: 0,
@@ -157,7 +158,8 @@ export function CreateCampaigns({ userId }) {
         ...(type === "video" && {
           videoUrlId: videoId,
           videoUrlIntelligenceStatus: status,
-          videoDuration: duration
+          videoDuration: duration,
+          campaignVideoUrl:videoId
         }),
       }));
 
@@ -317,8 +319,6 @@ export function CreateCampaigns({ userId }) {
         totalEngagementValue: formData.totalEngagementValue,
       };
 
-      console.log("campaignData in submit", campaignData);
-
       const response = await axios.post(
         "/api/routes/v1/campaignRoutes?action=createCampaign",
         campaignData,
@@ -336,18 +336,32 @@ export function CreateCampaigns({ userId }) {
     }
   };
 
-  const calculateEstimatedReach = useCallback(() => {
+const calculateEstimatedReach = useCallback(() => {
     if (!formData.budget || !formData.videoDuration) return null;
 
     const budget = parseFloat(formData.budget);
-    const [minutes, seconds] = formData.videoDuration.split(":").map(Number);
+
+    let durationStr = "";
+
+    if (typeof formData.videoDuration === "string") {
+        durationStr = formData.videoDuration;
+    } else if (typeof formData.videoDuration === "number") {
+        const m = Math.floor(formData.videoDuration / 60);
+        const s = formData.videoDuration % 60;
+        durationStr = `${m}:${s < 10 ? "0" : ""}${s}`;
+    } else {
+        console.error("❌ Invalid videoDuration:", formData.videoDuration);
+        return null;
+    }
+
+    const [minutes, seconds] = durationStr.split(":").map(Number);
     const duration = minutes * 60 + seconds;
 
-    if (isNaN(budget)) return null;
-    if (isNaN(duration) || duration <= 0) return null;
+    if (isNaN(budget) || isNaN(duration) || duration <= 0) return null;
 
     return (budget / duration) * 1000;
-  }, [formData.budget, formData.videoDuration]);
+}, [formData.budget, formData.videoDuration]);
+
 
   useEffect(() => {
     const brandNameFromCookie = Cookies.get("brandName");
