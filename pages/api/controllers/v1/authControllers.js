@@ -1135,7 +1135,7 @@ export const activeConsumerUser = async (req, res) => {
             { returnDocument: "after", upsert: true }
         );
 
-        await activeToPipelineEmail(updatedUser.value.email);
+        await activeToPipelineEmail(updatedUser.email);
 
         return res.status(200).json({
             success: true,
