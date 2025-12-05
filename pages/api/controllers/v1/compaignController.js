@@ -210,7 +210,6 @@ async function verifyCampaignVideos() {
 
                         if (exists) {
                             await file.delete();
-                            console.log(`Deleted video ${campaign.videoUrlId} for campaign ${campaign._id}`);
                         }
                     } catch (storageError) {
                         console.error(`Error deleting video ${campaign.videoUrlId} for campaign ${campaign._id}:`, storageError);

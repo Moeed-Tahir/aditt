@@ -157,7 +157,6 @@ const sendApprovedIdentityEmail = async (email, name) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('Approved identity email sent successfully');
   } catch (error) {
     console.error('Error sending approved identity email:', error);
   }
@@ -179,7 +178,6 @@ const sendRejectedIdentityEmail = async (email, name) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('Rejected identity email sent successfully');
   } catch (error) {
     console.error('Error sending rejected identity email:', error);
   }
@@ -206,7 +204,6 @@ const activeToPipelineEmail = async (to) => {
       html,
     });
 
-    console.log(`📧 Active-to-pipeline email sent to ${to}`);
   } catch (error) {
     console.error("❌ Failed to send activeToPipelineEmail:", error.message);
   }
