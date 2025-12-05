@@ -1111,13 +1111,11 @@ export const activeConsumerUser = async (req, res) => {
         const db = client.db();
         const usersCollection = db.collection('consumerusers');
 
-        const result = await usersCollection.findOneAndUpdate(
+        const updatedUser = await usersCollection.findOneAndUpdate(
             { _id: new ObjectId(userId) },
             { $set: { status: "signUpPipeline" } },
             { returnDocument: "after" }
         );
-
-        const updatedUser = result.value;
 
         if (!updatedUser) {
             return res.status(404).json({
@@ -1126,11 +1124,22 @@ export const activeConsumerUser = async (req, res) => {
             });
         }
 
+        // const dashboardCollection = db.collection('admindashboards');
+
+        // const updatedDashboard = await dashboardCollection.findOneAndUpdate(
+        //     {},
+        //     {
+        //         $inc: { userLimit: 1 },
+        //         $set: { lastUpdated: new Date() }
+        //     },
+        //     { returnDocument: "after", upsert: true }
+        // );
+
         await activeToPipelineEmail(updatedUser.email);
 
         return res.status(200).json({
             success: true,
-            message: "User status updated to active",
+            message: "User status updated to active and user limit increased",
             data: {
                 user: {
                     id: updatedUser._id,
@@ -1149,6 +1158,8 @@ export const activeConsumerUser = async (req, res) => {
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     } finally {
-        if (client) await client.close();
+        if (client) {
+            await client.close();
+        }
     }
 };
