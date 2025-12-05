@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGO_URI || "mongodb+srv://abdullahk10204:tnTIx6WxvYZNPQ0y@aditt-dev.bmur94v.mongodb.net/";
+const MONGODB_URI = process.env.MONGO_URI;
 
 if (!MONGODB_URI) {
     throw new Error("Please define the MONGODB_URI environment variable in .env.local");
@@ -20,7 +20,7 @@ async function connectToDatabase() {
     if (!cached.promise) {
         const options = {
             bufferCommands: false,
-            serverSelectionTimeoutMS: 30000,
+            serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 45000,
         };
 
