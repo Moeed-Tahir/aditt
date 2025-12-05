@@ -1124,16 +1124,16 @@ export const activeConsumerUser = async (req, res) => {
             });
         }
 
-        const dashboardCollection = db.collection('admindashboards');
+        // const dashboardCollection = db.collection('admindashboards');
 
-        const updatedDashboard = await dashboardCollection.findOneAndUpdate(
-            {},
-            {
-                $inc: { userLimit: 1 },
-                $set: { lastUpdated: new Date() }
-            },
-            { returnDocument: "after", upsert: true }
-        );
+        // const updatedDashboard = await dashboardCollection.findOneAndUpdate(
+        //     {},
+        //     {
+        //         $inc: { userLimit: 1 },
+        //         $set: { lastUpdated: new Date() }
+        //     },
+        //     { returnDocument: "after", upsert: true }
+        // );
 
         await activeToPipelineEmail(updatedUser.email);
 
