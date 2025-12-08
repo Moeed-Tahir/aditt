@@ -6,13 +6,13 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user:  process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
-  }
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
 });
 
 const getAdminDashboardData = async (req, res) => {
@@ -71,6 +71,9 @@ const getUserLimit = async (req, res) => {
 const updateUserLimit = async (req, res) => {
     let client;
     try {
+
+        await connectToDatabase();
+
         const { newUserLimit } = req.body;
 
         if (typeof newUserLimit !== 'number' || newUserLimit < 0) {
@@ -103,7 +106,7 @@ const updateUserLimit = async (req, res) => {
             const excess = activeCount - newUserLimit;
             const activeUsers = await db.collection('consumerusers')
                 .find({ status: 'active' })
-                .sort({ createdAt: -1 }) 
+                .sort({ createdAt: -1 })
                 .limit(excess)
                 .toArray();
 

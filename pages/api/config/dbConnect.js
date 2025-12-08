@@ -15,23 +15,37 @@ if (!cached) {
 }
 
 async function connectToDatabase() {
-    if (cached.conn) return cached.conn;
+    if (cached.conn) {
+        console.log("MongoDB already connected");
+        return cached.conn;
+    }
 
     if (!cached.promise) {
+        console.log("Connecting to MongoDB...");
+
         const options = {
             bufferCommands: false,
-            serverSelectionTimeoutMS: 5000,
+            serverSelectionTimeoutMS: 30000, // 30 sec
             socketTimeoutMS: 45000,
         };
 
-        cached.promise = mongoose.connect(MONGODB_URI, options).then((mongoose) => mongoose);
+        cached.promise = mongoose.connect(MONGODB_URI, options)
+            .then((mongoose) => {
+                console.log("MongoDB connected successfully");
+                return mongoose;
+            })
+            .catch((err) => {
+                console.error("❌ MongoDB connection error:");
+                console.error(err.message);
+                throw err;
+            });
     }
 
     cached.conn = await cached.promise;
     return cached.conn;
 }
 
-// Function to get the consumerusers collection
+
 async function getConsumerUsersCollection() {
     const db = await connectToDatabase();
     return db.connection.db.collection('consumerusers');
