@@ -48,8 +48,8 @@ const AdminDashboardSchema = new mongoose.Schema({
         default: Date.now
     },
     userLimit: {
-        type: Number,
-        default: 1000
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 

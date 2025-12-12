@@ -161,67 +161,65 @@ export const streamVideoFromS3 = async (req, res) => {
   }
 };
 
-// ========== Helper Functions (same as before) ==========
+// function evaluateVideo(analysisResult) {
+//   const { safe: isExplicitContentSafe } = checkExplicitContent(analysisResult);
+//   if (!isExplicitContentSafe) return false;
 
-function evaluateVideo(analysisResult) {
-  const { safe: isExplicitContentSafe } = checkExplicitContent(analysisResult);
-  if (!isExplicitContentSafe) return false;
+//   const { hasViolentContent } = checkForViolentContent(analysisResult);
+//   if (hasViolentContent) return false;
 
-  const { hasViolentContent } = checkForViolentContent(analysisResult);
-  if (hasViolentContent) return false;
+//   return true;
+// }
 
-  return true;
-}
+// function checkForViolentContent(analysisResult) {
+//   const violentKeywords = [
+//     'blood', 'gore', 'violence', 'wound', 'injury', 'bleeding',
+//     'bloody', 'bloodshed', 'hemorrhage', 'gun', 'weapon', 'fight',
+//     'stab', 'shoot', 'murder', 'death', 'corpse'
+//   ];
 
-function checkForViolentContent(analysisResult) {
-  const violentKeywords = [
-    'blood', 'gore', 'violence', 'wound', 'injury', 'bleeding',
-    'bloody', 'bloodshed', 'hemorrhage', 'gun', 'weapon', 'fight',
-    'stab', 'shoot', 'murder', 'death', 'corpse'
-  ];
+//   const violentLabels = analysisResult.annotationResults[0]?.segmentLabelAnnotations?.filter(
+//     label => {
+//       const description = label.entity.description.toLowerCase();
+//       return violentKeywords.some(keyword => description.includes(keyword)) &&
+//              label.segments[0].confidence > 0.5;
+//     }
+//   ) || [];
 
-  const violentLabels = analysisResult.annotationResults[0]?.segmentLabelAnnotations?.filter(
-    label => {
-      const description = label.entity.description.toLowerCase();
-      return violentKeywords.some(keyword => description.includes(keyword)) &&
-             label.segments[0].confidence > 0.5;
-    }
-  ) || [];
+//   return {
+//     hasViolentContent: violentLabels.length > 0,
+//     detectedLabels: violentLabels.map(label => ({
+//       label: label.entity.description,
+//       confidence: label.segments[0].confidence
+//     })),
+//   };
+// }
 
-  return {
-    hasViolentContent: violentLabels.length > 0,
-    detectedLabels: violentLabels.map(label => ({
-      label: label.entity.description,
-      confidence: label.segments[0].confidence
-    })),
-  };
-}
+// function checkExplicitContent(analysisResult) {
+//   if (!analysisResult.annotationResults[0]?.explicitAnnotation?.frames) {
+//     return { safe: true, worstCase: 'UNKNOWN' };
+//   }
 
-function checkExplicitContent(analysisResult) {
-  if (!analysisResult.annotationResults[0]?.explicitAnnotation?.frames) {
-    return { safe: true, worstCase: 'UNKNOWN' };
-  }
+//   const frames = analysisResult.annotationResults[0].explicitAnnotation.frames;
+//   const worstCase = frames.reduce((worst, frame) => {
+//     const levels = ['VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE', 'LIKELY', 'VERY_LIKELY'];
+//     return levels.indexOf(frame.pornographyLikelihood) > levels.indexOf(worst)
+//       ? frame.pornographyLikelihood
+//       : worst;
+//   }, 'VERY_UNLIKELY');
 
-  const frames = analysisResult.annotationResults[0].explicitAnnotation.frames;
-  const worstCase = frames.reduce((worst, frame) => {
-    const levels = ['VERY_UNLIKELY', 'UNLIKELY', 'POSSIBLE', 'LIKELY', 'VERY_LIKELY'];
-    return levels.indexOf(frame.pornographyLikelihood) > levels.indexOf(worst)
-      ? frame.pornographyLikelihood
-      : worst;
-  }, 'VERY_UNLIKELY');
+//   return {
+//     safe: worstCase === 'VERY_UNLIKELY' || worstCase === 'UNLIKELY',
+//     worstCase,
+//   };
+// }
 
-  return {
-    safe: worstCase === 'VERY_UNLIKELY' || worstCase === 'UNLIKELY',
-    worstCase,
-  };
-}
-
-function extractTopLabels(analysisResult, count = 5) {
-  return analysisResult.annotationResults[0].segmentLabelAnnotations
-    ?.sort((a, b) => b.segments[0].confidence - a.segments[0].confidence)
-    ?.slice(0, count)
-    ?.map(label => ({
-      label: label.entity.description,
-      confidence: label.segments[0].confidence,
-    })) || [];
-}
+// function extractTopLabels(analysisResult, count = 5) {
+//   return analysisResult.annotationResults[0].segmentLabelAnnotations
+//     ?.sort((a, b) => b.segments[0].confidence - a.segments[0].confidence)
+//     ?.slice(0, count)
+//     ?.map(label => ({
+//       label: label.entity.description,
+//       confidence: label.segments[0].confidence,
+//     })) || [];
+// }

@@ -69,15 +69,15 @@ const getUserLimit = async (req, res) => {
 };
 
 const updateUserLimit = async (req, res) => {
-    let client;
     try {
-
         await connectToDatabase();
 
-        const { newUserLimit } = req.body;
+        const { userLimit } = req.body;
 
-        if (typeof newUserLimit !== 'number' || newUserLimit < 0) {
-            return res.status(400).json({ message: 'Invalid user limit value' });
+        if (typeof userLimit !== 'boolean') {
+            return res.status(400).json({ 
+                message: 'Invalid user limit value. Must be true or false' 
+            });
         }
 
         const currentDashboard = await AdminDashboard.findOne({});
@@ -85,47 +85,15 @@ const updateUserLimit = async (req, res) => {
             return res.status(404).json({ message: 'Dashboard not found' });
         }
 
-        if (newUserLimit < currentDashboard.userLimit) {
-            return res.status(400).json({
-                message: `User limit can only be increased. Current limit is ${currentDashboard.userLimit}`
-            });
-        }
-
         const dashboard = await AdminDashboard.findOneAndUpdate(
             {},
-            { $set: { userLimit: newUserLimit } },
+            { $set: { userLimit: userLimit } },
             { new: true }
         );
 
-        client = await MongoClient.connect(process.env.MONGO_URI);
-        const db = client.db();
-
-        const activeCount = await db.collection('consumerusers').countDocuments({ status: 'active' });
-
-        if (activeCount > newUserLimit) {
-            const excess = activeCount - newUserLimit;
-            const activeUsers = await db.collection('consumerusers')
-                .find({ status: 'active' })
-                .sort({ createdAt: -1 })
-                .limit(excess)
-                .toArray();
-
-            await db.collection('consumerusers').updateMany(
-                { _id: { $in: activeUsers.map(u => u._id) } },
-                { $set: { status: 'waitlist' } }
-            );
-        }
-
-        const [finalActive, finalWaitlist] = await Promise.all([
-            db.collection('consumerusers').countDocuments({ status: 'active' }),
-            db.collection('consumerusers').countDocuments({ status: 'waitlist' })
-        ]);
-
         res.status(200).json({
-            message: 'User limit updated successfully',
-            userLimit: newUserLimit,
-            activeUsers: finalActive,
-            waitlistUsers: finalWaitlist
+            message: `User limit ${userLimit ? 'enabled' : 'disabled'} successfully`,
+            userLimit: userLimit
         });
 
     } catch (error) {
@@ -134,8 +102,6 @@ const updateUserLimit = async (req, res) => {
             message: 'Server error',
             error: error.message
         });
-    } finally {
-        if (client) await client.close();
     }
 };
 

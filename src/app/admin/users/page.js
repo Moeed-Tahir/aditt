@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import axios from "axios";
 import { toast } from "sonner";
@@ -16,9 +17,9 @@ import Image from "next/image";
 
 export default function UsersPage() {
   const [activeTab, setActiveTab] = useState("signupPipeline");
-  const [userLimit, setUserLimit] = useState(0);
-  const [editedLimit, setEditedLimit] = useState(0);
+  const [userLimitEnabled, setUserLimitEnabled] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
+  const [tempLimitEnabled, setTempLimitEnabled] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -26,8 +27,8 @@ export default function UsersPage() {
     try {
       setLoading(true);
       const limitResponse = await axios.post("/api/routes/v1/adminDashboardRoutes?action=getUserLimit");
-      setUserLimit(limitResponse.data.userLimit || 0);
-      setEditedLimit(limitResponse.data.userLimit || 0);
+      setUserLimitEnabled(limitResponse.data.userLimit || false);
+      setTempLimitEnabled(limitResponse.data.userLimit || false);
 
       const usersResponse = await axios.post("/api/routes/v1/authRoutes?action=listAllConsumerUsers");
       setUsers(usersResponse.data.data || []);
@@ -53,62 +54,17 @@ export default function UsersPage() {
     }
   };
 
-  const updateUserLimit = async (newLimit) => {
+  const updateUserLimit = async (enabled) => {
     try {
       const limitResponse = await axios.post(
         "/api/routes/v1/adminDashboardRoutes?action=updateUserLimit",
-        { newUserLimit: newLimit }
+        { userLimit: enabled }
       );
 
-      const updatedLimit = limitResponse.data.userLimit;
-      setUserLimit(updatedLimit);
-      setEditedLimit(updatedLimit);
-
-      const waitlistUsersWithVerification = users.filter(user =>
-        user.status === "waitlist" &&
-        user.identityVerificationStatus !== false
-      );
-
-      if (waitlistUsersWithVerification.length > 0) {
-        const updatePromises = waitlistUsersWithVerification.map(user =>
-          updateUserStatus(user._id, "pending")
-        );
-        await Promise.all(updatePromises);
-      }
-
-      const sortedUsers = [...users].sort((a, b) => {
-        if (a.status === b.status) {
-          return new Date(a.createdAt) - new Date(b.createdAt);
-        }
-        return a.status === "active" ? -1 : 1;
-      });
-
-      const usersToUpdate = [];
-      let activeCount = 0;
-
-      for (const user of sortedUsers) {
-        if (activeCount < updatedLimit) {
-          if (user.status !== "active") {
-            usersToUpdate.push({ ...user, newStatus: "active" });
-          }
-          activeCount++;
-        } else {
-          if (user.status !== "waitlist") {
-            usersToUpdate.push({ ...user, newStatus: "waitlist" });
-          }
-        }
-      }
-
-      if (usersToUpdate.length > 0) {
-        const updatePromises = usersToUpdate.map(user =>
-          updateUserStatus(user._id, user.newStatus)
-        );
-
-        await Promise.all(updatePromises);
-        await fetchData();
-      }
-
-      toast.success("User limit updated successfully");
+      setUserLimitEnabled(enabled);
+      await fetchData(); // Refresh data
+      
+      toast.success(`User limit ${enabled ? 'enabled' : 'disabled'} successfully`);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to update limit");
       console.error('Error updating limit:', error);
@@ -120,7 +76,7 @@ export default function UsersPage() {
   }, [fetchData]);
 
   const handleSaveLimit = () => {
-    updateUserLimit(editedLimit);
+    updateUserLimit(tempLimitEnabled);
     setShowLimitModal(false);
   };
 
@@ -392,49 +348,72 @@ export default function UsersPage() {
       </div>
 
       {activeTab === "active" && (
-        <div className="bg-white shadow-sm rounded-xl px-6 py-4 w-full flex justify-between items-start flex-wrap gap-4">
+        <div className="bg-white shadow-sm rounded-xl px-6 py-4 w-full flex justify-between items-center flex-wrap gap-4">
           <div>
-            <p className="text-[22px] font-semibold text-gray-800">
-              Active Users Limit: {userLimit} ({activeCount} active)
-            </p>
             <p className="text-sm text-gray-500">
-              Total users: {users.length}
+              User limit is <span className={`font-semibold ${userLimitEnabled ? 'text-green-600' : 'text-gray-600'}`}>
+                {userLimitEnabled ? 'enabled' : 'disabled'}
+              </span>
             </p>
           </div>
-          <button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              setEditedLimit(userLimit);
-              setShowLimitModal(true);
-            }}
-            className="py-2 px-5 rounded-full bg-blue-600 text-white border border-blue-800 hover:bg-blue-800 transition flex items-center gap-2 justify-center"
-          >
-            Edit Active Limit
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setTempLimitEnabled(userLimitEnabled);
+                setShowLimitModal(true);
+              }}
+              className="py-2 px-5 rounded-full bg-blue-600 text-white border border-blue-800 hover:bg-blue-800 transition flex items-center gap-2 justify-center"
+            >
+              Configure Limit
+            </button>
+          </div>
         </div>
       )}
 
       <Dialog open={showLimitModal} onOpenChange={setShowLimitModal}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>
-              Edit Active Users Limit
-            </DialogTitle>
+            <DialogTitle>Configure User Limit</DialogTitle>
+            <DialogDescription>
+              Enable or disable the user limit for active users
+            </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col gap-4">
-            <label className="text-sm font-medium">New Limit</label>
-            <input
-              type="number"
-              value={editedLimit}
-              onChange={(e) => setEditedLimit(Number(e.target.value))}
-              className="w-full border border-input rounded-full px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              min={0}
-            />
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="font-medium">User Limit Status</p>
+                  <p className="text-sm text-gray-500">
+                    {tempLimitEnabled 
+                      ? "Active users will be limited" 
+                      : "No limit on active users"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setTempLimitEnabled(!tempLimitEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${tempLimitEnabled ? 'bg-blue-600' : 'bg-gray-300'}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${tempLimitEnabled ? 'translate-x-6' : 'translate-x-1'}`}
+                  />
+                </button>
+              </div>
+              
+              <div className={`p-3 rounded-lg ${tempLimitEnabled ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50 border border-gray-200'}`}>
+                <p className="text-sm font-medium">
+                  {tempLimitEnabled ? '✓ Limit Enabled' : '✗ Limit Disabled'}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {tempLimitEnabled 
+                    ? "When enabled, only a fixed number of users can be active at once. Others will be moved to waitlist."
+                    : "When disabled, all verified users can be active simultaneously."}
+                </p>
+              </div>
+            </div>
+            
             <div className="flex justify-between gap-2 w-full">
               <button
-                variant="outline"
-                className="py-2 px-5 rounded-full bg-white text-gray-700 border hover:bg-blue-600 hover:text-white transition flex items-center gap-2 w-1/2 justify-center"
+                className="py-2 px-5 rounded-full bg-white text-gray-700 border hover:bg-gray-100 transition flex items-center gap-2 w-1/2 justify-center"
                 onClick={() => setShowLimitModal(false)}
               >
                 Cancel
@@ -443,7 +422,7 @@ export default function UsersPage() {
                 onClick={handleSaveLimit}
                 className="py-2 px-5 rounded-full bg-blue-600 text-white border border-blue-800 hover:bg-blue-800 transition flex items-center gap-2 w-1/2 justify-center"
               >
-                Save
+                Save Changes
               </button>
             </div>
           </div>
