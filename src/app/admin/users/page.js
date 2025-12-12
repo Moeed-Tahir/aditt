@@ -62,9 +62,9 @@ export default function UsersPage() {
       );
 
       setUserLimitEnabled(enabled);
-      await fetchData(); // Refresh data
-      
-      toast.success(`User limit ${enabled ? 'enabled' : 'disabled'} successfully`);
+      await fetchData();
+
+      toast.success(`Waitlist is ${enabled ? 'enabled' : 'disabled'} successfully`);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to update limit");
       console.error('Error updating limit:', error);
@@ -225,7 +225,7 @@ export default function UsersPage() {
         } else if (user.identityVerificationStatus === "rejected") {
           statusClass = "bg-red-100 text-red-800";
           displayStatus = "rejected";
-        }else if (user.identityVerificationStatus === "unKnown") {
+        } else if (user.identityVerificationStatus === "unKnown") {
           statusClass = "bg-red-100 text-red-800";
           displayStatus = "unKnown";
         } else {
@@ -351,7 +351,7 @@ export default function UsersPage() {
         <div className="bg-white shadow-sm rounded-xl px-6 py-4 w-full flex justify-between items-center flex-wrap gap-4">
           <div>
             <p className="text-sm text-gray-500">
-              User limit is <span className={`font-semibold ${userLimitEnabled ? 'text-green-600' : 'text-gray-600'}`}>
+              Waitlist is <span className={`font-semibold ${userLimitEnabled ? 'text-green-600' : 'text-gray-600'}`}>
                 {userLimitEnabled ? 'enabled' : 'disabled'}
               </span>
             </p>
@@ -373,19 +373,19 @@ export default function UsersPage() {
       <Dialog open={showLimitModal} onOpenChange={setShowLimitModal}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Configure User Limit</DialogTitle>
+            <DialogTitle>Configure Waitlist </DialogTitle>
             <DialogDescription>
-              Enable or disable the user limit for active users
+              Enable or disable the waitlist for users
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <p className="font-medium">User Limit Status</p>
+                  <p className="font-medium">Waitlist Status</p>
                   <p className="text-sm text-gray-500">
-                    {tempLimitEnabled 
-                      ? "Active users will be limited" 
+                    {tempLimitEnabled
+                      ? "Active users will be limited"
                       : "No limit on active users"}
                   </p>
                 </div>
@@ -398,19 +398,19 @@ export default function UsersPage() {
                   />
                 </button>
               </div>
-              
+
               <div className={`p-3 rounded-lg ${tempLimitEnabled ? 'bg-blue-50 border border-blue-200' : 'bg-gray-50 border border-gray-200'}`}>
                 <p className="text-sm font-medium">
                   {tempLimitEnabled ? '✓ Limit Enabled' : '✗ Limit Disabled'}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">
-                  {tempLimitEnabled 
-                    ? "When enabled, only a fixed number of users can be active at once. Others will be moved to waitlist."
-                    : "When disabled, all verified users can be active simultaneously."}
+                  {tempLimitEnabled
+                    ? "When enabled, all users will be moved to waitlist users"
+                    : "When disabled, all users will be moved to active users"}
                 </p>
               </div>
             </div>
-            
+
             <div className="flex justify-between gap-2 w-full">
               <button
                 className="py-2 px-5 rounded-full bg-white text-gray-700 border hover:bg-gray-100 transition flex items-center gap-2 w-1/2 justify-center"
